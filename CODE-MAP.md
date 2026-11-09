@@ -4,7 +4,7 @@ This is the master file (Code Labeling System, Rule 1). One entry per file or fo
 If it is not on this map, it does not belong. Updated in the same change as the code — never later (Rule 3).
 Every change is also recorded in CHANGELOG.md.
 
-**Map version:** 12 — November 8, 2026 (launch night: repo live on GitHub + GitHub Pages serving the site; all internal links in the built pages are now relative so the same files work at a root domain and under the /fractional-deal-desk-site/ subpath.)
+**Map version:** 13 — November 8, 2026 (launch night close: BOTH hosts live — GitHub Pages at thecozymerc.github.io/fractional-deal-desk-site/ and Cloudflare Pages at fractional-deal-desk-site.pages.dev, the same 42-file publish tree on both. Cloudflare deploys run through the API token connector (custom.cloudflare), never the browser — Cloudflare's bot check rejects the cloud browser. All internal links stay relative so one tree serves both hosts.)
 
 **File naming convention (Lucky's instruction, Nov 7):** every page's code file is named with its page ID + the descriptive title from the sitemap table — e.g. `P01-homepage.html`. The ID in the filename, the page's `<title>`, and the label comment at the top of the file always agree. At publish, a copy of each page file is placed as `index.html` in its own folder so the sitemap address resolves (e.g. `/tools/deal-check/`); the ID-named file stays the source of truth, and the publish step is recorded in the CHANGELOG like any other change.
 
