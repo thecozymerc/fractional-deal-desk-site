@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     LABEL — P01 — Homepage (the story page; address: /)
+     What this file is: the homepage of the site. It holds the homepage
+     versions of Sections 1–6 in Draft 1.11 order, the proof strip, and the
+     booking route. Copy: Draft 1.10 verbatim (Part II of Draft 1.11, the
+     copy of record), tight homepage cut. Design: D01 — Site Design Sheet.
+     Sitemap: 00-master/SITEMAP-TABLE.md, row P01.
+     Uses: assets/styles.css (shared D01 system) + assets/spreadsheet-tool.js
+     + assets/formula-engine.js (evaluates the workbook's OWN formulas)
+     with the Deal Pricing Solver's REVISED data file from
+     tools/deal-pricing-solver/ — the hero holds the ACTUAL workbook, both
+     sheets, usable, formulas never shown (Lucky's rule), with the revised
+     descriptions (Nov 8, 2026; the original-wording data file is kept
+     alongside).
+     Rule: any change to this file is recorded in CHANGELOG.md, and the
+     CODE-MAP entry is updated in the same change (Code Labeling, Rule 3).
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P01 — Homepage · Fractional Deal Desk &amp; Contract Management</title>
+<meta name="description" content="Fractional deal desk and contract management for founders and revenue leaders at B2B software companies. Complex enterprise deals, done right the first time.">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="wordmark" href="/">Fractional Deal Desk &amp; Contract Management</a>
+    <nav class="main-nav">
+      <a href="/tools/deal-pricing-solver/">Deal Pricing Calculator</a>
+          <a href="/tools/perpetual-to-saas-conversion/">Conversion Calculator</a>
+      <a class="btn btn-primary" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book the diagnostic</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO — Section 1 material -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Fractional Deal Desk &amp; Contract Management</p>
+        <h1>Complex enterprise deals, done right the first time.</h1>
+        <p class="lede">If your deals are getting stuck, I find out why, fix the process, and build the guardrails that keep the next deal from getting stuck the same way.</p>
+        <p>I build audit-proof pricing engines, governance workflows, and contract guardrails for founders and revenue leaders at B2B software companies whose deals have gotten big enough to hurt.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book the diagnostic</a>
+          <a class="btn btn-quiet" href="#proof">Try a tool — no email</a>
+        </div>
+        <p class="cta-note">Contract &amp; Revenue Diagnostic — $6,500 fixed fee. Contracts-only audit — $5,000.</p>
+      </div>
+      <div class="tool-frame">
+        <p class="eyebrow">Working proof — the actual workbook, live</p>
+        <div id="wb-home"></div>
+        <p class="small">This is the actual Deal Pricing Solver workbook on the page — both sheets, its own numbers, its own calculations. The descriptions are the revised wording (clearer to read on a screen); nothing about the math changed. Type in the yellow cells and the green results move. The formulas stay under the hood. <a href="/tools/deal-pricing-solver/">Open the full tool page</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROOF STRIP -->
+  <section class="proof-strip" style="padding-top: var(--s-48); padding-bottom: var(--s-48);">
+    <div class="wrap">
+      <p class="eyebrow">Working proof, not testimonials</p>
+      <div class="proof-grid">
+        <div class="fact"><strong>12</strong><span>working tools on this site — run them, don’t take my word for it</span></div>
+        <div class="fact"><strong>15</strong><span>contract forms, annotated with what I check and redline</span></div>
+        <div class="fact"><strong>Every price</strong><span>published on the services page — no “call for pricing”</span></div>
+        <div class="fact"><strong>No email gate</strong><span>the tools run before anyone asks for your address</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 · SECTION 2 -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">01 — The Mess I Fix</p>
+      <h2>The deal is not stuck for the reason people say it is.</h2>
+      <div class="reading">
+        <p>When a complex deal reaches the finish line and stalls, everyone usually has an explanation. Underneath, the basics are undone.</p>
+        <p>Paperwork is missing. Information is incomplete. Accounts are unverified. Sometimes the missing piece is the approval itself. Sometimes the check finds the opposite problem: a deal was approved that was not supposed to be.</p>
+        <p>The runbook exists, but it is too wordy to use in the moment. The process exists, but nobody is following the same version of it. Responsibilities are unclear, so the deal bounces between Deal Desk, Finance, Legal, and Fulfillment until it rots instead of booking.</p>
+        <p>If nobody holds the line, the deal drops into an endless loop. It gets pushed back, passed around, and slowly dies. That is deal paralysis.</p>
+        <p>Clean intake is not bureaucracy. It is how the deal gets done right the first time.</p>
+        <p><strong>That is the mess I fix.</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 · HOW I WORK -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">02 — How I Work</p>
+      <h2>The big work is reading the process.</h2>
+      <div class="reading">
+        <p>I do not start by blaming the team that touched the deal last. I read the whole process and find where it actually broke.</p>
+        <ol class="steps">
+          <li>I ask what we are doing and why. The why drives the action.</li>
+          <li>I check what the client has now, what the current deal is, whether this is new or a renewal, and whether they are eligible.</li>
+          <li>I look for the signal: what do the stakeholders actually want?</li>
+          <li>I check whether the stakeholders did their part. The tell is usually simple stuff: missing docs, missing info.</li>
+          <li>I find what is blocking the deal. Is something missing, or is a policy in the way?</li>
+          <li>I run the client’s own checklist in full. If they do not have one, that is the first finding.</li>
+        </ol>
+        <p>If the blocker is policy, the question is practical: can we bend it, or do we need to break it and recreate it in a form that works?</p>
+        <p>Then I build the fix into the operation — ownership, decision rights, escalation, and consequences — so the same problem does not need a hero the next time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 · SECTION 3 -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">03 — Why Me</p>
+      <h2>Why Me Instead of a Big Firm?</h2>
+      <div class="reading">
+        <p>You get the operator who actually held the line inside Google, Meta, and Apple — and sat on the customer’s side of the table in buy-side commercial and defense procurement at Raytheon — not a junior consultant with a slide deck.</p>
+        <p>When you hire a Big Four firm or a massive consultancy, you pay for heavy corporate overhead, junior analysts learning on your dime, and generic PowerPoint playbooks.</p>
+        <p>I do the work directly. I design and build the pricing guardrails, playbooks, approval rules, contract workflows, and tools your team will use after I leave.</p>
+        <p>No bloated theory. No army of billable bodies. The person you hire is the person who diagnoses the problem and builds the fix.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 · SECTION 4 -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">04 — The Lines I Hold</p>
+      <h2>These rules are stated up front so the wrong clients can screen themselves out before we get on a call.</h2>
+      <div class="reading">
+        <div class="value-block">
+          <h3>Clarity over hearsay</h3>
+          <p>Nothing gets approved without clean formulas, contract terms, or policy behind it. If a deal structure cannot be backed by the math and the written record, I will not sign off on it.</p>
+        </div>
+        <div class="value-block">
+          <h3>Audit-proofing over false speed</h3>
+          <p>Speed that breaks compliance or hides margin loss is not speed. It is a time bomb. Real velocity comes from clean intake and guardrails that work while the deal is moving.</p>
+        </div>
+        <div class="value-block">
+          <h3>Systems over heroics</h3>
+          <p>Fix the broken process once instead of firefighting it every month. I do not become an administrative concierge for incomplete submissions. I build the calculators, playbooks, and accountability structures so the fix stays fixed.</p>
+        </div>
+        <p>If you want a yes-man to rubber-stamp bad numbers or hide a discount, I am not your operator. If you want the operation diagnosed honestly and built right the first time, we will work well together.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 · SECTION 5 -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">05 — What You Can Hire Me For</p>
+      <h2>Before you automate the quote-to-cash process, make it worth automating.</h2>
+      <div class="reading">
+        <p>Most companies try to fix deal friction by buying or configuring software. Software cannot fix unclear business rules, bad intake, or a process nobody owns.</p>
+        <div class="phase-block">
+          <h3>Phase 1 — Diagnose the operation</h3>
+          <p class="price-line">Contract &amp; Revenue Diagnostic — $6,500 fixed fee, 2–4 weeks.</p>
+          <p>A deep look at the deal desk, pricing guardrails, approval bottlenecks, quote-to-contract workflow, active contract risks, and the cost of leaving the current system in place. You get a maturity score, workflow maps, a risk matrix, an executive readout, and a prioritized 90-day roadmap.</p>
+          <p class="price-line">Contracts-only option — $5,000 fixed fee.</p>
+          <p>A focused audit of active customer and vendor agreements for hidden liabilities, dangerous renewals, unfavorable terms, and margin leaks.</p>
+        </div>
+        <div class="phase-block">
+          <h3>Phase 2 — Build the fix</h3>
+          <p class="price-line">Execution &amp; Implementation Builds — $4,500 to $25,000, typically 3–8 weeks.</p>
+          <p>I build the commercial playbooks, discount rules, approval workflows, contract processes, data structures, and tools identified in the diagnostic. If you already know what is broken, Phase 2 can also be scoped directly.</p>
+        </div>
+        <div class="phase-block">
+          <h3>Phase 3 — Stay in the operation</h3>
+          <p class="price-line">Fractional Execution &amp; Advisory — $4,000, $7,500, or $12,500 per month.</p>
+          <p>Ongoing deal governance, live redlining, exception handling, negotiation support, reporting, and cross-functional alignment. Retainers begin with a 90-day commitment, then continue month to month on 30 days’ notice.</p>
+        </div>
+        <div class="phase-block">
+          <h3>The hero offer: Embedded Commercial Redliner &amp; Deal Desk</h3>
+          <p class="price-line">$7,500 per month.</p>
+          <p>Direct help on live buyer paper, with a 24-hour target turnaround on complex redlines. This is for companies hitting procurement walls and needing someone who understands both the seller’s margin problem and the buyer’s procurement playbook.</p>
+          <ul>
+            <li>Live redlining of customer contracts to protect margin, payment terms, and liability.</li>
+            <li>Negotiation support when procurement pushes for long payment terms, cash refunds, open-ended liability, custom data terms, or hard price caps.</li>
+            <li>Downtime remedies handled in the right order: continuity credits first, capped credits against future invoices second, with payouts tied to chronic failure rather than one bad day.</li>
+            <li>Concessions traded for something real — upfront payment, a longer term, or another commitment that matters.</li>
+            <li>Pre-negotiation coaching for account executives, plus help structuring non-standard deals that do not fit the drop-down menu.</li>
+          </ul>
+        </div>
+        <p class="small">Fixed-fee projects are typically billed 50% up front and 50% on delivery. Retainers are billed on the first of the month. Introductory discounts and Phase 1 continuity credits can roll into the next Phase 2 build or Phase 3 retainer when agreed up front in writing. One credit applies per engagement, credits do not stack, and they reduce future invoices rather than being paid back as cash refunds.</p>
+        <p></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 · SECTION 6 PREVIEW -->
+  <section id="proof">
+    <div class="wrap">
+      <p class="eyebrow">06 — The Proof</p>
+      <h2>Proof should not be a stack of PDFs. It should show the work.</h2>
+      <div class="reading">
+        <p>These are working samples. The names and data are samples where they need to be, but the mechanics are real: change an input, and the tool answers.</p>
+      </div>
+      <div class="card-grid">
+        <div class="tool-card">
+          <h3>Deal Pricing Solver</h3>
+          <p>Most discount fights are one triangle argued for days: list price, discount, and partner margin. Give the solver any two and it solves the third.</p>
+          <p class="meta">Put in: any two of the three · Get out: the third, solved · 2 min · no email</p>
+          <p><a href="/tools/deal-pricing-solver/">Run the solver</a></p>
+        </div>
+        <div class="tool-card">
+          <h3>Contract Spend Variance &amp; Renewal Tracker</h3>
+          <p>Unmanaged contracts leak quietly. This tracker keeps the contract register, compares forecast with actual spend, checks invoices against purchase orders, and flags the lines that need review — including renewal dates already overdue.</p>
+          <p class="meta">Put in: your contract register · Get out: variance and renewal flags · no email</p>
+          <p><span class="soon">Opening with the full site</span></p>
+        </div>
+        <div class="tool-card">
+          <h3>Quote-to-Cash Diagnostic</h3>
+          <p>Control points across five stages are scored by maturity and risk. The result is not a vague maturity label. It is a fix order: the critical gaps first, each with an owner and a prescribed fix.</p>
+          <p class="meta">Put in: maturity and risk scores · Get out: a prioritized fix order · no email</p>
+          <p><span class="soon">Opening with the full site</span></p>
+        </div>
+      </div>
+      <div class="reading" style="margin-top: var(--s-32);">
+        <p>Fifteen adapted contract forms are shown as annotated cards, not downloads. Each card explains what I check and redline before that kind of paper moves. <a href="/tools/deal-pricing-solver/">Start with the Deal Pricing Calculator</a></p>
+        <p class="small">Adapted from Tech Contracts Academy / David Tollen, under Tech Contracts Academy Terms of Use §C.3. Not claimed as original work. Not for sale or resale. Sample only, not legal advice. A sample must not be used in a real transaction without customization and review by a qualified attorney.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT STRIP — Section 1 -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">The Operator</p>
+      <h2>Sat on both sides of the table.</h2>
+      <div class="reading">
+        <p>My background is sell-side deal governance at Google, Meta, and Apple — and buy-side procurement at Raytheon. I have sat on both sides of the table.</p>
+        <p>At the core, I am a problem solver: direct, sometimes nerdy, honest, and I genuinely solve the problem.</p>
+        <p>That is the pattern: find the real blocker, push through the right door, and leave a process behind instead of a one-time exception.</p>
+        <p></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">Start With the Diagnosis</p>
+      <h2>Do not buy more software first. Do not hire an army. Get the process read properly.</h2>
+      <div class="reading">
+        <p>Start with the diagnostic. We find the real blocker, name who owns it, and decide what gets built, fixed, or stopped.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a call</a>
+          <a class="btn btn-quiet" href="/tools/deal-pricing-solver/">Or start with a tool</a>
+        </div>
+        <p>Give me a broken, complicated deal operation. That is the work.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk &amp; Contract Management — fractional deal desk, contract management &amp; quote-to-cash builds for B2B software companies.</p>
+    <p><a href="/tools/deal-pricing-solver/">Deal Pricing Calculator</a>
+          <a href="/tools/perpetual-to-saas-conversion/">Conversion Calculator</a> · · · <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a call</a></p>
+  </div>
+</footer>
+
+<script src="tools/deal-pricing-solver/S6-P01a-deal-pricing-solver-data-revised.js"></script>
+<script src="assets/formula-engine.js"></script>
+<script src="assets/spreadsheet-tool.js"></script>
+<script>
+  window.renderWorkbook(document.getElementById("wb-home"),
+    window.DEAL_PRICING_SOLVER_DATA_REVISED);
+</script>
+</body>
+</html>
