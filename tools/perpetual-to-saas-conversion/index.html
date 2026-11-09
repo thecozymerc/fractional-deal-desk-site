@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     LABEL — S6-P01.b — Perpetual-to-SaaS Conversion Calculator (tool page;
+     address: /tools/perpetual-to-saas-conversion/)
+     What this page holds: the Conversion Calculator's write-up (from Draft
+     1.11, Part II — Draft 1.10 §6, verbatim) and the ACTUAL workbook
+     embedded below it: one sheet, its own numbers, its own formulas run by
+     the formula engine, its own line chart drawn from the same cells.
+     Formulas are never shown. Numbers: the workbook's own sample values.
+     Uses: ../../assets/styles.css + ../../assets/spreadsheet-tool.js +
+     ../../assets/formula-engine.js + this folder's data file (converted
+     from "Perpetual-to-SaaS Conversion Calculator — SAMPLE v2.xlsx" by
+     convert-workbook.py).
+     Map: site/CODE-MAP.md ("tools/perpetual-to-saas-conversion/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S6-P01.b — Perpetual-to-SaaS Conversion Calculator · Fractional Deal Desk &amp; Contract Management</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav>
+      <a href="/">Home</a>
+          <a href="/tools/perpetual-to-saas-conversion/">Conversion Calculator</a>
+      <a href="/tools/deal-pricing-solver/">Deal Pricing Calculator</a>
+      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section">
+    <p class="kicker">Proof of Work · Pricing Engines</p>
+    <h1>Perpetual-to-SaaS Conversion Calculator.</h1>
+    <p class="lede">When a customer is deciding whether to stay on a perpetual license or move to subscription pricing, this calculator compares staying put with three SaaS options, year by year. It shows both the cumulative break-even and the year when the annual run-rate crosses over, with a chart so the shape of the decision is visible.</p>
+    <p>Below is the actual workbook — its one sheet, with its chart. The names and data are samples where they need to be, but the mechanics are real: change an input, and the tool answers. The formulas stay under the hood.</p>
+
+    <div class="tool-frame">
+      <div id="wb-tool"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span class="no">Next</span>Put this to work on a real decision.</h2>
+    <p><a class="btn" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book on my calendar</a></p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
+  </div>
+</footer>
+
+<script src="S6-P01b-perpetual-to-saas-conversion-data.js"></script>
+<script src="../../assets/formula-engine.js"></script>
+<script src="../../assets/spreadsheet-tool.js"></script>
+<script>
+  window.renderWorkbook(document.getElementById("wb-tool"),
+    window.CONVERSION_CALCULATOR_DATA);
+</script>
+</body>
+</html>
