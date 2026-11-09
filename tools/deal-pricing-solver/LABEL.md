@@ -1,0 +1,9 @@
+# LABEL — tools/deal-pricing-solver
+
+**Address:** /tools/deal-pricing-solver/
+**What this folder holds:** Deal Pricing Solver — Lead Tool #1, now the DEAL PRICING CALCULATOR (Lucky's ruling, Nov 8, 2026: the designed calculator replaced the spreadsheet embed on this page).
+**Files:** `S6-P01a-deal-pricing-solver.html` — the tool page (Draft 1.10 write-up + the calculator); `S6-P01a-deal-pricing-calculator.js` — the calculator's math (pure CALC block, verified against the Pricing Engine model's worked examples) + wiring for the New Deal and Old vs New views (product lines with dropdowns/editable names/add/delete, coupons, usage lines, usage-threshold concession, solver, TCV form, expansion utility); `S6-P01a-deal-pricing-calculator.css` — calculator styles, all rules scoped under .calc, token values matching D01.
+**Retired on this page (Nov 8, 2026):** the actual-workbook embed. Its data files stay in this folder unused — `S6-P01a-deal-pricing-solver-data.js` (converted from "Deal Pricing Solver — SAMPLE.xlsx") and `S6-P01a-deal-pricing-solver-data-revised.js` (the Revised Descriptions conversion) — and the shared formula engine (assets/formula-engine.js + spreadsheet-tool.js) still powers S6-P01.b. The homepage (P01) still embeds the workbook — flagged to Lucky Nov 8, his call pending.
+**Companion workbook:** "Deal Pricing Calculator — SAMPLE.xlsx" in ~/workspace/section6-restart/tool-builds/ — the same calculator as a live-formula spreadsheet (START HERE / New Deal / Old vs New / Expansion Utility), verified by LibreOffice recalculation against the same worked examples.
+
+Rule (Code Labeling System): this label is updated in the same change as anything in this folder. Every change is recorded in the site CHANGELOG.md, and the CODE-MAP.md entry is updated in the same move.
