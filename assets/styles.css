@@ -1,0 +1,180 @@
+/* ==========================================================================
+   LABEL — Shared stylesheet for the whole site (no page ID: it serves every page)
+   What this file does: holds the D01 design system ONCE — colours, type scale,
+   spacing scale, radius family — so every page looks like one site.
+   Map: site/CODE-MAP.md ("assets/"). Design source: D01 — Site Design Sheet.
+   Rule: a change here is a change to EVERY page — record it in site/CHANGELOG.md
+   and update the CODE-MAP in the same change (Code Labeling System, Rule 3).
+   ========================================================================== */
+
+:root {
+  /* D01 colour: warm paper, navy ink, ONE accent (deep teal) */
+  --paper: #FAFAF8;
+  --paper-2: #F3F1EC;
+  --ink: #1B2A41;
+  --ink-soft: #3D4E66;
+  --grey: #6B7686;
+  --grey-light: #9AA5B1;
+  --line: #DDD8CE;
+  --accent: #0E6B5C;
+  --accent-dark: #0A5246;
+  --frame-bg: #FFFFFF;
+
+  /* D01 type scale (~1.25 ratio) */
+  --t-12: 12px; --t-14: 14px; --t-16: 16px; --t-18: 18px; --t-20: 20px;
+  --t-24: 24px; --t-30: 30px; --t-36: 36px; --t-48: 48px;
+
+  /* D01 spacing scale — the only spacing values allowed */
+  --s-4: 4px; --s-8: 8px; --s-12: 12px; --s-16: 16px; --s-24: 24px;
+  --s-32: 32px; --s-48: 48px; --s-64: 64px; --s-96: 96px; --s-128: 128px;
+
+  /* D01 radius family */
+  --r-btn: 6px; --r-frame: 12px;
+
+  --font-body: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: Georgia, "Times New Roman", serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-18);
+  line-height: 1.6;
+}
+
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--s-24); }
+.reading { max-width: 680px; }
+
+/* ————— Header ————— */
+.site-header {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.site-header .wrap {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--s-16); min-height: 64px; flex-wrap: wrap;
+}
+.wordmark { font-weight: 700; font-size: var(--t-16); color: var(--ink); text-decoration: none; letter-spacing: .01em; }
+.main-nav { display: flex; align-items: center; gap: var(--s-24); flex-wrap: wrap; }
+.main-nav a { color: var(--ink-soft); text-decoration: none; font-size: var(--t-16); }
+.main-nav a:hover { color: var(--accent); }
+
+/* ————— Buttons ————— */
+.btn {
+  display: inline-block; min-height: 48px; padding: var(--s-12) var(--s-24);
+  border-radius: var(--r-btn); font-size: var(--t-16); font-weight: 600;
+  text-decoration: none; text-align: center; border: 1px solid transparent;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-dark); }
+.btn-quiet { background: transparent; color: var(--accent); border-color: var(--accent); }
+
+/* ————— Sections ————— */
+section { padding: var(--s-64) 0; border-bottom: 1px solid var(--line); }
+section:last-of-type { border-bottom: none; }
+@media (min-width: 900px) { section { padding: var(--s-96) 0; } }
+
+.eyebrow {
+  font-size: var(--t-12); font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--accent); margin: 0 0 var(--s-16);
+}
+h1, h2 { font-family: var(--font-display); font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; margin: 0 0 var(--s-24); }
+h1 { font-size: var(--t-36); }
+@media (min-width: 900px) { h1 { font-size: var(--t-48); } }
+h2 { font-size: var(--t-30); }
+h3 { font-size: var(--t-20); line-height: 1.3; margin: var(--s-32) 0 var(--s-8); }
+p { margin: 0 0 var(--s-16); max-width: 65ch; }
+.lede { font-size: var(--t-20); color: var(--ink-soft); }
+.small { font-size: var(--t-14); color: var(--grey); }
+
+/* ————— Hero + framed tool ————— */
+.hero { padding-top: var(--s-48); }
+.hero-grid { display: grid; gap: var(--s-48); }
+@media (min-width: 900px) { .hero-grid { grid-template-columns: 1.05fr .95fr; align-items: start; } }
+.cta-row { display: flex; gap: var(--s-16); flex-wrap: wrap; margin: var(--s-32) 0 var(--s-16); }
+.cta-note { font-size: var(--t-14); color: var(--grey); }
+
+.tool-frame {
+  background: var(--frame-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-frame);
+  box-shadow: 0 12px 32px rgba(27, 42, 65, .10);
+  padding: var(--s-24);
+}
+.tool-frame h3 { margin-top: 0; }
+.tool-frame label { display: block; font-size: var(--t-14); font-weight: 600; margin: var(--s-16) 0 var(--s-4); }
+.tool-frame input {
+  width: 100%; min-height: 48px; font-size: var(--t-16);
+  padding: var(--s-8) var(--s-12); border: 1px solid var(--grey-light); border-radius: var(--r-btn);
+}
+.tool-results { margin-top: var(--s-24); border-top: 1px solid var(--line); padding-top: var(--s-16); }
+.tool-results .row { display: flex; justify-content: space-between; gap: var(--s-16); padding: var(--s-4) 0; font-size: var(--t-16); }
+.tool-results .row strong { font-variant-numeric: tabular-nums; }
+
+/* Workbook rendering (spreadsheet engine) — the actual spreadsheet on the
+   page: sheet tabs, grid hairlines, yellow INPUT cells, green result cells. */
+.wb-tabs { display: flex; gap: var(--s-8); flex-wrap: wrap; margin-bottom: var(--s-16); }
+.wb-tab {
+  min-height: 48px; padding: var(--s-8) var(--s-16); cursor: pointer;
+  border: 1px solid var(--line); border-radius: var(--r-btn);
+  background: var(--paper-2); color: var(--ink-soft);
+  font-family: var(--font-body); font-size: var(--t-14); font-weight: 600;
+}
+.wb-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+.wb-scroll { overflow-x: auto; }
+.wb-table { border-collapse: collapse; width: 100%; font-size: var(--t-14); line-height: 1.45; }
+.wb-table td { border-bottom: 1px solid var(--line); padding: var(--s-8) var(--s-12); vertical-align: top; }
+.wb-table td.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.wb-table td.wb-span { white-space: normal; }
+.wb-table td.wb-title { font-family: var(--font-display); font-size: var(--t-20); font-weight: 600; }
+.wb-table td.wb-head { font-weight: 700; padding-top: var(--s-16); }
+.wb-input {
+  background: #FFF6CC; border: 1px solid var(--grey-light); border-radius: 4px;
+  width: 112px; min-height: 40px; padding: var(--s-4) var(--s-8);
+  font-size: var(--t-14); text-align: right; font-variant-numeric: tabular-nums;
+}
+.wb-out { background: #E4F0E6; border-radius: 4px; padding: 2px var(--s-8); font-variant-numeric: tabular-nums; }
+.wb-chart { border-top: 1px solid var(--line); padding: 16px 4px 4px; }
+.wb-chart-title { font-weight: 700; margin: 0 0 8px; }
+.wb-chart-legend { color: var(--muted); font-size: 14px; margin: 8px 0 0; }
+
+/* ————— Proof strip ————— */
+.proof-strip { background: var(--paper-2); }
+.proof-grid { display: grid; gap: var(--s-24); }
+@media (min-width: 900px) { .proof-grid { grid-template-columns: repeat(4, 1fr); } }
+.proof-grid .fact strong { display: block; font-family: var(--font-display); font-size: var(--t-30); }
+.proof-grid .fact span { font-size: var(--t-14); color: var(--ink-soft); }
+
+/* ————— Steps, values, phases ————— */
+.steps { counter-reset: step; list-style: none; padding: 0; margin: var(--s-24) 0; }
+.steps li { padding: var(--s-12) 0 var(--s-12) var(--s-48); position: relative; border-bottom: 1px solid var(--line); }
+.steps li:last-child { border-bottom: none; }
+.steps li::before {
+  counter-increment: step; content: counter(step);
+  position: absolute; left: 0; top: var(--s-12);
+  font-family: var(--font-display); font-size: var(--t-24); color: var(--accent);
+}
+.value-block, .phase-block { padding: var(--s-24) 0; border-bottom: 1px solid var(--line); }
+.value-block:last-child, .phase-block:last-child { border-bottom: none; }
+.price-line { font-weight: 700; }
+
+/* ————— Tool cards ————— */
+.card-grid { display: grid; gap: var(--s-24); margin-top: var(--s-32); }
+@media (min-width: 900px) { .card-grid { grid-template-columns: repeat(3, 1fr); } }
+.tool-card { background: var(--frame-bg); border: 1px solid var(--line); border-radius: var(--r-frame); padding: var(--s-24); }
+.tool-card h3 { margin-top: 0; }
+.tool-card .meta { font-size: var(--t-14); color: var(--grey); margin-top: var(--s-16); }
+.tool-card a { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+/* ————— Footer ————— */
+.site-footer { padding: var(--s-48) 0; background: var(--paper-2); }
+.site-footer p { font-size: var(--t-14); color: var(--ink-soft); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn, .main-nav a { transition: background-color .15s ease, color .15s ease; }
+}
