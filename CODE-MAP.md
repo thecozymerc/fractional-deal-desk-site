@@ -4,7 +4,7 @@ This is the master file (Code Labeling System, Rule 1). One entry per file or fo
 If it is not on this map, it does not belong. Updated in the same change as the code — never later (Rule 3).
 Every change is also recorded in CHANGELOG.md.
 
-**Map version:** 9 — November 8, 2026 (records catch-up for the calculator build + Option B launch: S6-P01.a purpose lines now name the Deal Pricing Calculator everywhere; the two embed data files are marked unused on the tool page — the revised-descriptions data still powers the P01 homepage hero embed only; dual-repository rule added: every page also lives in the Drive mirror — one folder per page, Page Text Sheet + code files.)
+**Map version:** 12 — November 8, 2026 (launch night: repo live on GitHub + GitHub Pages serving the site; all internal links in the built pages are now relative so the same files work at a root domain and under the /fractional-deal-desk-site/ subpath.)
 
 **File naming convention (Lucky's instruction, Nov 7):** every page's code file is named with its page ID + the descriptive title from the sitemap table — e.g. `P01-homepage.html`. The ID in the filename, the page's `<title>`, and the label comment at the top of the file always agree. At publish, a copy of each page file is placed as `index.html` in its own folder so the sitemap address resolves (e.g. `/tools/deal-check/`); the ID-named file stays the source of truth, and the publish step is recorded in the CHANGELOG like any other change.
 
