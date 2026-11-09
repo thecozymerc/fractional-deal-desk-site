@@ -101,8 +101,8 @@ if (typeof document !== "undefined" && document.getElementById("calc-root")) (fu
       return '<option value="' + p.name + '"' + (p.name === d.sku ? " selected" : "") + ">" + p.name + "</option>";
     }).join("") + "</select>";
     tr.innerHTML =
+      '<td><input class="in" id="' + prefix + i + '-name" type="text" value="' + (d.name || (d.sku === "None" ? "" : d.sku)) + '" placeholder="SKU name"></td>' +
       "<td>" + sel + "</td>" +
-      '<td><input class="in" id="' + prefix + i + '-name" type="text" value="' + (d.name || (d.sku === "None" ? "" : d.sku)) + '" placeholder="Name this line"></td>' +
       '<td><input class="in" id="' + prefix + i + '-list" type="number" step="any" value="' + d.list + '"></td>' +
       '<td><input class="in" id="' + prefix + i + '-seats" type="number" step="any" value="' + d.seats + '"></td>' +
       '<td><input class="in" id="' + prefix + i + '-disc" type="number" step="any" value="' + d.disc + '"></td>' +
@@ -117,11 +117,20 @@ if (typeof document !== "undefined" && document.getElementById("calc-root")) (fu
       '<td class="num" id="' + prefix + i + '-ftcv">—</td>' +
       '<td><button type="button" class="del" title="Delete this line">✕</button></td>';
     table.appendChild(tr);
-    $(prefix + i + "-sku").addEventListener("change", function () {
+    var skuEl = $(prefix + i + "-sku");
+    skuEl.dataset.prev = d.sku;
+    skuEl.addEventListener("change", function () {
       var p = PRODUCTS.filter(function (x) { return x.name === this.value; })[0];
       var row = this.closest("tr");
       row.querySelector('[id$="-list"]').value = p.list;
-      row.querySelector('[id$="-name"]').value = p.name === "None" ? "" : p.name;
+      var nameEl = row.querySelector('[id$="-name"]');
+      /* the SKU name is the visitor's to edit: a preset fills it only while
+         it is empty or still shows the previously picked preset's name —
+         a name the visitor typed is never wiped. */
+      if (!nameEl.value.trim() || nameEl.value === this.dataset.prev) {
+        nameEl.value = p.name === "None" ? "" : p.name;
+      }
+      this.dataset.prev = p.name;
       recompute();
     });
     tr.querySelector(".del").addEventListener("click", function () {
