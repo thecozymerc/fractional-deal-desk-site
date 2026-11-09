@@ -2,7 +2,7 @@
    Do not hand-edit: re-run the converter. Formula cells carry the sheet's
    own formulas as machinery for the formula engine; they are never displayed. */
 window.CONVERSION_CALCULATOR_DATA = {
- "source": "Perpetual-to-SaaS Conversion Calculator — SAMPLE v3.xlsx",
+ "source": "Perpetual-to-SaaS Conversion Calculator — SAMPLE v4.xlsx",
  "sheets": [
   {
    "name": "Conversion Calculator",
@@ -48,7 +48,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A5",
        "fmt": "general",
        "t": "text",
-       "v": "1. Enter the yellow INPUT cells: perpetual license value, annual maintenance, horizon in years, the SaaS annual subscription for Option A, Option B and Option C, and any Year 1 migration discount — plus, for each SaaS option, its one-time coupon credit and its usage line (usage type, expected usage per month, price per unit, usage discount, and committed monthly minimum)."
+       "v": "1. Enter the yellow INPUT cells: perpetual license value, annual maintenance, licensed seats, horizon in years, and any Year 1 migration discount. Then, for each SaaS option: its list price per seat per month, its discount, its starting seats and yearly seat growth — plus its one-time coupon credit and its usage line (usage type, expected usage per month, price per unit, usage discount, and committed monthly minimum). The three subscription figures in the top block are derived from the seat block, not typed in."
       }
      ]
     },
@@ -92,7 +92,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A9",
        "fmt": "general",
        "t": "text",
-       "v": "Inputs: yellow cells marked INPUT. Logic: Staying put costs the license once in Year 1 plus maintenance every year. A SaaS option costs its annual subscription every year (the migration discount applies in Year 1 only), minus its one-time coupon credit in Year 1, plus its usage cost every year. Usage cost for a year = the greater of the committed monthly minimum or the metered usage (units per month / units-per-price x price per unit x (1 - usage discount)), times 12. All year rows and totals are formulas. The Year-1 migration discount % input applies to all three SaaS options equally."
+       "v": "Inputs: yellow cells marked INPUT. Logic: Staying put costs the license once in Year 1 plus maintenance every year, and covers the licensed seats. A SaaS option is seat-driven: net PUPM = list price per seat x (1 - discount); seats grow each year at the option's growth rate (rounded to whole seats); a year's subscription = that year's seats x net PUPM x 12, with the migration discount and the one-time coupon credit in Year 1 only, plus the usage cost every year. Usage cost for a year = the greater of the committed monthly minimum or the metered usage (units per month / units-per-price x price per unit x (1 - usage discount)), times 12. All year rows and totals are formulas. The Year-1 migration discount % input applies to all three SaaS options equally."
       }
      ]
     },
@@ -103,7 +103,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A10",
        "fmt": "general",
        "t": "text",
-       "v": "Limits: the table shows Years 1 to 5, so set the horizon between 1 and 5. It compares cost only — it does not value features, support, or risk, and it does not discount future cash flows. Three generic SaaS options are compared against staying put. Usage is held flat at the expected monthly level for every year — real usage usually grows, which moves the break-even later than this table shows."
+       "v": "Limits: the table shows Years 1 to 5, so set the horizon between 1 and 5. It compares cost only — it does not value features, support, or risk, and it does not discount future cash flows. Three generic SaaS options are compared against staying put. Usage is held flat at the expected monthly level for every year — real usage usually grows, which moves the break-even later than this table shows. Seat growth is a straight yearly percentage — real rollouts move in steps, and a step rollout makes the growth years lumpier than this table shows."
       }
      ]
     },
@@ -114,7 +114,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A11",
        "fmt": "general",
        "t": "text",
-       "v": "Note: Built fresh for the website; it is not a copy of any internal file. Three generic options compared; the chart plots the workbook's own cumulative rows. Version 2 adds the annual run-rate crossover: the first year an option's one-year cost drops below the stay-put one-year cost, shown next to the cumulative break-even. Version 3 (Nov 8, 2026) adds the Tool 1 factors: one-time coupon credits and per-option usage lines (per use / per token), so a conversion priced on consumption is compared honestly."
+       "v": "Note: Built fresh for the website; it is not a copy of any internal file. Three generic options compared; the chart plots the workbook's own cumulative rows. Version 2 adds the annual run-rate crossover: the first year an option's one-year cost drops below the stay-put one-year cost, shown next to the cumulative break-even. Version 3 (Nov 8, 2026) adds the Tool 1 factors: one-time coupon credits and per-option usage lines (per use / per token), so a conversion priced on consumption is compared honestly. Version 4 (Nov 8, 2026) rebuilds the SaaS side around seats and PUPM, on Lucky's direction: the tool must show the reason a company spends MORE on a conversion — rollout growth raising TCV — not only the savings case."
       }
      ]
     },
@@ -252,25 +252,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A18",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS Annual Subscription — Option A — SAMPLE ($)"
+       "v": "SaaS Annual Subscription — Option A — derived from seats x net PUPM ($)"
       },
       {
        "a": "B18",
        "fmt": "money",
-       "t": "input",
-       "v": 30000
+       "t": "formula",
+       "f": "=$B$26*($B$24*(1-$B$25))*12"
       },
       {
        "a": "C18",
        "fmt": "general",
        "t": "text",
-       "v": "INPUT"
+       "v": "OUTPUT"
       },
       {
        "a": "D18",
        "fmt": "general",
        "t": "text",
-       "v": "Yearly SaaS subscription price."
+       "v": "Derived, not typed in: Option A starting seats x net PUPM x 12, from the seat block below."
       }
      ]
     },
@@ -310,25 +310,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A20",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS Annual Subscription — Option B — SAMPLE ($)"
+       "v": "SaaS Annual Subscription — Option B — derived from seats x net PUPM ($)"
       },
       {
        "a": "B20",
        "fmt": "money",
-       "t": "input",
-       "v": 36000
+       "t": "formula",
+       "f": "=$B$30*($B$28*(1-$B$29))*12"
       },
       {
        "a": "C20",
        "fmt": "general",
        "t": "text",
-       "v": "INPUT"
+       "v": "OUTPUT"
       },
       {
        "a": "D20",
        "fmt": "general",
        "t": "text",
-       "v": "Yearly SaaS subscription price — Option B."
+       "v": "Derived, not typed in: Option B starting seats x net PUPM x 12, from the seat block below."
       }
      ]
     },
@@ -339,25 +339,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A21",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS Annual Subscription — Option C — SAMPLE ($)"
+       "v": "SaaS Annual Subscription — Option C — derived from seats x net PUPM ($)"
       },
       {
        "a": "B21",
        "fmt": "money",
-       "t": "input",
-       "v": 27000
+       "t": "formula",
+       "f": "=$B$34*($B$32*(1-$B$33))*12"
       },
       {
        "a": "C21",
        "fmt": "general",
        "t": "text",
-       "v": "INPUT"
+       "v": "OUTPUT"
       },
       {
        "a": "D21",
        "fmt": "general",
        "t": "text",
-       "v": "Yearly SaaS subscription price — Option C."
+       "v": "Derived, not typed in: Option C starting seats x net PUPM x 12, from the seat block below."
       }
      ]
     },
@@ -368,7 +368,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A22",
        "fmt": "general",
        "t": "text",
-       "v": "Usage & coupons — per SaaS option (yellow cells)"
+       "v": "Seats & per-seat pricing — per SaaS option (yellow cells)"
       }
      ]
     },
@@ -379,13 +379,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A23",
        "fmt": "general",
        "t": "text",
-       "v": "Option A — one-time coupon credit, Year 1 only — SAMPLE ($)"
+       "v": "Licensed seats — stay-put (perpetual) — SAMPLE"
       },
       {
        "a": "B23",
-       "fmt": "money",
+       "fmt": "int",
        "t": "input",
-       "v": 1500
+       "v": 125
       },
       {
        "a": "C23",
@@ -397,7 +397,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D23",
        "fmt": "general",
        "t": "text",
-       "v": "One-time credit from the vendor. Comes off Option A's Year 1 cost only."
+       "v": "Seats the perpetual license covers. More people than this on perpetual means buying more licenses."
       }
      ]
     },
@@ -408,13 +408,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A24",
        "fmt": "general",
        "t": "text",
-       "v": "Option A — usage type — SAMPLE"
+       "v": "Option A — list price per seat per month — SAMPLE ($)"
       },
       {
        "a": "B24",
-       "fmt": "general",
+       "fmt": "money",
        "t": "input",
-       "v": "per 1M tokens"
+       "v": 25
       },
       {
        "a": "C24",
@@ -426,7 +426,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D24",
        "fmt": "general",
        "t": "text",
-       "v": "How usage is billed. Type it exactly as one of: per 1M tokens, per 1K tokens, per use, per API request."
+       "v": "Sticker price for one seat for one month, before the discount."
       }
      ]
     },
@@ -437,13 +437,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A25",
        "fmt": "general",
        "t": "text",
-       "v": "Option A — expected usage — SAMPLE (units per month)"
+       "v": "Option A — discount on the per-seat price — SAMPLE"
       },
       {
        "a": "B25",
-       "fmt": "int",
+       "fmt": "pct",
        "t": "input",
-       "v": 800
+       "v": 0.2
       },
       {
        "a": "C25",
@@ -455,7 +455,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D25",
        "fmt": "general",
        "t": "text",
-       "v": "Expected usage volume each month, in the units picked above."
+       "v": "Discount off the per-seat list price. Net PUPM = list x (1 - discount)."
       }
      ]
     },
@@ -466,13 +466,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A26",
        "fmt": "general",
        "t": "text",
-       "v": "Option A — price per unit — SAMPLE ($)"
+       "v": "Option A — starting seats — SAMPLE"
       },
       {
        "a": "B26",
-       "fmt": "money",
+       "fmt": "int",
        "t": "input",
-       "v": 2.25
+       "v": 125
       },
       {
        "a": "C26",
@@ -484,7 +484,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D26",
        "fmt": "general",
        "t": "text",
-       "v": "Price for one unit of usage, before the usage discount."
+       "v": "Seats on this option in Year 1."
       }
      ]
     },
@@ -495,7 +495,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A27",
        "fmt": "general",
        "t": "text",
-       "v": "Option A — usage discount — SAMPLE"
+       "v": "Option A — seat growth per year — SAMPLE"
       },
       {
        "a": "B27",
@@ -513,7 +513,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D27",
        "fmt": "general",
        "t": "text",
-       "v": "Discount on the usage charge only. Use 0% if none."
+       "v": "How fast the seat count grows each year on this option. Use 0% for a flat rollout."
       }
      ]
     },
@@ -524,13 +524,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A28",
        "fmt": "general",
        "t": "text",
-       "v": "Option A — committed minimum — SAMPLE ($ per month)"
+       "v": "Option B — list price per seat per month — SAMPLE ($)"
       },
       {
        "a": "B28",
        "fmt": "money",
        "t": "input",
-       "v": 100
+       "v": 30
       },
       {
        "a": "C28",
@@ -542,7 +542,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D28",
        "fmt": "general",
        "t": "text",
-       "v": "You pay at least this much per month for usage, even if actual usage costs less."
+       "v": "Sticker price for one seat for one month, before the discount."
       }
      ]
     },
@@ -553,13 +553,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A29",
        "fmt": "general",
        "t": "text",
-       "v": "Option B — one-time coupon credit, Year 1 only — SAMPLE ($)"
+       "v": "Option B — discount on the per-seat price — SAMPLE"
       },
       {
        "a": "B29",
-       "fmt": "money",
+       "fmt": "pct",
        "t": "input",
-       "v": 0
+       "v": 0.2
       },
       {
        "a": "C29",
@@ -571,7 +571,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D29",
        "fmt": "general",
        "t": "text",
-       "v": "No coupon in this sample — set to 0. A real credit would come off Option B's Year 1 cost only."
+       "v": "Discount off the per-seat list price. Net PUPM = list x (1 - discount)."
       }
      ]
     },
@@ -582,13 +582,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A30",
        "fmt": "general",
        "t": "text",
-       "v": "Option B — usage type — SAMPLE"
+       "v": "Option B — starting seats — SAMPLE"
       },
       {
        "a": "B30",
-       "fmt": "general",
+       "fmt": "int",
        "t": "input",
-       "v": "per use"
+       "v": 125
       },
       {
        "a": "C30",
@@ -600,7 +600,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D30",
        "fmt": "general",
        "t": "text",
-       "v": "How usage is billed. Type it exactly as one of: per 1M tokens, per 1K tokens, per use, per API request."
+       "v": "Seats on this option in Year 1."
       }
      ]
     },
@@ -611,13 +611,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A31",
        "fmt": "general",
        "t": "text",
-       "v": "Option B — expected usage — SAMPLE (units per month)"
+       "v": "Option B — seat growth per year — SAMPLE"
       },
       {
        "a": "B31",
-       "fmt": "int",
+       "fmt": "pct",
        "t": "input",
-       "v": 0
+       "v": 0.1
       },
       {
        "a": "C31",
@@ -629,7 +629,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D31",
        "fmt": "general",
        "t": "text",
-       "v": "No usage in this sample — set to 0."
+       "v": "How fast the seat count grows each year on this option. Use 0% for a flat rollout."
       }
      ]
     },
@@ -640,13 +640,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A32",
        "fmt": "general",
        "t": "text",
-       "v": "Option B — price per unit — SAMPLE ($)"
+       "v": "Option C — list price per seat per month — SAMPLE ($)"
       },
       {
        "a": "B32",
        "fmt": "money",
        "t": "input",
-       "v": 0
+       "v": 22.5
       },
       {
        "a": "C32",
@@ -658,7 +658,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D32",
        "fmt": "general",
        "t": "text",
-       "v": "Price for one unit of usage, before the usage discount."
+       "v": "Sticker price for one seat for one month, before the discount."
       }
      ]
     },
@@ -669,13 +669,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A33",
        "fmt": "general",
        "t": "text",
-       "v": "Option B — usage discount — SAMPLE"
+       "v": "Option C — discount on the per-seat price — SAMPLE"
       },
       {
        "a": "B33",
        "fmt": "pct",
        "t": "input",
-       "v": 0
+       "v": 0.2
       },
       {
        "a": "C33",
@@ -687,7 +687,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D33",
        "fmt": "general",
        "t": "text",
-       "v": "Discount on the usage charge only. Use 0% if none."
+       "v": "Discount off the per-seat list price. Net PUPM = list x (1 - discount)."
       }
      ]
     },
@@ -698,13 +698,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A34",
        "fmt": "general",
        "t": "text",
-       "v": "Option B — committed minimum — SAMPLE ($ per month)"
+       "v": "Option C — starting seats — SAMPLE"
       },
       {
        "a": "B34",
-       "fmt": "money",
+       "fmt": "int",
        "t": "input",
-       "v": 0
+       "v": 125
       },
       {
        "a": "C34",
@@ -716,7 +716,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D34",
        "fmt": "general",
        "t": "text",
-       "v": "You pay at least this much per month for usage, even if actual usage costs less."
+       "v": "Seats on this option in Year 1."
       }
      ]
     },
@@ -727,13 +727,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A35",
        "fmt": "general",
        "t": "text",
-       "v": "Option C — one-time coupon credit, Year 1 only — SAMPLE ($)"
+       "v": "Option C — seat growth per year — SAMPLE"
       },
       {
        "a": "B35",
-       "fmt": "money",
+       "fmt": "pct",
        "t": "input",
-       "v": 2500
+       "v": 0.1
       },
       {
        "a": "C35",
@@ -745,36 +745,18 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D35",
        "fmt": "general",
        "t": "text",
-       "v": "One-time credit from the vendor. Comes off Option C's Year 1 cost only."
+       "v": "How fast the seat count grows each year on this option. Use 0% for a flat rollout."
       }
      ]
     },
     {
-     "span": false,
+     "span": true,
      "cells": [
       {
        "a": "A36",
        "fmt": "general",
        "t": "text",
-       "v": "Option C — usage type — SAMPLE"
-      },
-      {
-       "a": "B36",
-       "fmt": "general",
-       "t": "input",
-       "v": "per 1K tokens"
-      },
-      {
-       "a": "C36",
-       "fmt": "general",
-       "t": "text",
-       "v": "INPUT"
-      },
-      {
-       "a": "D36",
-       "fmt": "general",
-       "t": "text",
-       "v": "How usage is billed. Type it exactly as one of: per 1M tokens, per 1K tokens, per use, per API request."
+       "v": "Usage & coupons — per SaaS option (yellow cells)"
       }
      ]
     },
@@ -785,13 +767,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A37",
        "fmt": "general",
        "t": "text",
-       "v": "Option C — expected usage — SAMPLE (units per month)"
+       "v": "Option A — one-time coupon credit, Year 1 only — SAMPLE ($)"
       },
       {
        "a": "B37",
-       "fmt": "int",
+       "fmt": "money",
        "t": "input",
-       "v": 250000
+       "v": 1500
       },
       {
        "a": "C37",
@@ -803,7 +785,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D37",
        "fmt": "general",
        "t": "text",
-       "v": "Expected usage volume each month, in the units picked above."
+       "v": "One-time credit from the vendor. Comes off Option A's Year 1 cost only."
       }
      ]
     },
@@ -814,13 +796,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A38",
        "fmt": "general",
        "t": "text",
-       "v": "Option C — price per unit — SAMPLE ($)"
+       "v": "Option A — usage type — SAMPLE"
       },
       {
        "a": "B38",
        "fmt": "general",
        "t": "input",
-       "v": 0.012
+       "v": "per 1M tokens"
       },
       {
        "a": "C38",
@@ -832,7 +814,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D38",
        "fmt": "general",
        "t": "text",
-       "v": "Price for one unit of usage, before the usage discount."
+       "v": "How usage is billed. Type it exactly as one of: per 1M tokens, per 1K tokens, per use, per API request."
       }
      ]
     },
@@ -843,13 +825,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A39",
        "fmt": "general",
        "t": "text",
-       "v": "Option C — usage discount — SAMPLE"
+       "v": "Option A — expected usage — SAMPLE (units per month)"
       },
       {
        "a": "B39",
-       "fmt": "pct",
+       "fmt": "int",
        "t": "input",
-       "v": 0
+       "v": 800
       },
       {
        "a": "C39",
@@ -861,7 +843,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D39",
        "fmt": "general",
        "t": "text",
-       "v": "Discount on the usage charge only. Use 0% if none."
+       "v": "Expected usage volume each month, in the units picked above."
       }
      ]
     },
@@ -872,13 +854,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A40",
        "fmt": "general",
        "t": "text",
-       "v": "Option C — committed minimum — SAMPLE ($ per month)"
+       "v": "Option A — price per unit — SAMPLE ($)"
       },
       {
        "a": "B40",
        "fmt": "money",
        "t": "input",
-       "v": 150
+       "v": 2.25
       },
       {
        "a": "C40",
@@ -890,40 +872,123 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D40",
        "fmt": "general",
        "t": "text",
-       "v": "You pay at least this much per month for usage, even if actual usage costs less."
+       "v": "Price for one unit of usage, before the usage discount."
       }
      ]
     },
     {
-     "span": true,
+     "span": false,
      "cells": [
       {
        "a": "A41",
        "fmt": "general",
        "t": "text",
-       "v": "How the usage cost is figured (per option, per year)"
+       "v": "Option A — usage discount — SAMPLE"
+      },
+      {
+       "a": "B41",
+       "fmt": "pct",
+       "t": "input",
+       "v": 0.1
+      },
+      {
+       "a": "C41",
+       "fmt": "general",
+       "t": "text",
+       "v": "INPUT"
+      },
+      {
+       "a": "D41",
+       "fmt": "general",
+       "t": "text",
+       "v": "Discount on the usage charge only. Use 0% if none."
       }
      ]
     },
     {
-     "span": true,
+     "span": false,
      "cells": [
       {
        "a": "A42",
        "fmt": "general",
        "t": "text",
-       "v": "Usage cost = MAX(committed minimum, units per month / units-per-price x price per unit x (1 - usage discount)) x 12. Tokens — per 1M divides units by 1,000,000; per 1K by 1,000; per use and per API request divide by 1. The one-time coupon credit comes off Year 1 only, after the migration discount and the usage cost are added."
+       "v": "Option A — committed minimum — SAMPLE ($ per month)"
+      },
+      {
+       "a": "B42",
+       "fmt": "money",
+       "t": "input",
+       "v": 100
+      },
+      {
+       "a": "C42",
+       "fmt": "general",
+       "t": "text",
+       "v": "INPUT"
+      },
+      {
+       "a": "D42",
+       "fmt": "general",
+       "t": "text",
+       "v": "You pay at least this much per month for usage, even if actual usage costs less."
       }
      ]
     },
     {
-     "span": true,
+     "span": false,
+     "cells": [
+      {
+       "a": "A43",
+       "fmt": "general",
+       "t": "text",
+       "v": "Option B — one-time coupon credit, Year 1 only — SAMPLE ($)"
+      },
+      {
+       "a": "B43",
+       "fmt": "money",
+       "t": "input",
+       "v": 0
+      },
+      {
+       "a": "C43",
+       "fmt": "general",
+       "t": "text",
+       "v": "INPUT"
+      },
+      {
+       "a": "D43",
+       "fmt": "general",
+       "t": "text",
+       "v": "No coupon in this sample — set to 0. A real credit would come off Option B's Year 1 cost only."
+      }
+     ]
+    },
+    {
+     "span": false,
      "cells": [
       {
        "a": "A44",
        "fmt": "general",
        "t": "text",
-       "v": "Year-by-year comparison — all cells below are formulas"
+       "v": "Option B — usage type — SAMPLE"
+      },
+      {
+       "a": "B44",
+       "fmt": "general",
+       "t": "input",
+       "v": "per use"
+      },
+      {
+       "a": "C44",
+       "fmt": "general",
+       "t": "text",
+       "v": "INPUT"
+      },
+      {
+       "a": "D44",
+       "fmt": "general",
+       "t": "text",
+       "v": "How usage is billed. Type it exactly as one of: per 1M tokens, per 1K tokens, per use, per API request."
       }
      ]
     },
@@ -934,37 +999,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A45",
        "fmt": "general",
        "t": "text",
-       "v": "Item"
+       "v": "Option B — expected usage — SAMPLE (units per month)"
       },
       {
        "a": "B45",
-       "fmt": "general",
-       "t": "text",
-       "v": "Year 1"
+       "fmt": "int",
+       "t": "input",
+       "v": 0
       },
       {
        "a": "C45",
        "fmt": "general",
        "t": "text",
-       "v": "Year 2"
+       "v": "INPUT"
       },
       {
        "a": "D45",
        "fmt": "general",
        "t": "text",
-       "v": "Year 3"
-      },
-      {
-       "a": "E45",
-       "fmt": "general",
-       "t": "text",
-       "v": "Year 4"
-      },
-      {
-       "a": "F45",
-       "fmt": "general",
-       "t": "text",
-       "v": "Year 5"
+       "v": "No usage in this sample — set to 0."
       }
      ]
     },
@@ -975,37 +1028,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A46",
        "fmt": "general",
        "t": "text",
-       "v": "Stay put — cost in year ($)"
+       "v": "Option B — price per unit — SAMPLE ($)"
       },
       {
        "a": "B46",
        "fmt": "money",
-       "t": "formula",
-       "f": "=$B$15+$B$16"
+       "t": "input",
+       "v": 0
       },
       {
        "a": "C46",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=$B$16"
+       "fmt": "general",
+       "t": "text",
+       "v": "INPUT"
       },
       {
        "a": "D46",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=$B$16"
-      },
-      {
-       "a": "E46",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=$B$16"
-      },
-      {
-       "a": "F46",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=$B$16"
+       "fmt": "general",
+       "t": "text",
+       "v": "Price for one unit of usage, before the usage discount."
       }
      ]
     },
@@ -1016,37 +1057,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A47",
        "fmt": "general",
        "t": "text",
-       "v": "Stay put — cumulative cost ($)"
+       "v": "Option B — usage discount — SAMPLE"
       },
       {
        "a": "B47",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=B46"
+       "fmt": "pct",
+       "t": "input",
+       "v": 0
       },
       {
        "a": "C47",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=B47+C46"
+       "fmt": "general",
+       "t": "text",
+       "v": "INPUT"
       },
       {
        "a": "D47",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=C47+D46"
-      },
-      {
-       "a": "E47",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=D47+E46"
-      },
-      {
-       "a": "F47",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=E47+F46"
+       "fmt": "general",
+       "t": "text",
+       "v": "Discount on the usage charge only. Use 0% if none."
       }
      ]
     },
@@ -1057,37 +1086,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A48",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS Option A — cost in year ($)"
+       "v": "Option B — committed minimum — SAMPLE ($ per month)"
       },
       {
        "a": "B48",
        "fmt": "money",
-       "t": "formula",
-       "f": "=$B$18*(1-$B$19)-$B$23+MAX($B$28,$B$25/IF($B$24=\"per 1M tokens\",1000000,IF($B$24=\"per 1K tokens\",1000,1))*$B$26*(1-$B$27))*12"
+       "t": "input",
+       "v": 0
       },
       {
        "a": "C48",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=$B$18+MAX($B$28,$B$25/IF($B$24=\"per 1M tokens\",1000000,IF($B$24=\"per 1K tokens\",1000,1))*$B$26*(1-$B$27))*12"
+       "fmt": "general",
+       "t": "text",
+       "v": "INPUT"
       },
       {
        "a": "D48",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=$B$18+MAX($B$28,$B$25/IF($B$24=\"per 1M tokens\",1000000,IF($B$24=\"per 1K tokens\",1000,1))*$B$26*(1-$B$27))*12"
-      },
-      {
-       "a": "E48",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=$B$18+MAX($B$28,$B$25/IF($B$24=\"per 1M tokens\",1000000,IF($B$24=\"per 1K tokens\",1000,1))*$B$26*(1-$B$27))*12"
-      },
-      {
-       "a": "F48",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=$B$18+MAX($B$28,$B$25/IF($B$24=\"per 1M tokens\",1000000,IF($B$24=\"per 1K tokens\",1000,1))*$B$26*(1-$B$27))*12"
+       "fmt": "general",
+       "t": "text",
+       "v": "You pay at least this much per month for usage, even if actual usage costs less."
       }
      ]
     },
@@ -1098,37 +1115,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A49",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS Option A — cumulative cost ($)"
+       "v": "Option C — one-time coupon credit, Year 1 only — SAMPLE ($)"
       },
       {
        "a": "B49",
        "fmt": "money",
-       "t": "formula",
-       "f": "=B48"
+       "t": "input",
+       "v": 2500
       },
       {
        "a": "C49",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=B49+C48"
+       "fmt": "general",
+       "t": "text",
+       "v": "INPUT"
       },
       {
        "a": "D49",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=C49+D48"
-      },
-      {
-       "a": "E49",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=D49+E48"
-      },
-      {
-       "a": "F49",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=E49+F48"
+       "fmt": "general",
+       "t": "text",
+       "v": "One-time credit from the vendor. Comes off Option C's Year 1 cost only."
       }
      ]
     },
@@ -1139,37 +1144,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A50",
        "fmt": "general",
        "t": "text",
-       "v": "Difference in year — Stay-put cumulative minus SaaS Option A cumulative ($)"
+       "v": "Option C — usage type — SAMPLE"
       },
       {
        "a": "B50",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=B47-B49"
+       "fmt": "general",
+       "t": "input",
+       "v": "per 1K tokens"
       },
       {
        "a": "C50",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=C47-C49"
+       "fmt": "general",
+       "t": "text",
+       "v": "INPUT"
       },
       {
        "a": "D50",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=D47-D49"
-      },
-      {
-       "a": "E50",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=E47-E49"
-      },
-      {
-       "a": "F50",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=F47-F49"
+       "fmt": "general",
+       "t": "text",
+       "v": "How usage is billed. Type it exactly as one of: per 1M tokens, per 1K tokens, per use, per API request."
       }
      ]
     },
@@ -1180,37 +1173,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A51",
        "fmt": "general",
        "t": "text",
-       "v": "Helper A: SaaS Option A cumulative is lower or equal (1 = yes, 0 = no)"
+       "v": "Option C — expected usage — SAMPLE (units per month)"
       },
       {
        "a": "B51",
        "fmt": "int",
-       "t": "formula",
-       "f": "=--(B49<=B47)"
+       "t": "input",
+       "v": 250000
       },
       {
        "a": "C51",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(C49<=C47)"
+       "fmt": "general",
+       "t": "text",
+       "v": "INPUT"
       },
       {
        "a": "D51",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(D49<=D47)"
-      },
-      {
-       "a": "E51",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(E49<=E47)"
-      },
-      {
-       "a": "F51",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(F49<=F47)"
+       "fmt": "general",
+       "t": "text",
+       "v": "Expected usage volume each month, in the units picked above."
       }
      ]
     },
@@ -1221,37 +1202,54 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A52",
        "fmt": "general",
        "t": "text",
-       "v": "Helper: Year number"
+       "v": "Option C — price per unit — SAMPLE ($)"
       },
       {
        "a": "B52",
-       "fmt": "int",
-       "t": "value",
-       "v": 1
+       "fmt": "general",
+       "t": "input",
+       "v": 0.012
       },
       {
        "a": "C52",
-       "fmt": "int",
-       "t": "value",
-       "v": 2
+       "fmt": "general",
+       "t": "text",
+       "v": "INPUT"
       },
       {
        "a": "D52",
-       "fmt": "int",
-       "t": "value",
-       "v": 3
+       "fmt": "general",
+       "t": "text",
+       "v": "Price for one unit of usage, before the usage discount."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A53",
+       "fmt": "general",
+       "t": "text",
+       "v": "Option C — usage discount — SAMPLE"
       },
       {
-       "a": "E52",
-       "fmt": "int",
-       "t": "value",
-       "v": 4
+       "a": "B53",
+       "fmt": "pct",
+       "t": "input",
+       "v": 0
       },
       {
-       "a": "F52",
-       "fmt": "int",
-       "t": "value",
-       "v": 5
+       "a": "C53",
+       "fmt": "general",
+       "t": "text",
+       "v": "INPUT"
+      },
+      {
+       "a": "D53",
+       "fmt": "general",
+       "t": "text",
+       "v": "Discount on the usage charge only. Use 0% if none."
       }
      ]
     },
@@ -1262,201 +1260,58 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A54",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS Option B — cost in year ($)"
+       "v": "Option C — committed minimum — SAMPLE ($ per month)"
       },
       {
        "a": "B54",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=$B$20*(1-$B$19)-$B$29+MAX($B$34,$B$31/IF($B$30=\"per 1M tokens\",1000000,IF($B$30=\"per 1K tokens\",1000,1))*$B$32*(1-$B$33))*12"
+       "fmt": "money",
+       "t": "input",
+       "v": 150
       },
       {
        "a": "C54",
        "fmt": "general",
-       "t": "formula",
-       "f": "=$B$20+MAX($B$34,$B$31/IF($B$30=\"per 1M tokens\",1000000,IF($B$30=\"per 1K tokens\",1000,1))*$B$32*(1-$B$33))*12"
+       "t": "text",
+       "v": "INPUT"
       },
       {
        "a": "D54",
        "fmt": "general",
-       "t": "formula",
-       "f": "=$B$20+MAX($B$34,$B$31/IF($B$30=\"per 1M tokens\",1000000,IF($B$30=\"per 1K tokens\",1000,1))*$B$32*(1-$B$33))*12"
-      },
-      {
-       "a": "E54",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=$B$20+MAX($B$34,$B$31/IF($B$30=\"per 1M tokens\",1000000,IF($B$30=\"per 1K tokens\",1000,1))*$B$32*(1-$B$33))*12"
-      },
-      {
-       "a": "F54",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=$B$20+MAX($B$34,$B$31/IF($B$30=\"per 1M tokens\",1000000,IF($B$30=\"per 1K tokens\",1000,1))*$B$32*(1-$B$33))*12"
+       "t": "text",
+       "v": "You pay at least this much per month for usage, even if actual usage costs less."
       }
      ]
     },
     {
-     "span": false,
+     "span": true,
      "cells": [
       {
        "a": "A55",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS Option B — cumulative cost ($)"
-      },
-      {
-       "a": "B55",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=B54"
-      },
-      {
-       "a": "C55",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=B55+C54"
-      },
-      {
-       "a": "D55",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=C55+D54"
-      },
-      {
-       "a": "E55",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=D55+E54"
-      },
-      {
-       "a": "F55",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=E55+F54"
+       "v": "How the usage cost is figured (per option, per year)"
       }
      ]
     },
     {
-     "span": false,
+     "span": true,
      "cells": [
       {
        "a": "A56",
        "fmt": "general",
        "t": "text",
-       "v": "Helper B: SaaS Option B cumulative is lower or equal (1 = yes, 0 = no)"
-      },
-      {
-       "a": "B56",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(B55<=B47)"
-      },
-      {
-       "a": "C56",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(C55<=C47)"
-      },
-      {
-       "a": "D56",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(D55<=D47)"
-      },
-      {
-       "a": "E56",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(E55<=E47)"
-      },
-      {
-       "a": "F56",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(F55<=F47)"
+       "v": "Usage cost = MAX(committed minimum, units per month / units-per-price x price per unit x (1 - usage discount)) x 12. Tokens — per 1M divides units by 1,000,000; per 1K by 1,000; per use and per API request divide by 1. The one-time coupon credit comes off Year 1 only, after the migration discount and the usage cost are added."
       }
      ]
     },
     {
-     "span": false,
-     "cells": [
-      {
-       "a": "A57",
-       "fmt": "general",
-       "t": "text",
-       "v": "SaaS Option C — cost in year ($)"
-      },
-      {
-       "a": "B57",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=$B$21*(1-$B$19)-$B$35+MAX($B$40,$B$37/IF($B$36=\"per 1M tokens\",1000000,IF($B$36=\"per 1K tokens\",1000,1))*$B$38*(1-$B$39))*12"
-      },
-      {
-       "a": "C57",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=$B$21+MAX($B$40,$B$37/IF($B$36=\"per 1M tokens\",1000000,IF($B$36=\"per 1K tokens\",1000,1))*$B$38*(1-$B$39))*12"
-      },
-      {
-       "a": "D57",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=$B$21+MAX($B$40,$B$37/IF($B$36=\"per 1M tokens\",1000000,IF($B$36=\"per 1K tokens\",1000,1))*$B$38*(1-$B$39))*12"
-      },
-      {
-       "a": "E57",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=$B$21+MAX($B$40,$B$37/IF($B$36=\"per 1M tokens\",1000000,IF($B$36=\"per 1K tokens\",1000,1))*$B$38*(1-$B$39))*12"
-      },
-      {
-       "a": "F57",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=$B$21+MAX($B$40,$B$37/IF($B$36=\"per 1M tokens\",1000000,IF($B$36=\"per 1K tokens\",1000,1))*$B$38*(1-$B$39))*12"
-      }
-     ]
-    },
-    {
-     "span": false,
+     "span": true,
      "cells": [
       {
        "a": "A58",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS Option C — cumulative cost ($)"
-      },
-      {
-       "a": "B58",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=B57"
-      },
-      {
-       "a": "C58",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=B58+C57"
-      },
-      {
-       "a": "D58",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=C58+D57"
-      },
-      {
-       "a": "E58",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=D58+E57"
-      },
-      {
-       "a": "F58",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=E58+F57"
+       "v": "Year-by-year comparison — all cells below are formulas"
       }
      ]
     },
@@ -1467,48 +1322,78 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A59",
        "fmt": "general",
        "t": "text",
-       "v": "Helper C: SaaS Option C cumulative is lower or equal (1 = yes, 0 = no)"
+       "v": "Item"
       },
       {
        "a": "B59",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(B58<=B47)"
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 1"
       },
       {
        "a": "C59",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(C58<=C47)"
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 2"
       },
       {
        "a": "D59",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(D58<=D47)"
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 3"
       },
       {
        "a": "E59",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(E58<=E47)"
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 4"
       },
       {
        "a": "F59",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(F58<=F47)"
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 5"
       }
      ]
     },
     {
-     "span": true,
+     "span": false,
      "cells": [
       {
        "a": "A60",
        "fmt": "general",
        "t": "text",
-       "v": "Results — all cells below are formulas"
+       "v": "Stay put — cost in year ($)"
+      },
+      {
+       "a": "B60",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$15+$B$16"
+      },
+      {
+       "a": "C60",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "D60",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "E60",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "F60",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
       }
      ]
     },
@@ -1519,25 +1404,37 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A61",
        "fmt": "general",
        "t": "text",
-       "v": "Result"
+       "v": "Stay put — cumulative cost ($)"
       },
       {
        "a": "B61",
-       "fmt": "general",
-       "t": "text",
-       "v": "Value"
+       "fmt": "money",
+       "t": "formula",
+       "f": "=B60"
       },
       {
        "a": "C61",
-       "fmt": "general",
-       "t": "text",
-       "v": "Type"
+       "fmt": "money",
+       "t": "formula",
+       "f": "=B61+C60"
       },
       {
        "a": "D61",
-       "fmt": "general",
-       "t": "text",
-       "v": "Logic / note"
+       "fmt": "money",
+       "t": "formula",
+       "f": "=C61+D60"
+      },
+      {
+       "a": "E61",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=D61+E60"
+      },
+      {
+       "a": "F61",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=E61+F60"
       }
      ]
     },
@@ -1548,25 +1445,37 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A62",
        "fmt": "general",
        "t": "text",
-       "v": "Break-even year (first year SaaS cumulative is lower or equal)"
+       "v": "SaaS Option A — cost in year ($)"
       },
       {
        "a": "B62",
-       "fmt": "general",
+       "fmt": "money",
        "t": "formula",
-       "f": "=IF(SUM(B51:F51)=0,\"No break-even within horizon\",INDEX(B52:F52,MATCH(1,B51:F51,0)))"
+       "f": "=ROUND($B$26*(1+$B$27)^(B$66-1),0)*($B$24*(1-$B$25))*12*(1-$B$19)-$B$37+MAX($B$42,$B$39/IF($B$38=\"per 1M tokens\",1000000,IF($B$38=\"per 1K tokens\",1000,1))*$B$40*(1-$B$41))*12"
       },
       {
        "a": "C62",
-       "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$26*(1+$B$27)^(C$66-1),0)*($B$24*(1-$B$25))*12+MAX($B$42,$B$39/IF($B$38=\"per 1M tokens\",1000000,IF($B$38=\"per 1K tokens\",1000,1))*$B$40*(1-$B$41))*12"
       },
       {
        "a": "D62",
-       "fmt": "general",
-       "t": "text",
-       "v": "Found from the helper row above. If SaaS never catches up in the table, it says so in words."
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$26*(1+$B$27)^(D$66-1),0)*($B$24*(1-$B$25))*12+MAX($B$42,$B$39/IF($B$38=\"per 1M tokens\",1000000,IF($B$38=\"per 1K tokens\",1000,1))*$B$40*(1-$B$41))*12"
+      },
+      {
+       "a": "E62",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$26*(1+$B$27)^(E$66-1),0)*($B$24*(1-$B$25))*12+MAX($B$42,$B$39/IF($B$38=\"per 1M tokens\",1000000,IF($B$38=\"per 1K tokens\",1000,1))*$B$40*(1-$B$41))*12"
+      },
+      {
+       "a": "F62",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$26*(1+$B$27)^(F$66-1),0)*($B$24*(1-$B$25))*12+MAX($B$42,$B$39/IF($B$38=\"per 1M tokens\",1000000,IF($B$38=\"per 1K tokens\",1000,1))*$B$40*(1-$B$41))*12"
       }
      ]
     },
@@ -1577,25 +1486,37 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A63",
        "fmt": "general",
        "t": "text",
-       "v": "Stay-put total at horizon ($)"
+       "v": "SaaS Option A — cumulative cost ($)"
       },
       {
        "a": "B63",
        "fmt": "money",
        "t": "formula",
-       "f": "=INDEX(B47:F47,$B$17)"
+       "f": "=B62"
       },
       {
        "a": "C63",
-       "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
+       "fmt": "money",
+       "t": "formula",
+       "f": "=B63+C62"
       },
       {
        "a": "D63",
-       "fmt": "general",
-       "t": "text",
-       "v": "Cumulative stay-put cost at the horizon year you picked."
+       "fmt": "money",
+       "t": "formula",
+       "f": "=C63+D62"
+      },
+      {
+       "a": "E63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=D63+E62"
+      },
+      {
+       "a": "F63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=E63+F62"
       }
      ]
     },
@@ -1606,25 +1527,37 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A64",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS total at horizon ($)"
+       "v": "Difference in year — Stay-put cumulative minus SaaS Option A cumulative ($)"
       },
       {
        "a": "B64",
        "fmt": "money",
        "t": "formula",
-       "f": "=INDEX(B49:F49,$B$17)"
+       "f": "=B61-B63"
       },
       {
        "a": "C64",
-       "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
+       "fmt": "money",
+       "t": "formula",
+       "f": "=C61-C63"
       },
       {
        "a": "D64",
-       "fmt": "general",
-       "t": "text",
-       "v": "Cumulative SaaS cost at the horizon year you picked."
+       "fmt": "money",
+       "t": "formula",
+       "f": "=D61-D63"
+      },
+      {
+       "a": "E64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=E61-E63"
+      },
+      {
+       "a": "F64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=F61-F63"
       }
      ]
     },
@@ -1635,25 +1568,37 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A65",
        "fmt": "general",
        "t": "text",
-       "v": "Difference at horizon — stay-put minus SaaS ($)"
+       "v": "Helper A: SaaS Option A cumulative is lower or equal (1 = yes, 0 = no)"
       },
       {
        "a": "B65",
-       "fmt": "money",
+       "fmt": "int",
        "t": "formula",
-       "f": "=B63-B64"
+       "f": "=--(B63<=B61)"
       },
       {
        "a": "C65",
-       "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(C63<=C61)"
       },
       {
        "a": "D65",
-       "fmt": "general",
-       "t": "text",
-       "v": "Positive means SaaS costs less in total by the horizon. Negative means staying put costs less."
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(D63<=D61)"
+      },
+      {
+       "a": "E65",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(E63<=E61)"
+      },
+      {
+       "a": "F65",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(F63<=F61)"
       }
      ]
     },
@@ -1664,54 +1609,37 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A66",
        "fmt": "general",
        "t": "text",
-       "v": "5-year stay-put total ($)"
+       "v": "Helper: Year number"
       },
       {
        "a": "B66",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=F47"
+       "fmt": "int",
+       "t": "value",
+       "v": 1
       },
       {
        "a": "C66",
-       "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
+       "fmt": "int",
+       "t": "value",
+       "v": 2
       },
       {
        "a": "D66",
-       "fmt": "general",
-       "t": "text",
-       "v": "Cumulative stay-put cost at Year 5."
-      }
-     ]
-    },
-    {
-     "span": false,
-     "cells": [
-      {
-       "a": "A67",
-       "fmt": "general",
-       "t": "text",
-       "v": "5-year SaaS total ($)"
+       "fmt": "int",
+       "t": "value",
+       "v": 3
       },
       {
-       "a": "B67",
-       "fmt": "money",
-       "t": "formula",
-       "f": "=F49"
+       "a": "E66",
+       "fmt": "int",
+       "t": "value",
+       "v": 4
       },
       {
-       "a": "C67",
-       "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
-      },
-      {
-       "a": "D67",
-       "fmt": "general",
-       "t": "text",
-       "v": "Cumulative SaaS cost at Year 5."
+       "a": "F66",
+       "fmt": "int",
+       "t": "value",
+       "v": 5
       }
      ]
     },
@@ -1722,25 +1650,37 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A68",
        "fmt": "general",
        "t": "text",
-       "v": "5-year difference — stay-put minus SaaS ($)"
+       "v": "SaaS Option B — cost in year ($)"
       },
       {
        "a": "B68",
-       "fmt": "money",
+       "fmt": "general",
        "t": "formula",
-       "f": "=F47-F49"
+       "f": "=ROUND($B$30*(1+$B$31)^(B$66-1),0)*($B$28*(1-$B$29))*12*(1-$B$19)-$B$43+MAX($B$48,$B$45/IF($B$44=\"per 1M tokens\",1000000,IF($B$44=\"per 1K tokens\",1000,1))*$B$46*(1-$B$47))*12"
       },
       {
        "a": "C68",
        "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
+       "t": "formula",
+       "f": "=ROUND($B$30*(1+$B$31)^(C$66-1),0)*($B$28*(1-$B$29))*12+MAX($B$48,$B$45/IF($B$44=\"per 1M tokens\",1000000,IF($B$44=\"per 1K tokens\",1000,1))*$B$46*(1-$B$47))*12"
       },
       {
        "a": "D68",
        "fmt": "general",
-       "t": "text",
-       "v": "Positive means SaaS costs less over 5 years."
+       "t": "formula",
+       "f": "=ROUND($B$30*(1+$B$31)^(D$66-1),0)*($B$28*(1-$B$29))*12+MAX($B$48,$B$45/IF($B$44=\"per 1M tokens\",1000000,IF($B$44=\"per 1K tokens\",1000,1))*$B$46*(1-$B$47))*12"
+      },
+      {
+       "a": "E68",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$30*(1+$B$31)^(E$66-1),0)*($B$28*(1-$B$29))*12+MAX($B$48,$B$45/IF($B$44=\"per 1M tokens\",1000000,IF($B$44=\"per 1K tokens\",1000,1))*$B$46*(1-$B$47))*12"
+      },
+      {
+       "a": "F68",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$30*(1+$B$31)^(F$66-1),0)*($B$28*(1-$B$29))*12+MAX($B$48,$B$45/IF($B$44=\"per 1M tokens\",1000000,IF($B$44=\"per 1K tokens\",1000,1))*$B$46*(1-$B$47))*12"
       }
      ]
     },
@@ -1751,25 +1691,37 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A69",
        "fmt": "general",
        "t": "text",
-       "v": "Break-even year — Option B (first year SaaS Option B cumulative is lower or equal)"
+       "v": "SaaS Option B — cumulative cost ($)"
       },
       {
        "a": "B69",
        "fmt": "general",
        "t": "formula",
-       "f": "=IF(SUM(B56:F56)=0,\"No break-even within horizon\",INDEX(B52:F52,MATCH(1,B56:F56,0)))"
+       "f": "=B68"
       },
       {
        "a": "C69",
        "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
+       "t": "formula",
+       "f": "=B69+C68"
       },
       {
        "a": "D69",
        "fmt": "general",
-       "t": "text",
-       "v": "Found from Helper B above, the same way as Option A. If Option B never catches up in the table, it says so in words."
+       "t": "formula",
+       "f": "=C69+D68"
+      },
+      {
+       "a": "E69",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=D69+E68"
+      },
+      {
+       "a": "F69",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=E69+F68"
       }
      ]
     },
@@ -1780,25 +1732,37 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A70",
        "fmt": "general",
        "t": "text",
-       "v": "Break-even year — Option C (first year SaaS Option C cumulative is lower or equal)"
+       "v": "Helper B: SaaS Option B cumulative is lower or equal (1 = yes, 0 = no)"
       },
       {
        "a": "B70",
-       "fmt": "general",
+       "fmt": "int",
        "t": "formula",
-       "f": "=IF(SUM(B59:F59)=0,\"No break-even within horizon\",INDEX(B52:F52,MATCH(1,B59:F59,0)))"
+       "f": "=--(B69<=B61)"
       },
       {
        "a": "C70",
-       "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(C69<=C61)"
       },
       {
        "a": "D70",
-       "fmt": "general",
-       "t": "text",
-       "v": "Found from Helper C above, the same way as Option A. If Option C never catches up in the table, it says so in words."
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(D69<=D61)"
+      },
+      {
+       "a": "E70",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(E69<=E61)"
+      },
+      {
+       "a": "F70",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(F69<=F61)"
       }
      ]
     },
@@ -1809,25 +1773,37 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A71",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS Option B total at horizon ($)"
+       "v": "SaaS Option C — cost in year ($)"
       },
       {
        "a": "B71",
        "fmt": "general",
        "t": "formula",
-       "f": "=INDEX(B55:F55,$B$17)"
+       "f": "=ROUND($B$34*(1+$B$35)^(B$66-1),0)*($B$32*(1-$B$33))*12*(1-$B$19)-$B$49+MAX($B$54,$B$51/IF($B$50=\"per 1M tokens\",1000000,IF($B$50=\"per 1K tokens\",1000,1))*$B$52*(1-$B$53))*12"
       },
       {
        "a": "C71",
        "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
+       "t": "formula",
+       "f": "=ROUND($B$34*(1+$B$35)^(C$66-1),0)*($B$32*(1-$B$33))*12+MAX($B$54,$B$51/IF($B$50=\"per 1M tokens\",1000000,IF($B$50=\"per 1K tokens\",1000,1))*$B$52*(1-$B$53))*12"
       },
       {
        "a": "D71",
        "fmt": "general",
-       "t": "text",
-       "v": "Cumulative SaaS Option B cost at the horizon year you picked."
+       "t": "formula",
+       "f": "=ROUND($B$34*(1+$B$35)^(D$66-1),0)*($B$32*(1-$B$33))*12+MAX($B$54,$B$51/IF($B$50=\"per 1M tokens\",1000000,IF($B$50=\"per 1K tokens\",1000,1))*$B$52*(1-$B$53))*12"
+      },
+      {
+       "a": "E71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$34*(1+$B$35)^(E$66-1),0)*($B$32*(1-$B$33))*12+MAX($B$54,$B$51/IF($B$50=\"per 1M tokens\",1000000,IF($B$50=\"per 1K tokens\",1000,1))*$B$52*(1-$B$53))*12"
+      },
+      {
+       "a": "F71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$34*(1+$B$35)^(F$66-1),0)*($B$32*(1-$B$33))*12+MAX($B$54,$B$51/IF($B$50=\"per 1M tokens\",1000000,IF($B$50=\"per 1K tokens\",1000,1))*$B$52*(1-$B$53))*12"
       }
      ]
     },
@@ -1838,25 +1814,78 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A72",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS Option C total at horizon ($)"
+       "v": "SaaS Option C — cumulative cost ($)"
       },
       {
        "a": "B72",
        "fmt": "general",
        "t": "formula",
-       "f": "=INDEX(B58:F58,$B$17)"
+       "f": "=B71"
       },
       {
        "a": "C72",
        "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
+       "t": "formula",
+       "f": "=B72+C71"
       },
       {
        "a": "D72",
        "fmt": "general",
+       "t": "formula",
+       "f": "=C72+D71"
+      },
+      {
+       "a": "E72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=D72+E71"
+      },
+      {
+       "a": "F72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=E72+F71"
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A73",
+       "fmt": "general",
        "t": "text",
-       "v": "Cumulative SaaS Option C cost at the horizon year you picked."
+       "v": "Helper C: SaaS Option C cumulative is lower or equal (1 = yes, 0 = no)"
+      },
+      {
+       "a": "B73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(B72<=B61)"
+      },
+      {
+       "a": "C73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(C72<=C61)"
+      },
+      {
+       "a": "D73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(D72<=D61)"
+      },
+      {
+       "a": "E73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(E72<=E61)"
+      },
+      {
+       "a": "F73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(F72<=F61)"
       }
      ]
     },
@@ -1867,7 +1896,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A74",
        "fmt": "general",
        "t": "text",
-       "v": "Comparison summary — per option (all values below are formulas)"
+       "v": "Results — all cells below are formulas"
       }
      ]
     },
@@ -1878,37 +1907,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A75",
        "fmt": "general",
        "t": "text",
-       "v": "Option"
+       "v": "Result"
       },
       {
        "a": "B75",
        "fmt": "general",
        "t": "text",
-       "v": "Total at horizon ($)"
+       "v": "Value"
       },
       {
        "a": "C75",
        "fmt": "general",
        "t": "text",
-       "v": "5-year total ($)"
+       "v": "Type"
       },
       {
        "a": "D75",
        "fmt": "general",
        "t": "text",
-       "v": "Break-even year"
-      },
-      {
-       "a": "E75",
-       "fmt": "general",
-       "t": "text",
-       "v": "Note"
-      },
-      {
-       "a": "F75",
-       "fmt": "general",
-       "t": "text",
-       "v": "Run-rate crossover year"
+       "v": "Logic / note"
       }
      ]
     },
@@ -1919,37 +1936,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A76",
        "fmt": "general",
        "t": "text",
-       "v": "Stay put (perpetual)"
+       "v": "Break-even year (first year SaaS cumulative is lower or equal)"
       },
       {
        "a": "B76",
        "fmt": "general",
        "t": "formula",
-       "f": "=B63"
+       "f": "=IF(SUM(B65:F65)=0,\"No break-even within horizon\",INDEX(B66:F66,MATCH(1,B65:F65,0)))"
       },
       {
        "a": "C76",
        "fmt": "general",
-       "t": "formula",
-       "f": "=B66"
+       "t": "text",
+       "v": "OUTPUT"
       },
       {
        "a": "D76",
        "fmt": "general",
        "t": "text",
-       "v": "—"
-      },
-      {
-       "a": "E76",
-       "fmt": "general",
-       "t": "text",
-       "v": "Baseline: license paid once in Year 1, plus maintenance every year."
-      },
-      {
-       "a": "F76",
-       "fmt": "general",
-       "t": "text",
-       "v": "—"
+       "v": "Found from the helper row above. If SaaS never catches up in the table, it says so in words."
       }
      ]
     },
@@ -1960,37 +1965,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A77",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS — Option A"
+       "v": "Stay-put total at horizon ($)"
       },
       {
        "a": "B77",
-       "fmt": "general",
+       "fmt": "money",
        "t": "formula",
-       "f": "=B64"
+       "f": "=INDEX(B61:F61,$B$17)"
       },
       {
        "a": "C77",
        "fmt": "general",
-       "t": "formula",
-       "f": "=B67"
+       "t": "text",
+       "v": "OUTPUT"
       },
       {
        "a": "D77",
        "fmt": "general",
-       "t": "formula",
-       "f": "=B62"
-      },
-      {
-       "a": "E77",
-       "fmt": "general",
        "t": "text",
-       "v": "Option A: subscription (Year 1 migration discount), minus its coupon credit, plus its per-1M-tokens usage line."
-      },
-      {
-       "a": "F77",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=B87"
+       "v": "Cumulative stay-put cost at the horizon year you picked."
       }
      ]
     },
@@ -2001,37 +1994,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A78",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS — Option B"
+       "v": "SaaS total at horizon ($)"
       },
       {
        "a": "B78",
-       "fmt": "general",
+       "fmt": "money",
        "t": "formula",
-       "f": "=B71"
+       "f": "=INDEX(B63:F63,$B$17)"
       },
       {
        "a": "C78",
        "fmt": "general",
-       "t": "formula",
-       "f": "=F55"
+       "t": "text",
+       "v": "OUTPUT"
       },
       {
        "a": "D78",
        "fmt": "general",
-       "t": "formula",
-       "f": "=B69"
-      },
-      {
-       "a": "E78",
-       "fmt": "general",
        "t": "text",
-       "v": "Option B: subscription (same Year 1 migration discount); no coupon and no usage in this sample."
-      },
-      {
-       "a": "F78",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=B88"
+       "v": "Cumulative SaaS cost at the horizon year you picked."
       }
      ]
     },
@@ -2042,48 +2023,83 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A79",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS — Option C"
+       "v": "Difference at horizon — stay-put minus SaaS ($)"
       },
       {
        "a": "B79",
-       "fmt": "general",
+       "fmt": "money",
        "t": "formula",
-       "f": "=B72"
+       "f": "=B77-B78"
       },
       {
        "a": "C79",
        "fmt": "general",
-       "t": "formula",
-       "f": "=F58"
+       "t": "text",
+       "v": "OUTPUT"
       },
       {
        "a": "D79",
        "fmt": "general",
-       "t": "formula",
-       "f": "=B70"
-      },
-      {
-       "a": "E79",
-       "fmt": "general",
        "t": "text",
-       "v": "Option C: subscription (same Year 1 migration discount), minus its coupon credit, plus its per-1K-tokens usage line."
-      },
-      {
-       "a": "F79",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=B89"
+       "v": "Positive means SaaS costs less in total by the horizon. Negative means staying put costs less."
       }
      ]
     },
     {
-     "span": true,
+     "span": false,
+     "cells": [
+      {
+       "a": "A80",
+       "fmt": "general",
+       "t": "text",
+       "v": "5-year stay-put total ($)"
+      },
+      {
+       "a": "B80",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=F61"
+      },
+      {
+       "a": "C80",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D80",
+       "fmt": "general",
+       "t": "text",
+       "v": "Cumulative stay-put cost at Year 5."
+      }
+     ]
+    },
+    {
+     "span": false,
      "cells": [
       {
        "a": "A81",
        "fmt": "general",
        "t": "text",
-       "v": "Annual run-rate crossover — added in v2 (all cells below are formulas)"
+       "v": "5-year SaaS total ($)"
+      },
+      {
+       "a": "B81",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=F63"
+      },
+      {
+       "a": "C81",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D81",
+       "fmt": "general",
+       "t": "text",
+       "v": "Cumulative SaaS cost at Year 5."
       }
      ]
     },
@@ -2094,37 +2110,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A82",
        "fmt": "general",
        "t": "text",
-       "v": "Helper A2: SaaS Option A annual cost is lower than stay-put annual cost (1 = yes, 0 = no)"
+       "v": "5-year difference — stay-put minus SaaS ($)"
       },
       {
        "a": "B82",
-       "fmt": "int",
+       "fmt": "money",
        "t": "formula",
-       "f": "=--(B48<B46)"
+       "f": "=F61-F63"
       },
       {
        "a": "C82",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(C48<C46)"
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
       },
       {
        "a": "D82",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(D48<D46)"
-      },
-      {
-       "a": "E82",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(E48<E46)"
-      },
-      {
-       "a": "F82",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(F48<F46)"
+       "fmt": "general",
+       "t": "text",
+       "v": "Positive means SaaS costs less over 5 years."
       }
      ]
     },
@@ -2135,37 +2139,25 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A83",
        "fmt": "general",
        "t": "text",
-       "v": "Helper B2: SaaS Option B annual cost is lower than stay-put annual cost (1 = yes, 0 = no)"
+       "v": "Break-even year — Option B (first year SaaS Option B cumulative is lower or equal)"
       },
       {
        "a": "B83",
-       "fmt": "int",
+       "fmt": "general",
        "t": "formula",
-       "f": "=--(B54<B46)"
+       "f": "=IF(SUM(B70:F70)=0,\"No break-even within horizon\",INDEX(B66:F66,MATCH(1,B70:F70,0)))"
       },
       {
        "a": "C83",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(C54<C46)"
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
       },
       {
        "a": "D83",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(D54<D46)"
-      },
-      {
-       "a": "E83",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(E54<E46)"
-      },
-      {
-       "a": "F83",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(F54<F46)"
+       "fmt": "general",
+       "t": "text",
+       "v": "Found from Helper B above, the same way as Option A. If Option B never catches up in the table, it says so in words."
       }
      ]
     },
@@ -2176,37 +2168,83 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A84",
        "fmt": "general",
        "t": "text",
-       "v": "Helper C2: SaaS Option C annual cost is lower than stay-put annual cost (1 = yes, 0 = no)"
+       "v": "Break-even year — Option C (first year SaaS Option C cumulative is lower or equal)"
       },
       {
        "a": "B84",
-       "fmt": "int",
+       "fmt": "general",
        "t": "formula",
-       "f": "=--(B57<B46)"
+       "f": "=IF(SUM(B73:F73)=0,\"No break-even within horizon\",INDEX(B66:F66,MATCH(1,B73:F73,0)))"
       },
       {
        "a": "C84",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(C57<C46)"
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
       },
       {
        "a": "D84",
-       "fmt": "int",
-       "t": "formula",
-       "f": "=--(D57<D46)"
+       "fmt": "general",
+       "t": "text",
+       "v": "Found from Helper C above, the same way as Option A. If Option C never catches up in the table, it says so in words."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A85",
+       "fmt": "general",
+       "t": "text",
+       "v": "SaaS Option B total at horizon ($)"
       },
       {
-       "a": "E84",
-       "fmt": "int",
+       "a": "B85",
+       "fmt": "general",
        "t": "formula",
-       "f": "=--(E57<E46)"
+       "f": "=INDEX(B69:F69,$B$17)"
       },
       {
-       "a": "F84",
-       "fmt": "int",
+       "a": "C85",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D85",
+       "fmt": "general",
+       "t": "text",
+       "v": "Cumulative SaaS Option B cost at the horizon year you picked."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A86",
+       "fmt": "general",
+       "t": "text",
+       "v": "SaaS Option C total at horizon ($)"
+      },
+      {
+       "a": "B86",
+       "fmt": "general",
        "t": "formula",
-       "f": "=--(F57<F46)"
+       "f": "=INDEX(B72:F72,$B$17)"
+      },
+      {
+       "a": "C86",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D86",
+       "fmt": "general",
+       "t": "text",
+       "v": "Cumulative SaaS Option C cost at the horizon year you picked."
       }
      ]
     },
@@ -2214,68 +2252,10 @@ window.CONVERSION_CALCULATOR_DATA = {
      "span": true,
      "cells": [
       {
-       "a": "A86",
-       "fmt": "general",
-       "t": "text",
-       "v": "Run-rate crossover — results"
-      }
-     ]
-    },
-    {
-     "span": false,
-     "cells": [
-      {
-       "a": "A87",
-       "fmt": "general",
-       "t": "text",
-       "v": "Run-rate crossover year — Option A (first year SaaS annual cost is lower than stay-put annual cost)"
-      },
-      {
-       "a": "B87",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=IF(SUM(B82:F82)=0,\"No crossover within horizon\",INDEX(B52:F52,MATCH(1,B82:F82,0)))"
-      },
-      {
-       "a": "C87",
-       "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
-      },
-      {
-       "a": "D87",
-       "fmt": "general",
-       "t": "text",
-       "v": "Compares one year's cost against one year's cost — not cumulative totals. Year 1 stay-put cost includes the one-time license; in later years it is maintenance only."
-      }
-     ]
-    },
-    {
-     "span": false,
-     "cells": [
-      {
        "a": "A88",
        "fmt": "general",
        "t": "text",
-       "v": "Run-rate crossover year — Option B (first year SaaS annual cost is lower than stay-put annual cost)"
-      },
-      {
-       "a": "B88",
-       "fmt": "general",
-       "t": "formula",
-       "f": "=IF(SUM(B83:F83)=0,\"No crossover within horizon\",INDEX(B52:F52,MATCH(1,B83:F83,0)))"
-      },
-      {
-       "a": "C88",
-       "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
-      },
-      {
-       "a": "D88",
-       "fmt": "general",
-       "t": "text",
-       "v": "Compares one year's cost against one year's cost — not cumulative totals. Year 1 stay-put cost includes the one-time license; in later years it is maintenance only."
+       "v": "Comparison summary — per option (all values below are formulas)"
       }
      ]
     },
@@ -2286,36 +2266,78 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A89",
        "fmt": "general",
        "t": "text",
-       "v": "Run-rate crossover year — Option C (first year SaaS annual cost is lower than stay-put annual cost)"
+       "v": "Option"
       },
       {
        "a": "B89",
        "fmt": "general",
-       "t": "formula",
-       "f": "=IF(SUM(B84:F84)=0,\"No crossover within horizon\",INDEX(B52:F52,MATCH(1,B84:F84,0)))"
+       "t": "text",
+       "v": "Total at horizon ($)"
       },
       {
        "a": "C89",
        "fmt": "general",
        "t": "text",
-       "v": "OUTPUT"
+       "v": "5-year total ($)"
       },
       {
        "a": "D89",
        "fmt": "general",
        "t": "text",
-       "v": "Compares one year's cost against one year's cost — not cumulative totals. Year 1 stay-put cost includes the one-time license; in later years it is maintenance only."
+       "v": "Break-even year"
+      },
+      {
+       "a": "E89",
+       "fmt": "general",
+       "t": "text",
+       "v": "Note"
+      },
+      {
+       "a": "F89",
+       "fmt": "general",
+       "t": "text",
+       "v": "Run-rate crossover year"
       }
      ]
     },
     {
-     "span": true,
+     "span": false,
      "cells": [
       {
        "a": "A90",
        "fmt": "general",
        "t": "text",
-       "v": "Usage & coupon results — added in v3 (all cells below are formulas)"
+       "v": "Stay put (perpetual)"
+      },
+      {
+       "a": "B90",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=B77"
+      },
+      {
+       "a": "C90",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=B80"
+      },
+      {
+       "a": "D90",
+       "fmt": "general",
+       "t": "text",
+       "v": "—"
+      },
+      {
+       "a": "E90",
+       "fmt": "general",
+       "t": "text",
+       "v": "Baseline: license paid once in Year 1, plus maintenance every year."
+      },
+      {
+       "a": "F90",
+       "fmt": "general",
+       "t": "text",
+       "v": "—"
       }
      ]
     },
@@ -2326,25 +2348,37 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A91",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS Option A — annual usage cost ($)"
+       "v": "SaaS — Option A"
       },
       {
        "a": "B91",
-       "fmt": "money",
+       "fmt": "general",
        "t": "formula",
-       "f": "=MAX($B$28,$B$25/IF($B$24=\"per 1M tokens\",1000000,IF($B$24=\"per 1K tokens\",1000,1))*$B$26*(1-$B$27))*12"
+       "f": "=B78"
       },
       {
        "a": "C91",
        "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
+       "t": "formula",
+       "f": "=B81"
       },
       {
        "a": "D91",
        "fmt": "general",
+       "t": "formula",
+       "f": "=B76"
+      },
+      {
+       "a": "E91",
+       "fmt": "general",
        "t": "text",
-       "v": "Option A's usage charge for one year: the greater of the committed minimum or the metered usage, times 12 months. In this sample the $100/month minimum is what binds."
+       "v": "Option A: $20.00 net PUPM, seats 125 growing 10%/yr, minus its coupon credit, plus its per-1M-tokens usage line."
+      },
+      {
+       "a": "F91",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=B101"
       }
      ]
     },
@@ -2355,25 +2389,37 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A92",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS Option B — annual usage cost ($)"
+       "v": "SaaS — Option B"
       },
       {
        "a": "B92",
-       "fmt": "money",
+       "fmt": "general",
        "t": "formula",
-       "f": "=MAX($B$34,$B$31/IF($B$30=\"per 1M tokens\",1000000,IF($B$30=\"per 1K tokens\",1000,1))*$B$32*(1-$B$33))*12"
+       "f": "=B85"
       },
       {
        "a": "C92",
        "fmt": "general",
-       "t": "text",
-       "v": "OUTPUT"
+       "t": "formula",
+       "f": "=F69"
       },
       {
        "a": "D92",
        "fmt": "general",
+       "t": "formula",
+       "f": "=B83"
+      },
+      {
+       "a": "E92",
+       "fmt": "general",
        "t": "text",
-       "v": "Option B's usage charge for one year, figured the same way. Option B has no usage in this sample, so this is 0."
+       "v": "Option B: $24.00 net PUPM, seats 125 growing 10%/yr; no coupon and no usage in this sample."
+      },
+      {
+       "a": "F92",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=B102"
       }
      ]
     },
@@ -2384,22 +2430,364 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A93",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS Option C — annual usage cost ($)"
+       "v": "SaaS — Option C"
       },
       {
        "a": "B93",
-       "fmt": "money",
+       "fmt": "general",
        "t": "formula",
-       "f": "=MAX($B$40,$B$37/IF($B$36=\"per 1M tokens\",1000000,IF($B$36=\"per 1K tokens\",1000,1))*$B$38*(1-$B$39))*12"
+       "f": "=B86"
       },
       {
        "a": "C93",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=F72"
+      },
+      {
+       "a": "D93",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=B84"
+      },
+      {
+       "a": "E93",
+       "fmt": "general",
+       "t": "text",
+       "v": "Option C: $18.00 net PUPM, seats 125 growing 10%/yr, minus its coupon credit, plus its per-1K-tokens usage line."
+      },
+      {
+       "a": "F93",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=B103"
+      }
+     ]
+    },
+    {
+     "span": true,
+     "cells": [
+      {
+       "a": "A95",
+       "fmt": "general",
+       "t": "text",
+       "v": "Annual run-rate crossover — added in v2 (all cells below are formulas)"
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A96",
+       "fmt": "general",
+       "t": "text",
+       "v": "Helper A2: SaaS Option A annual cost is lower than stay-put annual cost (1 = yes, 0 = no)"
+      },
+      {
+       "a": "B96",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(B62<B60)"
+      },
+      {
+       "a": "C96",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(C62<C60)"
+      },
+      {
+       "a": "D96",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(D62<D60)"
+      },
+      {
+       "a": "E96",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(E62<E60)"
+      },
+      {
+       "a": "F96",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(F62<F60)"
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A97",
+       "fmt": "general",
+       "t": "text",
+       "v": "Helper B2: SaaS Option B annual cost is lower than stay-put annual cost (1 = yes, 0 = no)"
+      },
+      {
+       "a": "B97",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(B68<B60)"
+      },
+      {
+       "a": "C97",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(C68<C60)"
+      },
+      {
+       "a": "D97",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(D68<D60)"
+      },
+      {
+       "a": "E97",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(E68<E60)"
+      },
+      {
+       "a": "F97",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(F68<F60)"
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A98",
+       "fmt": "general",
+       "t": "text",
+       "v": "Helper C2: SaaS Option C annual cost is lower than stay-put annual cost (1 = yes, 0 = no)"
+      },
+      {
+       "a": "B98",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(B71<B60)"
+      },
+      {
+       "a": "C98",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(C71<C60)"
+      },
+      {
+       "a": "D98",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(D71<D60)"
+      },
+      {
+       "a": "E98",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(E71<E60)"
+      },
+      {
+       "a": "F98",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(F71<F60)"
+      }
+     ]
+    },
+    {
+     "span": true,
+     "cells": [
+      {
+       "a": "A100",
+       "fmt": "general",
+       "t": "text",
+       "v": "Run-rate crossover — results"
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A101",
+       "fmt": "general",
+       "t": "text",
+       "v": "Run-rate crossover year — Option A (first year SaaS annual cost is lower than stay-put annual cost)"
+      },
+      {
+       "a": "B101",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=IF(SUM(B96:F96)=0,\"No crossover within horizon\",INDEX(B66:F66,MATCH(1,B96:F96,0)))"
+      },
+      {
+       "a": "C101",
        "fmt": "general",
        "t": "text",
        "v": "OUTPUT"
       },
       {
-       "a": "D93",
+       "a": "D101",
+       "fmt": "general",
+       "t": "text",
+       "v": "Compares one year's cost against one year's cost — not cumulative totals. Year 1 stay-put cost includes the one-time license; in later years it is maintenance only."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A102",
+       "fmt": "general",
+       "t": "text",
+       "v": "Run-rate crossover year — Option B (first year SaaS annual cost is lower than stay-put annual cost)"
+      },
+      {
+       "a": "B102",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=IF(SUM(B97:F97)=0,\"No crossover within horizon\",INDEX(B66:F66,MATCH(1,B97:F97,0)))"
+      },
+      {
+       "a": "C102",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D102",
+       "fmt": "general",
+       "t": "text",
+       "v": "Compares one year's cost against one year's cost — not cumulative totals. Year 1 stay-put cost includes the one-time license; in later years it is maintenance only."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A103",
+       "fmt": "general",
+       "t": "text",
+       "v": "Run-rate crossover year — Option C (first year SaaS annual cost is lower than stay-put annual cost)"
+      },
+      {
+       "a": "B103",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=IF(SUM(B98:F98)=0,\"No crossover within horizon\",INDEX(B66:F66,MATCH(1,B98:F98,0)))"
+      },
+      {
+       "a": "C103",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D103",
+       "fmt": "general",
+       "t": "text",
+       "v": "Compares one year's cost against one year's cost — not cumulative totals. Year 1 stay-put cost includes the one-time license; in later years it is maintenance only."
+      }
+     ]
+    },
+    {
+     "span": true,
+     "cells": [
+      {
+       "a": "A104",
+       "fmt": "general",
+       "t": "text",
+       "v": "Usage & coupon results — added in v3 (all cells below are formulas)"
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A105",
+       "fmt": "general",
+       "t": "text",
+       "v": "SaaS Option A — annual usage cost ($)"
+      },
+      {
+       "a": "B105",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=MAX($B$42,$B$39/IF($B$38=\"per 1M tokens\",1000000,IF($B$38=\"per 1K tokens\",1000,1))*$B$40*(1-$B$41))*12"
+      },
+      {
+       "a": "C105",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D105",
+       "fmt": "general",
+       "t": "text",
+       "v": "Option A's usage charge for one year: the greater of the committed minimum or the metered usage, times 12 months. In this sample the $100/month minimum is what binds."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A106",
+       "fmt": "general",
+       "t": "text",
+       "v": "SaaS Option B — annual usage cost ($)"
+      },
+      {
+       "a": "B106",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=MAX($B$48,$B$45/IF($B$44=\"per 1M tokens\",1000000,IF($B$44=\"per 1K tokens\",1000,1))*$B$46*(1-$B$47))*12"
+      },
+      {
+       "a": "C106",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D106",
+       "fmt": "general",
+       "t": "text",
+       "v": "Option B's usage charge for one year, figured the same way. Option B has no usage in this sample, so this is 0."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A107",
+       "fmt": "general",
+       "t": "text",
+       "v": "SaaS Option C — annual usage cost ($)"
+      },
+      {
+       "a": "B107",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=MAX($B$54,$B$51/IF($B$50=\"per 1M tokens\",1000000,IF($B$50=\"per 1K tokens\",1000,1))*$B$52*(1-$B$53))*12"
+      },
+      {
+       "a": "C107",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D107",
        "fmt": "general",
        "t": "text",
        "v": "Option C's usage charge for one year, figured the same way. In this sample the $150/month minimum is what binds."
@@ -2410,28 +2798,340 @@ window.CONVERSION_CALCULATOR_DATA = {
      "span": false,
      "cells": [
       {
-       "a": "A94",
+       "a": "A108",
        "fmt": "general",
        "t": "text",
        "v": "Coupon credits in Year 1 — Options A / B / C combined ($)"
       },
       {
-       "a": "B94",
+       "a": "B108",
        "fmt": "money",
        "t": "formula",
-       "f": "=$B$23+$B$29+$B$35"
+       "f": "=$B$37+$B$43+$B$49"
       },
       {
-       "a": "C94",
+       "a": "C108",
        "fmt": "general",
        "t": "text",
        "v": "OUTPUT"
       },
       {
-       "a": "D94",
+       "a": "D108",
        "fmt": "general",
        "t": "text",
        "v": "Total one-time coupon credits across the three options. Each credit comes off that option's Year 1 cost only."
+      }
+     ]
+    },
+    {
+     "span": true,
+     "cells": [
+      {
+       "a": "A110",
+       "fmt": "general",
+       "t": "text",
+       "v": "Per-seat & growth readouts — added in v4 (all cells below are formulas)"
+      }
+     ]
+    },
+    {
+     "span": true,
+     "cells": [
+      {
+       "a": "A111",
+       "fmt": "general",
+       "t": "text",
+       "v": "Why a company can spend MORE here and still be winning: the SaaS options serve a growing seat count — 125 seats in Year 1, 183 by Year 5 in this sample — while staying put covers the licensed seats and charges a new license for every added person. So an option's total can pass the stay-put total while its cost per seat stays lower. That is the conversion pitch: TCV up because the rollout grows, cost per seat down. Both numbers are on this sheet — totals in the results, per-seat in the readouts below."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A112",
+       "fmt": "general",
+       "t": "text",
+       "v": "Net PUPM — Option A ($ per seat per month)"
+      },
+      {
+       "a": "B112",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$24*(1-$B$25)"
+      },
+      {
+       "a": "C112",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D112",
+       "fmt": "general",
+       "t": "text",
+       "v": "What one Option A seat costs for one month, after its discount."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A113",
+       "fmt": "general",
+       "t": "text",
+       "v": "Net PUPM — Option B ($ per seat per month)"
+      },
+      {
+       "a": "B113",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$28*(1-$B$29)"
+      },
+      {
+       "a": "C113",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D113",
+       "fmt": "general",
+       "t": "text",
+       "v": "What one Option B seat costs for one month, after its discount."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A114",
+       "fmt": "general",
+       "t": "text",
+       "v": "Net PUPM — Option C ($ per seat per month)"
+      },
+      {
+       "a": "B114",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$32*(1-$B$33)"
+      },
+      {
+       "a": "C114",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D114",
+       "fmt": "general",
+       "t": "text",
+       "v": "What one Option C seat costs for one month, after its discount."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A115",
+       "fmt": "general",
+       "t": "text",
+       "v": "Seats at Year 5 — Option A"
+      },
+      {
+       "a": "B115",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$26*(1+$B$27)^4,0)"
+      },
+      {
+       "a": "C115",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D115",
+       "fmt": "general",
+       "t": "text",
+       "v": "Option A seats in Year 5 at its growth rate, rounded to whole seats."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A116",
+       "fmt": "general",
+       "t": "text",
+       "v": "Seats at Year 5 — Option B"
+      },
+      {
+       "a": "B116",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$30*(1+$B$31)^4,0)"
+      },
+      {
+       "a": "C116",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D116",
+       "fmt": "general",
+       "t": "text",
+       "v": "Option B seats in Year 5 at its growth rate, rounded to whole seats."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A117",
+       "fmt": "general",
+       "t": "text",
+       "v": "Seats at Year 5 — Option C"
+      },
+      {
+       "a": "B117",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$34*(1+$B$35)^4,0)"
+      },
+      {
+       "a": "C117",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D117",
+       "fmt": "general",
+       "t": "text",
+       "v": "Option C seats in Year 5 at its growth rate, rounded to whole seats."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A118",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year-5 run rate — Option A ($ per year, incl. usage)"
+      },
+      {
+       "a": "B118",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$26*(1+$B$27)^4,0)*($B$24*(1-$B$25))*12+MAX($B$42,$B$39/IF($B$38=\"per 1M tokens\",1000000,IF($B$38=\"per 1K tokens\",1000,1))*$B$40*(1-$B$41))*12"
+      },
+      {
+       "a": "C118",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D118",
+       "fmt": "general",
+       "t": "text",
+       "v": "What Option A costs for a year once it is at Year-5 seats: subscription at Year-5 seats, plus its usage line."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A119",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year-5 run rate — Option B ($ per year, incl. usage)"
+      },
+      {
+       "a": "B119",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$30*(1+$B$31)^4,0)*($B$28*(1-$B$29))*12+MAX($B$48,$B$45/IF($B$44=\"per 1M tokens\",1000000,IF($B$44=\"per 1K tokens\",1000,1))*$B$46*(1-$B$47))*12"
+      },
+      {
+       "a": "C119",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D119",
+       "fmt": "general",
+       "t": "text",
+       "v": "What Option B costs for a year once it is at Year-5 seats: subscription at Year-5 seats, plus its usage line."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A120",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year-5 run rate — Option C ($ per year, incl. usage)"
+      },
+      {
+       "a": "B120",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$34*(1+$B$35)^4,0)*($B$32*(1-$B$33))*12+MAX($B$54,$B$51/IF($B$50=\"per 1M tokens\",1000000,IF($B$50=\"per 1K tokens\",1000,1))*$B$52*(1-$B$53))*12"
+      },
+      {
+       "a": "C120",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D120",
+       "fmt": "general",
+       "t": "text",
+       "v": "What Option C costs for a year once it is at Year-5 seats: subscription at Year-5 seats, plus its usage line."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A121",
+       "fmt": "general",
+       "t": "text",
+       "v": "Stay-put effective cost per seat per month at horizon ($)"
+      },
+      {
+       "a": "B121",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=INDEX(B61:F61,$B$17)/($B$23*12*$B$17)"
+      },
+      {
+       "a": "C121",
+       "fmt": "general",
+       "t": "text",
+       "v": "OUTPUT"
+      },
+      {
+       "a": "D121",
+       "fmt": "general",
+       "t": "text",
+       "v": "Stay-put total at your horizon, spread over the licensed seats and months — the per-seat figure to compare against each option's net PUPM."
       }
      ]
     }
@@ -2442,23 +3142,23 @@ window.CONVERSION_CALCULATOR_DATA = {
      "series": [
       {
        "name": "Stay put — cumulative cost ($)",
-       "from": "B47",
-       "to": "F47"
+       "from": "B61",
+       "to": "F61"
       },
       {
        "name": "SaaS Option A — cumulative cost ($)",
-       "from": "B49",
-       "to": "F49"
+       "from": "B63",
+       "to": "F63"
       },
       {
        "name": "SaaS Option B — cumulative cost ($)",
-       "from": "B55",
-       "to": "F55"
+       "from": "B69",
+       "to": "F69"
       },
       {
        "name": "SaaS Option C — cumulative cost ($)",
-       "from": "B58",
-       "to": "F58"
+       "from": "B72",
+       "to": "F72"
       }
      ]
     }

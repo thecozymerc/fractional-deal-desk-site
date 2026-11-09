@@ -10,9 +10,12 @@
      Formulas are never shown. Numbers: the workbook's own sample values.
      Uses: ../../assets/styles.css + ../../assets/spreadsheet-tool.js +
      ../../assets/formula-engine.js + this folder's data file (converted
-     from "Perpetual-to-SaaS Conversion Calculator — SAMPLE v3.xlsx" by
-     convert-workbook.py; v3 adds one-time coupon credits and per-option
-     usage lines — the Tool 1 factors).
+     from "Perpetual-to-SaaS Conversion Calculator — SAMPLE v4.xlsx" by
+     convert-workbook.py; v3 added one-time coupon credits and per-option
+     usage lines — the Tool 1 factors; v4 rebuilds the SaaS side around
+     seats and PUPM — list price per seat, discount, net PUPM, starting
+     seats and yearly seat growth — so the sheet shows the upsell case
+     (TCV growing with the rollout) next to the savings case).
      Map: site/CODE-MAP.md ("tools/perpetual-to-saas-conversion/").
      Rule: any change here is recorded in site/CHANGELOG.md with the
      CODE-MAP and this folder's LABEL.md updated in the same change
@@ -45,7 +48,7 @@
     <p class="kicker">Proof of Work · Pricing Engines</p>
     <h1>Perpetual-to-SaaS Conversion Calculator.</h1>
     <p class="lede">When a customer is deciding whether to stay on a perpetual license or move to subscription pricing, this calculator compares staying put with three SaaS options, year by year. It shows both the cumulative break-even and the year when the annual run-rate crosses over, with a chart so the shape of the decision is visible.</p>
-    <p>Below is the actual workbook — its one sheet, with its chart. The names and data are samples where they need to be, but the mechanics are real: change an input, and the tool answers. The formulas stay under the hood. Each SaaS option can also carry a one-time coupon credit and a usage line — priced per use or per token, with a usage discount and a committed monthly minimum — so a conversion priced on consumption is compared honestly, not just on subscription.</p>
+    <p>Below is the actual workbook — its one sheet, with its chart. The names and data are samples where they need to be, but the mechanics are real: change an input, and the tool answers. The formulas stay under the hood. Each SaaS option is priced the real way — a list price per seat per month and a discount give the net PUPM; a starting seat count and a yearly growth rate grow the deal — and each option can also carry a one-time coupon credit and a usage line, priced per use or per token. So the sheet shows both stories at once: what the conversion saves per seat, and why the total can grow as the rollout grows.</p>
 
     <div class="tool-frame">
       <div id="wb-tool"></div>
