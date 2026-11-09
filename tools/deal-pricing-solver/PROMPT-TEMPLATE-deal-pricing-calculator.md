@@ -46,6 +46,7 @@ Build a working web calculator for [PAGE ID — e.g. S6-P01.c] — [TOOL NAME] �
 4. Formulas are machinery, never display.
 5. Build everything asked in ONE pass, then bring it back for Lucky's good/bad ruling — review versions are expected (this calculator took four).
 6. Verify before reporting: the math against the sources' worked examples AND the companion workbook recalculated in a real spreadsheet engine — page and sheet must agree.
+7. **THE FACTORS STANDARD (Lucky, Nov 8, 2026 — applies to Tool 1, Tool 2, and every pricing tool after):** every pricing tool keeps the full factor set in mind, adapted to its job — product lines with dropdown presets + editable names + add/delete; a coupon field per line; usage lines built INTO the deal views, never a separate tab (unit types: per use / per API request / per 1,000 tokens / per 1,000,000 tokens; a usage discount; a committed monthly minimum); and a usage-threshold concession where it fits the tool's job. The umbrella word is **usage** — tokens are one unit type inside it, never the headline word. Applied so far: S6-P01.a (the full set, as shipped) and S6-P01.b v3 (coupon adapted as a one-time Year-1 credit per option + a usage line per option; the concession's role there is played by the committed monthly minimum).
 
 ## PART 3 — THE ACCEPTANCE TESTS (S6-P01.a's actual numbers)
 
