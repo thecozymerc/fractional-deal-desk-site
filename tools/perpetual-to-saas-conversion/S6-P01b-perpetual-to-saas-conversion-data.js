@@ -2,7 +2,7 @@
    Do not hand-edit: re-run the converter. Formula cells carry the sheet's
    own formulas as machinery for the formula engine; they are never displayed. */
 window.CONVERSION_CALCULATOR_DATA = {
- "source": "Perpetual-to-SaaS Conversion Calculator — SAMPLE v10.xlsx",
+ "source": "Perpetual-to-SaaS Conversion Calculator — SAMPLE v11.xlsx",
  "sheets": [
   {
    "name": "Conversion Calculator",
@@ -48,7 +48,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A5",
        "fmt": "general",
        "t": "text",
-       "v": "1. Enter the yellow INPUT cells: perpetual license value, annual maintenance, licensed seats, horizon in years, and any Year 1 migration discount. Then, for each SaaS option: its list price per seat per month, its discount, its starting seats and yearly seat growth — plus its one-time coupon credit and its usage line (usage type, expected usage per month, price per unit, usage discount, and committed monthly minimum). The three subscription figures in the top block are derived from the seat block, not typed in. Rename any option in the name cells at the top of the seat block — everything below calls it by your name."
+       "v": "1. Enter the yellow INPUT cells: perpetual license value, annual maintenance, licensed seats, the term in months (plus any extra days, on the row just above the year table), and any Year 1 migration discount. Then, for each SaaS option: its list price per seat per month, its discount, its starting seats and yearly seat growth — plus its one-time coupon credit and its usage line (usage type, expected usage per month, price per unit, usage discount, and committed monthly minimum). The three subscription figures in the top block are derived from the seat block, not typed in. Rename any option in the name cells at the top of the seat block — everything below calls it by your name."
       }
      ]
     },
@@ -70,7 +70,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A7",
        "fmt": "general",
        "t": "text",
-       "v": "3. Read the results block for the break-even year for each option, the totals at your horizon, and the difference between the paths — then check the comparison summary and the chart, which plots the cumulative rows from the table. The comparison summary also shows both views side by side for each option: the break-even year (cumulative) and the run-rate crossover year — the first year the option's annual cost is lower than the stay-put annual cost."
+       "v": "3. Read the results block for the break-even year for each option, the totals at the end of your term, and the difference between the paths — then check the comparison summary and the chart, which plots the cumulative rows from the table. The comparison summary also shows both views side by side for each option: the break-even year (cumulative) and the run-rate crossover year — the first year the option's annual cost is lower than the stay-put annual cost."
       }
      ]
     },
@@ -92,7 +92,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A9",
        "fmt": "general",
        "t": "text",
-       "v": "Inputs: yellow cells marked INPUT. Logic: Staying put costs the license once in Year 1 plus maintenance every year, and covers the licensed seats. A SaaS option is seat-driven: net PUPM = list price per seat x (1 - discount); seats grow each year at the option's growth rate (rounded to whole seats); a year's subscription = that year's seats x net PUPM x 12, with the migration discount and the one-time coupon credit in Year 1 only, plus the usage cost every year. Usage cost for a year = the greater of the committed monthly minimum or the metered usage (units per month / units-per-price x price per unit x (1 - usage discount)), times 12. All year rows and totals are formulas. The Year-1 migration discount % input applies to all three SaaS options equally. The option names are labels only — they change no math. A seat growth of 0% keeps an option’s seats flat; in this sample the third option is flat (0%) while the first two grow at 10% a year. The horizon runs 1 to 20 years — the sheet carries twenty year columns, so a horizon above 20 reads as 20, and below 1 reads as 1. A fraction rounds to the nearest whole year (2.5 reads as 3)."
+       "v": "Inputs: yellow cells marked INPUT. Logic: Staying put costs the license once in Year 1 plus maintenance every year, and covers the licensed seats. A SaaS option is seat-driven: net PUPM = list price per seat x (1 - discount); seats grow each year at the option's growth rate (rounded to whole seats); a year's subscription = that year's seats x net PUPM x 12, with the migration discount and the one-time coupon credit in Year 1 only, plus the usage cost every year. Usage cost for a year = the greater of the committed monthly minimum or the metered usage (units per month / units-per-price x price per unit x (1 - usage discount)), times 12. All year rows and totals are formulas. The Year-1 migration discount % input applies to all three SaaS options equally. The option names are labels only — they change no math. A seat growth of 0% keeps an option’s seats flat; in this sample the third option is flat (0%) while the first two grow at 10% a year. The term is set in months (plus any extra days, on the row just above the year table) — the way contracts are actually written. Whole years inside the term read straight off the twenty year columns; the leftover months and days are charged pro-rata at the next year’s cost (days as days/365 of that year). A term past 20 years reads as 20 years; the break-even and crossover rows still read in whole years."
       }
      ]
     },
@@ -103,7 +103,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A10",
        "fmt": "general",
        "t": "text",
-       "v": "Limits: the table shows Years 1 to 20, so set the horizon between 1 and 20. It compares cost only — it does not value features, support, or risk, and it does not discount future cash flows. Three generic SaaS options are compared against staying put. Usage is held flat at the expected monthly level for every year — real usage usually grows, which moves the break-even later than this table shows. Seat growth is a straight yearly percentage — real rollouts move in steps, and a step rollout makes the growth years lumpier than this table shows."
+       "v": "Limits: the term is set in months (and extra days) and can run to 20 years — the table carries twenty year columns, whole years read straight off them, and the leftover part of a year is charged pro-rata at the next year’s cost. It compares cost only — it does not value features, support, or risk, and it does not discount future cash flows. Three generic SaaS options are compared against staying put. Usage is held flat at the expected monthly level for every year — real usage usually grows, which moves the break-even later than this table shows. Seat growth is a straight yearly percentage — real rollouts move in steps, and a step rollout makes the growth years lumpier than this table shows."
       }
      ]
     },
@@ -114,7 +114,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A11",
        "fmt": "general",
        "t": "text",
-       "v": "Note: Built fresh for the website; it is not a copy of any internal file. Three generic options compared; the chart plots the workbook's own cumulative rows. Version 2 adds the annual run-rate crossover: the first year an option's one-year cost drops below the stay-put one-year cost, shown next to the cumulative break-even. Version 3 (Nov 8, 2026) adds the Tool 1 factors: one-time coupon credits and per-option usage lines (per use / per token), so a conversion priced on consumption is compared honestly. Version 4 (Nov 8, 2026) rebuilds the SaaS side around seats and PUPM, on Lucky's direction: the tool must show the reason a company spends MORE on a conversion — rollout growth raising TCV — not only the savings case. Version 5 (Nov 9, 2026) makes the option names editable, on Lucky's direction after his v4 review pass: three name inputs, and every label that names an option is now a formula carrying the typed name. v6 (Nov 10, 2026): built at the owner’s review — a seats-by-year table and cost-per-seat-at-horizon rows were added so seat growth is shown, not just priced, and the third option’s sample growth was set to 0% so a flat option sits next to growing ones. v7 (Nov 10, 2026): the horizon is clamped to the sheet’s five year columns (1–5) — before this, a horizon outside 1–5 sent the totals and cost-per-seat rows to zero, because they index the year columns by the horizon; the horizon label and the inputs note now state the range. v8 (Nov 10, 2026): the year table was widened from five to twenty year columns at the owner’s direction — the horizon now truly runs 1 to 20 years, and the v7 clamp remains only as a guard at those stated ends. The fixed Year-5 readouts and the 5-year summary rows still read Year 5, exactly as their labels say. v9 (Nov 10, 2026): from the simulation sweep — a fractional horizon (2.5) reached the year INDEX as a fraction and the page printed #DIV/0! in the cost-per-seat rows; the horizon is now rounded to a whole year inside the clamp, so the sheet, the page, and the phone summary strip all read a fraction the same way. v10 (Nov 10, 2026): text sweep — the Limits note and the horizon’s side note still said 1 to 5 from the five-column era; both now state the 1-to-20 range. No math changed."
+       "v": "Note: Built fresh for the website; it is not a copy of any internal file. Three generic options compared; the chart plots the workbook's own cumulative rows. Version 2 adds the annual run-rate crossover: the first year an option's one-year cost drops below the stay-put one-year cost, shown next to the cumulative break-even. Version 3 (Nov 8, 2026) adds the Tool 1 factors: one-time coupon credits and per-option usage lines (per use / per token), so a conversion priced on consumption is compared honestly. Version 4 (Nov 8, 2026) rebuilds the SaaS side around seats and PUPM, on Lucky's direction: the tool must show the reason a company spends MORE on a conversion — rollout growth raising TCV — not only the savings case. Version 5 (Nov 9, 2026) makes the option names editable, on Lucky's direction after his v4 review pass: three name inputs, and every label that names an option is now a formula carrying the typed name. v6 (Nov 10, 2026): built at the owner’s review — a seats-by-year table and cost-per-seat-at-horizon rows were added so seat growth is shown, not just priced, and the third option’s sample growth was set to 0% so a flat option sits next to growing ones. v7 (Nov 10, 2026): the horizon is clamped to the sheet’s five year columns (1–5) — before this, a horizon outside 1–5 sent the totals and cost-per-seat rows to zero, because they index the year columns by the horizon; the horizon label and the inputs note now state the range. v8 (Nov 10, 2026): the year table was widened from five to twenty year columns at the owner’s direction — the horizon now truly runs 1 to 20 years, and the v7 clamp remains only as a guard at those stated ends. The fixed Year-5 readouts and the 5-year summary rows still read Year 5, exactly as their labels say. v9 (Nov 10, 2026): from the simulation sweep — a fractional horizon (2.5) reached the year INDEX as a fraction and the page printed #DIV/0! in the cost-per-seat rows; the horizon is now rounded to a whole year inside the clamp, so the sheet, the page, and the phone summary strip all read a fraction the same way. v10 (Nov 10, 2026): text sweep — the Limits note and the horizon’s side note still said 1 to 5 from the five-column era; both now state the 1-to-20 range. No math changed. v11 (Nov 10, 2026): the term is now set the way it was done at Google — in MONTHS and DAYS, not whole years (Lucky’s correction). The old years input became Term — months (default 60 = the same 5-year sample), plus a Term — extra days input above the year table. Totals now add the leftover part-year pro-rata at the next year’s cost; cost-per-seat reads the seats of the year the term ends in; terms past 20 years read as 20. Every “horizon” label became “term.”"
       }
      ]
     },
@@ -223,13 +223,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A17",
        "fmt": "general",
        "t": "text",
-       "v": "Horizon (years, 1–20)"
+       "v": "Term — months — SAMPLE"
       },
       {
        "a": "B17",
        "fmt": "int",
        "t": "input",
-       "v": 5
+       "v": 60
       },
       {
        "a": "C17",
@@ -241,7 +241,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D17",
        "fmt": "general",
        "t": "text",
-       "v": "How many years to compare. Use 1 to 20 (a fraction rounds to the nearest whole year)."
+       "v": "The whole term in months — 12 = 1 year, 30 = 2½ years, 60 = 5 years. Add any leftover days on the “Term — extra days” row just above the year table."
       }
      ]
     },
@@ -1388,6 +1388,35 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "general",
        "t": "text",
        "v": "Usage cost = MAX(committed minimum, units per month / units-per-price x price per unit x (1 - usage discount)) x 12. Tokens — per 1M divides units by 1,000,000; per 1K by 1,000; per use and per API request divide by 1. The one-time coupon credit comes off Year 1 only, after the migration discount and the usage cost are added."
+      }
+     ]
+    },
+    {
+     "span": false,
+     "cells": [
+      {
+       "a": "A60",
+       "fmt": "general",
+       "t": "text",
+       "v": "Term — extra days beyond the months — SAMPLE"
+      },
+      {
+       "a": "B60",
+       "fmt": "int",
+       "t": "input",
+       "v": 0
+      },
+      {
+       "a": "C60",
+       "fmt": "general",
+       "t": "text",
+       "v": "INPUT"
+      },
+      {
+       "a": "D60",
+       "fmt": "general",
+       "t": "text",
+       "v": "Leftover days past the whole months — for a term of 2 years and 47 days, set the months above to 24 and put 47 here. Days are charged as days/365 of the next year’s cost."
       }
      ]
     },
@@ -3819,7 +3848,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A84",
        "fmt": "general",
        "t": "text",
-       "v": "Cost per seat at horizon — total cost divided by the seats served in the final year ($)"
+       "v": "Cost per seat at term end — total cost divided by the seats served in the final year of the term ($)"
       }
      ]
     },
@@ -3830,7 +3859,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A85",
        "fmt": "general",
        "t": "text",
-       "v": "Cost per seat at horizon — Stay put"
+       "v": "Cost per seat at term end — Stay put"
       },
       {
        "a": "B85",
@@ -3847,13 +3876,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A86",
        "fmt": "general",
        "t": "formula",
-       "f": "=\"Cost per seat at horizon — \"&$B$23"
+       "f": "=\"Cost per seat at term end — \"&$B$23"
       },
       {
        "a": "B86",
        "fmt": "money",
        "t": "formula",
-       "f": "=B93/INDEX(B80:U80,MIN(MAX(ROUND($B$17,0),1),20))"
+       "f": "=B93/INDEX(B80:U80,MAX(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)+IF(IF(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)>=20,0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20))>0,1,0),1))"
       }
      ]
     },
@@ -3864,13 +3893,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A87",
        "fmt": "general",
        "t": "formula",
-       "f": "=\"Cost per seat at horizon — \"&$B$24"
+       "f": "=\"Cost per seat at term end — \"&$B$24"
       },
       {
        "a": "B87",
        "fmt": "money",
        "t": "formula",
-       "f": "=B100/INDEX(B81:U81,MIN(MAX(ROUND($B$17,0),1),20))"
+       "f": "=B100/INDEX(B81:U81,MAX(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)+IF(IF(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)>=20,0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20))>0,1,0),1))"
       }
      ]
     },
@@ -3881,13 +3910,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A88",
        "fmt": "general",
        "t": "formula",
-       "f": "=\"Cost per seat at horizon — \"&$B$25"
+       "f": "=\"Cost per seat at term end — \"&$B$25"
       },
       {
        "a": "B88",
        "fmt": "money",
        "t": "formula",
-       "f": "=B101/INDEX(B82:U82,MIN(MAX(ROUND($B$17,0),1),20))"
+       "f": "=B101/INDEX(B82:U82,MAX(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)+IF(IF(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)>=20,0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20))>0,1,0),1))"
       }
      ]
     },
@@ -3944,7 +3973,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B91",
        "fmt": "general",
        "t": "formula",
-       "f": "=IF(SUM(B68:U68)=0,\"No break-even within horizon\",INDEX(B69:U69,MATCH(1,B68:U68,0)))"
+       "f": "=IF(SUM(B68:U68)=0,\"No break-even within the term\",INDEX(B69:U69,MATCH(1,B68:U68,0)))"
       },
       {
        "a": "C91",
@@ -3967,13 +3996,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A92",
        "fmt": "general",
        "t": "text",
-       "v": "Stay-put total at horizon ($)"
+       "v": "Stay-put total at term end ($)"
       },
       {
        "a": "B92",
        "fmt": "money",
        "t": "formula",
-       "f": "=INDEX(B64:U64,MIN(MAX(ROUND($B$17,0),1),20))"
+       "f": "=IF(OR(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)=0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)<=0),0,INDEX(B64:U64,MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)))+IF(OR(IF(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)>=20,0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20))=0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)<=0),0,IF(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)>=20,0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20))*INDEX(B63:U63,MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)+1))"
       },
       {
        "a": "C92",
@@ -3985,7 +4014,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D92",
        "fmt": "general",
        "t": "text",
-       "v": "Cumulative stay-put cost at the horizon year you picked."
+       "v": "Cumulative stay-put cost at the end of your term."
       }
      ]
     },
@@ -3996,13 +4025,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A93",
        "fmt": "general",
        "t": "text",
-       "v": "SaaS total at horizon ($)"
+       "v": "SaaS total at term end ($)"
       },
       {
        "a": "B93",
        "fmt": "money",
        "t": "formula",
-       "f": "=INDEX(B66:U66,MIN(MAX(ROUND($B$17,0),1),20))"
+       "f": "=IF(OR(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)=0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)<=0),0,INDEX(B66:U66,MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)))+IF(OR(IF(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)>=20,0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20))=0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)<=0),0,IF(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)>=20,0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20))*INDEX(B65:U65,MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)+1))"
       },
       {
        "a": "C93",
@@ -4014,7 +4043,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D93",
        "fmt": "general",
        "t": "text",
-       "v": "Cumulative SaaS cost at the horizon year you picked."
+       "v": "Cumulative SaaS cost at the end of your term."
       }
      ]
     },
@@ -4025,7 +4054,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A94",
        "fmt": "general",
        "t": "text",
-       "v": "Difference at horizon — stay-put minus SaaS ($)"
+       "v": "Difference at term end — stay-put minus SaaS ($)"
       },
       {
        "a": "B94",
@@ -4043,7 +4072,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D94",
        "fmt": "general",
        "t": "text",
-       "v": "Positive means SaaS costs less in total by the horizon. Negative means staying put costs less."
+       "v": "Positive means SaaS costs less in total by the end of the term. Negative means staying put costs less."
       }
      ]
     },
@@ -4147,7 +4176,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B98",
        "fmt": "general",
        "t": "formula",
-       "f": "=IF(SUM(B73:U73)=0,\"No break-even within horizon\",INDEX(B69:U69,MATCH(1,B73:U73,0)))"
+       "f": "=IF(SUM(B73:U73)=0,\"No break-even within the term\",INDEX(B69:U69,MATCH(1,B73:U73,0)))"
       },
       {
        "a": "C98",
@@ -4176,7 +4205,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B99",
        "fmt": "general",
        "t": "formula",
-       "f": "=IF(SUM(B76:U76)=0,\"No break-even within horizon\",INDEX(B69:U69,MATCH(1,B76:U76,0)))"
+       "f": "=IF(SUM(B76:U76)=0,\"No break-even within the term\",INDEX(B69:U69,MATCH(1,B76:U76,0)))"
       },
       {
        "a": "C99",
@@ -4199,13 +4228,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A100",
        "fmt": "general",
        "t": "formula",
-       "f": "=\"SaaS \"&$B$24&\" total at horizon ($)\""
+       "f": "=\"SaaS \"&$B$24&\" total at term end ($)\""
       },
       {
        "a": "B100",
        "fmt": "general",
        "t": "formula",
-       "f": "=INDEX(B72:U72,MIN(MAX(ROUND($B$17,0),1),20))"
+       "f": "=IF(OR(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)=0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)<=0),0,INDEX(B72:U72,MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)))+IF(OR(IF(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)>=20,0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20))=0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)<=0),0,IF(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)>=20,0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20))*INDEX(B71:U71,MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)+1))"
       },
       {
        "a": "C100",
@@ -4217,7 +4246,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D100",
        "fmt": "general",
        "t": "text",
-       "v": "Cumulative SaaS Option B cost at the horizon year you picked."
+       "v": "Cumulative SaaS Option B cost at the end of your term."
       }
      ]
     },
@@ -4228,13 +4257,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A101",
        "fmt": "general",
        "t": "formula",
-       "f": "=\"SaaS \"&$B$25&\" total at horizon ($)\""
+       "f": "=\"SaaS \"&$B$25&\" total at term end ($)\""
       },
       {
        "a": "B101",
        "fmt": "general",
        "t": "formula",
-       "f": "=INDEX(B75:U75,MIN(MAX(ROUND($B$17,0),1),20))"
+       "f": "=IF(OR(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)=0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)<=0),0,INDEX(B75:U75,MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)))+IF(OR(IF(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)>=20,0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20))=0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)<=0),0,IF(MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)>=20,0,(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20))*INDEX(B74:U74,MIN(ROUND((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)-0.5,0),20)+1))"
       },
       {
        "a": "C101",
@@ -4246,7 +4275,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D101",
        "fmt": "general",
        "t": "text",
-       "v": "Cumulative SaaS Option C cost at the horizon year you picked."
+       "v": "Cumulative SaaS Option C cost at the end of your term."
       }
      ]
     },
@@ -4274,7 +4303,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B104",
        "fmt": "general",
        "t": "text",
-       "v": "Total at horizon ($)"
+       "v": "Total at term end ($)"
       },
       {
        "a": "C104",
@@ -4624,7 +4653,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B116",
        "fmt": "general",
        "t": "formula",
-       "f": "=IF(SUM(B111:U111)=0,\"No crossover within horizon\",INDEX(B69:U69,MATCH(1,B111:U111,0)))"
+       "f": "=IF(SUM(B111:U111)=0,\"No crossover within the term\",INDEX(B69:U69,MATCH(1,B111:U111,0)))"
       },
       {
        "a": "C116",
@@ -4653,7 +4682,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B117",
        "fmt": "general",
        "t": "formula",
-       "f": "=IF(SUM(B112:U112)=0,\"No crossover within horizon\",INDEX(B69:U69,MATCH(1,B112:U112,0)))"
+       "f": "=IF(SUM(B112:U112)=0,\"No crossover within the term\",INDEX(B69:U69,MATCH(1,B112:U112,0)))"
       },
       {
        "a": "C117",
@@ -4682,7 +4711,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B118",
        "fmt": "general",
        "t": "formula",
-       "f": "=IF(SUM(B113:U113)=0,\"No crossover within horizon\",INDEX(B69:U69,MATCH(1,B113:U113,0)))"
+       "f": "=IF(SUM(B113:U113)=0,\"No crossover within the term\",INDEX(B69:U69,MATCH(1,B113:U113,0)))"
       },
       {
        "a": "C118",
@@ -5115,13 +5144,13 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A136",
        "fmt": "general",
        "t": "text",
-       "v": "Stay-put effective cost per seat per month at horizon ($)"
+       "v": "Stay-put effective cost per seat per month at term end ($)"
       },
       {
        "a": "B136",
        "fmt": "money",
        "t": "formula",
-       "f": "=INDEX(B64:U64,MIN(MAX(ROUND($B$17,0),1),20))/($B$26*12*MIN(MAX(ROUND($B$17,0),1),20))"
+       "f": "=IF((MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)=0,0,B92/($B$26*12*(MIN(MAX(ROUND($B$17,0),0),240)/12+MIN(MAX(ROUND($B$60,0),0),364)/365)))"
       },
       {
        "a": "C136",
@@ -5133,7 +5162,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D136",
        "fmt": "general",
        "t": "text",
-       "v": "Stay-put total at your horizon, spread over the licensed seats and months — the per-seat figure to compare against each option's net PUPM."
+       "v": "Stay-put total at the end of your term, spread over the licensed seats and months — the per-seat figure to compare against each option's net PUPM."
       }
      ]
     }
