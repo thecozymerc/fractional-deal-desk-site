@@ -24,7 +24,17 @@ window.renderWorkbook = function (container, data) {
     if (typeof v === "string") return v;
     if (typeof v === "boolean") return v ? "TRUE" : "FALSE";
     if (fmt === "money") return v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    // money0 / pct1 / dateiso added Nov 11, 2026 for S6-P02 / Tool 4, whose workbook
+    // formats are "$"#,##0 (no decimals), 0.0% (one decimal) and yyyy-mm-dd.
+    if (fmt === "money0") return v.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     if (fmt === "pct") return (v * 100).toFixed(2) + "%";
+    if (fmt === "pct1") return (v * 100).toFixed(1) + "%";
+    if (fmt === "dateiso") {
+      var di = new Date(Math.round((v - 25569) * 86400 * 1000));
+      if (isNaN(di.getTime())) return String(v);
+      function p2i(x) { return (x < 10 ? "0" : "") + x; }
+      return di.getUTCFullYear() + "-" + p2i(di.getUTCMonth() + 1) + "-" + p2i(di.getUTCDate());
+    }
     if (fmt === "int") return String(Math.round(v));
     if (fmt === "date" || fmt === "datelong") {
       var dt = new Date(Math.round((v - 25569) * 86400 * 1000));
