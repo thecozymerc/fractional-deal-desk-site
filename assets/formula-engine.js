@@ -475,6 +475,12 @@ window.FormulaEngine = (function () {
         var x = toNum(ev(args[0])), d = args.length > 1 ? toNum(ev(args[1])) : 0, f = Math.pow(10, d);
         return Math.sign(x) * Math.ceil(Math.abs(x) * f - 1e-10) / f;
       },
+      // Added Nov 11, 2026 for S6-P02 / Tool 4 (Dashboard renewal count uses TODAY()+90):
+      // Excel serial for the visitor's local calendar date at midnight (1899-12-30 base).
+      TODAY: function () {
+        var n = new Date();
+        return Math.round((Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) - Date.UTC(1899, 11, 30)) / 86400000);
+      },
       TEXT: function (args, ev) {
         var v = ev(args[0]), fmt = toText(ev(args[1]));
         if (isError(v)) return v;
