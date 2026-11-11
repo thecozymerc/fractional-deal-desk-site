@@ -100,8 +100,8 @@
     function money2(v) { return "$" + (+v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
     function render() {
       var hRaw = sheet.get("B17");
-      var h = Math.min(Math.max(Math.round(hRaw) || 1, 1), 5);
-      var colL = "BCDEF".charAt(h - 1);
+      var h = Math.min(Math.max(Math.round(hRaw) || 1, 1), 20);
+      var colL = "BCDEFGHIJKLMNOPQRSTU".charAt(h - 1);
       var rows = [
         ["Stay put", "B92", "B85", sheet.get("B26")],
         [sheet.get("B23"), "B93", "B86", sheet.get(colL + "80")],
