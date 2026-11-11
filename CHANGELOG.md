@@ -1,7 +1,7 @@
 # CHANGE LOG — every change to the site code, in plain words
 
 ## 2026-11-11 — Identity pass: name + photo (Joseph Conte)
-- About: identity block at the top of the story section (photo + name + role + LinkedIn + Book a Call). Homepage: the same block in the Operator section above 'More about the operator'. Photo: Lucky's casual denim-jacket photo (supplied Nov 11, chosen over the formal studio headshot because it matches how he looks in person at events); square crop, 600×600, assets/about-photo.jpg replaced on both trees. styles.css gained .id-block rules. No locked copy edited.
+- About: identity block at the top of the story section (photo + name + role + LinkedIn + Book a Call). Homepage: the same block in the Operator section above 'More about the operator'. Photos: BOTH of Lucky's Nov 11 shots, side by side per his follow-up order ('the casual vs business guy') — casual denim photo as assets/about-photo.jpg ('In person') and the formal studio headshot as assets/business-photo.jpg ('In the boardroom'); square crops, 600×600, on both trees. styles.css gained .id-block rules. No locked copy edited.
 
 ## 2026-11-11 — Tool 14: Cloud Commit & Usage Playbook (S6-P01.d)
 - New tool page at /tools/cloud-commit-playbook/ with the original sample workbook embedded (Discount Matrix / Renewal Check / Commit & Usage; ALLINPUT conversion; formulas hidden). Phone strip reads the asked discount's approver, the ratchet verdict, the deepest growing discount, the commit's effective discount, and the unused commitment.
