@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     LABEL — S6-P05.2 — Contract Redlining Playbook & Clause Fallback
+     Matrix + Story 2 (tool page; Tool / piece ID: Tool 6 — Redlining
+     Playbook, address: /tools/redlining-playbook/)
+     What this page holds: the tool's write-up and the ACTUAL workbook
+     embedded below it — the Contract Redlining Playbook & Clause
+     Fallback Matrix (SAMPLE): 2 tabs (Playbook_Matrix,
+     Deal_Redline_Scorer), 115 cells, 35 of the workbook's own formulas
+     run by the formula engine. Formulas are never shown. Every
+     non-formula cell is a live input — in the real sheet, every
+     non-formula cell is typeable.
+     PROVENANCE (stated plainly, Lucky's rule): this workbook is a sample
+     built for the site in the Argon batch — it is NOT one of Lucky's
+     original work files. It was verified in the Section 6 restart
+     (SPEC — Redlining Playbook.md) and the page's directions are that
+     spec's corrected directions, pasted in. The story below is Story 2,
+     the workbook's companion text, in its own words. All clause
+     positions, thresholds, and scoring rules are illustrative sample
+     data — the file says so itself — and the standards shown are
+     illustrative governance architecture, not legal advice and not any
+     client's actual positions. The workbook carries no number formats
+     of its own and none were needed: tiers and risk points display as
+     the plain numbers they are; no value or formula was changed.
+     ENGINE NOTE: the scorer's formulas use CHOOSE and a range MAX,
+     which the shared formula engine did not have — both were added for
+     this tool (Nov 11, 2026), and the range MAX correction also fixed
+     a latent bug: MAX over a range used to read only its first cell.
+     Every earlier tool was re-verified after the change (Tools 2, 3,
+     4, 5 — zero differences).
+     Uses: ../../assets/styles.css + ../../assets/spreadsheet-tool.js +
+     ../../assets/formula-engine.js + this folder's data file (converted
+     from "Contract_Redlining_Playbook_&_Clause_Fallback_Matrix_
+     SAMPLE.xlsx" by convert-workbook.py, ALLINPUT mode). Verified
+     cell-for-cell against a LibreOffice recalculation: defaults plus
+     six scenarios (all tiers standard, all walk-away, one walk-away,
+     all escalation, fractional tiers, hostile values) — zero
+     differences in 35 compared formulas per scenario. Phone summary
+     strip on this page only: it reads the scorer's total risk score,
+     highest tier, and routing decision from its own engine instance
+     fed by the same typed values, so the verdict sits above the tool
+     on a phone instead of below the matrix.
+     Map: site/CODE-MAP.md ("tools/redlining-playbook/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S6-P05.2 — Contract Redlining Playbook &amp; Clause Fallback Matrix · Fractional Deal Desk &amp; Contract Management</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../services/">Services &amp; Pricing</a>
+      <a href="../../tools/">Proof of Work</a>
+      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section">
+    <p class="kicker">Proof of Work · Stories &amp; Sandboxes</p>
+    <h1>Contract Redlining Playbook &amp; Clause Fallback Matrix.</h1>
+    <p class="lede">Enterprise deals routinely stall in redlining because commercial teams rely on fragmented email threads and ad-hoc escalations instead of pre-approved guardrails. When a buyer's procurement team redlines payment terms, renewal uplift caps, auto-renewal notice windows, or liability caps, everything grinds to a halt while Sales, Deal Desk, Finance, and Legal debate each edit from scratch. This is the playbook that ends the debate before it starts: eight clauses, four pre-written positions each, and a scorer that names the approver each position needs and routes the deal. Every clause position and threshold in it is sample data — illustrative governance architecture, not legal advice and not any client's actual positions.</p>
+    <p><strong>Directions:</strong> For each of the eight clauses, set the tier the other side is asking for: Tier 0 is the standard position, Tier 1 the Deal Desk fallback, Tier 2 an escalation position, Tier 3 the walk-away boundary. The scorer adds up the risk points — 0, 1, 3, or 10 per clause depending on tier — names the approver each clause now needs, and routes the deal: low-risk redlines fast-track, mid-range redlines stay Deal Desk approvable, and anything touching the walk-away boundary is blocked. Read the playbook matrix alongside to see what each tier gives and gets.</p>
+
+    <div class="m-summary" id="m-summary" aria-label="Redline scoring totals"></div>
+
+    <div class="tool-frame">
+      <div id="wb-tool"></div>
+    </div>
+
+    <h2>Inputs, logic, limits</h2>
+    <p>Inputs: one Requested Tier (0–3) per clause — 8 inputs total; everything else in the workbook is reference text or formulas. Logic: each requested tier maps to a required approver and to risk points (0, 1, 3, or 10); the points sum to the Total Redline Risk Score, the Highest Tier Requested is taken across all eight clauses, and the routing decision follows from it — any Tier 3 blocks the deal, any Tier 2 escalates it, Tier 1 stays Deal Desk approvable, all Tier 0 fast-tracks. Limits: sample data only. The playbook matrix itself is static reference text; only the scorer calculates. The sample standards are illustrative governance architecture, not legal advice and not any client's actual positions.</p>
+  </section>
+
+  <section class="section">
+    <h2>Story 2 — Redlines decided before they arrive.</h2>
+    <p><strong>What this piece shows.</strong> This two-tab workbook (Playbook_Matrix and Deal_Redline_Scorer) turns contract redlining into a structured decision engine across eight commercial clauses that stall B2B software deals: Payment Terms, Renewal Price Uplift Caps, Auto-Renewal Notice Windows, Termination for Convenience, SLA Credits, Limitation of Liability, Invoice Dispute Windows, and Custom Domain / Technical Provisioning. For each clause, the matrix defines four clear tiers: Tier 0 (Standard Paper), Tier 1 (Pre-Approved Deal Desk Fallback), Tier 2 (Finance / Legal Escalation Fallback), and Tier 3 (Walk-Away Hard Boundary). Every clause includes the buy-side procurement perspective — why the customer's procurement team is asking for the edit, and the exact commercial “give-get” trade-off required before granting the fallback (for example, trading Net 45 payment terms for annual upfront billing, or trading a renewal uplift cap for a multi-year term lock).</p>
+    <p><strong>How a buyer uses it.</strong> When a customer returns a redlined contract, the Deal Desk analyst opens the Deal_Redline_Scorer tab and enters the requested tier (0, 1, 2, or 3) next to each clause. Live formulas calculate the deal's total redline risk score, identify the exact approver required for each line item, and output the overall routing decision: Fast-Track, Deal Desk Approvable (within Tier 1 fallbacks), Escalate Specific Clauses to Finance/Legal (Tier 2), or Blocked by Walk-Away Redline (Tier 3).</p>
+    <p><strong>The point it proves.</strong> Having sat on both the sell side (Google, Meta, Apple) and the buy-side procurement desk (Raytheon), I know how enterprise buyers read your paper and where they push back. Giving Deal Desk pre-approved commercial fallbacks and strict give-get rules resolves routine redlines in hours instead of weeks, protects margin, and keeps Legal focused only on true Tier 2 exceptions.</p>
+  </section>
+
+  <section class="section">
+    <h2><span class="no">Next</span> — Put this to work on a real negotiation.</h2>
+    <p><a class="btn" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book on my calendar</a></p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
+  </div>
+</footer>
+
+<script src="S6-P05b-redlining-playbook-data.js"></script>
+<script src="../../assets/formula-engine.js"></script>
+<script src="../../assets/spreadsheet-tool.js"></script>
+<script>
+  window.renderWorkbook(document.getElementById("wb-tool"),
+    window.REDLINING_PLAYBOOK_DATA);
+</script>
+<script>
+  /* Phone summary strip (this page only, same pattern as Tools 2, 4,
+     5): the scorer's verdict rows sit at the bottom of the second tab,
+     so on a phone the routing decision is far from the tier inputs a
+     visitor is typing. The strip builds its own engine instance from
+     the same data file, feeds it every value typed into the rendered
+     workbook (matched to its sheet by panel), and shows the total
+     risk score, highest tier, and routing decision above the tool.
+     It only reads; it never writes back. */
+  (function () {
+    var strip = document.getElementById("m-summary");
+    var data = window.REDLINING_PLAYBOOK_DATA;
+    if (!strip || !data || !window.FormulaEngine) return;
+    var overrides = {}; // sheetName -> { addr: rawValue }
+    function compute() {
+      var reg = {};
+      data.sheets.forEach(function (sh) {
+        var m = {};
+        sh.rows.forEach(function (r) { r.cells.forEach(function (c) {
+          m[c.a] = c.t === "formula" ? { kind: "formula", value: c.f } : { kind: "value", value: c.v };
+        }); });
+        var ov = overrides[sh.name] || {};
+        Object.keys(ov).forEach(function (a) { m[a] = { kind: "value", value: ov[a] }; });
+        reg[sh.name] = window.FormulaEngine.createSheet(m, { resolve: function (name, addr) {
+          var t = reg[name]; return t ? t.get(addr) : "#REF!";
+        } });
+      });
+      var s = reg["Deal_Redline_Scorer"];
+      function num(v) { return (typeof v === "number" && isFinite(v)) ? String(Math.round(v)) : "—"; }
+      function txt(v) { return (typeof v === "string" && v !== "") ? v : "—"; }
+      strip.innerHTML =
+        "<div><span>Total risk score</span><strong>" + num(s.get("B11")) + "</strong></div>" +
+        "<div><span>Highest tier</span><strong>" + num(s.get("B12")) + "</strong></div>" +
+        "<div><span>Routing</span><strong>" + txt(s.get("B13")) + "</strong></div>";
+    }
+    var panels = document.querySelectorAll("#wb-tool .wb-panel");
+    document.getElementById("wb-tool").addEventListener("input", function (e) {
+      var input = e.target;
+      if (!input.classList || !input.classList.contains("wb-input")) return;
+      var addr = input.getAttribute("aria-label");
+      var panel = input.closest ? input.closest(".wb-panel") : null;
+      var si = panel ? Array.prototype.indexOf.call(panels, panel) : -1;
+      if (!addr || si < 0) return;
+      var name = data.sheets[si].name;
+      var cell = null;
+      data.sheets[si].rows.forEach(function (r) { r.cells.forEach(function (c) { if (c.a === addr) cell = c; }); });
+      var raw = input.value;
+      var v;
+      if (cell && cell.fmt === "pct") { v = raw === "" ? "" : parseFloat(raw) / 100; }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && String(parseFloat(raw)) === raw.trim().replace(/,/g, "")) { v = parseFloat(raw); }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && cell && typeof cell.v === "number") { v = parseFloat(raw); }
+      else { v = raw; }
+      (overrides[name] = overrides[name] || {})[addr] = v;
+      compute();
+    });
+    compute();
+  })();
+</script>
+</body>
+</html>
