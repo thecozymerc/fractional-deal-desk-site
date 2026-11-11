@@ -99,8 +99,15 @@
     function money0(v) { return "$" + Math.round(v).toLocaleString("en-US"); }
     function money2(v) { return "$" + (+v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
     function render() {
-      var hRaw = sheet.get("B17");
-      var h = Math.min(Math.max(Math.round(hRaw) || 1, 1), 20);
+      var mRaw = Math.round(sheet.get("B17")) || 0;
+      var dRaw = Math.round(sheet.get("B60")) || 0;
+      var termY = Math.min(Math.max(mRaw, 0), 240) / 12 + Math.min(Math.max(dRaw, 0), 364) / 365;
+      if (termY > 20) termY = 20;
+      var fullY = Math.min(Math.floor(termY + 1e-9), 20);
+      var stub = fullY >= 20 ? 0 : termY - fullY;
+      var h = Math.max(fullY + (stub > 0 ? 1 : 0), 1);
+      var termText = (mRaw > 0 ? mRaw + (mRaw === 1 ? " month" : " months") : "") + (mRaw > 0 && dRaw > 0 ? " + " : "") + (dRaw > 0 ? dRaw + (dRaw === 1 ? " day" : " days") : "");
+      if (!termText) termText = "no term set";
       var colL = "BCDEFGHIJKLMNOPQRSTU".charAt(h - 1);
       var rows = [
         ["Stay put", "B92", "B85", sheet.get("B26")],
@@ -108,7 +115,7 @@
         [sheet.get("B24"), "B100", "B87", sheet.get(colL + "81")],
         [sheet.get("B25"), "B101", "B88", sheet.get(colL + "82")]
       ];
-      var html = "<h3>At your horizon — " + h + (h === 1 ? " year" : " years") + "</h3><table>";
+      var html = "<h3>At your term — " + termText + "</h3><table>";
       rows.forEach(function (r) {
         html += "<tr><td>" + r[0] + "<br><span class=\"sub\">" + r[3] + " seats in the final year</span></td>" +
           "<td class=\"n\">" + money0(sheet.get(r[1])) + "<br><span class=\"sub\">" + money2(sheet.get(r[2])) + " / seat</span></td></tr>";
