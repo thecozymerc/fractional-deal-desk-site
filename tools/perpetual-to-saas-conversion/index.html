@@ -96,8 +96,11 @@
       if (c.fmt) fmtByAddr[c.a] = c.fmt;
     }); }); });
     var sheet = window.FormulaEngine.createSheet(cellsMap);
-    function money0(v) { return "$" + Math.round(v).toLocaleString("en-US"); }
-    function money2(v) { return "$" + (+v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    /* A cell that cannot compute shows "—" here, never $NaN: a formula doing
+       math on a text cell is an error value (#VALUE!), not a number.
+       (Nov 11, 2026 — Tool 4 typing fuzz; the sheet itself shows #VALUE!.) */
+    function money0(v) { return (typeof v === "number" && isFinite(v)) ? "$" + Math.round(v).toLocaleString("en-US") : "—"; }
+    function money2(v) { return (typeof v === "number" && isFinite(v)) ? "$" + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"; }
     function render() {
       var mRaw = sheet.get("B17") || 0;
       var dRaw = sheet.get("B60") || 0;
