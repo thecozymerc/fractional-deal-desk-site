@@ -70,15 +70,15 @@ if (typeof document !== "undefined" && document.getElementById("calc-root")) (fu
   function $(id) { return document.getElementById(id); }
   function num(id) { var v = parseFloat($(id).value); return isNaN(v) ? 0 : v; }
   function money(v, dec) {
-    if (v === null || v === undefined || isNaN(v)) return "—";
+    if (v === null || v === undefined || !isFinite(v)) return "—";
     return v.toLocaleString("en-US", { minimumFractionDigits: dec === undefined ? 2 : dec, maximumFractionDigits: dec === undefined ? 2 : dec });
   }
   function pctFmt(v) {
-    if (v === null || v === undefined || isNaN(v)) return "—";
+    if (v === null || v === undefined || !isFinite(v)) return "—";
     return (v * 100).toFixed(2) + "%";
   }
   function deltaHtml(v) {
-    if (isNaN(v)) return '<span class="num">—</span>';
+    if (!isFinite(v)) return '<span class="num">—</span>';
     var cls = v > 0 ? "pos" : (v < 0 ? "neg" : "");
     return '<span class="num ' + cls + '">' + (v > 0 ? "+" : "") + pctFmt(v) + "</span>";
   }
@@ -230,7 +230,7 @@ if (typeof document !== "undefined" && document.getElementById("calc-root")) (fu
     var meta = UNIT_TYPES.filter(function (x) { return x.id === u.type; })[0];
     $(prefix + i + "-net").textContent = money(u.net);
     $(prefix + i + "-eff").textContent = money(u.effPerUnit, 4);
-    $(prefix + i + "-pertoken").textContent = meta.per ? "$" + (u.effPerUnit / meta.per).toFixed(8) : "—";
+    $(prefix + i + "-pertoken").textContent = meta.per && isFinite(u.effPerUnit) ? "$" + (u.effPerUnit / meta.per).toFixed(8) : "—";
   }
 
   var ND = [
