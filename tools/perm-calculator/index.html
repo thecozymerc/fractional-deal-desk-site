@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     LABEL — S6-P01.c — Perm Calculator (tool page; Tool / piece ID: Tool 3 —
+     Perm Calculator, address: /tools/perm-calculator/)
+     What this page holds: the Perm Calculator's write-up and the ACTUAL
+     workbook embedded below it — the scrubbed sample of Lucky's working
+     deal-structuring workbook: 22 tabs, its own figures, its own formulas
+     (6,100 of them, cross-tab included) run by the formula engine, which
+     learned cross-sheet references, TEXT(), and the sheet's array-formula
+     list extraction for this build. Formulas are never shown.
+     Every non-formula cell is a live input — in the real sheet, every
+     non-formula cell is typeable. The sheet speaks in factors (0.65 means
+     35% off); by Lucky's ruling (Nov 11, 2026 — "we do both") the values
+     stay exactly as the file has them AND a plain-English gloss beside
+     each factor input translates it live ("— that's 35% off").
+     Uses: ../../assets/styles.css + ../../assets/spreadsheet-tool.js +
+     ../../assets/formula-engine.js + this folder's data file (converted
+     from "Perm Calculator — SCRUBBED SAMPLE v2.xlsx" by
+     convert-workbook.py, ALLINPUT mode). Verified cell-for-cell against
+     a LibreOffice recalculation: defaults plus five scenarios (price/
+     margin changes, a term change, summary text flow, hostile values,
+     blanked inputs) — zero differences in 6,099 compared formulas per
+     scenario; two documented residuals (LibreOffice cannot evaluate
+     TEXTJOIN; one scratch-sheet text cell where a stale cached string
+     in the source export differs from a fresh recalculation, which the
+     engine matches).
+     Map: site/CODE-MAP.md ("tools/perm-calculator/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S6-P01.c — Perm Calculator · Fractional Deal Desk &amp; Contract Management</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+<style>
+  .wb-gloss { display: block; font-size: 12.5px; line-height: 1.35; color: #0E6B5C; margin-top: 2px; white-space: normal; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../services/">Services &amp; Pricing</a>
+      <a href="../../tools/">Proof of Work</a>
+      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section">
+    <p class="kicker">Proof of Work · Pricing Engines</p>
+    <h1>Perm Calculator.</h1>
+    <p class="lede">One deal, structured several ways at once. This is the working workbook I used to price enterprise deals: each option tab builds the same deal a different way — an upgrade path, a deeper discount, more seats, vouchers instead of a straight cut — and a compiled tab lines the versions up, so the difference between structures is a number, not an argument.</p>
+    <p>Below is the actual workbook — all 22 tabs, scrubbed: every name and link from the working file has been replaced with a sample label, and the figures are the model's own, kept so the calculations run end to end. Pick an option tab and change the inputs — list price, the partner-margin factor, the extra-discount factor, the term in months, the seats — and the tab answers with the price after margin, the paying price, the price per user per year, the cost per license, and the annual and total contract values, plus the seat tallies and the differences. The factors are how the real model speaks: you type 0.65 and it means 35% off. So nobody has to learn that dialect to read this sheet, the page says it in plain words beside every factor, and the translation updates as you type. The Compiled Results tab gathers the totals and per-SKU sections from the option tabs in one place, and the Summary tabs draft the approval summary from the numbers. The first tab, START HERE, is the sheet's own instructions, in its own words.</p>
+
+    <div class="tool-frame">
+      <div id="wb-tool"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span class="no">Next</span> — Put this to work on a real decision.</h2>
+    <p><a class="btn" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book on my calendar</a></p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
+  </div>
+</footer>
+
+<script src="S6-P01c-perm-calculator-data.js"></script>
+<script src="../../assets/formula-engine.js"></script>
+<script src="../../assets/spreadsheet-tool.js"></script>
+<script>
+  window.renderWorkbook(document.getElementById("wb-tool"),
+    window.PERM_CALCULATOR_DATA);
+</script>
+<script>
+  /* Plain-English gloss (Lucky's ruling, Nov 11, 2026 — "we do both"):
+     the workbook's factor values stay exactly as the file has them, and
+     beside each factor input the page translates the factor into plain
+     words, live as the visitor types — 0.65 reads "— that's 35% off",
+     a partner-margin factor reads "— the partner keeps 20%". The map
+     below was built from the workbook itself: a factor's kind comes
+     from the sheet's own labels (the "Partner discount" and "Extra
+     discount" columns are discounts; the partner-margin columns are
+     margins). Display only — the gloss never touches a value. */
+  (function () {
+    var GLOSS = {"Enterprise standard to enterpri":{"B13":"margin","B17":"margin","C27":"discount","C28":"discount","C29":"discount","D29":"discount","C30":"discount","D30":"discount","C37":"discount","D37":"discount","C38":"discount","D38":"discount","C39":"discount","C40":"discount","D40":"discount"},"OPT 1 (upgrade to e standard) U":{"B13":"margin","E16":"margin","G17":"discount","J22":"margin","J23":"margin","B31":"margin","B35":"margin","B37":"margin","D50":"discount","E50":"discount","D51":"discount","E51":"discount","D52":"discount","E52":"discount","D53":"discount","E53":"discount","D60":"discount","E60":"discount","D61":"discount","D62":"discount","E62":"discount","D63":"discount","E63":"discount"},"OPT 1.2 $ - R$":{"B13":"margin","E16":"margin","G17":"discount","J24":"margin","J25":"margin","B33":"margin","B37":"margin","B39":"margin","D52":"discount","E52":"discount","D53":"discount","E53":"discount","D54":"discount","E54":"discount","D55":"discount","E55":"discount","D62":"discount","E62":"discount","D63":"discount","D64":"discount","E64":"discount","D65":"discount","E65":"discount"},"OPT 2":{"B13":"margin","E16":"margin","G17":"discount","J22":"margin","J23":"margin","B31":"margin","B35":"margin","B37":"margin","D50":"discount","E50":"discount","D51":"discount","E51":"discount","D52":"discount","E52":"discount","D53":"discount","E53":"discount","D60":"discount","E60":"discount","D61":"discount","D62":"discount","D63":"discount","E63":"discount"},"OPT 3":{"B13":"margin","E16":"margin","G17":"discount","J22":"margin","J23":"margin","B31":"margin","B35":"margin","B37":"margin","D50":"discount","E50":"discount","D51":"discount","E51":"discount","D52":"discount","E52":"discount","D53":"discount","E53":"discount","D60":"discount","E60":"discount","D61":"discount","E61":"discount","D62":"discount","D63":"discount","E63":"discount"},"Pivot 1":{"B13":"margin","E16":"margin","G17":"discount","J22":"margin","J23":"margin","B31":"margin","B35":"margin","B37":"margin","D50":"discount","E50":"discount","D51":"discount","E51":"discount","D52":"discount","E52":"discount","D53":"discount","E53":"discount","D60":"discount","E60":"discount","D61":"discount","E61":"discount","D62":"discount","E62":"discount","D63":"discount","E63":"discount","AE70":"margin","AE71":"margin","AE72":"margin"},"Scenario 1":{"B13":"margin","F16":"margin","H17":"discount","M22":"margin","M23":"margin","B31":"margin","B35":"margin","B37":"margin","E50":"discount","F50":"discount","E51":"discount","F51":"discount","E52":"discount","F52":"discount","E53":"discount","F53":"discount","E71":"discount","G71":"discount","E72":"discount","G72":"discount","AJ81":"margin","AJ82":"margin","AJ83":"margin"},"Scenario 2":{"B13":"margin","F16":"margin","H17":"discount","M22":"margin","M23":"margin","B31":"margin","B35":"margin","B37":"margin","E50":"discount","F50":"discount","E51":"discount","F51":"discount","E52":"discount","F52":"discount","E53":"discount","F53":"discount","E71":"discount","G71":"discount","E72":"discount","G72":"discount","AJ86":"margin","AJ87":"margin","AJ88":"margin"},"Scenario 3":{"B13":"margin","G16":"margin","I17":"discount","N22":"margin","N23":"margin","B31":"margin","B35":"margin","B37":"margin","E50":"discount","G50":"discount","E51":"discount","E52":"discount","A64":"discount","AK87":"margin","AK88":"margin","AK89":"margin"},"Scenario 4 - Add-on":{"B13":"margin","G16":"margin","I17":"discount","N22":"margin","N23":"margin","B31":"margin","B35":"margin","B37":"margin","E50":"discount","E51":"discount","E52":"discount","A64":"discount","AK88":"margin","AK89":"margin","AK90":"margin"},"Scenario 5 - Vouchers":{"B13":"margin","G16":"margin","I17":"discount","N22":"margin","N23":"margin","B31":"margin","B35":"margin","B37":"margin","E50":"discount","E51":"discount","E52":"discount","A64":"discount","AK87":"margin","AK88":"margin","AK89":"margin"},"Pivot 2 (40% on B plus)":{"B13":"margin","F16":"margin","H17":"discount","M22":"margin","M23":"margin","B31":"margin","B35":"margin","B37":"margin","E50":"discount","F50":"discount","E51":"discount","F51":"discount","E52":"discount","F52":"discount","E53":"discount","F53":"discount","E60":"discount","G60":"discount","E61":"discount","G61":"discount","E62":"discount","G62":"discount","E63":"discount","G63":"discount","AJ70":"margin","AJ71":"margin","AJ72":"margin"},"Flex Explanations":{"D4":"margin"},"OPT 2 (35% discount) ES to E-pl":{"B13":"margin","B17":"margin","B19":"margin","C27":"discount","C28":"discount","D28":"discount","C29":"discount","D29":"discount","C30":"discount","D30":"discount","C37":"discount","D37":"discount","C38":"discount","D38":"discount","C39":"discount","C40":"discount"},"OPT 3 (29.17%) ES to E+ ":{"B13":"margin","B17":"margin","B19":"margin","C27":"discount","C28":"discount","C29":"discount","D29":"discount","C30":"discount","D30":"discount","C37":"discount","C38":"discount","D38":"discount","C39":"discount","C40":"discount"},"OPT 4 ES to E+ (additional 1000":{"B13":"margin","B17":"margin","B19":"margin","C27":"discount","C28":"discount","C29":"discount","D29":"discount","C30":"discount","D30":"discount","D38":"discount","D39":"discount","E39":"discount","D40":"discount","D41":"discount","E41":"discount","D42":"discount","D43":"discount","E43":"discount"}};
+    var data = window.PERM_CALCULATOR_DATA;
+    if (!data) return;
+    function pct(x) { return String(Math.round(x * 100) / 100); }
+    function phrase(kind, v) {
+      if (isNaN(v)) return "";
+      if (kind === "discount") {
+        if (v === 1) return "— that's no discount";
+        if (v === 0) return "— that's 100% off — free";
+        if (v > 0 && v < 1) return "— that's " + pct((1 - v) * 100) + "% off";
+        if (v > 1) return "— that's " + pct((v - 1) * 100) + "% above list — a markup";
+        return "— that's more than 100% off";
+      }
+      if (v === 1) return "— no partner margin";
+      if (v >= 0 && v < 1) return "— the partner keeps " + pct((1 - v) * 100) + "%";
+      if (v < 0) return "— the partner keeps more than the price";
+      return "— above list — a negative margin";
+    }
+    var panels = document.querySelectorAll("#wb-tool .wb-panel");
+    data.sheets.forEach(function (sh, si) {
+      var map = GLOSS[sh.name];
+      var panel = panels[si];
+      if (!map || !panel) return;
+      panel.querySelectorAll("input.wb-input").forEach(function (input) {
+        var kind = map[input.getAttribute("aria-label")];
+        if (!kind) return;
+        var span = document.createElement("span");
+        span.className = "wb-gloss";
+        input.parentNode.appendChild(span);
+        var paint = function () { span.textContent = phrase(kind, parseFloat(input.value)); };
+        input.addEventListener("input", paint);
+        paint();
+      });
+    });
+  })();
+</script>
+</body>
+</html>
