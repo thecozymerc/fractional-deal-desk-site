@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     LABEL — S6-P03.2 — Contract Migration & Triage Tracker (tool page;
+     Tool / piece ID: Tool 9 — Migration Triage, address:
+     /tools/contract-migration-triage/)
+     What this page holds: the tool's write-up and the ACTUAL workbook
+     embedded below it — the Contract Migration & Triage Tracker
+     (SAMPLE): 5 tabs (README, Migration Tracker, Approval Routing,
+     RACI Matrix, Exception Log), 220 cells, 9 of the workbook's own
+     formulas run by the formula engine (six Risk Flags and three
+     count-by-tier COUNTIFs — the rest of the workbook is reference
+     tables, as in the source). Formulas are never shown. Every
+     non-formula cell is a live input — in the real sheet, every
+     non-formula cell is typeable.
+     PROVENANCE (stated plainly, Lucky's rule): this workbook is an
+     EQUIVALENT SAMPLE built in October 2026 to pair with the Contract
+     Migration & Deal Desk Transformation Framework portfolio PDF —
+     the framework itself is a document and no workbook version
+     existed; the workbook's own README says so. The site build adds
+     typed metadata columns (Governing Law, Effective Date,
+     Auto-Renewal, Liability Cap) and a user-assigned Tier column
+     with count-by-tier formulas (adopted Nov 5, 2026 build) — the
+     spec is SPEC — Migration Tracker.md and the page's directions
+     are that spec's corrected directions, pasted in. Tier is
+     assigned by the user; nothing is auto-extracted from contract
+     documents and nothing is auto-tiered. Every customer, contract,
+     and figure is illustrative sample data — the file says so
+     itself. The workbook carries no number formats and none were
+     needed; dates are text in the file and stay text.
+     Uses: ../../assets/styles.css + ../../assets/spreadsheet-tool.js +
+     ../../assets/formula-engine.js + this folder's data file
+     (converted from "Contract Migration & Triage Tracker —
+     SAMPLE.xlsx" by convert-workbook.py, ALLINPUT mode). Verified
+     cell-for-cell against a LibreOffice recalculation: defaults plus
+     four scenarios (status flips, a tier reassignment, mixed-case
+     statuses, hostile values) — zero differences in 9 compared
+     formulas per scenario. Phone summary strip on this page only:
+     it reads the workbook's own count-by-tier formulas and counts
+     the sheet's own Risk Flag values from its own engine instance
+     fed by the same typed values, so the portfolio state sits above
+     the tool on a phone instead of below a fourteen-column table.
+     There is no dashboard or velocity roll-up in the workbook and
+     the strip invents none — it repeats the sheet's own numbers.
+     Map: site/CODE-MAP.md ("tools/contract-migration-triage/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S6-P03.2 — Contract Migration &amp; Triage Tracker · Fractional Deal Desk &amp; Contract Management</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../services/">Services &amp; Pricing</a>
+      <a href="../../tools/">Proof of Work</a>
+      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section">
+    <p class="kicker">Proof of Work · Contract Operations</p>
+    <h1>Contract Migration &amp; Triage Tracker.</h1>
+    <p class="lede">Moving contracts from one system to another is where migrations quietly stall: a stage slips, an owner is unclear, a target date moves and nobody flags it. This tracker is the control sheet for that work — one row per migrating contract with where it is moving from and to, its stage, owner, target date, and status, a Risk Flag that reacts the moment a status changes, the metadata that matters when the contract comes back up (governing law, effective date, auto-renewal, liability cap), and a priority tier the operator assigns. Behind it sit the governance references: an approval-routing matrix by discount band, a RACI matrix for the work itself, and an exception log. Every customer, contract, and figure in it is sample data.</p>
+    <p><strong>Directions:</strong> Each row is one contract migration (sample data): where it is moving from, where it is going, its stage, owner, and target date. Change a row's Status and watch the Risk Flag react — set a migration to At Risk and the flag flips to REVIEW; mark it Complete and the flag reads Done; anything else reads Monitor. Use the Approval Routing table to see who must approve at each discount band, and the RACI Matrix to see who owns each step of the work.</p>
+
+    <div class="m-summary" id="m-summary" aria-label="Migration portfolio totals"></div>
+
+    <div class="tool-frame">
+      <div id="wb-tool"></div>
+    </div>
+
+    <h2>Inputs, logic, limits</h2>
+    <p>Inputs: the tracker row fields — contract ID, customer, from system, to system, migration stage, owner, target date, status — plus the metadata columns and the Tier, all typed in by hand. Nothing in this tool extracts terms from contract documents, and the Tier is the operator's judgment, assigned by the user — the tool never auto-tiers a contract. Logic: the only live logic is the Risk Flag formula (At Risk → REVIEW, Complete → Done, anything else → Monitor) and the count-by-tier summary beneath the rows. The Approval Routing and RACI tabs are static reference tables, and the Exception Log is a record, not a calculator. Limits: sample data only — six contracts, three exceptions. There is no dashboard or velocity roll-up in this workbook, and the page does not promise one.</p>
+  </section>
+
+  <section class="section">
+    <h2>The reference tables behind the tracker.</h2>
+    <p><strong>Approval Routing.</strong> Who must approve or review a deal at each discount band — ≤10% runs standard, then 11–20% and 21–30% add reviewers, and anything over 30%, or carrying prepay or most-favoured-nation terms, routes to the top — across Deal Desk, Finance, Legal, and VP Commercial.</p>
+    <p><strong>RACI Matrix.</strong> For each of the seven migration activities, who is responsible, accountable, consulted, and informed — so a stalled step has a name on it before it stalls.</p>
+    <p><strong>Exception Log.</strong> The pricing and concession exceptions the migration surfaces, each with its approver and status — the audit trail for every deliberate departure from standard terms.</p>
+  </section>
+
+  <section class="section">
+    <h2><span class="no">Next</span> — Put this to work on a real migration.</h2>
+    <p><a class="btn" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book on my calendar</a></p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
+  </div>
+</footer>
+
+<script src="S6-P03b-contract-migration-triage-data.js"></script>
+<script src="../../assets/formula-engine.js"></script>
+<script src="../../assets/spreadsheet-tool.js"></script>
+<script>
+  window.renderWorkbook(document.getElementById("wb-tool"),
+    window.MIGRATION_TRIAGE_DATA);
+</script>
+<script>
+  /* Phone summary strip (this page only, same pattern as Tools 2 and
+     4–8): the tracker is fourteen columns wide, so on a phone the
+     Risk Flags and the count-by-tier summary sit far from the Status
+     cells a visitor is editing. The strip builds its own engine
+     instance from the same data file, feeds it every value typed
+     into the rendered workbook, and shows the workbook's own tier
+     counts plus a tally of the sheet's own Risk Flag values above
+     the tool. It only reads; it never writes back, and it invents
+     no measure the workbook does not carry. */
+  (function () {
+    var strip = document.getElementById("m-summary");
+    var data = window.MIGRATION_TRIAGE_DATA;
+    if (!strip || !data || !window.FormulaEngine) return;
+    var overrides = {}; // sheetName -> { addr: rawValue }
+    function compute() {
+      var reg = {};
+      data.sheets.forEach(function (sh) {
+        var m = {};
+        sh.rows.forEach(function (r) { r.cells.forEach(function (c) {
+          m[c.a] = c.t === "formula" ? { kind: "formula", value: c.f } : { kind: "value", value: c.v };
+        }); });
+        var ov = overrides[sh.name] || {};
+        Object.keys(ov).forEach(function (a) { m[a] = { kind: "value", value: ov[a] }; });
+        reg[sh.name] = window.FormulaEngine.createSheet(m, { resolve: function (name, addr) {
+          var t = reg[name]; return t ? t.get(addr) : "#REF!";
+        } });
+      });
+      var t = reg["Migration Tracker"];
+      function num(v) { return (typeof v === "number" && isFinite(v)) ? String(Math.round(v)) : "—"; }
+      var review = 0;
+      for (var i = 2; i <= 7; i++) { if (t.get("I" + i) === "REVIEW") review++; }
+      strip.innerHTML =
+        "<div><span>Tier 1 Strategic</span><strong>" + num(t.get("B10")) + "</strong></div>" +
+        "<div><span>Tier 2 Standard</span><strong>" + num(t.get("B11")) + "</strong></div>" +
+        "<div><span>Tier 3 Archive</span><strong>" + num(t.get("B12")) + "</strong></div>" +
+        "<div><span>Flags at REVIEW</span><strong>" + review + "</strong></div>";
+    }
+    var panels = document.querySelectorAll("#wb-tool .wb-panel");
+    document.getElementById("wb-tool").addEventListener("input", function (e) {
+      var input = e.target;
+      if (!input.classList || !input.classList.contains("wb-input")) return;
+      var addr = input.getAttribute("aria-label");
+      var panel = input.closest ? input.closest(".wb-panel") : null;
+      var si = panel ? Array.prototype.indexOf.call(panels, panel) : -1;
+      if (!addr || si < 0) return;
+      var name = data.sheets[si].name;
+      var cell = null;
+      data.sheets[si].rows.forEach(function (r) { r.cells.forEach(function (c) { if (c.a === addr) cell = c; }); });
+      var raw = input.value;
+      var v;
+      if (cell && cell.fmt === "pct") { v = raw === "" ? "" : parseFloat(raw) / 100; }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && String(parseFloat(raw)) === raw.trim().replace(/,/g, "")) { v = parseFloat(raw); }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && cell && typeof cell.v === "number") { v = parseFloat(raw); }
+      else { v = raw; }
+      (overrides[name] = overrides[name] || {})[addr] = v;
+      compute();
+    });
+    compute();
+  })();
+</script>
+</body>
+</html>
