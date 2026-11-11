@@ -26,6 +26,13 @@ window.renderWorkbook = function (container, data) {
     if (fmt === "money") return v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     if (fmt === "pct") return (v * 100).toFixed(2) + "%";
     if (fmt === "int") return String(Math.round(v));
+    if (fmt === "date" || fmt === "datelong") {
+      var dt = new Date(Math.round((v - 25569) * 86400 * 1000));
+      if (isNaN(dt.getTime())) return String(v);
+      if (fmt === "date") return (dt.getUTCMonth() + 1) + "/" + dt.getUTCDate() + "/" + dt.getUTCFullYear();
+      var MN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      return MN[dt.getUTCMonth()] + " " + dt.getUTCDate() + " " + dt.getUTCFullYear();
+    }
     return String(Math.round(v * 100) / 100);
   }
   function colIndex(addr) {
@@ -38,8 +45,12 @@ window.renderWorkbook = function (container, data) {
   tabBar.className = "wb-tabs";
   var panels = [];
 
-  data.sheets.forEach(function (sheet, si) {
-    /* Build the calculation sheet from the workbook's own cells. */
+  /* Workbook pass 1: build every sheet's calculator first, with a resolver
+     so formulas can reference other sheets ('Compiled Results'!A1 style).
+     Resolvers run lazily at evaluation time, when the registry is full. */
+  var registry = {};
+  var sheetStates = [];
+  data.sheets.forEach(function (sheet) {
     var cellsMap = {};
     sheet.rows.forEach(function (row) {
       row.cells.forEach(function (c) {
@@ -47,7 +58,26 @@ window.renderWorkbook = function (container, data) {
         else cellsMap[c.a] = { kind: "value", value: c.v };
       });
     });
-    var calc = window.FormulaEngine.createSheet(cellsMap);
+    var calc = window.FormulaEngine.createSheet(cellsMap, {
+      resolve: function (name, addr) {
+        var target = registry[name];
+        return target ? target.get(addr) : "#REF!";
+      }
+    });
+    registry[sheet.name] = calc;
+    sheetStates.push({ calc: calc, dirty: false, repaint: null });
+  });
+  /* An input changed on one sheet: repaint that sheet now; every other
+     sheet is invalidated and repainted when its tab is next opened. */
+  function afterChange(sourceSi) {
+    sheetStates.forEach(function (st, i) {
+      if (i === sourceSi) { if (st.repaint) st.repaint(); }
+      else { st.calc.invalidate(); st.dirty = true; }
+    });
+  }
+
+  data.sheets.forEach(function (sheet, si) {
+    var calc = sheetStates[si].calc;
     var outSpans = {};       /* formula cell address -> span element */
     var cellFmt = {};        /* formula cell address -> number format */
 
@@ -60,6 +90,8 @@ window.renderWorkbook = function (container, data) {
         p.style.display = pi === si ? "" : "none";
         tabBar.children[pi].classList.toggle("active", pi === si);
       });
+      var st = sheetStates[si];
+      if (st.dirty && st.repaint) { st.repaint(); st.dirty = false; }
     });
     tabBar.appendChild(tab);
 
@@ -102,7 +134,7 @@ window.renderWorkbook = function (container, data) {
                 input.value = c2.v;
                 input.addEventListener("input", function () {
                   calc.set(c2.a, input.value);
-                  recompute();
+                  afterChange(si);
                 });
               } else {
                 input.type = "number";
@@ -112,7 +144,7 @@ window.renderWorkbook = function (container, data) {
                 input.addEventListener("input", function () {
                   var raw = parseFloat(input.value);
                   calc.set(c2.a, isNaN(raw) ? 0 : (c2.fmt === "pct" ? raw / 100 : raw));
-                  recompute();
+                  afterChange(si);
                 });
               }
               td2.appendChild(input);
@@ -214,6 +246,7 @@ window.renderWorkbook = function (container, data) {
       drawCharts();
     }
     recompute();
+    sheetStates[si].repaint = recompute;
 
     scroll.appendChild(table);
     panel.appendChild(scroll);
