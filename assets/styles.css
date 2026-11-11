@@ -75,10 +75,20 @@ body {
 .btn-primary:hover { background: var(--accent-dark); }
 .btn-quiet { background: transparent; color: var(--accent); border-color: var(--accent); }
 
-/* ————— Sections ————— */
-section { padding: var(--s-64) 0; border-bottom: 1px solid var(--line); }
+/* ————— Sections —————
+   Section padding (Nov 11, 2026, spacing research pass, Lucky's order):
+   the seam between two stacked sections is bottom + top padding, so the
+   old 64/96 per side read as 128px (phone) / 192px (desktop) of empty
+   space at every boundary — about twice what document-style design
+   systems use, and a false-floor risk with this site's hairlines
+   (NN/g). Now: 32/32 phone (64px seam), 48/48 desktop (96px seam);
+   hero and the closing CTA keep extra air by their own rules, and the
+   proof strip runs tighter as a short strip. */
+section { padding: var(--s-32) 0; border-bottom: 1px solid var(--line); }
 section:last-of-type { border-bottom: none; }
-@media (min-width: 900px) { section { padding: var(--s-96) 0; } }
+@media (min-width: 900px) { section { padding: var(--s-48) 0; } }
+section.final-cta { padding: var(--s-48) 0; }
+@media (min-width: 900px) { section.final-cta { padding: var(--s-64) 0; } }
 
 .eyebrow {
   font-size: var(--t-12); font-weight: 700; letter-spacing: .14em;
@@ -97,6 +107,7 @@ p { margin: 0 0 var(--s-16); max-width: 65ch; }
 .hero { padding-top: var(--s-48); }
 .hero-grid { display: grid; gap: var(--s-48); }
 @media (min-width: 900px) { .hero-grid { grid-template-columns: 1.05fr .95fr; align-items: start; } }
+@media (min-width: 900px) { .hero { padding-top: 72px; } }
 .cta-row { display: flex; gap: var(--s-16); flex-wrap: wrap; margin: var(--s-32) 0 var(--s-16); }
 .cta-note { font-size: var(--t-14); color: var(--grey); }
 
