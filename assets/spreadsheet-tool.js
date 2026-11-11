@@ -29,6 +29,9 @@ window.renderWorkbook = function (container, data) {
     if (fmt === "money0") return v.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     if (fmt === "pct") return (v * 100).toFixed(2) + "%";
     if (fmt === "pct1") return (v * 100).toFixed(1) + "%";
+    // pct0 added Nov 11, 2026 for S6-P05.3 / Tool 7, whose workbook formats
+    // its Health % column as 0% (no decimals).
+    if (fmt === "pct0") return (v * 100).toFixed(0) + "%";
     if (fmt === "dateiso") {
       var di = new Date(Math.round((v - 25569) * 86400 * 1000));
       if (isNaN(di.getTime())) return String(v);

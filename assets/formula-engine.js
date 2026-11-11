@@ -334,13 +334,22 @@ window.FormulaEngine = (function () {
         try { var v = ev(args[0]); return isError(v) ? ev(args[1]) : v; }
         catch (e) { return ev(args[1]); }
       },
+      // SUM / AVERAGE / MIN / MAX — error propagation corrected Nov 11,
+      // 2026 for S6-P05.3 / Tool 7: an Excel error sitting INSIDE a range
+      // must propagate (a SUM over a range holding #VALUE! IS #VALUE!),
+      // but the engine used to skip error strings as non-numbers. The
+      // result had been order-dependent: an error that arrived by throw
+      // propagated, one that arrived as a cached value did not. Now a
+      // cached error value throws the moment an aggregate touches it.
+      // COUNT and COUNTA stay as they are — LibreOffice proves COUNT
+      // ignores range errors (counts the numbers) and COUNTA counts them.
       SUM: function (args, ev) {
         var total = 0;
         args.forEach(function (a) {
           if (a.k === "range") rangeAddrs(a).forEach(function (addr) {
-            var v = getCell(a.sheet, addr); if (typeof v === "number") total += v;
+            var v = getCell(a.sheet, addr); if (isError(v)) throw new Error(v); if (typeof v === "number") total += v;
           });
-          else { var v2 = ev(a); if (isArr(v2)) v2.forEach(function (x) { if (typeof x === "number") total += x; }); else if (typeof v2 === "number") total += v2; }
+          else { var v2 = ev(a); if (isError(v2)) throw new Error(v2); if (isArr(v2)) v2.forEach(function (x) { if (isError(x)) throw new Error(x); if (typeof x === "number") total += x; }); else if (typeof v2 === "number") total += v2; }
         });
         return total;
       },
@@ -367,6 +376,89 @@ window.FormulaEngine = (function () {
         addrs.forEach(function (addr) { if (criteriaMatch(getCell(args[0].sheet, addr), crit)) n++; });
         return n;
       },
+      // Added Nov 11, 2026 for S6-P04.b / Tool 12: its regional table
+      // averages case age per region with AVERAGEIF. Excel semantics:
+      // average the numeric values in the average range whose
+      // criteria-range cell matches; an error in a MATCHING row's
+      // value propagates; no matches is #DIV/0!.
+      AVERAGEIF: function (args, ev) {
+        var crit = ev(args[1]);
+        var critAddrs = rangeAddrs(args[0]);
+        var avgArg = args.length > 2 ? args[2] : args[0];
+        var avgAddrs = rangeAddrs(avgArg);
+        var sum = 0, n = 0;
+        critAddrs.forEach(function (addr, idx) {
+          if (!criteriaMatch(getCell(args[0].sheet, addr), crit)) return;
+          var v = getCell(avgArg.sheet, avgAddrs[idx]);
+          if (isError(v)) throw v;
+          if (typeof v === "number") { sum += v; n++; }
+        });
+        if (!n) throw err("#DIV/0!");
+        return sum / n;
+      },
+      // Added Nov 11, 2026 for S6-P04.a / Tool 11: its composites are
+      // SUMPRODUCT of weights and scores. Excel semantics: text and
+      // blanks inside the ranges count as 0; an error value inside a
+      // range propagates.
+      SUMPRODUCT: function (args, ev) {
+        var arrs = args.map(function (a) {
+          if (a.type === "range" || a.type === "ref") {
+            return rangeAddrs(a).map(function (addr) {
+              var v = getCell(a.sheet, addr);
+              if (isError(v)) throw v;
+              return v;
+            });
+          }
+          var v = ev(a);
+          return isArr(v) ? v.slice() : [v];
+        });
+        if (!arrs.length) return 0;
+        var n = arrs[0].length, total = 0;
+        for (var i = 0; i < n; i++) {
+          var p = 1;
+          for (var j = 0; j < arrs.length; j++) {
+            var v = arrs[j][i];
+            if (v === EMPTY || v == null || isPhantom(v) || typeof v === "string" || typeof v === "boolean") v = 0;
+            p *= v;
+          }
+          total += p;
+        }
+        return total;
+      },
+      // Added Nov 11, 2026 for S6-P04.a / Tool 11: the Rank rows.
+      // Classic RANK: order 0 (or omitted) ranks largest first; ties
+      // share the top rank and the next rank skips.
+      RANK: function (args, ev) {
+        var num = ev(args[0]);
+        if (isError(num)) return num;
+        var order = args.length > 2 ? ev(args[2]) : 0;
+        var rank = 1;
+        rangeAddrs(args[1]).forEach(function (addr) {
+          var v = getCell(args[1].sheet, addr);
+          if (typeof v !== "number") return;
+          if (!order) { if (v > num) rank++; } else { if (v < num) rank++; }
+        });
+        return rank;
+      },
+      // Added Nov 11, 2026 for S6-P03.3 / Tool 10: its dashboard counts
+      // backlog, escalations and breaches by region with COUNTIFS —
+      // range/criteria pairs where a row counts only if every pair
+      // matches at the same position.
+      COUNTIFS: function (args, ev) {
+        var sets = [];
+        for (var i = 0; i + 1 < args.length; i += 2) {
+          sets.push({ addrs: rangeAddrs(args[i]), sheet: args[i].sheet, crit: ev(args[i + 1]) });
+        }
+        if (!sets.length) return 0;
+        var n = 0;
+        sets[0].addrs.forEach(function (addr, idx) {
+          for (var s = 0; s < sets.length; s++) {
+            if (!criteriaMatch(getCell(sets[s].sheet, sets[s].addrs[idx]), sets[s].crit)) return;
+          }
+          n++;
+        });
+        return n;
+      },
       SUMIF: function (args, ev) {
         var addrs = rangeAddrs(args[0]), crit = ev(args[1]), n = 0;
         var sumAddrs = args.length > 2 ? rangeAddrs(args[2]) : addrs;
@@ -381,14 +473,38 @@ window.FormulaEngine = (function () {
         var total = 0, n = 0;
         args.forEach(function (a) {
           if (a.k === "range") rangeAddrs(a).forEach(function (addr) {
-            var v = getCell(a.sheet, addr); if (typeof v === "number") { total += v; n++; }
+            var v = getCell(a.sheet, addr); if (isError(v)) throw new Error(v); if (typeof v === "number") { total += v; n++; }
           });
-          else { var v2 = ev(a); if (typeof v2 === "number") { total += v2; n++; } }
+          else { var v2 = ev(a); if (isError(v2)) throw new Error(v2); if (typeof v2 === "number") { total += v2; n++; } }
         });
         return n === 0 ? 0 : total / n;
       },
-      MIN: function (args, ev) { return Math.min.apply(null, args.map(function (a) { return toNum(ev(a)); })); },
-      MAX: function (args, ev) { return Math.max.apply(null, args.map(function (a) { return toNum(ev(a)); })); },
+      // MIN/MAX corrected Nov 11, 2026 for S6-P05.2 / Tool 6: they used to
+      // coerce each ARGUMENT, so MAX(C2:C9) read only the range's first
+      // cell (the redline scorer's Highest Tier came back 1 instead of 2).
+      // They now collect values the way SUM and AVERAGE do — every number
+      // in a range counts, text and empties in ranges are ignored, scalar
+      // arguments are coerced — and no numbers at all reads 0, as in Excel.
+      MIN: function (args, ev) {
+        var vals = [];
+        args.forEach(function (a) {
+          if (a.k === "range") rangeAddrs(a).forEach(function (addr) {
+            var v = getCell(a.sheet, addr); if (isError(v)) throw new Error(v); if (typeof v === "number") vals.push(v);
+          });
+          else vals.push(toNum(ev(a)));
+        });
+        return vals.length ? Math.min.apply(null, vals) : 0;
+      },
+      MAX: function (args, ev) {
+        var vals = [];
+        args.forEach(function (a) {
+          if (a.k === "range") rangeAddrs(a).forEach(function (addr) {
+            var v = getCell(a.sheet, addr); if (isError(v)) throw new Error(v); if (typeof v === "number") vals.push(v);
+          });
+          else vals.push(toNum(ev(a)));
+        });
+        return vals.length ? Math.max.apply(null, vals) : 0;
+      },
       ROUND: function (args, ev) {
         var x = toNum(ev(args[0])), d = args.length > 1 ? toNum(ev(args[1])) : 0, f = Math.pow(10, d);
         return Math.round(x * f) / f;
@@ -441,6 +557,15 @@ window.FormulaEngine = (function () {
         var k = toNum(ev(args[1]));
         if (k < 1 || k > vals.length) throw new Error("#NUM!");
         return vals[k - 1];
+      },
+      // Added Nov 11, 2026 for S6-P05.2 / Tool 6 (the redline scorer maps a
+      // requested tier to risk points with CHOOSE(tier+1, 0, 1, 3, 10)).
+      // Excel semantics: the index is truncated to an integer; an index
+      // below 1 or past the last value is #VALUE!.
+      CHOOSE: function (args, ev) {
+        var idx = Math.trunc(toNum(ev(args[0])));
+        if (idx < 1 || idx > args.length - 1) throw new Error("#VALUE!");
+        return ev(args[idx]);
       },
       CONCATENATE: function (args, ev) {
         var out = "";
