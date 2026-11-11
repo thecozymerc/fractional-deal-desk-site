@@ -52,6 +52,8 @@
     <p class="lede">When a customer is deciding whether to stay on a perpetual license or move to subscription pricing, this calculator compares staying put with three SaaS options, year by year. It shows both the cumulative break-even and the year when the annual run-rate crosses over, with a chart so the shape of the decision is visible.</p>
     <p>Below is the actual workbook — its one sheet, with its chart. The names and data are samples where they need to be, but the mechanics are real: change an input, and the tool answers. The formulas stay under the hood. Each SaaS option is priced the real way — a list price per seat per month and a discount give the net PUPM; a starting seat count and a yearly growth rate grow the deal — and each option can also carry a one-time coupon credit and a usage line, priced per use or per token. You can rename each option, too — the sheet calls it by your name everywhere below. So the sheet shows both stories at once: what the conversion saves per seat, and why the total can grow as the rollout grows. A seats-by-year table sits under the cost table, so you can watch each option’s seats grow year by year — or hold flat, when its growth is set to zero — and a cost-per-seat line divides each option’s total by the seats it serves in the final year. In this sample, the third option stays flat while the first two grow.</p>
 
+    <div class="m-summary" id="m-summary"></div>
+
     <div class="tool-frame">
       <div id="wb-tool"></div>
     </div>
@@ -76,6 +78,54 @@
 <script>
   window.renderWorkbook(document.getElementById("wb-tool"),
     window.CONVERSION_CALCULATOR_DATA);
+</script>
+<script>
+  /* Mobile summary strip (Nov 10, 2026): on phone widths this strip sits
+     above the sheet with the results first. It computes from the SAME
+     workbook data through the SAME formula engine the sheet itself uses,
+     and re-reads the sheet's inputs on every change — so its numbers are
+     the sheet's numbers, never a second implementation. */
+  (function () {
+    var box = document.getElementById("m-summary");
+    if (!box || !window.FormulaEngine || !window.CONVERSION_CALCULATOR_DATA) return;
+    var data = window.CONVERSION_CALCULATOR_DATA;
+    var cellsMap = {}, fmtByAddr = {};
+    data.sheets.forEach(function (sh) { sh.rows.forEach(function (r) { r.cells.forEach(function (c) {
+      if (c.t === "formula") cellsMap[c.a] = { kind: "formula", value: c.f };
+      else cellsMap[c.a] = { kind: "value", value: c.v };
+      if (c.fmt) fmtByAddr[c.a] = c.fmt;
+    }); }); });
+    var sheet = window.FormulaEngine.createSheet(cellsMap);
+    function money0(v) { return "$" + Math.round(v).toLocaleString("en-US"); }
+    function money2(v) { return "$" + (+v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function render() {
+      var h = sheet.get("B17");
+      var colL = "BCDEF".charAt(h - 1);
+      var rows = [
+        ["Stay put", "B92", "B85", sheet.get("B26")],
+        [sheet.get("B23"), "B93", "B86", sheet.get(colL + "80")],
+        [sheet.get("B24"), "B100", "B87", sheet.get(colL + "81")],
+        [sheet.get("B25"), "B101", "B88", sheet.get(colL + "82")]
+      ];
+      var html = "<h3>At your horizon — " + h + (h === 1 ? " year" : " years") + "</h3><table>";
+      rows.forEach(function (r) {
+        html += "<tr><td>" + r[0] + "<br><span class=\"sub\">" + r[3] + " seats in the final year</span></td>" +
+          "<td class=\"n\">" + money0(sheet.get(r[1])) + "<br><span class=\"sub\">" + money2(sheet.get(r[2])) + " / seat</span></td></tr>";
+      });
+      box.innerHTML = html + "</table>";
+    }
+    document.getElementById("wb-tool").addEventListener("input", function (e) {
+      var a = e.target.getAttribute && e.target.getAttribute("aria-label");
+      if (!a) return;
+      var raw = e.target.value;
+      if (e.target.type === "number") {
+        var v = parseFloat(raw);
+        sheet.set(a, isNaN(v) ? 0 : (fmtByAddr[a] === "pct" ? v / 100 : v));
+      } else { sheet.set(a, raw); }
+      render();
+    });
+    render();
+  })();
 </script>
 </body>
 </html>
