@@ -5177,17 +5177,17 @@ window.CONVERSION_CALCULATOR_DATA = {
        "to": "U64"
       },
       {
-       "name": "=\"SaaS \"&$B$23&\" — cumulative cost ($)\"",
+       "name": "SaaS Option A — cumulative cost ($)",
        "from": "B66",
        "to": "U66"
       },
       {
-       "name": "=\"SaaS \"&$B$24&\" — cumulative cost ($)\"",
+       "name": "SaaS Option B — cumulative cost ($)",
        "from": "B72",
        "to": "U72"
       },
       {
-       "name": "=\"SaaS \"&$B$25&\" — cumulative cost ($)\"",
+       "name": "SaaS Option C — cumulative cost ($)",
        "from": "B75",
        "to": "U75"
       }
