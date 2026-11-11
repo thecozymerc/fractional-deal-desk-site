@@ -2,11 +2,11 @@
    Do not hand-edit: re-run the converter. Formula cells carry the sheet's
    own formulas as machinery for the formula engine; they are never displayed. */
 window.CONVERSION_CALCULATOR_DATA = {
- "source": "Perpetual-to-SaaS Conversion Calculator — SAMPLE v7.xlsx",
+ "source": "Perpetual-to-SaaS Conversion Calculator — SAMPLE v8.xlsx",
  "sheets": [
   {
    "name": "Conversion Calculator",
-   "cols": 7,
+   "cols": 21,
    "rows": [
     {
      "span": true,
@@ -92,7 +92,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A9",
        "fmt": "general",
        "t": "text",
-       "v": "Inputs: yellow cells marked INPUT. Logic: Staying put costs the license once in Year 1 plus maintenance every year, and covers the licensed seats. A SaaS option is seat-driven: net PUPM = list price per seat x (1 - discount); seats grow each year at the option's growth rate (rounded to whole seats); a year's subscription = that year's seats x net PUPM x 12, with the migration discount and the one-time coupon credit in Year 1 only, plus the usage cost every year. Usage cost for a year = the greater of the committed monthly minimum or the metered usage (units per month / units-per-price x price per unit x (1 - usage discount)), times 12. All year rows and totals are formulas. The Year-1 migration discount % input applies to all three SaaS options equally. The option names are labels only — they change no math. A seat growth of 0% keeps an option’s seats flat; in this sample the third option is flat (0%) while the first two grow at 10% a year. The horizon runs 1 to 5 years — the sheet carries five year columns, so a horizon above 5 reads as 5, and below 1 reads as 1."
+       "v": "Inputs: yellow cells marked INPUT. Logic: Staying put costs the license once in Year 1 plus maintenance every year, and covers the licensed seats. A SaaS option is seat-driven: net PUPM = list price per seat x (1 - discount); seats grow each year at the option's growth rate (rounded to whole seats); a year's subscription = that year's seats x net PUPM x 12, with the migration discount and the one-time coupon credit in Year 1 only, plus the usage cost every year. Usage cost for a year = the greater of the committed monthly minimum or the metered usage (units per month / units-per-price x price per unit x (1 - usage discount)), times 12. All year rows and totals are formulas. The Year-1 migration discount % input applies to all three SaaS options equally. The option names are labels only — they change no math. A seat growth of 0% keeps an option’s seats flat; in this sample the third option is flat (0%) while the first two grow at 10% a year. The horizon runs 1 to 20 years — the sheet carries twenty year columns, so a horizon above 20 reads as 20, and below 1 reads as 1."
       }
      ]
     },
@@ -114,7 +114,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A11",
        "fmt": "general",
        "t": "text",
-       "v": "Note: Built fresh for the website; it is not a copy of any internal file. Three generic options compared; the chart plots the workbook's own cumulative rows. Version 2 adds the annual run-rate crossover: the first year an option's one-year cost drops below the stay-put one-year cost, shown next to the cumulative break-even. Version 3 (Nov 8, 2026) adds the Tool 1 factors: one-time coupon credits and per-option usage lines (per use / per token), so a conversion priced on consumption is compared honestly. Version 4 (Nov 8, 2026) rebuilds the SaaS side around seats and PUPM, on Lucky's direction: the tool must show the reason a company spends MORE on a conversion — rollout growth raising TCV — not only the savings case. Version 5 (Nov 9, 2026) makes the option names editable, on Lucky's direction after his v4 review pass: three name inputs, and every label that names an option is now a formula carrying the typed name. v6 (Nov 10, 2026): built at the owner’s review — a seats-by-year table and cost-per-seat-at-horizon rows were added so seat growth is shown, not just priced, and the third option’s sample growth was set to 0% so a flat option sits next to growing ones. v7 (Nov 10, 2026): the horizon is clamped to the sheet’s five year columns (1–5) — before this, a horizon outside 1–5 sent the totals and cost-per-seat rows to zero, because they index the year columns by the horizon; the horizon label and the inputs note now state the range."
+       "v": "Note: Built fresh for the website; it is not a copy of any internal file. Three generic options compared; the chart plots the workbook's own cumulative rows. Version 2 adds the annual run-rate crossover: the first year an option's one-year cost drops below the stay-put one-year cost, shown next to the cumulative break-even. Version 3 (Nov 8, 2026) adds the Tool 1 factors: one-time coupon credits and per-option usage lines (per use / per token), so a conversion priced on consumption is compared honestly. Version 4 (Nov 8, 2026) rebuilds the SaaS side around seats and PUPM, on Lucky's direction: the tool must show the reason a company spends MORE on a conversion — rollout growth raising TCV — not only the savings case. Version 5 (Nov 9, 2026) makes the option names editable, on Lucky's direction after his v4 review pass: three name inputs, and every label that names an option is now a formula carrying the typed name. v6 (Nov 10, 2026): built at the owner’s review — a seats-by-year table and cost-per-seat-at-horizon rows were added so seat growth is shown, not just priced, and the third option’s sample growth was set to 0% so a flat option sits next to growing ones. v7 (Nov 10, 2026): the horizon is clamped to the sheet’s five year columns (1–5) — before this, a horizon outside 1–5 sent the totals and cost-per-seat rows to zero, because they index the year columns by the horizon; the horizon label and the inputs note now state the range. v8 (Nov 10, 2026): the year table was widened from five to twenty year columns at the owner’s direction — the horizon now truly runs 1 to 20 years, and the v7 clamp remains only as a guard at those stated ends. The fixed Year-5 readouts and the 5-year summary rows still read Year 5, exactly as their labels say."
       }
      ]
     },
@@ -223,7 +223,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A17",
        "fmt": "general",
        "t": "text",
-       "v": "Horizon (years, 1–5)"
+       "v": "Horizon (years, 1–20)"
       },
       {
        "a": "B17",
@@ -1440,6 +1440,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "general",
        "t": "text",
        "v": "Year 5"
+      },
+      {
+       "a": "G62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 6"
+      },
+      {
+       "a": "H62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 7"
+      },
+      {
+       "a": "I62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 8"
+      },
+      {
+       "a": "J62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 9"
+      },
+      {
+       "a": "K62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 10"
+      },
+      {
+       "a": "L62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 11"
+      },
+      {
+       "a": "M62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 12"
+      },
+      {
+       "a": "N62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 13"
+      },
+      {
+       "a": "O62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 14"
+      },
+      {
+       "a": "P62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 15"
+      },
+      {
+       "a": "Q62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 16"
+      },
+      {
+       "a": "R62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 17"
+      },
+      {
+       "a": "S62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 18"
+      },
+      {
+       "a": "T62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 19"
+      },
+      {
+       "a": "U62",
+       "fmt": "general",
+       "t": "text",
+       "v": "Year 20"
       }
      ]
     },
@@ -1478,6 +1568,96 @@ window.CONVERSION_CALCULATOR_DATA = {
       },
       {
        "a": "F63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "G63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "H63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "I63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "J63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "K63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "L63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "M63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "N63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "O63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "P63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "Q63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "R63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "S63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "T63",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=$B$16"
+      },
+      {
+       "a": "U63",
        "fmt": "money",
        "t": "formula",
        "f": "=$B$16"
@@ -1522,6 +1702,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "money",
        "t": "formula",
        "f": "=E64+F63"
+      },
+      {
+       "a": "G64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=F64+G63"
+      },
+      {
+       "a": "H64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=G64+H63"
+      },
+      {
+       "a": "I64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=H64+I63"
+      },
+      {
+       "a": "J64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=I64+J63"
+      },
+      {
+       "a": "K64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=J64+K63"
+      },
+      {
+       "a": "L64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=K64+L63"
+      },
+      {
+       "a": "M64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=L64+M63"
+      },
+      {
+       "a": "N64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=M64+N63"
+      },
+      {
+       "a": "O64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=N64+O63"
+      },
+      {
+       "a": "P64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=O64+P63"
+      },
+      {
+       "a": "Q64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=P64+Q63"
+      },
+      {
+       "a": "R64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=Q64+R63"
+      },
+      {
+       "a": "S64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=R64+S63"
+      },
+      {
+       "a": "T64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=S64+T63"
+      },
+      {
+       "a": "U64",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=T64+U63"
       }
      ]
     },
@@ -1563,6 +1833,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "money",
        "t": "formula",
        "f": "=ROUND($B$29*(1+$B$30)^(F$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "G65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(G$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "H65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(H$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "I65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(I$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "J65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(J$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "K65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(K$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "L65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(L$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "M65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(M$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "N65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(N$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "O65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(O$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "P65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(P$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "Q65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(Q$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "R65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(R$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "S65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(S$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "T65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(T$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
+      },
+      {
+       "a": "U65",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(U$69-1),0)*($B$27*(1-$B$28))*12+MAX($B$45,$B$42/IF($B$41=\"per 1M tokens\",1000000,IF($B$41=\"per 1K tokens\",1000,1))*$B$43*(1-$B$44))*12"
       }
      ]
     },
@@ -1604,6 +1964,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "money",
        "t": "formula",
        "f": "=E66+F65"
+      },
+      {
+       "a": "G66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=F66+G65"
+      },
+      {
+       "a": "H66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=G66+H65"
+      },
+      {
+       "a": "I66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=H66+I65"
+      },
+      {
+       "a": "J66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=I66+J65"
+      },
+      {
+       "a": "K66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=J66+K65"
+      },
+      {
+       "a": "L66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=K66+L65"
+      },
+      {
+       "a": "M66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=L66+M65"
+      },
+      {
+       "a": "N66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=M66+N65"
+      },
+      {
+       "a": "O66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=N66+O65"
+      },
+      {
+       "a": "P66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=O66+P65"
+      },
+      {
+       "a": "Q66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=P66+Q65"
+      },
+      {
+       "a": "R66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=Q66+R65"
+      },
+      {
+       "a": "S66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=R66+S65"
+      },
+      {
+       "a": "T66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=S66+T65"
+      },
+      {
+       "a": "U66",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=T66+U65"
       }
      ]
     },
@@ -1645,6 +2095,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "money",
        "t": "formula",
        "f": "=F64-F66"
+      },
+      {
+       "a": "G67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=G64-G66"
+      },
+      {
+       "a": "H67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=H64-H66"
+      },
+      {
+       "a": "I67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=I64-I66"
+      },
+      {
+       "a": "J67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=J64-J66"
+      },
+      {
+       "a": "K67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=K64-K66"
+      },
+      {
+       "a": "L67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=L64-L66"
+      },
+      {
+       "a": "M67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=M64-M66"
+      },
+      {
+       "a": "N67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=N64-N66"
+      },
+      {
+       "a": "O67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=O64-O66"
+      },
+      {
+       "a": "P67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=P64-P66"
+      },
+      {
+       "a": "Q67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=Q64-Q66"
+      },
+      {
+       "a": "R67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=R64-R66"
+      },
+      {
+       "a": "S67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=S64-S66"
+      },
+      {
+       "a": "T67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=T64-T66"
+      },
+      {
+       "a": "U67",
+       "fmt": "money",
+       "t": "formula",
+       "f": "=U64-U66"
       }
      ]
     },
@@ -1686,6 +2226,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "int",
        "t": "formula",
        "f": "=--(F66<=F64)"
+      },
+      {
+       "a": "G68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(G66<=G64)"
+      },
+      {
+       "a": "H68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(H66<=H64)"
+      },
+      {
+       "a": "I68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(I66<=I64)"
+      },
+      {
+       "a": "J68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(J66<=J64)"
+      },
+      {
+       "a": "K68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(K66<=K64)"
+      },
+      {
+       "a": "L68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(L66<=L64)"
+      },
+      {
+       "a": "M68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(M66<=M64)"
+      },
+      {
+       "a": "N68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(N66<=N64)"
+      },
+      {
+       "a": "O68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(O66<=O64)"
+      },
+      {
+       "a": "P68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(P66<=P64)"
+      },
+      {
+       "a": "Q68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(Q66<=Q64)"
+      },
+      {
+       "a": "R68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(R66<=R64)"
+      },
+      {
+       "a": "S68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(S66<=S64)"
+      },
+      {
+       "a": "T68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(T66<=T64)"
+      },
+      {
+       "a": "U68",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(U66<=U64)"
       }
      ]
     },
@@ -1727,6 +2357,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "int",
        "t": "value",
        "v": 5
+      },
+      {
+       "a": "G69",
+       "fmt": "int",
+       "t": "value",
+       "v": 6
+      },
+      {
+       "a": "H69",
+       "fmt": "int",
+       "t": "value",
+       "v": 7
+      },
+      {
+       "a": "I69",
+       "fmt": "int",
+       "t": "value",
+       "v": 8
+      },
+      {
+       "a": "J69",
+       "fmt": "int",
+       "t": "value",
+       "v": 9
+      },
+      {
+       "a": "K69",
+       "fmt": "int",
+       "t": "value",
+       "v": 10
+      },
+      {
+       "a": "L69",
+       "fmt": "int",
+       "t": "value",
+       "v": 11
+      },
+      {
+       "a": "M69",
+       "fmt": "int",
+       "t": "value",
+       "v": 12
+      },
+      {
+       "a": "N69",
+       "fmt": "int",
+       "t": "value",
+       "v": 13
+      },
+      {
+       "a": "O69",
+       "fmt": "int",
+       "t": "value",
+       "v": 14
+      },
+      {
+       "a": "P69",
+       "fmt": "int",
+       "t": "value",
+       "v": 15
+      },
+      {
+       "a": "Q69",
+       "fmt": "int",
+       "t": "value",
+       "v": 16
+      },
+      {
+       "a": "R69",
+       "fmt": "int",
+       "t": "value",
+       "v": 17
+      },
+      {
+       "a": "S69",
+       "fmt": "int",
+       "t": "value",
+       "v": 18
+      },
+      {
+       "a": "T69",
+       "fmt": "int",
+       "t": "value",
+       "v": 19
+      },
+      {
+       "a": "U69",
+       "fmt": "int",
+       "t": "value",
+       "v": 20
       }
      ]
     },
@@ -1768,6 +2488,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "general",
        "t": "formula",
        "f": "=ROUND($B$33*(1+$B$34)^(F$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "G71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(G$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "H71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(H$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "I71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(I$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "J71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(J$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "K71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(K$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "L71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(L$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "M71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(M$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "N71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(N$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "O71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(O$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "P71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(P$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "Q71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(Q$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "R71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(R$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "S71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(S$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "T71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(T$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
+      },
+      {
+       "a": "U71",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(U$69-1),0)*($B$31*(1-$B$32))*12+MAX($B$51,$B$48/IF($B$47=\"per 1M tokens\",1000000,IF($B$47=\"per 1K tokens\",1000,1))*$B$49*(1-$B$50))*12"
       }
      ]
     },
@@ -1809,6 +2619,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "general",
        "t": "formula",
        "f": "=E72+F71"
+      },
+      {
+       "a": "G72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=F72+G71"
+      },
+      {
+       "a": "H72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=G72+H71"
+      },
+      {
+       "a": "I72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=H72+I71"
+      },
+      {
+       "a": "J72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=I72+J71"
+      },
+      {
+       "a": "K72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=J72+K71"
+      },
+      {
+       "a": "L72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=K72+L71"
+      },
+      {
+       "a": "M72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=L72+M71"
+      },
+      {
+       "a": "N72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=M72+N71"
+      },
+      {
+       "a": "O72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=N72+O71"
+      },
+      {
+       "a": "P72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=O72+P71"
+      },
+      {
+       "a": "Q72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=P72+Q71"
+      },
+      {
+       "a": "R72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=Q72+R71"
+      },
+      {
+       "a": "S72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=R72+S71"
+      },
+      {
+       "a": "T72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=S72+T71"
+      },
+      {
+       "a": "U72",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=T72+U71"
       }
      ]
     },
@@ -1850,6 +2750,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "int",
        "t": "formula",
        "f": "=--(F72<=F64)"
+      },
+      {
+       "a": "G73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(G72<=G64)"
+      },
+      {
+       "a": "H73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(H72<=H64)"
+      },
+      {
+       "a": "I73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(I72<=I64)"
+      },
+      {
+       "a": "J73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(J72<=J64)"
+      },
+      {
+       "a": "K73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(K72<=K64)"
+      },
+      {
+       "a": "L73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(L72<=L64)"
+      },
+      {
+       "a": "M73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(M72<=M64)"
+      },
+      {
+       "a": "N73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(N72<=N64)"
+      },
+      {
+       "a": "O73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(O72<=O64)"
+      },
+      {
+       "a": "P73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(P72<=P64)"
+      },
+      {
+       "a": "Q73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(Q72<=Q64)"
+      },
+      {
+       "a": "R73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(R72<=R64)"
+      },
+      {
+       "a": "S73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(S72<=S64)"
+      },
+      {
+       "a": "T73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(T72<=T64)"
+      },
+      {
+       "a": "U73",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(U72<=U64)"
       }
      ]
     },
@@ -1891,6 +2881,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "general",
        "t": "formula",
        "f": "=ROUND($B$37*(1+$B$38)^(F$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "G74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(G$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "H74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(H$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "I74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(I$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "J74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(J$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "K74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(K$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "L74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(L$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "M74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(M$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "N74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(N$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "O74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(O$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "P74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(P$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "Q74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(Q$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "R74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(R$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "S74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(S$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "T74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(T$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
+      },
+      {
+       "a": "U74",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(U$69-1),0)*($B$35*(1-$B$36))*12+MAX($B$57,$B$54/IF($B$53=\"per 1M tokens\",1000000,IF($B$53=\"per 1K tokens\",1000,1))*$B$55*(1-$B$56))*12"
       }
      ]
     },
@@ -1932,6 +3012,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "general",
        "t": "formula",
        "f": "=E75+F74"
+      },
+      {
+       "a": "G75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=F75+G74"
+      },
+      {
+       "a": "H75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=G75+H74"
+      },
+      {
+       "a": "I75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=H75+I74"
+      },
+      {
+       "a": "J75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=I75+J74"
+      },
+      {
+       "a": "K75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=J75+K74"
+      },
+      {
+       "a": "L75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=K75+L74"
+      },
+      {
+       "a": "M75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=L75+M74"
+      },
+      {
+       "a": "N75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=M75+N74"
+      },
+      {
+       "a": "O75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=N75+O74"
+      },
+      {
+       "a": "P75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=O75+P74"
+      },
+      {
+       "a": "Q75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=P75+Q74"
+      },
+      {
+       "a": "R75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=Q75+R74"
+      },
+      {
+       "a": "S75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=R75+S74"
+      },
+      {
+       "a": "T75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=S75+T74"
+      },
+      {
+       "a": "U75",
+       "fmt": "general",
+       "t": "formula",
+       "f": "=T75+U74"
       }
      ]
     },
@@ -1973,6 +3143,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "int",
        "t": "formula",
        "f": "=--(F75<=F64)"
+      },
+      {
+       "a": "G76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(G75<=G64)"
+      },
+      {
+       "a": "H76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(H75<=H64)"
+      },
+      {
+       "a": "I76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(I75<=I64)"
+      },
+      {
+       "a": "J76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(J75<=J64)"
+      },
+      {
+       "a": "K76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(K75<=K64)"
+      },
+      {
+       "a": "L76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(L75<=L64)"
+      },
+      {
+       "a": "M76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(M75<=M64)"
+      },
+      {
+       "a": "N76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(N75<=N64)"
+      },
+      {
+       "a": "O76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(O75<=O64)"
+      },
+      {
+       "a": "P76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(P75<=P64)"
+      },
+      {
+       "a": "Q76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(Q75<=Q64)"
+      },
+      {
+       "a": "R76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(R75<=R64)"
+      },
+      {
+       "a": "S76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(S75<=S64)"
+      },
+      {
+       "a": "T76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(T75<=T64)"
+      },
+      {
+       "a": "U76",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=--(U75<=U64)"
       }
      ]
     },
@@ -2066,6 +3326,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "int",
        "t": "formula",
        "f": "=$B$26"
+      },
+      {
+       "a": "G79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "H79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "I79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "J79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "K79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "L79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "M79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "N79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "O79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "P79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "Q79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "R79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "S79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "T79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
+      },
+      {
+       "a": "U79",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=$B$26"
       }
      ]
     },
@@ -2107,6 +3457,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "int",
        "t": "formula",
        "f": "=ROUND($B$29*(1+$B$30)^(F$69-1),0)"
+      },
+      {
+       "a": "G80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(G$69-1),0)"
+      },
+      {
+       "a": "H80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(H$69-1),0)"
+      },
+      {
+       "a": "I80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(I$69-1),0)"
+      },
+      {
+       "a": "J80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(J$69-1),0)"
+      },
+      {
+       "a": "K80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(K$69-1),0)"
+      },
+      {
+       "a": "L80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(L$69-1),0)"
+      },
+      {
+       "a": "M80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(M$69-1),0)"
+      },
+      {
+       "a": "N80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(N$69-1),0)"
+      },
+      {
+       "a": "O80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(O$69-1),0)"
+      },
+      {
+       "a": "P80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(P$69-1),0)"
+      },
+      {
+       "a": "Q80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(Q$69-1),0)"
+      },
+      {
+       "a": "R80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(R$69-1),0)"
+      },
+      {
+       "a": "S80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(S$69-1),0)"
+      },
+      {
+       "a": "T80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(T$69-1),0)"
+      },
+      {
+       "a": "U80",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$29*(1+$B$30)^(U$69-1),0)"
       }
      ]
     },
@@ -2148,6 +3588,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "int",
        "t": "formula",
        "f": "=ROUND($B$33*(1+$B$34)^(F$69-1),0)"
+      },
+      {
+       "a": "G81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(G$69-1),0)"
+      },
+      {
+       "a": "H81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(H$69-1),0)"
+      },
+      {
+       "a": "I81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(I$69-1),0)"
+      },
+      {
+       "a": "J81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(J$69-1),0)"
+      },
+      {
+       "a": "K81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(K$69-1),0)"
+      },
+      {
+       "a": "L81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(L$69-1),0)"
+      },
+      {
+       "a": "M81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(M$69-1),0)"
+      },
+      {
+       "a": "N81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(N$69-1),0)"
+      },
+      {
+       "a": "O81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(O$69-1),0)"
+      },
+      {
+       "a": "P81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(P$69-1),0)"
+      },
+      {
+       "a": "Q81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(Q$69-1),0)"
+      },
+      {
+       "a": "R81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(R$69-1),0)"
+      },
+      {
+       "a": "S81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(S$69-1),0)"
+      },
+      {
+       "a": "T81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(T$69-1),0)"
+      },
+      {
+       "a": "U81",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$33*(1+$B$34)^(U$69-1),0)"
       }
      ]
     },
@@ -2189,6 +3719,96 @@ window.CONVERSION_CALCULATOR_DATA = {
        "fmt": "int",
        "t": "formula",
        "f": "=ROUND($B$37*(1+$B$38)^(F$69-1),0)"
+      },
+      {
+       "a": "G82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(G$69-1),0)"
+      },
+      {
+       "a": "H82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(H$69-1),0)"
+      },
+      {
+       "a": "I82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(I$69-1),0)"
+      },
+      {
+       "a": "J82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(J$69-1),0)"
+      },
+      {
+       "a": "K82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(K$69-1),0)"
+      },
+      {
+       "a": "L82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(L$69-1),0)"
+      },
+      {
+       "a": "M82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(M$69-1),0)"
+      },
+      {
+       "a": "N82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(N$69-1),0)"
+      },
+      {
+       "a": "O82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(O$69-1),0)"
+      },
+      {
+       "a": "P82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(P$69-1),0)"
+      },
+      {
+       "a": "Q82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(Q$69-1),0)"
+      },
+      {
+       "a": "R82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(R$69-1),0)"
+      },
+      {
+       "a": "S82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(S$69-1),0)"
+      },
+      {
+       "a": "T82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(T$69-1),0)"
+      },
+      {
+       "a": "U82",
+       "fmt": "int",
+       "t": "formula",
+       "f": "=ROUND($B$37*(1+$B$38)^(U$69-1),0)"
       }
      ]
     },
@@ -2233,7 +3853,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B86",
        "fmt": "money",
        "t": "formula",
-       "f": "=B93/INDEX(B80:F80,MIN(MAX($B$17,1),5))"
+       "f": "=B93/INDEX(B80:U80,MIN(MAX($B$17,1),20))"
       }
      ]
     },
@@ -2250,7 +3870,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B87",
        "fmt": "money",
        "t": "formula",
-       "f": "=B100/INDEX(B81:F81,MIN(MAX($B$17,1),5))"
+       "f": "=B100/INDEX(B81:U81,MIN(MAX($B$17,1),20))"
       }
      ]
     },
@@ -2267,7 +3887,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B88",
        "fmt": "money",
        "t": "formula",
-       "f": "=B101/INDEX(B82:F82,MIN(MAX($B$17,1),5))"
+       "f": "=B101/INDEX(B82:U82,MIN(MAX($B$17,1),20))"
       }
      ]
     },
@@ -2324,7 +3944,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B91",
        "fmt": "general",
        "t": "formula",
-       "f": "=IF(SUM(B68:F68)=0,\"No break-even within horizon\",INDEX(B69:F69,MATCH(1,B68:F68,0)))"
+       "f": "=IF(SUM(B68:U68)=0,\"No break-even within horizon\",INDEX(B69:U69,MATCH(1,B68:U68,0)))"
       },
       {
        "a": "C91",
@@ -2353,7 +3973,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B92",
        "fmt": "money",
        "t": "formula",
-       "f": "=INDEX(B64:F64,MIN(MAX($B$17,1),5))"
+       "f": "=INDEX(B64:U64,MIN(MAX($B$17,1),20))"
       },
       {
        "a": "C92",
@@ -2382,7 +4002,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B93",
        "fmt": "money",
        "t": "formula",
-       "f": "=INDEX(B66:F66,MIN(MAX($B$17,1),5))"
+       "f": "=INDEX(B66:U66,MIN(MAX($B$17,1),20))"
       },
       {
        "a": "C93",
@@ -2527,7 +4147,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B98",
        "fmt": "general",
        "t": "formula",
-       "f": "=IF(SUM(B73:F73)=0,\"No break-even within horizon\",INDEX(B69:F69,MATCH(1,B73:F73,0)))"
+       "f": "=IF(SUM(B73:U73)=0,\"No break-even within horizon\",INDEX(B69:U69,MATCH(1,B73:U73,0)))"
       },
       {
        "a": "C98",
@@ -2556,7 +4176,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B99",
        "fmt": "general",
        "t": "formula",
-       "f": "=IF(SUM(B76:F76)=0,\"No break-even within horizon\",INDEX(B69:F69,MATCH(1,B76:F76,0)))"
+       "f": "=IF(SUM(B76:U76)=0,\"No break-even within horizon\",INDEX(B69:U69,MATCH(1,B76:U76,0)))"
       },
       {
        "a": "C99",
@@ -2585,7 +4205,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B100",
        "fmt": "general",
        "t": "formula",
-       "f": "=INDEX(B72:F72,MIN(MAX($B$17,1),5))"
+       "f": "=INDEX(B72:U72,MIN(MAX($B$17,1),20))"
       },
       {
        "a": "C100",
@@ -2614,7 +4234,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B101",
        "fmt": "general",
        "t": "formula",
-       "f": "=INDEX(B75:F75,MIN(MAX($B$17,1),5))"
+       "f": "=INDEX(B75:U75,MIN(MAX($B$17,1),20))"
       },
       {
        "a": "C101",
@@ -3004,7 +4624,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B116",
        "fmt": "general",
        "t": "formula",
-       "f": "=IF(SUM(B111:F111)=0,\"No crossover within horizon\",INDEX(B69:F69,MATCH(1,B111:F111,0)))"
+       "f": "=IF(SUM(B111:U111)=0,\"No crossover within horizon\",INDEX(B69:U69,MATCH(1,B111:U111,0)))"
       },
       {
        "a": "C116",
@@ -3033,7 +4653,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B117",
        "fmt": "general",
        "t": "formula",
-       "f": "=IF(SUM(B112:F112)=0,\"No crossover within horizon\",INDEX(B69:F69,MATCH(1,B112:F112,0)))"
+       "f": "=IF(SUM(B112:U112)=0,\"No crossover within horizon\",INDEX(B69:U69,MATCH(1,B112:U112,0)))"
       },
       {
        "a": "C117",
@@ -3062,7 +4682,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B118",
        "fmt": "general",
        "t": "formula",
-       "f": "=IF(SUM(B113:F113)=0,\"No crossover within horizon\",INDEX(B69:F69,MATCH(1,B113:F113,0)))"
+       "f": "=IF(SUM(B113:U113)=0,\"No crossover within horizon\",INDEX(B69:U69,MATCH(1,B113:U113,0)))"
       },
       {
        "a": "C118",
@@ -3501,7 +5121,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "B136",
        "fmt": "money",
        "t": "formula",
-       "f": "=INDEX(B64:F64,MIN(MAX($B$17,1),5))/($B$26*12*MIN(MAX($B$17,1),5))"
+       "f": "=INDEX(B64:U64,MIN(MAX($B$17,1),20))/($B$26*12*MIN(MAX($B$17,1),20))"
       },
       {
        "a": "C136",
@@ -3525,22 +5145,22 @@ window.CONVERSION_CALCULATOR_DATA = {
       {
        "name": "Stay put — cumulative cost ($)",
        "from": "B64",
-       "to": "F64"
+       "to": "U64"
       },
       {
        "name": "=\"SaaS \"&$B$23&\" — cumulative cost ($)\"",
        "from": "B66",
-       "to": "F66"
+       "to": "U66"
       },
       {
        "name": "=\"SaaS \"&$B$24&\" — cumulative cost ($)\"",
        "from": "B72",
-       "to": "F72"
+       "to": "U72"
       },
       {
        "name": "=\"SaaS \"&$B$25&\" — cumulative cost ($)\"",
        "from": "B75",
-       "to": "F75"
+       "to": "U75"
       }
      ]
     }
