@@ -139,6 +139,13 @@ p { margin: 0 0 var(--s-16); max-width: 65ch; }
   width: 112px; min-height: 40px; padding: var(--s-4) var(--s-8);
   font-size: var(--t-14); text-align: right; font-variant-numeric: tabular-nums;
 }
+/* Hero preview card rows (Nov 11, 2026 — the homepage hero carries a static
+   preview of the solver's own sample outputs; the live workbook lives on
+   its own page). */
+.pv-rows { margin: var(--s-16) 0; }
+.pv-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-16); padding: var(--s-8) 0; border-bottom: 1px solid var(--line); }
+.pv-row strong { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pv-row .kind { font-style: normal; color: var(--muted); font-size: var(--t-12); letter-spacing: .04em; }
 .wb-input.wb-text { width: auto; text-align: left; } /* text inputs size to their content (renderer sets size); the fixed 112px clipped long labels (Nov 11, 2026 test pass) */
 .wb-out { background: #E4F0E6; border-radius: 4px; padding: 2px var(--s-8); font-variant-numeric: tabular-nums; }
 .wb-chart { border-top: 1px solid var(--line); padding: 16px 4px 4px; }
