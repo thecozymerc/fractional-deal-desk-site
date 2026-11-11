@@ -1,5 +1,13 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-11 — Identity pass: name + photo (Joseph Conte)
+- About: identity block at the top of the story section (photo + name + role + LinkedIn + Book a Call). Homepage: the same block in the Operator section above 'More about the operator'. Photo: Lucky's casual denim-jacket photo (supplied Nov 11, chosen over the formal studio headshot because it matches how he looks in person at events); square crop, 600×600, assets/about-photo.jpg replaced on both trees. styles.css gained .id-block rules. No locked copy edited.
+
+## 2026-11-11 — Tool 14: Cloud Commit & Usage Playbook (S6-P01.d)
+- New tool page at /tools/cloud-commit-playbook/ with the original sample workbook embedded (Discount Matrix / Renewal Check / Commit & Usage; ALLINPUT conversion; formulas hidden). Phone strip reads the asked discount's approver, the ratchet verdict, the deepest growing discount, the commit's effective discount, and the unused commitment.
+- Provenance: built from the playbook STRUCTURE (governance first, gate second, levers third — mapped Nov 11 from Lucky's scrubbed deal-desk notes) and public CUD mechanics; no internal system, codename, KB text, real threshold, figure or SKU carried over. Every value is a labeled sample.
+- Counts: 13 → 14 tools; 36 → 37 pieces (25 shown). Homepage strip, hub lede + P01 card, P01 partition page, SITEMAP-TABLE, MASTER-SITE-CHART, SECTION-6-CHART (count table reconciled to include Tool 13 as well), WEBSITE-CHART.html, CHART-ARROWS (regenerated, 43,876 B), folder charts regenerated.
+
 ## 2026-11-11 — Spacing pass + Contract Analyzer AI live (sitewide CSS; S6-P03.4 worker)
 - Section padding cut from 64px (phone) / 96px (desktop) per side to 32 / 48 — the seam between stacked sections drops from 128/192px to 64/96px — per the Nov 11 spacing research (document design systems run 40–64px seams; NN/g flags wide gaps plus full-width hairlines as a false-floor risk). Hero keeps extra air (72px top on desktop); the homepage's closing section is marked final-cta (48 phone / 64 desktop). No words changed anywhere.
 - The analyzer's AI read is switched ON: GEMINI_API_KEY set as a secret env var on the Pages project; the worker's Gemini model is gemini-3.8-flash with a gemini-3.1-flash-lite fallback (gemini-2.0/2.5-flash are refused to new users). Verified live end to end on the sample contract — summary, key terms, watch-outs and a missing list came back.
