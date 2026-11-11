@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     LABEL — S6-P05.4 — Commercial Restructuring & Margin Bundling
+     Sandbox + Story 4 (tool page; Tool / piece ID: Tool 8 — Bundling
+     Sandbox, address: /tools/bundling-sandbox/)
+     What this page holds: the tool's write-up and the ACTUAL workbook
+     embedded below it — the Commercial Restructuring & Margin
+     Bundling Sandbox (SAMPLE): 1 tab (Bundling_Sandbox), 84 cells, 28
+     of the workbook's own formulas run by the formula engine.
+     Formulas are never shown. Every non-formula cell is a live input
+     — in the real sheet, every non-formula cell is typeable.
+     PROVENANCE (stated plainly, Lucky's rule): this workbook is a
+     sample built for the site in the Argon batch — it is NOT one of
+     Lucky's original work files. It was verified in the Section 6
+     restart (SPEC — Bundling Sandbox.md) and the page's directions
+     are that spec's corrected directions, pasted in. The story below
+     is Story 4, the workbook's companion text, in its own words. All
+     figures, SKUs, and cost baselines are illustrative sample data —
+     the file says so itself. The workbook carries no number formats
+     of its own, so the conversion assigns display formats only
+     (prices and totals as dollars, discounts and margins as
+     percentages) — a format-only patch verified to change zero
+     values and zero formulas. One deliberate quirk of the source is
+     preserved: each option's implementation line is a one-time item
+     whose revenue and cost carry no term multiplier.
+     Uses: ../../assets/styles.css + ../../assets/spreadsheet-tool.js +
+     ../../assets/formula-engine.js + this folder's data file
+     (converted from "Commercial_Restructuring_&_Margin_Bundling_
+     Sandbox_SAMPLE.xlsx" by convert-workbook.py, ALLINPUT mode).
+     Verified cell-for-cell against a LibreOffice recalculation:
+     defaults plus six scenarios (term change, ceiling raised, floor
+     dropped, discount fixed, fractional inputs, hostile values) —
+     zero differences in 28 compared formulas per scenario. Phone
+     summary strip on this page only: the option totals and gate
+     verdicts sit at the far right of a ten-column sheet, so the
+     strip reads them from its own engine instance fed by the same
+     typed values and shows them above the tool on a phone.
+     Map: site/CODE-MAP.md ("tools/bundling-sandbox/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S6-P05.4 — Commercial Restructuring &amp; Margin Bundling Sandbox · Fractional Deal Desk &amp; Contract Management</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../services/">Services &amp; Pricing</a>
+      <a href="../../tools/">Proof of Work</a>
+      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section">
+    <p class="kicker">Proof of Work · Stories &amp; Sandboxes</p>
+    <h1>Commercial Restructuring &amp; Margin Bundling Sandbox.</h1>
+    <p class="lede">Enterprise buyers frequently demand aggressive unit discounts on recurring software licenses to hit their internal procurement budget ceiling. When sales teams simply apply a flat discount to meet the buyer's target price, the deal drops below the company's gross margin floor and gets rejected by Finance. This sandbox is the math that answers it: two bundle structures side by side — the raw sales ask and the restructured bundle — every line priced live, and each option gated against the buyer's budget ceiling and the internal margin floor at the same time. All figures, SKUs, and cost baselines in it are sample data.</p>
+    <p><strong>Directions:</strong> Set the buyer's budget ceiling, your internal margin floor, and the contract term, then build each option line by line: quantity or seats, annual list price, unit cost, and discount. Every line shows its net unit price, 3-year revenue, 3-year cost, and gross margin, and each option is gated live — it passes only if its total revenue fits the buyer's budget and its margin clears your floor. Adjust quantities, list prices, costs, or discounts and watch a failing bundle turn into a passing one without giving margin away blind.</p>
+
+    <div class="m-summary" id="m-summary" aria-label="Bundle gate totals"></div>
+
+    <div class="tool-frame">
+      <div id="wb-tool"></div>
+    </div>
+
+    <h2>Inputs, logic, limits</h2>
+    <p>Inputs: the three deal-level settings (budget ceiling, margin floor %, contract term in years) plus four levers per component line — quantity/seats, annual list $, unit COGS $, and discount %. There is no “service hours” input; implementation is a single priced line. Logic: net unit price is list × (1 − discount); revenue and COGS run over the contract term; gross margin % is (revenue − COGS) ÷ revenue, per line and per option; the gate passes an option only when its total revenue is at or under the ceiling AND its margin is at or over the floor. One deliberate quirk, preserved from the source: each option's implementation line is a one-time item — its revenue and cost carry no term multiplier, unlike the recurring license lines. Limits: sample data only, one sheet in the source.</p>
+  </section>
+
+  <section class="section">
+    <h2>Story 4 — Restructure the deal, keep the margin.</h2>
+    <p><strong>What this piece shows.</strong> A Commercial Restructuring &amp; Margin-Preserving Bundling Sandbox that models side-by-side deal structures. Instead of rejecting the deal or giving away margin, the model restructures the commercial mechanics — adjusting license discount depth, contract term, and professional implementation service bundles — to hit the buyer's target budget while clearing internal gross margin guardrails. The workbook includes an Unstructured Ask (Fails Margin Gate), which shows the raw sales request — heavy flat discount on software licenses — and calculates the exact gross margin shortfall; a Restructured Bundle (Passes Margin Gate), which re-allocates the commercial mix across recurring software tiers, multi-year commitment locks, and fixed-scope implementation services; and a Blended Margin &amp; Buyer Budget Validator: live formulas verifying that (1) the buyer's total spend stays at or below their target price ceiling, and (2) the company's blended gross margin clears the required Finance floor.</p>
+    <p><strong>The point it proves.</strong> It unblocks deadlocked enterprise deals without cutting corners on margin governance, and gives Deal Desk and Sales an objective math sandbox to restructure deals in real time instead of arguing over flat discount exceptions. Skills and controls demonstrated: Commercial Engineering · Gross Margin Protection · Multi-SKU Bundling · Deal Restructuring · Finance Guardrail Validation.</p>
+  </section>
+
+  <section class="section">
+    <h2><span class="no">Next</span> — Put this to work on a real bundle.</h2>
+    <p><a class="btn" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book on my calendar</a></p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
+  </div>
+</footer>
+
+<script src="S6-P05d-bundling-sandbox-data.js"></script>
+<script src="../../assets/formula-engine.js"></script>
+<script src="../../assets/spreadsheet-tool.js"></script>
+<script>
+  window.renderWorkbook(document.getElementById("wb-tool"),
+    window.BUNDLING_SANDBOX_DATA);
+</script>
+<script>
+  /* Phone summary strip (this page only, same pattern as Tools 2 and
+     4–7): the option totals and Gate Status verdicts sit in the far
+     right columns of a ten-column sheet, so on a phone they are
+     several swipes from the levers a visitor is typing. The strip
+     builds its own engine instance from the same data file, feeds it
+     every value typed into the rendered workbook, and shows both
+     options' totals, margins, and gate verdicts above the tool. It
+     only reads; it never writes back. */
+  (function () {
+    var strip = document.getElementById("m-summary");
+    var data = window.BUNDLING_SANDBOX_DATA;
+    if (!strip || !data || !window.FormulaEngine) return;
+    var overrides = {}; // sheetName -> { addr: rawValue }
+    function compute() {
+      var reg = {};
+      data.sheets.forEach(function (sh) {
+        var m = {};
+        sh.rows.forEach(function (r) { r.cells.forEach(function (c) {
+          m[c.a] = c.t === "formula" ? { kind: "formula", value: c.f } : { kind: "value", value: c.v };
+        }); });
+        var ov = overrides[sh.name] || {};
+        Object.keys(ov).forEach(function (a) { m[a] = { kind: "value", value: ov[a] }; });
+        reg[sh.name] = window.FormulaEngine.createSheet(m, { resolve: function (name, addr) {
+          var t = reg[name]; return t ? t.get(addr) : "#REF!";
+        } });
+      });
+      var s = reg["Bundling_Sandbox"];
+      function money(v) { return (typeof v === "number" && isFinite(v)) ? "$" + Math.round(v).toLocaleString("en-US") : "—"; }
+      function pct(v) { return (typeof v === "number" && isFinite(v)) ? (v * 100).toFixed(0) + "%" : "—"; }
+      function txt(v) { return (typeof v === "string" && v !== "") ? v : "—"; }
+      strip.innerHTML =
+        "<div><span>Option A total</span><strong>" + money(s.get("G11")) + " · " + pct(s.get("I11")) + "</strong></div>" +
+        "<div><span>Option A gate</span><strong>" + txt(s.get("J11")) + "</strong></div>" +
+        "<div><span>Option B total</span><strong>" + money(s.get("G18")) + " · " + pct(s.get("I18")) + "</strong></div>" +
+        "<div><span>Option B gate</span><strong>" + txt(s.get("J18")) + "</strong></div>";
+    }
+    var panels = document.querySelectorAll("#wb-tool .wb-panel");
+    document.getElementById("wb-tool").addEventListener("input", function (e) {
+      var input = e.target;
+      if (!input.classList || !input.classList.contains("wb-input")) return;
+      var addr = input.getAttribute("aria-label");
+      var panel = input.closest ? input.closest(".wb-panel") : null;
+      var si = panel ? Array.prototype.indexOf.call(panels, panel) : -1;
+      if (!addr || si < 0) return;
+      var name = data.sheets[si].name;
+      var cell = null;
+      data.sheets[si].rows.forEach(function (r) { r.cells.forEach(function (c) { if (c.a === addr) cell = c; }); });
+      var raw = input.value;
+      var v;
+      if (cell && cell.fmt === "pct") { v = raw === "" ? "" : parseFloat(raw) / 100; }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && String(parseFloat(raw)) === raw.trim().replace(/,/g, "")) { v = parseFloat(raw); }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && cell && typeof cell.v === "number") { v = parseFloat(raw); }
+      else { v = raw; }
+      (overrides[name] = overrides[name] || {})[addr] = v;
+      compute();
+    });
+    compute();
+  })();
+</script>
+</body>
+</html>
