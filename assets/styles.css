@@ -232,3 +232,16 @@ p { margin: 0 0 var(--s-16); max-width: 65ch; }
   .m-summary td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .m-summary .sub { color: var(--grey); font-size: var(--t-12); }
 }
+
+/* Identity block (Nov 11, 2026 — Lucky's order: name + photo on the site so
+   people he meets can connect the face to the name). Pure furniture: photo,
+   name, role line, connect links. */
+.id-block { display: flex; gap: var(--s-24); align-items: center; flex-wrap: wrap; margin: var(--s-24) 0; }
+.id-block img { border-radius: 12px; display: block; }
+.id-block .id-name { font-family: var(--font-display); font-size: var(--t-30); font-weight: 600; line-height: 1.15; margin: 0; color: var(--ink); }
+.id-block .id-role { color: var(--ink-soft); margin: var(--s-4) 0 var(--s-8); }
+.id-block .id-links { margin: 0; }
+
+.id-photos { display: flex; gap: var(--s-16); }
+.id-block figure { margin: 0; }
+.id-block figcaption { font-size: var(--t-13); color: var(--ink-soft); text-align: center; margin-top: var(--s-4); }
