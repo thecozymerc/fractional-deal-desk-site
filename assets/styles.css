@@ -178,3 +178,37 @@ p { margin: 0 0 var(--s-16); max-width: 65ch; }
 @media (prefers-reduced-motion: no-preference) {
   .btn, .main-nav a { transition: background-color .15s ease, color .15s ease; }
 }
+
+/* ==========================================================================
+   MOBILE PRESENTATION — workbook tools (Nov 10, 2026, Lucky's ruling:
+   a mobile version and a desktop version of every tool, one codebase,
+   same numbers). Desktop rendering is untouched: everything below lives
+   inside a max-width media query. On phones the sheet keeps its real
+   table (comparisons stay side-by-side), the label column sticks while
+   the year columns scroll, inputs become full tap targets, and a
+   summary strip (.m-summary, populated by the tool page's own script
+   from the same formula engine) puts the results first.
+   ========================================================================== */
+.m-summary { display: none; }
+@media (max-width: 700px) {
+  .wb-scroll { box-shadow: inset -14px 0 14px -14px rgba(27,42,65,.45); }
+  .wb-table { min-width: 620px; }
+  .wb-table td:first-child:not(.wb-span) {
+    position: sticky; left: 0; z-index: 1;
+    background: var(--paper); max-width: 200px;
+    box-shadow: 1px 0 0 var(--line);
+  }
+  .wb-input { min-height: 44px; font-size: 16px; }
+  .wb-chart { overflow-x: auto; }
+  .m-summary {
+    display: block; background: var(--frame-bg);
+    border: 1px solid var(--line); border-radius: var(--r-frame);
+    padding: var(--s-12) var(--s-16); margin-bottom: var(--s-16);
+  }
+  .m-summary h3 { margin: 0 0 var(--s-8); font-size: var(--t-16); }
+  .m-summary table { width: 100%; border-collapse: collapse; font-size: var(--t-14); }
+  .m-summary td { padding: var(--s-4) 0; border-bottom: 1px solid var(--line); }
+  .m-summary tr:last-child td { border-bottom: none; }
+  .m-summary td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .m-summary .sub { color: var(--grey); font-size: var(--t-12); }
+}
