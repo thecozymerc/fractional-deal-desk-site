@@ -27,17 +27,27 @@ const SYSTEM = [
 async function callAI(env, text) {
   const prompt = SYSTEM + "\n\nCONTRACT TEXT:\n" + text;
   if (env.GEMINI_API_KEY) {
-    const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + env.GEMINI_API_KEY, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json", maxOutputTokens: 1200, temperature: 0.2 }
-      })
-    });
-    if (!r.ok) throw new Error("gemini " + r.status);
-    const j = await r.json();
-    return j.candidates[0].content.parts.map(p => p.text || "").join("");
+    // New-user keys: gemini-2.5-flash is refused ("no longer available to
+    // new users"); Google directs to gemini-3.8-flash. The free tier can
+    // answer 503/overloaded under load, so a lighter model backs it up.
+    const models = ["gemini-3.8-flash", "gemini-3.1-flash-lite"];
+    let lastErr = null;
+    for (const model of models) {
+      try {
+        const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + env.GEMINI_API_KEY, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: "application/json", maxOutputTokens: 1200, temperature: 0.2 }
+          })
+        });
+        if (!r.ok) { lastErr = new Error("gemini " + r.status); continue; }
+        const j = await r.json();
+        return j.candidates[0].content.parts.map(p => p.text || "").join("");
+      } catch (e) { lastErr = e; }
+    }
+    throw lastErr || new Error("gemini unavailable");
   }
   if (env.OPENAI_API_KEY) {
     const r = await fetch("https://api.openai.com/v1/chat/completions", {
