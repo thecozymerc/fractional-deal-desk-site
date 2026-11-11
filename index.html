@@ -6,13 +6,16 @@
      booking route. Copy: Draft 1.10 verbatim (Part II of Draft 1.11, the
      copy of record), tight homepage cut. Design: D01 — Site Design Sheet.
      Sitemap: 00-master/SITEMAP-TABLE.md, row P01.
-     Uses: assets/styles.css (shared D01 system) + assets/spreadsheet-tool.js
-     + assets/formula-engine.js (evaluates the workbook's OWN formulas)
-     with the Deal Pricing Solver's REVISED data file from
-     tools/deal-pricing-solver/ — the hero holds the ACTUAL workbook, both
-     sheets, usable, formulas never shown (Lucky's rule), with the revised
-     descriptions (Nov 8, 2026; the original-wording data file is kept
-     alongside).
+     Uses: assets/styles.css only (shared D01 system).
+     HERO (Nov 11, 2026 — Lucky's ruling after the hero research): the hero
+     no longer embeds the live workbook. It carries a static preview card of
+     the Deal Pricing Solver's own sample outputs (the workbook's own labels
+     and default values) with a "Run the solver" button to the tool's page.
+     The live embed (both sheets, Nov 8, 2026) was retired because it made
+     the hero ~3,670px tall on desktop and broke the phone layout (the page
+     rendered 694px wide on a 390px screen, clipping the headline). The
+     workbook itself is unchanged and lives on its own page. Copy: not one
+     word of the page's text changed in this pass.
      Rule: any change to this file is recorded in CHANGELOG.md, and the
      CODE-MAP entry is updated in the same change (Code Labeling, Rule 3).
      ========================================================================== -->
@@ -28,13 +31,12 @@
 
 <header class="site-header">
   <div class="wrap">
-    <a class="wordmark" href="./">Fractional Deal Desk &amp; Contract Management</a>
-    <nav class="main-nav">
-      <a href="tools/deal-pricing-solver/">Deal Pricing Calculator</a>
-          <a href="tools/perpetual-to-saas-conversion/">Conversion Calculator</a>
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav>
+      <a href="./">Home</a>
       <a href="services/">Services &amp; Pricing</a>
-      <a href="about/">About</a>
-      <a class="btn btn-primary" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book the diagnostic</a>
+      <a href="tools/">Proof of Work</a>
+      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
     </nav>
   </div>
 </header>
@@ -56,9 +58,20 @@
         <p class="cta-note">Contract &amp; Revenue Diagnostic — $6,500 fixed fee. Contracts-only audit — $5,000.</p>
       </div>
       <div class="tool-frame">
-        <p class="eyebrow">Working proof — the actual workbook, live</p>
-        <div id="wb-home"></div>
-        <p class="small">This is the actual Deal Pricing Solver workbook on the page — both sheets, its own numbers, its own calculations. The descriptions are the revised wording (clearer to read on a screen); nothing about the math changed. Type in the yellow cells and the green results move. The formulas stay under the hood. <a href="tools/deal-pricing-solver/">Open the full tool page</a></p>
+        <p class="eyebrow">Working proof — the actual workbook</p>
+        <h3>Deal Pricing Solver — Sample</h3>
+        <p class="small">SAMPLE DATA — Every number here is a generic sample value.</p>
+        <div class="pv-rows">
+          <div class="pv-row"><span>ARPU — average revenue per user ($) <em class="kind">INPUT</em></span><strong>158.4</strong></div>
+          <div class="pv-row"><span>Months in the term <em class="kind">INPUT</em></span><strong>12</strong></div>
+          <div class="pv-row"><span>PUPM — the price per user, per month ($) <em class="kind">OUTPUT</em></span><strong>13.20</strong></div>
+          <div class="pv-row"><span>List Price — solved for you ($) <em class="kind">OUTPUT</em></span><strong>10,000.00</strong></div>
+          <div class="pv-row"><span>Discount — solved for you (%) <em class="kind">OUTPUT</em></span><strong>25.00%</strong></div>
+          <div class="pv-row"><span>Partner Margin — solved for you (%) <em class="kind">OUTPUT</em></span><strong>15.00%</strong></div>
+          <div class="pv-row"><span>Partner Margin — in dollars ($) <em class="kind">OUTPUT</em></span><strong>1,200.00</strong></div>
+        </div>
+        <p><a class="btn btn-primary" href="tools/deal-pricing-solver/">Run the solver</a></p>
+        <p class="small">The actual workbook — both sheets, its own numbers, its own calculations — is live on its own page. Type in the yellow cells and the green results move. The formulas stay under the hood.</p>
       </div>
     </div>
   </section>
@@ -211,13 +224,13 @@
           <h3>Contract Spend Variance &amp; Renewal Tracker</h3>
           <p>Unmanaged contracts leak quietly. This tracker keeps the contract register, compares forecast with actual spend, checks invoices against purchase orders, and flags the lines that need review — including renewal dates already overdue.</p>
           <p class="meta">Put in: your contract register · Get out: variance and renewal flags · no email</p>
-          <p><span class="soon">Opening with the full site</span></p>
+          <p><a href="tools/spend-variance/">Open the tracker</a></p>
         </div>
         <div class="tool-card">
           <h3>Quote-to-Cash Diagnostic</h3>
           <p>Control points across five stages are scored by maturity and risk. The result is not a vague maturity label. It is a fix order: the critical gaps first, each with an owner and a prescribed fix.</p>
           <p class="meta">Put in: maturity and risk scores · Get out: a prioritized fix order · no email</p>
-          <p><span class="soon">Opening with the full site</span></p>
+          <p><a href="tools/qtc-diagnostic/">Run the diagnostic</a></p>
         </div>
       </div>
       <div class="reading" style="margin-top: var(--s-32);">
@@ -236,7 +249,7 @@
         <p>My background is sell-side deal governance at Google, Meta, and Apple — and buy-side procurement at Raytheon. I have sat on both sides of the table.</p>
         <p>At the core, I am a problem solver: direct, sometimes nerdy, honest, and I genuinely solve the problem.</p>
         <p>That is the pattern: find the real blocker, push through the right door, and leave a process behind instead of a one-time exception.</p>
-        <p></p>
+        <p><a href="about/">More about the operator</a></p>
       </div>
     </div>
   </section>
@@ -250,7 +263,7 @@
         <p>Start with the diagnostic. We find the real blocker, name who owns it, and decide what gets built, fixed, or stopped.</p>
         <div class="cta-row">
           <a class="btn btn-primary" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a call</a>
-          <a class="btn btn-quiet" href="tools/deal-pricing-solver/">Or start with a tool</a>
+          <a class="btn btn-quiet" href="tools/">Or start with a tool</a>
         </div>
         <p>Give me a broken, complicated deal operation. That is the work.</p>
       </div>
@@ -261,18 +274,10 @@
 
 <footer class="site-footer">
   <div class="wrap">
-    <p>Fractional Deal Desk &amp; Contract Management — fractional deal desk, contract management &amp; quote-to-cash builds for B2B software companies.</p>
-    <p><a href="tools/deal-pricing-solver/">Deal Pricing Calculator</a>
-          <a href="tools/perpetual-to-saas-conversion/">Conversion Calculator</a> · <a href="services/">Services &amp; Pricing</a> · <a href="about/">About</a> · <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a call</a></p>
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
   </div>
 </footer>
 
-<script src="tools/deal-pricing-solver/S6-P01a-deal-pricing-solver-data-revised.js"></script>
-<script src="assets/formula-engine.js"></script>
-<script src="assets/spreadsheet-tool.js"></script>
-<script>
-  window.renderWorkbook(document.getElementById("wb-home"),
-    window.DEAL_PRICING_SOLVER_DATA_REVISED);
-</script>
+
 </body>
 </html>
