@@ -2,7 +2,7 @@
    Do not hand-edit: re-run the converter. Formula cells carry the sheet's
    own formulas as machinery for the formula engine; they are never displayed. */
 window.CONVERSION_CALCULATOR_DATA = {
- "source": "Perpetual-to-SaaS Conversion Calculator — SAMPLE v9.xlsx",
+ "source": "Perpetual-to-SaaS Conversion Calculator — SAMPLE v10.xlsx",
  "sheets": [
   {
    "name": "Conversion Calculator",
@@ -103,7 +103,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A10",
        "fmt": "general",
        "t": "text",
-       "v": "Limits: the table shows Years 1 to 5, so set the horizon between 1 and 5. It compares cost only — it does not value features, support, or risk, and it does not discount future cash flows. Three generic SaaS options are compared against staying put. Usage is held flat at the expected monthly level for every year — real usage usually grows, which moves the break-even later than this table shows. Seat growth is a straight yearly percentage — real rollouts move in steps, and a step rollout makes the growth years lumpier than this table shows."
+       "v": "Limits: the table shows Years 1 to 20, so set the horizon between 1 and 20. It compares cost only — it does not value features, support, or risk, and it does not discount future cash flows. Three generic SaaS options are compared against staying put. Usage is held flat at the expected monthly level for every year — real usage usually grows, which moves the break-even later than this table shows. Seat growth is a straight yearly percentage — real rollouts move in steps, and a step rollout makes the growth years lumpier than this table shows."
       }
      ]
     },
@@ -114,7 +114,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "A11",
        "fmt": "general",
        "t": "text",
-       "v": "Note: Built fresh for the website; it is not a copy of any internal file. Three generic options compared; the chart plots the workbook's own cumulative rows. Version 2 adds the annual run-rate crossover: the first year an option's one-year cost drops below the stay-put one-year cost, shown next to the cumulative break-even. Version 3 (Nov 8, 2026) adds the Tool 1 factors: one-time coupon credits and per-option usage lines (per use / per token), so a conversion priced on consumption is compared honestly. Version 4 (Nov 8, 2026) rebuilds the SaaS side around seats and PUPM, on Lucky's direction: the tool must show the reason a company spends MORE on a conversion — rollout growth raising TCV — not only the savings case. Version 5 (Nov 9, 2026) makes the option names editable, on Lucky's direction after his v4 review pass: three name inputs, and every label that names an option is now a formula carrying the typed name. v6 (Nov 10, 2026): built at the owner’s review — a seats-by-year table and cost-per-seat-at-horizon rows were added so seat growth is shown, not just priced, and the third option’s sample growth was set to 0% so a flat option sits next to growing ones. v7 (Nov 10, 2026): the horizon is clamped to the sheet’s five year columns (1–5) — before this, a horizon outside 1–5 sent the totals and cost-per-seat rows to zero, because they index the year columns by the horizon; the horizon label and the inputs note now state the range. v8 (Nov 10, 2026): the year table was widened from five to twenty year columns at the owner’s direction — the horizon now truly runs 1 to 20 years, and the v7 clamp remains only as a guard at those stated ends. The fixed Year-5 readouts and the 5-year summary rows still read Year 5, exactly as their labels say. v9 (Nov 10, 2026): from the simulation sweep — a fractional horizon (2.5) reached the year INDEX as a fraction and the page printed #DIV/0! in the cost-per-seat rows; the horizon is now rounded to a whole year inside the clamp, so the sheet, the page, and the phone summary strip all read a fraction the same way."
+       "v": "Note: Built fresh for the website; it is not a copy of any internal file. Three generic options compared; the chart plots the workbook's own cumulative rows. Version 2 adds the annual run-rate crossover: the first year an option's one-year cost drops below the stay-put one-year cost, shown next to the cumulative break-even. Version 3 (Nov 8, 2026) adds the Tool 1 factors: one-time coupon credits and per-option usage lines (per use / per token), so a conversion priced on consumption is compared honestly. Version 4 (Nov 8, 2026) rebuilds the SaaS side around seats and PUPM, on Lucky's direction: the tool must show the reason a company spends MORE on a conversion — rollout growth raising TCV — not only the savings case. Version 5 (Nov 9, 2026) makes the option names editable, on Lucky's direction after his v4 review pass: three name inputs, and every label that names an option is now a formula carrying the typed name. v6 (Nov 10, 2026): built at the owner’s review — a seats-by-year table and cost-per-seat-at-horizon rows were added so seat growth is shown, not just priced, and the third option’s sample growth was set to 0% so a flat option sits next to growing ones. v7 (Nov 10, 2026): the horizon is clamped to the sheet’s five year columns (1–5) — before this, a horizon outside 1–5 sent the totals and cost-per-seat rows to zero, because they index the year columns by the horizon; the horizon label and the inputs note now state the range. v8 (Nov 10, 2026): the year table was widened from five to twenty year columns at the owner’s direction — the horizon now truly runs 1 to 20 years, and the v7 clamp remains only as a guard at those stated ends. The fixed Year-5 readouts and the 5-year summary rows still read Year 5, exactly as their labels say. v9 (Nov 10, 2026): from the simulation sweep — a fractional horizon (2.5) reached the year INDEX as a fraction and the page printed #DIV/0! in the cost-per-seat rows; the horizon is now rounded to a whole year inside the clamp, so the sheet, the page, and the phone summary strip all read a fraction the same way. v10 (Nov 10, 2026): text sweep — the Limits note and the horizon’s side note still said 1 to 5 from the five-column era; both now state the 1-to-20 range. No math changed."
       }
      ]
     },
@@ -241,7 +241,7 @@ window.CONVERSION_CALCULATOR_DATA = {
        "a": "D17",
        "fmt": "general",
        "t": "text",
-       "v": "How many years to compare. Use 1 to 5."
+       "v": "How many years to compare. Use 1 to 20 (a fraction rounds to the nearest whole year)."
       }
      ]
     },
