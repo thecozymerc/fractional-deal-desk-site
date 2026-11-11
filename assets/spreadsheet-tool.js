@@ -129,11 +129,19 @@ window.renderWorkbook = function (container, data) {
               var input = document.createElement("input");
               input.className = "wb-input";
               input.setAttribute("aria-label", c2.a);
+              /* Capture this cell's own address/format/element for the
+                 listener: c2 and input are row-scoped vars that keep
+                 changing as the row's remaining columns are built, so a
+                 listener reading them at event time would set the wrong
+                 cell (or throw when the row's last column is empty).
+                 Fixed Nov 11, 2026 — this bug silently stopped every
+                 sheet input from recalculating its own sheet. */
+              const cellAddr = c2.a, cellFmt = c2.fmt, cellInput = input;
               if (typeof c2.v === "string") {
                 input.type = "text";
                 input.value = c2.v;
                 input.addEventListener("input", function () {
-                  calc.set(c2.a, input.value);
+                  calc.set(cellAddr, cellInput.value);
                   afterChange(si);
                 });
               } else {
@@ -142,8 +150,8 @@ window.renderWorkbook = function (container, data) {
                 input.inputMode = "decimal";
                 input.value = c2.fmt === "pct" ? +(c2.v * 100).toFixed(4) : c2.v;
                 input.addEventListener("input", function () {
-                  var raw = parseFloat(input.value);
-                  calc.set(c2.a, isNaN(raw) ? 0 : (c2.fmt === "pct" ? raw / 100 : raw));
+                  var raw = parseFloat(cellInput.value);
+                  calc.set(cellAddr, isNaN(raw) ? 0 : (cellFmt === "pct" ? raw / 100 : raw));
                   afterChange(si);
                 });
               }
