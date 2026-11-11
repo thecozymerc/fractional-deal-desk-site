@@ -153,6 +153,11 @@ window.renderWorkbook = function (container, data) {
               if (typeof c2.v === "string") {
                 input.type = "text";
                 input.value = c2.v;
+                /* Size text inputs to their content — the fixed-width input
+                   clipped long labels to a few characters (Nov 11, 2026
+                   test pass). Display-only; values and math untouched. */
+                input.classList.add("wb-text");
+                input.size = Math.min(Math.max(c2.v.length + 2, 8), 48);
                 input.addEventListener("input", function () {
                   calc.set(cellAddr, cellInput.value);
                   afterChange(si);
