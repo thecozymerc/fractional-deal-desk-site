@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     LABEL — S6-P02 — Spend Variance & Renewal Tracker (tool page; Tool /
+     piece ID: Tool 4 — Spend Variance, address: /tools/spend-variance/)
+     What this page holds: the tracker's write-up (Draft 1.11 copy) and the
+     ACTUAL workbook embedded below it — Lucky's Contract Spend Variance &
+     Renewal Tracker: 5 tabs (README, Contract Register, Actual vs Forecast,
+     Invoice Audit Log, Dashboard), 668 cells, 192 of the workbook's own
+     formulas run by the formula engine, which learned TODAY() for this
+     build (the Dashboard's 90-day renewal count runs off it). Formulas are
+     never shown. Every non-formula cell is a live input — in the real
+     sheet, every non-formula cell is typeable.
+     Uses: ../../assets/styles.css + ../../assets/spreadsheet-tool.js +
+     ../../assets/formula-engine.js + this folder's data file (converted
+     from "Contract Spend Variance & Renewal Tracker.xlsx" by
+     convert-workbook.py, ALLINPUT mode, with the workbook's own number
+     formats mapped: "$"#,##0, yyyy-mm-dd, 0.0%). Verified cell-for-cell
+     against a LibreOffice recalculation: defaults plus six scenarios
+     (spend changes, invoice changes, a register change, hostile values,
+     fractions, blanked inputs) — zero differences in 192 compared
+     formulas per scenario. Phone summary strip on this page only: it
+     reads the Dashboard KPIs from its own engine instance fed by the
+     same typed values, so the headline numbers sit above the tool on a
+     phone instead of behind the last tab.
+     Map: site/CODE-MAP.md ("tools/spend-variance/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S6-P02 — Spend Variance &amp; Renewal Tracker · Fractional Deal Desk &amp; Contract Management</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../services/">Services &amp; Pricing</a>
+      <a href="../../tools/">Proof of Work</a>
+      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section">
+    <p class="kicker">Proof of Work · Spend Variance</p>
+    <h1>Spend Variance &amp; Renewal Tracker.</h1>
+    <p class="lede">Unmanaged vendor contracts leak money quietly: spend drifts above forecast, invoices arrive that do not match the PO, and renewal notice dates pass while nobody is watching. This tracker is the control system for all three. A contract register holds the portfolio; a monthly forecast-versus-actual sheet flags any contract running hot; an invoice audit log checks invoiced amounts against POs; and a live dashboard rolls it up — total annual contract value, how many contracts have a renewal notice date on or before the 90-day horizon (including any already overdue), year-to-date forecast versus actual, and how many items are flagged for review. Every vendor name and dollar in it is sample data — the file says so itself.</p>
+    <p><strong>Directions:</strong> Start on the Contract Register and add or edit a contract (annual value, start and end dates, owner, status). The renewal notice date calculates itself — end date minus 60 days. Enter monthly forecast and actual OpEx on the Actual vs Forecast sheet; any line beyond ±10% variance flags REVIEW. Log invoices on the Invoice Audit Log; invoiced amounts that do not match the PO flag REVIEW with the disparity shown. The Dashboard totals everything live.</p>
+
+    <div class="m-summary" id="m-summary" aria-label="Dashboard totals"></div>
+
+    <div class="tool-frame">
+      <div id="wb-tool"></div>
+    </div>
+
+    <h2>Inputs, logic, limits</h2>
+    <p>Inputs: contract register rows; monthly forecast and actual OpEx per contract; invoice PO, invoiced, and accrued amounts. Logic: variance = actual − forecast, flagged REVIEW when |variance %| exceeds 10%; invoice disparity = invoiced − PO, flagged MATCH or REVIEW; renewal notice date = end date − 60 days; the dashboard counts contracts whose notice date is on or before today plus 90 days (including any already overdue). Limits: the 60-day notice period is fixed in this tool, not a setting you can change, and there is no day-by-day countdown to a deadline — the dashboard's 90-day count is the horizon view. All data is sample data.</p>
+  </section>
+
+  <section class="section">
+    <h2><span class="no">Next</span> — Put this to work on a real book of contracts.</h2>
+    <p><a class="btn" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book on my calendar</a></p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
+  </div>
+</footer>
+
+<script src="S6-P02-spend-variance-data.js"></script>
+<script src="../../assets/formula-engine.js"></script>
+<script src="../../assets/spreadsheet-tool.js"></script>
+<script>
+  window.renderWorkbook(document.getElementById("wb-tool"),
+    window.SPEND_VARIANCE_DATA);
+</script>
+<script>
+  /* Phone summary strip (this page only, same pattern as Tool 2's): the
+     Dashboard is the LAST tab, so on a phone its totals sit far from the
+     registers a visitor is typing in. The strip builds its own engine
+     instance from the same data file, feeds it every value typed into
+     the rendered workbook (matched to its sheet by panel), and shows the
+     Dashboard KPIs above the tool. It only reads; it never writes back. */
+  (function () {
+    var strip = document.getElementById("m-summary");
+    var data = window.SPEND_VARIANCE_DATA;
+    if (!strip || !data || !window.FormulaEngine) return;
+    var overrides = {}; // sheetName -> { addr: rawValue }
+    function compute() {
+      var reg = {};
+      data.sheets.forEach(function (sh) {
+        var m = {};
+        sh.rows.forEach(function (r) { r.cells.forEach(function (c) {
+          m[c.a] = c.t === "formula" ? { kind: "formula", value: c.f } : { kind: "value", value: c.v };
+        }); });
+        var ov = overrides[sh.name] || {};
+        Object.keys(ov).forEach(function (a) { m[a] = { kind: "value", value: ov[a] }; });
+        reg[sh.name] = window.FormulaEngine.createSheet(m, { resolve: function (name, addr) {
+          var t = reg[name]; return t ? t.get(addr) : "#REF!";
+        } });
+      });
+      var d = reg["Dashboard"];
+      function money(v) { return (typeof v === "number" && isFinite(v)) ? "$" + Math.round(v).toLocaleString("en-US") : "—"; }
+      function num(v) { return (typeof v === "number" && isFinite(v)) ? String(Math.round(v)) : "—"; }
+      function pct(v) { return (typeof v === "number" && isFinite(v)) ? (v * 100).toFixed(1) + "%" : "—"; }
+      strip.innerHTML =
+        "<div><span>Total value</span><strong>" + money(d.get("B4")) + "</strong></div>" +
+        "<div><span>Notices due ≤90d</span><strong>" + num(d.get("B5")) + "</strong></div>" +
+        "<div><span>YTD variance</span><strong>" + money(d.get("B8")) + " (" + pct(d.get("B9")) + ")</strong></div>" +
+        "<div><span>Flagged REVIEW</span><strong>" + num(d.get("B10")) + " lines · " + num(d.get("B11")) + " invoices</strong></div>";
+    }
+    var panels = document.querySelectorAll("#wb-tool .wb-panel");
+    document.getElementById("wb-tool").addEventListener("input", function (e) {
+      var input = e.target;
+      if (!input.classList || !input.classList.contains("wb-input")) return;
+      var addr = input.getAttribute("aria-label");
+      var panel = input.closest ? input.closest(".wb-panel") : null;
+      var si = panel ? Array.prototype.indexOf.call(panels, panel) : -1;
+      if (!addr || si < 0) return;
+      var name = data.sheets[si].name;
+      var cell = null;
+      data.sheets[si].rows.forEach(function (r) { r.cells.forEach(function (c) { if (c.a === addr) cell = c; }); });
+      var raw = input.value;
+      var v;
+      if (cell && cell.fmt === "pct") { v = raw === "" ? "" : parseFloat(raw) / 100; }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && String(parseFloat(raw)) === raw.trim().replace(/,/g, "")) { v = parseFloat(raw); }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && cell && typeof cell.v === "number") { v = parseFloat(raw); }
+      else { v = raw; }
+      (overrides[name] = overrides[name] || {})[addr] = v;
+      compute();
+    });
+    compute();
+  })();
+</script>
+</body>
+</html>
