@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     LABEL — S6-P05.1 — Intake Gate & Submission Scorecard + Story 1 (tool
+     page; Tool / piece ID: Tool 5 — Intake Gate, address:
+     /tools/intake-gate/)
+     What this page holds: the tool's write-up and the ACTUAL workbook
+     embedded below it — the Deal Desk Intake Gate & Submission Scorecard
+     (SAMPLE): 2 tabs (Intake_Gate_Log, Triage_Dashboard), 103 cells, 25 of
+     the workbook's own formulas run by the formula engine. Formulas are
+     never shown. Every non-formula cell is a live input — in the real
+     sheet, every non-formula cell is typeable.
+     PROVENANCE (stated plainly, Lucky's rule): this workbook is a sample
+     built for the site in the Argon batch — it is NOT one of Lucky's
+     original work files. It was verified in the Section 6 restart
+     (SPEC — Intake Gate.md) and the page's directions are that spec's
+     corrected directions, pasted in. The story below is Story 1, the
+     workbook's companion text, in its own words. All deal IDs, account
+     names, and figures are illustrative sample data — the file says so
+     itself. The workbook carries no number formats of its own, so the
+     conversion assigns display formats only (ACV as dollars, discount
+     and readiness as percentages); no value or formula was changed.
+     Uses: ../../assets/styles.css + ../../assets/spreadsheet-tool.js +
+     ../../assets/formula-engine.js + this folder's data file (converted
+     from "Deal_Desk_Intake_Gate_&_Submission_Scorecard_SAMPLE.xlsx" by
+     convert-workbook.py, ALLINPUT mode). Verified cell-for-cell against
+     a LibreOffice recalculation: defaults plus seven scenarios (an
+     approval without baseline, a discount over 20%, a clean fast-track,
+     a finance routing, hostile values, blanked inputs, text flow) —
+     zero differences in 25 compared formulas per scenario. Phone
+     summary strip on this page only: it reads the Triage Dashboard KPIs
+     from its own engine instance fed by the same typed values, so the
+     headline numbers sit above the tool on a phone instead of behind
+     the last tab.
+     Map: site/CODE-MAP.md ("tools/intake-gate/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S6-P05.1 — Intake Gate &amp; Submission Scorecard · Fractional Deal Desk &amp; Contract Management</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../services/">Services &amp; Pricing</a>
+      <a href="../../tools/">Proof of Work</a>
+      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section">
+    <p class="kicker">Proof of Work · Stories &amp; Sandboxes</p>
+    <h1>Intake Gate &amp; Submission Scorecard.</h1>
+    <p class="lede">When enterprise deals stall, the bottleneck is rarely a complex strategy problem. Most delays happen because sales teams bring deals across the fence without doing the baseline work — missing paperwork, missing information, incomplete or unverified accounts, unconfirmed renewal eligibility, or missing approvals — expecting Deal Desk to act as their administrative buffer. When Deal Desk accommodates incomplete submissions, sales learns to treat deal operations like an administrative concierge, and the deal drops into an endless operational loop between Deal Desk, Finance, and Fulfillment. This is the front-door control gate that stops that: five baseline checks on every deal, a live readiness score, an audit flag that catches approvals that skipped the baseline, and a dashboard that tracks how clean the queue really is. Every deal ID, account name, and figure in it is sample data.</p>
+    <p><strong>Directions:</strong> For each deal, enter the deal type, proposed ACV, and requested discount, then answer the five baseline checks Yes or No: account verified, prior contract linked, eligibility confirmed, SKU mix valid, docs complete. The Readiness Score is the share of Yes answers. Set the approval status — and if a deal is marked Approved before all five checks pass, or with a discount over 20%, the gate fires an AUDIT ALERT and routes the deal to STOP – REVOKE &amp; AUDIT. Clean deals fast-track; incomplete deals are held and returned to Sales with a pushback note explaining what is missing.</p>
+
+    <div class="m-summary" id="m-summary" aria-label="Triage dashboard totals"></div>
+
+    <div class="tool-frame">
+      <div id="wb-tool"></div>
+    </div>
+
+    <h2>Inputs, logic, limits</h2>
+    <p>Inputs: ACV, discount %, the five Y/N checks, and approval status — nothing else. There are no contract-terms or customer-commitment inputs beyond those. Logic: readiness percentage, the audit-alert condition (Approved + readiness under 100% or discount over 20%), the four-way routing decision, and dashboard KPI counts. Limits: sample data only. Scores and routing move only when the deal-row inputs above change.</p>
+  </section>
+
+  <section class="section">
+    <h2>Story 1 — The gate that keeps the queue honest.</h2>
+    <p><strong>What this piece shows.</strong> This two-tab workbook is the front-door control gate for Deal Desk. It checks five binary baseline requirements on every submission: Account Verified, Prior Contract Linked, Eligibility Confirmed, SKU Mix Valid, and Required Docs Complete. It calculates a live Readiness Score (0% to 100%) for each deal. It runs an audit formula that catches unauthorized approvals — flagging any deal marked Approved in the system that bypassed baseline readiness checks or discount thresholds. It auto-generates the exact pushback note to Sales listing what is missing, so Deal Desk analysts do not waste time typing manual follow-up emails.</p>
+    <p><strong>How a buyer uses it.</strong> A founder or revenue leader puts this gate in front of the deal approval queue. When a rep submits a deal, the sheet checks the basics first. If all five baseline checks pass, the formula routes the deal to Fast-Track (Pre-Approved) or to Deal Desk / Finance review based on the discount tier. If any baseline item is missing, the sheet stamps the deal “HOLD – RETURN TO SALES” and outputs the exact missing items. The Triage Dashboard tracks First-Pass Yield — the percentage of deals submitted clean on day one — alongside hold counts and audit alerts.</p>
+    <p><strong>The point it proves.</strong> Real deal velocity only happens when Deal Desk enforces strict boundaries from day one. You do not speed up closing cycles by having Deal Desk chase missing fields for sales reps. You speed them up by requiring a clean structure at intake before a deal ever moves to approval.</p>
+  </section>
+
+  <section class="section">
+    <h2><span class="no">Next</span> — Put this to work on a real approval queue.</h2>
+    <p><a class="btn" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book on my calendar</a></p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
+  </div>
+</footer>
+
+<script src="S6-P05a-intake-gate-data.js"></script>
+<script src="../../assets/formula-engine.js"></script>
+<script src="../../assets/spreadsheet-tool.js"></script>
+<script>
+  window.renderWorkbook(document.getElementById("wb-tool"),
+    window.INTAKE_GATE_DATA);
+</script>
+<script>
+  /* Phone summary strip (this page only, same pattern as Tools 2 and 4):
+     the Triage Dashboard is the LAST tab, so on a phone its KPIs sit far
+     from the deal rows a visitor is typing in. The strip builds its own
+     engine instance from the same data file, feeds it every value typed
+     into the rendered workbook (matched to its sheet by panel), and shows
+     the Dashboard KPIs above the tool. It only reads; it never writes back. */
+  (function () {
+    var strip = document.getElementById("m-summary");
+    var data = window.INTAKE_GATE_DATA;
+    if (!strip || !data || !window.FormulaEngine) return;
+    var overrides = {}; // sheetName -> { addr: rawValue }
+    function compute() {
+      var reg = {};
+      data.sheets.forEach(function (sh) {
+        var m = {};
+        sh.rows.forEach(function (r) { r.cells.forEach(function (c) {
+          m[c.a] = c.t === "formula" ? { kind: "formula", value: c.f } : { kind: "value", value: c.v };
+        }); });
+        var ov = overrides[sh.name] || {};
+        Object.keys(ov).forEach(function (a) { m[a] = { kind: "value", value: ov[a] }; });
+        reg[sh.name] = window.FormulaEngine.createSheet(m, { resolve: function (name, addr) {
+          var t = reg[name]; return t ? t.get(addr) : "#REF!";
+        } });
+      });
+      var d = reg["Triage_Dashboard"];
+      function num(v) { return (typeof v === "number" && isFinite(v)) ? String(Math.round(v)) : "—"; }
+      function pct(v) { return (typeof v === "number" && isFinite(v)) ? (v * 100).toFixed(0) + "%" : "—"; }
+      strip.innerHTML =
+        "<div><span>Total deals</span><strong>" + num(d.get("B2")) + "</strong></div>" +
+        "<div><span>Clean first-pass</span><strong>" + num(d.get("B3")) + " · " + pct(d.get("B4")) + " yield</strong></div>" +
+        "<div><span>Held at gate</span><strong>" + num(d.get("B5")) + "</strong></div>" +
+        "<div><span>Unauthorized approvals</span><strong>" + num(d.get("B6")) + "</strong></div>";
+    }
+    var panels = document.querySelectorAll("#wb-tool .wb-panel");
+    document.getElementById("wb-tool").addEventListener("input", function (e) {
+      var input = e.target;
+      if (!input.classList || !input.classList.contains("wb-input")) return;
+      var addr = input.getAttribute("aria-label");
+      var panel = input.closest ? input.closest(".wb-panel") : null;
+      var si = panel ? Array.prototype.indexOf.call(panels, panel) : -1;
+      if (!addr || si < 0) return;
+      var name = data.sheets[si].name;
+      var cell = null;
+      data.sheets[si].rows.forEach(function (r) { r.cells.forEach(function (c) { if (c.a === addr) cell = c; }); });
+      var raw = input.value;
+      var v;
+      if (cell && cell.fmt === "pct") { v = raw === "" ? "" : parseFloat(raw) / 100; }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && String(parseFloat(raw)) === raw.trim().replace(/,/g, "")) { v = parseFloat(raw); }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && cell && typeof cell.v === "number") { v = parseFloat(raw); }
+      else { v = raw; }
+      (overrides[name] = overrides[name] || {})[addr] = v;
+      compute();
+    });
+    compute();
+  })();
+</script>
+</body>
+</html>
