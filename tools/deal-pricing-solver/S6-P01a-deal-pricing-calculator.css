@@ -60,3 +60,26 @@
   .rule{border-top:1px solid var(--line);padding:10px 0}
   footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:14px;margin-top:8px}
   .kbd-note{font-size:13px;color:var(--muted)}
+
+  /* MOBILE PRESENTATION (Nov 10, 2026, Lucky's ruling: a mobile version and
+     a desktop version of every tool — one codebase, same numbers; desktop
+     untouched, everything here is inside the max-width query). Tables keep
+     their real columns inside their .scroll frames, the SKU name column
+     sticks while the numbers scroll, controls become full tap targets,
+     and a sticky totals bar (.calc-mobile-bar, fed by a page script that
+     only READS the calculator's own outputs) keeps the deal totals on
+     screen while a phone visitor scrolls the lines. */
+  @media (max-width:700px){
+    .calc table{min-width:660px}
+    .calc .scroll{box-shadow:inset -14px 0 14px -14px rgba(27,42,65,.45)}
+    .calc td:first-child,.calc th:first-child{position:sticky;left:0;background:#fff;z-index:1;
+      box-shadow:1px 0 0 var(--line);min-width:150px}
+    .calc input[type=number],.calc input[type=text],.calc select{min-height:44px}
+    .calc .del{width:44px;height:44px}
+    .calc-mobile-bar{position:sticky;bottom:0;z-index:5;background:var(--ink);color:#fff;
+      border-radius:8px;padding:10px 14px;margin-top:16px;font-size:15px;
+      display:flex;gap:16px;flex-wrap:wrap;align-items:baseline}
+    .calc-mobile-bar b{font-size:17px}
+    .calc-mobile-bar .lbl{color:#C9D4E2;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  }
+  @media (min-width:701px){ .calc-mobile-bar{display:none} }

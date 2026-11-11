@@ -277,6 +277,7 @@
         </div>
       </div>
       <div class="reading" style="margin-top: var(--s-32);">
+        <div class="calc-mobile-bar" id="calc-mobile-bar"><span class="lbl">Deal totals</span><span id="cmb-main">—</span><span id="cmb-sub"></span></div>
         <p><a href="../../tools/pricing-engines/">Back to Pricing Engines</a> · <a href="../../tools/">All tools</a></p>
         <div class="cta-row">
           <a class="btn btn-primary" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book the diagnostic</a>
@@ -295,5 +296,32 @@
 </footer>
 
 <script src="S6-P01a-deal-pricing-calculator.js"></script>
+<script>
+  /* Mobile totals bar (Nov 10, 2026): phone widths only (CSS hides it on
+     desktop). This script only READS the calculator's own rendered
+     outputs and mirrors the active view's totals into the sticky bar —
+     it computes nothing. */
+  (function () {
+    var root = document.getElementById("calc-root");
+    var main = document.getElementById("cmb-main"), sub = document.getElementById("cmb-sub");
+    if (!root || !main) return;
+    function txt(id) { var el = document.getElementById(id); return el ? el.textContent.trim() : ""; }
+    function sync() {
+      var active = root.querySelector(".tab.active");
+      var view = active ? active.getAttribute("data-view") : "v1";
+      if (view === "v2") {
+        main.innerHTML = "New deal: <b>" + txt("cmp-new") + "</b>";
+        sub.innerHTML = "TCV change: <b>" + txt("cmp-tcv") + "</b>";
+      } else {
+        main.innerHTML = "Seat TCV after coupons: <b>$" + txt("nd-tcv") + "</b>";
+        sub.innerHTML = "Full deal TCV: <b>$" + txt("nd-fulltcv") + "</b>";
+      }
+    }
+    var t = null;
+    root.addEventListener("input", function () { clearTimeout(t); t = setTimeout(sync, 60); });
+    root.addEventListener("click", function () { clearTimeout(t); t = setTimeout(sync, 60); });
+    sync();
+  })();
+</script>
 </body>
 </html>
