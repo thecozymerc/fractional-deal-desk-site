@@ -557,7 +557,21 @@ window.FormulaEngine = (function () {
     }
 
     return {
-      get: function (addr) { var v = rawGet(addr); return isPhantom(v) ? 0 : v; },
+      get: function (addr) {
+        try { var v = rawGet(addr); return isPhantom(v) ? 0 : v; }
+        catch (e) {
+          /* Spreadsheet errors are VALUES on the page, not exceptions: a
+             formula doing math on a text cell must SHOW #VALUE! in its own
+             cell (as Excel does) while the rest of the sheet keeps
+             calculating. Evaluation throws Excel errors as exceptions
+             (toNum, SMALL); convert them back to values at this boundary.
+             Anything else is a real engine bug and still throws.
+             (Nov 11, 2026 — Tool 4 typing fuzz: letters in a forecast cell
+             threw "Uncaught Error: #VALUE!" and aborted the repaint.) */
+          if (e && typeof e.message === "string" && /^#(DIV\/0!|N\/A|REF!|VALUE!|NUM!|NAME\?)/.test(e.message)) return e.message;
+          throw e;
+        }
+      },
       set: function (addr, rawValue) {
         cells[addr] = { kind: "value", value: rawValue };
         cache = {};
