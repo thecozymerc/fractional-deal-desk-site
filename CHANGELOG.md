@@ -1,5 +1,9 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-11 — Spacing pass + Contract Analyzer AI live (sitewide CSS; S6-P03.4 worker)
+- Section padding cut from 64px (phone) / 96px (desktop) per side to 32 / 48 — the seam between stacked sections drops from 128/192px to 64/96px — per the Nov 11 spacing research (document design systems run 40–64px seams; NN/g flags wide gaps plus full-width hairlines as a false-floor risk). Hero keeps extra air (72px top on desktop); the homepage's closing section is marked final-cta (48 phone / 64 desktop). No words changed anywhere.
+- The analyzer's AI read is switched ON: GEMINI_API_KEY set as a secret env var on the Pages project; the worker's Gemini model is gemini-3.8-flash with a gemini-3.1-flash-lite fallback (gemini-2.0/2.5-flash are refused to new users). Verified live end to end on the sample contract — summary, key terms, watch-outs and a missing list came back.
+
 Lucky's rule (Nov 7, 2026): any change on any page is recorded here — date, page or file, what changed. A change is not finished until its label, the CODE-MAP, and this log are all updated in the same move.
 
 ## 2026-11-11 — Post-Tool-13 improvement loop (P04 + all pages)
