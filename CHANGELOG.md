@@ -1,5 +1,11 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-12 — SWAP: Tool 3.2 (Argon build) replaces the workbook-converted Tool 3 at /tools/perm-calculator/ — Lucky's ruling
+- Lucky reviewed all three live versions (Tool 3 workbook conversion, Tool 3.1 Argon build 1, Tool 3.2 Argon build 2) and ruled: 3.2 takes Tool 3's address 'if it works and you find no problems.' Verification before the swap: 240-check interaction battery across all 4 samples (every input tortured incl. $0/$1B prices, 0/1/1.5 factors, 1–120 month terms, −5%/250% growth, zero-unit usage) with ZERO page errors; usage math and the seat-growth model hand-verified to the cent; a live real-browser pass (load, Generate Note, price edit re-pricing to $341,870, sample switch to the $61,200 token commit) with no visible errors.
+- What changed at this address: S6-P01c-perm-calculator.html + index.html are now the Tool 3.2 build (byte-identical to /tools/perm-calculator-3-2/). The retired workbook page + its data file are preserved (snapshot in the build records; data.js stays in the folder, unreferenced). Tools 3.1 and 3.2 keep their own addresses as the comparison record. Muse's only edit to Argon's code remains the version label (3.1 → 3.2, two spots).
+- Records: CODE-MAP v51; Plans tab -19 Log 48; Tool Review Checklist rows for Tool 3 / Tool 3.2 updated (verdict columns untouched); Drive mirror S6-P01.c folder updated in the same pass.
+
+
 ## 2026-11-11 — About tenure line: 'Working since age 14.' opener cut (P03) — Lucky's order
 - P03 About: the tenure line now opens with the corporate line — 'Corporate since 2006 — Eton, Reco, Apple, Raytheon, Meta, Google — with 15+ years in commercial contracts, deal desk, and revenue operations.' — matching the homepage hero (bank pass). No other About text changed.
 - The fact itself is untouched (working since 14; 26 years total) — it simply no longer opens the page. A sourced research check on the opener's effect on senior presentation was commissioned the same evening at Lucky's request.
