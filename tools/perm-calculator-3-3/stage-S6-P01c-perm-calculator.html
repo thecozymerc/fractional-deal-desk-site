@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perm Calculator — Fractional Deal Desk &amp; Contract Management</title>
+  <style>
+    :root {
+      --paper-bg: #F8F8F5;
+      --surface-sec: #ECEEF1;
+      --panel-bg: #FFFFFF;
+      --ink: #0F1E38;
+      --ink-soft: #33445E;
+      --text-grey: #5F6B7A;
+      --text-light: #98A1AD;
+      --hairline-color: #D9DCE1;
+      --hairline: 1px solid #D9DCE1;
+      --accent: #8A6D1F;
+      --accent-dark: #6E5716;
+      --font-serif: Georgia, "Times New Roman", serif;
+      --font-sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --radius: 2px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background-color: var(--paper-bg); color: var(--ink); font-family: var(--font-sans); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    .tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+    /* TOOL HEADER (NO SITE CHROME — TOOL BAR ONLY) */
+    .tool-header { background: var(--ink); color: var(--panel-bg); border-bottom: 1px solid var(--accent); padding: 16px; }
+    .wrap-1120 { max-width: 1120px; margin: 0 auto; }
+    .header-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .brand-col { display: flex; flex-direction: column; gap: 4px; }
+    .tool-badge { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--panel-bg); background: var(--accent); border: 1px solid var(--accent-dark); padding: 4px 8px; border-radius: var(--radius); width: fit-content; }
+    .tool-header h1 { font-family: var(--font-serif); font-weight: 600; font-size: 30px; color: var(--panel-bg); line-height: 1.2; }
+    .tool-prose-lead { font-size: 18px; line-height: 1.6; color: var(--surface-sec); max-width: 640px; }
+    .header-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .sample-picker-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: var(--ink-soft); border: var(--hairline); padding: 8px 12px; border-radius: var(--radius); }
+    .picker-label { font-size: 12px; font-weight: 600; color: var(--surface-sec); }
+    .sample-select { font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--panel-bg); border: var(--hairline); border-radius: var(--radius); padding: 4px 8px; min-width: 240px; }
+    .header-btn-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    /* BUTTONS — FLAT, 2PX RADIUS, SYSTEM FONT */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; font-family: var(--font-sans); font-size: 14px; font-weight: 600; padding: 8px 12px; border-radius: var(--radius); border: var(--hairline); cursor: pointer; white-space: nowrap; background: var(--panel-bg); color: var(--ink); }
+    .btn:hover { background: var(--surface-sec); }
+    .btn-accent { background: var(--accent); color: var(--panel-bg); border-color: var(--accent-dark); }
+    .btn-accent:hover { background: var(--accent-dark); }
+    .btn-ink-outline { background: var(--ink-soft); color: var(--panel-bg); border-color: var(--text-light); }
+    .btn-ink-outline:hover { background: var(--ink); }
+    .btn-sm { font-size: 12px; padding: 4px 8px; }
+    .btn-icon { background: transparent; border: 1px solid transparent; color: var(--text-grey); cursor: pointer; padding: 4px; border-radius: var(--radius); font-size: 12px; line-height: 1; }
+    .btn-icon:hover { color: var(--ink); background: var(--surface-sec); border-color: var(--hairline-color); }
+
+    /* STICKY SIDE-BY-SIDE OPTION TOTALS STRIP */
+    .summary-strip-wrap { background: var(--surface-sec); border-bottom: var(--hairline); padding: 12px 16px; position: sticky; top: 0; z-index: 40; }
+    .strip-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; flex-wrap: wrap; }
+    .strip-title { font-size: 12px; font-weight: 600; color: var(--accent-dark); }
+    .strip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .strip-card { background: var(--panel-bg); border: var(--hairline); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .strip-card.is-proposed { border-color: var(--accent); background: var(--paper-bg); }
+    .strip-card.is-current { border-color: var(--ink-soft); }
+    .strip-card.is-delta { background: var(--surface-sec); border-style: dashed; border-color: var(--accent); }
+    .strip-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: var(--hairline); padding-bottom: 8px; }
+    .strip-opt-name { font-family: var(--font-serif); font-size: 16px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .role-pill { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 4px 8px; border-radius: var(--radius); white-space: nowrap; border: var(--hairline); }
+    .role-pill.current { background: var(--surface-sec); color: var(--ink-soft); }
+    .role-pill.proposed { background: var(--accent); color: var(--panel-bg); border-color: var(--accent-dark); }
+    .role-pill.variant { background: var(--panel-bg); color: var(--text-grey); }
+    .strip-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .strip-metric-label { font-size: 12px; color: var(--text-grey); display: block; }
+    .strip-metric-val { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+    .strip-metric-val.accent-val { color: var(--accent-dark); }
+    .strip-metric-sub { font-size: 12px; color: var(--text-light); display: block; }
+
+    /* MAIN WORKSPACE (MAX-WIDTH 1120PX) */
+    .workspace { max-width: 1120px; margin: 0 auto; padding: 16px 16px 48px; display: grid; grid-template-columns: minmax(0, 1.38fr) minmax(340px, 0.92fr); gap: 16px; align-items: start; }
+    .col-stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+    /* PANELS — FLAT, 1PX HAIRLINES, ZERO SHADOWS */
+    .panel { background: var(--panel-bg); border: var(--hairline); border-radius: var(--radius); overflow: hidden; }
+    .panel-header { background: var(--surface-sec); border-bottom: var(--hairline); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .panel-header-navy { background: var(--ink); color: var(--panel-bg); border-bottom: 1px solid var(--accent); padding: 12px 16px; }
+    .panel-title-group { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+    .panel-title { font-family: var(--font-serif); font-size: 20px; font-weight: 400; color: var(--ink); }
+    .panel-header-navy .panel-title { color: var(--panel-bg); }
+    .panel-kicker { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); }
+    .panel-header-navy .panel-kicker { color: var(--surface-sec); }
+    .panel-body { padding: 16px; }
+
+    /* OPTION CARDS & PRICING TABLE */
+    .option-card { border: var(--hairline); border-radius: var(--radius); background: var(--panel-bg); overflow: hidden; }
+    .option-card.is-proposed { border-color: var(--accent); }
+    .option-bar { background: var(--surface-sec); border-bottom: var(--hairline); padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .option-card.is-proposed .option-bar { background: var(--paper-bg); border-bottom-color: var(--accent); }
+    .option-title-wrap { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .option-title-text { font-family: var(--font-serif); font-size: 18px; font-weight: 400; color: var(--ink); }
+    .option-controls { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .deal-table { width: 100%; border-collapse: collapse; min-width: 650px; }
+    .deal-table th { background: var(--paper-bg); border-bottom: var(--hairline); padding: 8px; font-size: 12px; font-weight: 600; color: var(--text-grey); text-align: right; white-space: nowrap; }
+    .deal-table th:first-child { text-align: left; padding-left: 12px; }
+    .deal-table th.computed-col { background: var(--surface-sec); color: var(--ink); }
+    .deal-table td { border-bottom: var(--hairline); padding: 8px; vertical-align: top; text-align: right; font-size: 14px; }
+    .deal-table td:first-child { text-align: left; padding-left: 12px; min-width: 165px; }
+    .deal-table td.computed-cell { background: var(--paper-bg); font-size: 14px; color: var(--ink); white-space: nowrap; }
+    .deal-table td.computed-cell.strong { font-weight: 700; }
+    .deal-table tfoot td { background: var(--ink); color: var(--panel-bg); font-size: 14px; font-weight: 600; padding: 8px; border-bottom: none; white-space: nowrap; }
+    .deal-table tfoot td:first-child { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--surface-sec); padding-left: 12px; }
+
+    /* LINE META & INPUTS */
+    .sku-label-wrap { display: flex; align-items: flex-start; justify-content: space-between; gap: 4px; }
+    .sku-name-text { font-weight: 600; color: var(--ink); font-size: 14px; }
+    .line-type-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+    .type-badge { font-size: 12px; font-weight: 600; padding: 0 4px; border-radius: var(--radius); border: var(--hairline); background: var(--surface-sec); color: var(--ink-soft); }
+    .type-badge.usage { background: var(--paper-bg); border-color: var(--accent); color: var(--accent-dark); }
+    .sub-detail { font-size: 12px; color: var(--text-grey); display: block; margin-top: 4px; }
+    .waste-tag { font-size: 12px; color: var(--accent-dark); font-weight: 600; display: block; margin-top: 4px; }
+    .field-input, .num-input, .select-input { font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--panel-bg); border: var(--hairline); border-radius: var(--radius); padding: 4px 8px; }
+    .field-input:focus, .num-input:focus, .select-input:focus { outline: none; border-color: var(--accent); }
+    .num-input { font-variant-numeric: tabular-nums; text-align: right; width: 72px; }
+    .num-input.price-w { width: 88px; }
+    .num-input.short-w { width: 56px; }
+    .factor-wrap { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .factor-hint { font-size: 12px; color: var(--text-grey); line-height: 1.1; }
+    .usage-params-grid { display: grid; grid-template-columns: repeat(2, auto); gap: 4px 8px; justify-content: end; align-items: center; text-align: right; }
+    .usage-param-lbl { font-size: 12px; color: var(--text-grey); white-space: nowrap; }
+
+    /* CONTEXT FORM & AUTO-COMPUTED STRIP */
+    .section-divider { display: flex; align-items: center; justify-content: space-between; border-bottom: var(--hairline); padding-bottom: 4px; margin: 16px 0 12px; }
+    .section-divider:first-child { margin-top: 0; }
+    .section-divider-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink); }
+    .section-divider-meta { font-size: 12px; color: var(--text-grey); }
+    .form-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .form-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .field-group { display: flex; flex-direction: column; gap: 4px; }
+    .field-group.span-2 { grid-column: span 2; }
+    .field-label { font-size: 12px; font-weight: 600; color: var(--ink-soft); display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+    .field-label-tag { font-size: 12px; font-weight: 400; color: var(--text-light); }
+    .auto-metrics-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 8px; background: var(--paper-bg); border: var(--hairline); border-radius: var(--radius); padding: 12px; margin-top: 12px; }
+    .auto-metric-item { display: flex; flex-direction: column; gap: 4px; }
+    .auto-metric-label { font-size: 12px; font-weight: 600; color: var(--text-grey); }
+    .auto-metric-value { font-size: 14px; font-weight: 700; color: var(--ink); }
+    .program-box { border: var(--hairline); background: var(--paper-bg); border-radius: var(--radius); padding: 12px; margin-top: 12px; }
+    .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer; }
+    .list-builder { display: flex; flex-direction: column; gap: 8px; }
+    .list-items { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .list-item-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--paper-bg); border: var(--hairline); border-radius: var(--radius); padding: 4px 8px; font-size: 14px; color: var(--ink); }
+    .list-item-num { font-weight: 700; color: var(--accent-dark); margin-right: 4px; }
+    .list-add-row { display: flex; gap: 8px; }
+    .list-add-row .field-input { flex: 1; }
+
+    /* STICKY RIGHT COLUMN: APPROVAL NOTE */
+    .note-sticky-col { position: sticky; top: 128px; display: flex; flex-direction: column; gap: 16px; }
+    .note-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 16px; background: var(--paper-bg); border-bottom: var(--hairline); flex-wrap: wrap; }
+    .note-status { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--ink-soft); }
+    .status-dot { width: 8px; height: 8px; border-radius: var(--radius); background: var(--accent); display: inline-block; }
+    .note-output-wrap { padding: 16px; background: var(--ink); }
+    .note-pre { font-family: var(--font-sans); font-size: 14px; line-height: 1.5; color: var(--panel-bg); white-space: pre-wrap; word-break: break-word; background: var(--ink-soft); border: 1px solid var(--accent); border-radius: var(--radius); padding: 16px; max-height: 540px; overflow-y: auto; }
+    .note-footer { padding: 8px 16px; background: var(--surface-sec); border-top: var(--hairline); display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-grey); gap: 8px; flex-wrap: wrap; }
+    .copy-toast { display: inline-flex; align-items: center; font-size: 12px; font-weight: 700; color: var(--panel-bg); background: var(--accent); padding: 4px 8px; border-radius: var(--radius); }
+
+    @media (max-width: 960px) {
+      .workspace { grid-template-columns: 1fr; }
+      .note-sticky-col, .summary-strip-wrap { position: static; }
+      .header-controls { align-items: stretch; width: 100%; }
+      .sample-select { min-width: 0; flex: 1; }
+    }
+    @media (max-width: 640px) {
+      .tool-header { padding: 12px; }
+      .tool-header h1 { font-size: 24px; }
+      .tool-prose-lead { font-size: 16px; }
+      .summary-strip-wrap { padding: 12px; }
+      .strip-metrics { grid-template-columns: repeat(2, 1fr); }
+      .workspace { padding: 12px 12px 32px; gap: 12px; }
+      .panel-body { padding: 12px; }
+      .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+      .field-group.span-2 { grid-column: span 1; }
+      .note-pre { font-size: 12px; padding: 12px; }
+    }
+  </style>
+  <style>
+    /* SCOPED SITE FRAME & PAGE COPY STYLES */
+    .site-header { background: #F8F8F5; border-top: 3px solid #0F1E38; border-bottom: 1px solid #D9DCE1; }
+    .site-header .wrap { max-width: 1120px; margin: 0 auto; min-height: 64px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .site-header .brand { font-family: Georgia, "Times New Roman", serif; font-weight: 700; font-size: 18px; color: #0F1E38; letter-spacing: .01em; }
+    .site-header nav { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .site-header nav a { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 16px; color: #33445E; text-decoration: none; }
+    .site-header nav a:hover { color: #6E5716; }
+
+    .page-copy { background: #F8F8F5; color: #0F1E38; border-bottom: 1px solid #D9DCE1; }
+    .page-copy.site-bottom-copy { border-top: 1px solid #D9DCE1; border-bottom: none; }
+    .page-copy .site-copy-wrap { max-width: 1120px; margin: 0 auto; padding: 48px 24px; }
+    .page-copy .site-reading-box { max-width: 680px; text-align: left; }
+    .page-copy .site-eyebrow { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-variant: small-caps; color: #8A6D1F; margin-bottom: 12px; }
+    .page-copy .site-lead-title { font-family: Georgia, "Times New Roman", serif; font-size: 36px; font-weight: 600; line-height: 1.2; color: #0F1E38; margin-bottom: 16px; }
+    .page-copy .site-section-h2 { font-family: Georgia, "Times New Roman", serif; font-size: 24px; font-weight: 600; line-height: 1.3; color: #0F1E38; margin-bottom: 16px; }
+    .page-copy p { font-size: 18px; line-height: 1.6; color: #33445E; margin-bottom: 16px; }
+    .page-copy p:last-child { margin-bottom: 0; }
+    .page-copy .site-how-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 24px; margin-bottom: 24px; }
+    .page-copy .site-how-card { background: #FFFFFF; border: 1px solid #D9DCE1; border-radius: 2px; padding: 20px; }
+    .page-copy .site-how-card h3 { font-family: Georgia, "Times New Roman", serif; font-size: 18px; font-weight: 600; color: #0F1E38; margin-bottom: 8px; }
+    .page-copy .site-how-card p { font-size: 16px; line-height: 1.6; color: #33445E; margin: 0; }
+    .page-copy .site-gloss-box { max-width: 680px; background: #ECEEF1; border: 1px solid #D9DCE1; border-left: 3px solid #8A6D1F; border-radius: 2px; padding: 16px 20px; margin-bottom: 16px; }
+    .page-copy .site-gloss-box p { font-size: 16px; line-height: 1.6; color: #0F1E38; margin-bottom: 8px; }
+    .page-copy .site-gloss-box p:last-child { margin-bottom: 0; }
+    .page-copy .site-honesty-line { font-size: 16px; color: #5F6B7A; font-style: italic; }
+    .page-copy .site-next-block { margin-top: 48px; padding-top: 32px; border-top: 1px solid #D9DCE1; max-width: 680px; }
+    .page-copy .site-cta-link { display: inline-block; margin-top: 8px; background: #8A6D1F; color: #FFFFFF; border: 1px solid #6E5716; border-radius: 2px; font-size: 16px; font-weight: 600; padding: 12px 24px; text-decoration: none; }
+    .page-copy .site-cta-link:hover { background: #6E5716; }
+
+    .site-footer { background: #0F1E38; border-top: 3px solid #8A6D1F; padding: 48px 0; }
+    .site-footer .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+    .site-footer p { font-size: 14px; color: #D8DCE3; margin: 0; }
+
+    @media (max-width: 840px) {
+      .page-copy .site-how-grid { grid-template-columns: 1fr; }
+      .page-copy .site-lead-title { font-size: 30px; }
+    }
+    @media (max-width: 640px) {
+      .site-header .wrap { padding: 12px 16px; }
+      .site-header nav { gap: 12px; }
+      .page-copy .site-copy-wrap { padding: 32px 16px; }
+    }
+  </style>
+</head>
+<body>
+<header class="site-header"><div class="wrap"><span class="brand">Fractional Deal Desk &amp; Contract Management</span><nav><a href="../../">Home</a><a href="../../services/">Services &amp; Pricing</a><a href="../../tools/">Proof of Work</a><a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a></nav></div></header>
+
+<section class="page-copy" aria-label="Tool Introduction">
+  <div class="site-copy-wrap">
+    <div class="site-reading-box">
+      <span class="site-eyebrow">Proof of Work · Pricing Engines</span>
+      <h2 class="site-lead-title">One deal, structured several ways at once.</h2>
+      <p>This tool builds the same perpetual deal as several options side by side—combining seat lines and usage or commit lines—re-prices every option live as you type, and writes the approval note immediately.</p>
+      <p>The model behind this tool is the operator’s own working perpetual-deal workbook, rebuilt as a clean web template; the deals loaded in it are fictional samples. The operator brings 15+ years in commercial contracts, deal desk, and revenue operations, working in corporate roles since 2006 (Eton, Reco, Apple, Raytheon, Meta, Google), and has governed contracts up to $300M and priced 3,000+ SKUs.</p>
+    </div>
+  </div>
+</section>
+
+
+  <header class="tool-header">
+    <div class="wrap-1120 header-inner">
+      <div class="brand-col">
+        <span class="tool-badge">Tool 3 · Deal Desk</span>
+        <h1>Perpetual License &amp; Usage Commit Structurer</h1>
+        <p class="tool-prose-lead">Structure perpetual seat lines, compound seat growth, and prepaid usage/token commitments side by side; generate the skip-the-blanks approval note immediately.</p>
+      </div>
+      <div class="header-controls">
+        <div class="sample-picker-bar">
+          <label class="picker-label" for="sampleDealPicker">Load Sample Deal:</label>
+          <select id="sampleDealPicker" class="sample-select">
+            <option value="sample-1">1. Baseline Perpetual Expansion (Northstar Logistics)</option>
+            <option value="sample-2">2. AI Token Commit &amp; Overage Expansion (Kestrel Financial)</option>
+            <option value="sample-3">3. Platform Consolidation &amp; Dual Seat Growth (Helios Bio)</option>
+            <option value="sample-4">4. Renewal with TCV Ratchet &amp; Commit Floor (Aegis Defense)</option>
+          </select>
+        </div>
+        <div class="header-btn-row">
+          <button type="button" class="btn btn-ink-outline btn-sm" id="btnAddOption">+ Add Option Variant</button>
+          <button type="button" class="btn btn-ink-outline btn-sm" id="btnResetSample">Reset Current Sample</button>
+          <button type="button" class="btn btn-accent btn-sm" id="btnHeaderCopy">Copy Approval Note</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="summary-strip-wrap" aria-label="Side-by-Side Option Totals">
+    <div class="wrap-1120">
+      <div class="strip-header">
+        <span class="strip-title">Side-by-Side Option Totals · Seat &amp; Usage Commit Chain (Paying Price · PUPM / PUPY · Usage Waste · ACV · TCV)</span>
+      </div>
+      <div class="strip-grid" id="summaryStripGrid"></div>
+    </div>
+  </section>
+
+  <main class="workspace">
+    <div class="col-stack">
+      <section class="panel" aria-label="Deal Options Builder">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span class="panel-kicker">Section 01</span>
+            <h2 class="panel-title">Deal Options: Seat Lines &amp; Usage Commitments</h2>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <span style="font-size:12px; color:var(--text-grey);">Factors: 1.00 = 0% off; 0.65 = 35% off</span>
+            <button type="button" class="btn btn-sm" id="btnAddOptionInline">+ New Option</button>
+          </div>
+        </div>
+        <div class="panel-body" style="display:flex; flex-direction:column; gap:16px;" id="optionsContainer"></div>
+      </section>
+
+      <section class="panel" aria-label="Approval Context & Program Details">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span class="panel-kicker">Section 02</span>
+            <h2 class="panel-title">Approval Request Context &amp; Program Rules</h2>
+          </div>
+          <button type="button" class="btn btn-sm" id="btnToggleBlanksDemo">Test Skip-the-Blanks</button>
+        </div>
+
+        <div class="panel-body">
+          <div class="section-divider">
+            <span class="section-divider-title">Greeting &amp; Deal References</span>
+            <span class="section-divider-meta">Blank fields drop out of note automatically</span>
+          </div>
+          <div class="form-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="ctxSalesRep">Sales Representative (To) <span class="field-label-tag">Optional</span></label>
+              <input type="text" id="ctxSalesRep" class="field-input" placeholder="e.g. Elena Rostova" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxOperator">Deal Desk Operator (From) <span class="field-label-tag">Optional</span></label>
+              <input type="text" id="ctxOperator" class="field-input" placeholder="e.g. Marcus Thorne" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxOppLink">Opportunity Link / ID <span class="field-label-tag">Deal Reference</span></label>
+              <input type="text" id="ctxOppLink" class="field-input" placeholder="https://crm.example.internal/opp/..." />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxCaseLink">Case Number / Link <span class="field-label-tag">Deal Reference</span></label>
+              <input type="text" id="ctxCaseLink" class="field-input" placeholder="DD-88412 / https://desk.example.internal/..." />
+            </div>
+          </div>
+
+          <div class="section-divider">
+            <span class="section-divider-title">Sales Request Summary</span>
+            <span class="section-divider-meta">Combined with auto-computed metrics below</span>
+          </div>
+          <div class="form-grid-3">
+            <div class="field-group">
+              <label class="field-label" for="ctxCustomer">Customer Name</label>
+              <input type="text" id="ctxCustomer" class="field-input" placeholder="Customer legal name" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxPartner">Partner Name</label>
+              <input type="text" id="ctxPartner" class="field-input" placeholder="Channel partner / reseller" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxRequestType">Request Type</label>
+              <input type="text" id="ctxRequestType" class="field-input" placeholder="Pricing Approval" />
+            </div>
+            <div class="field-group span-2">
+              <label class="field-label" for="ctxReason">Pricing Criteria Not Met (Reason)</label>
+              <input type="text" id="ctxReason" class="field-input" placeholder="Reason approval is required" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxEduGov">EDU / Non-Profit / Gov Flag</label>
+              <select id="ctxEduGov" class="select-input">
+                <option value="">— Leave Blank (Omit) —</option>
+                <option value="N">N</option>
+                <option value="Y (EDU)">Y (EDU)</option>
+                <option value="Y (Non-Profit)">Y (Non-Profit)</option>
+                <option value="Y (Gov)">Y (Gov)</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxPrevContract">Previous Contract</label>
+              <input type="text" id="ctxPrevContract" class="field-input" placeholder="Prior contract ID" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxPrevStart">Previous Contract Start Date</label>
+              <input type="text" id="ctxPrevStart" class="field-input" placeholder="YYYY-MM-DD" />
+            </div>
+          </div>
+
+          <div class="auto-metrics-strip tabular" id="autoComputedSummaryStrip" aria-label="Auto-Computed Note Fields"></div>
+
+          <div class="section-divider">
+            <span class="section-divider-title">Program Block</span>
+            <span class="section-divider-meta">Included in note only when a program applies</span>
+          </div>
+          <div class="program-box">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+              <label class="checkbox-row">
+                <input type="checkbox" id="ctxProgramApplies" />
+                <span>Promotional / Concession Program Applies to Proposed Deal</span>
+              </label>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <label class="field-label" for="ctxFreeMonths" style="margin:0;">Free Months (Total):</label>
+                <input type="number" id="ctxFreeMonths" class="num-input short-w" min="0" max="60" step="1" />
+              </div>
+            </div>
+            <div id="programComputedPreview" class="tabular" style="margin-top:8px; font-size:12px; color:var(--ink-soft);"></div>
+          </div>
+
+          <div class="form-grid-2" style="margin-top:16px;">
+            <div>
+              <div class="section-divider" style="margin-top:0;">
+                <span class="section-divider-title">Missing Information</span>
+                <button type="button" class="btn-icon" id="btnClearMissing">Clear all</button>
+              </div>
+              <div class="list-builder">
+                <ul class="list-items" id="missingList"></ul>
+                <div class="list-add-row">
+                  <input type="text" id="inputNewMissing" class="field-input" placeholder="Add missing info item..." />
+                  <button type="button" class="btn btn-sm" id="btnAddMissing">+ Add</button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="section-divider" style="margin-top:0;">
+                <span class="section-divider-title">Validation Checks</span>
+                <button type="button" class="btn-icon" id="btnClearValidation">Clear all</button>
+              </div>
+              <div class="list-builder">
+                <ul class="list-items" id="validationList"></ul>
+                <div class="list-add-row">
+                  <input type="text" id="inputNewValidation" class="field-input" placeholder="Add check to re-validate..." />
+                  <button type="button" class="btn btn-sm" id="btnAddValidation">+ Add</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="note-sticky-col" aria-label="Approval Request Note Output">
+      <section class="panel">
+        <div class="panel-header panel-header-navy">
+          <div class="panel-title-group">
+            <span class="panel-kicker">Primary Output</span>
+            <h2 class="panel-title">Approval Request Note</h2>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button type="button" class="btn btn-ink-outline btn-sm" id="btnGenerateNote">Generate Note</button>
+            <button type="button" class="btn btn-accent btn-sm" id="btnCopyNote">Copy Note</button>
+          </div>
+        </div>
+        <div class="note-toolbar">
+          <div class="note-status">
+            <span class="status-dot"></span>
+            <span id="noteComparisonLabel">Comparing Current Deal vs Proposed Deal</span>
+          </div>
+          <span id="copyFeedback" class="copy-toast" style="display:none;">Copied to clipboard ✓</span>
+        </div>
+        <div class="note-output-wrap">
+          <pre class="note-pre tabular" id="approvalNoteOutput"></pre>
+        </div>
+        <div class="note-footer">
+          <span>Assembled from filled fields only · Computed fields pulled automatically</span>
+          <span id="noteStats" class="tabular"></span>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const SAMPLE_LIBRARY = {
+        'sample-1': function () {
+          return {
+            sampleKey: 'sample-1', currentOptionId: 'opt-1', proposedOptionId: 'opt-2',
+            editingSkuKey: null, editingUnitKey: null, editingOptionId: null,
+            context: {
+              salesRep: 'Elena Rostova', operator: 'Marcus Thorne',
+              oppLink: 'https://crm.northstar-internal.example/opp/OPP-2026-4190',
+              caseLink: 'DD-88412 / https://desk.northstar-internal.example/cases/88412',
+              customerName: 'Northstar Meridian Logistics', partnerName: 'Vanguard Systems Integration',
+              requestType: 'Pricing Approval',
+              criteriaReason: 'Extra discount exceeds 25% standard threshold on expansion seats; includes 6-month promotional ramp.',
+              eduGovFlag: 'N', prevContract: 'AGR-2023-0942', prevStartDate: '2023-12-01',
+              programApplies: true, freeMonths: 6,
+              missingInfo: ['Partner non-standard margin acknowledgment email from Vanguard channel manager'],
+              validationChecks: [
+                'Confirm order form payment terms remain Net 30 per standard perpetual policy',
+                'Re-validate existing perpetual seat keys under AGR-2023-0942 prior to provisioning expansion'
+              ]
+            },
+            options: [
+              {
+                id: 'opt-1', name: 'Option 1 — Current Deal (Baseline)',
+                lines: [
+                  { id: 'l-101', lineType: 'seat', name: 'Enterprise Core Platform — Perpetual', listPrice: 180000, partnerFactor: 0.90, extraFactor: 0.85, termMonths: 36, seats: 200, seatGrowthPct: 0 },
+                  { id: 'l-102', lineType: 'seat', name: 'Automated Workflow Engine — Perpetual', listPrice: 72000, partnerFactor: 0.90, extraFactor: 0.90, termMonths: 36, seats: 200, seatGrowthPct: 0 },
+                  { id: 'l-103', lineType: 'seat', name: 'Audit & Compliance Telemetry — Perpetual', listPrice: 36000, partnerFactor: 0.90, extraFactor: 0.95, termMonths: 36, seats: 100, seatGrowthPct: 0 }
+                ]
+              },
+              {
+                id: 'opt-2', name: 'Option 2 — Proposed 36M Expansion',
+                lines: [
+                  { id: 'l-201', lineType: 'seat', name: 'Enterprise Core Platform — Perpetual', listPrice: 315000, partnerFactor: 0.85, extraFactor: 0.65, termMonths: 36, seats: 350, seatGrowthPct: 0 },
+                  { id: 'l-202', lineType: 'seat', name: 'Automated Workflow Engine — Perpetual', listPrice: 126000, partnerFactor: 0.85, extraFactor: 0.70, termMonths: 36, seats: 350, seatGrowthPct: 0 },
+                  { id: 'l-203', lineType: 'seat', name: 'Audit & Compliance Telemetry — Perpetual', listPrice: 72000, partnerFactor: 0.85, extraFactor: 0.75, termMonths: 36, seats: 200, seatGrowthPct: 0 }
+                ]
+              }
+            ]
+          };
+        },
+        'sample-2': function () {
+          return {
+            sampleKey: 'sample-2', currentOptionId: 'opt-1', proposedOptionId: 'opt-2',
+            editingSkuKey: null, editingUnitKey: null, editingOptionId: null,
+            context: {
+              salesRep: 'Devon Sterling', operator: 'Marcus Thorne',
+              oppLink: 'https://crm.northstar-internal.example/opp/OPP-2026-7731',
+              caseLink: 'DD-90104 / https://desk.northstar-internal.example/cases/90104',
+              customerName: 'Kestrel Financial Holdings', partnerName: 'Meridian Cloud Guild',
+              requestType: 'Pricing Approval',
+              criteriaReason: 'Adds prepaid AI Token Commit pool with custom overage rate protection and 30% extra discount on core seats.',
+              eduGovFlag: 'N', prevContract: 'AGR-2024-3318', prevStartDate: '2024-06-15',
+              programApplies: true, freeMonths: 3,
+              missingInfo: ['Architecture sizing sign-off for 185M token forecast over 36-month term'],
+              validationChecks: [
+                'Verify token overage billing rate ($420 / 1M Tokens) is codified in Exhibit B',
+                'Confirm prepaid commit is non-refundable and expires at end of 36-month term'
+              ]
+            },
+            options: [
+              {
+                id: 'opt-1', name: 'Option 1 — Current Deal (Seat Baseline)',
+                lines: [
+                  { id: 'k-101', lineType: 'seat', name: 'Vanguard Core Ledger — Enterprise Edition', listPrice: 240000, partnerFactor: 0.90, extraFactor: 0.85, termMonths: 36, seats: 250, seatGrowthPct: 0 },
+                  { id: 'k-102', lineType: 'seat', name: 'Regulatory Archiver — Standard Seat', listPrice: 90000, partnerFactor: 0.90, extraFactor: 0.90, termMonths: 36, seats: 250, seatGrowthPct: 0 }
+                ]
+              },
+              {
+                id: 'opt-2', name: 'Option 2 — Proposed Seat + AI Token Commit (Overage Case)',
+                lines: [
+                  { id: 'k-201', lineType: 'seat', name: 'Vanguard Core Ledger — Enterprise Edition', listPrice: 336000, partnerFactor: 0.85, extraFactor: 0.70, termMonths: 36, seats: 350, seatGrowthPct: 0 },
+                  { id: 'k-202', lineType: 'seat', name: 'Regulatory Archiver — Standard Seat', listPrice: 126000, partnerFactor: 0.85, extraFactor: 0.75, termMonths: 36, seats: 350, seatGrowthPct: 0 },
+                  { id: 'k-203', lineType: 'usage', name: 'Neural Document Parser — AI Token Pool', unitName: '1M Tokens', commitMode: 'dollar', listPrice: 90000, unitListRate: 600, partnerFactor: 0.85, extraFactor: 0.80, termMonths: 36, includedUnits: 150, overageRate: 420, forecastUnits: 185 }
+                ]
+              },
+              {
+                id: 'opt-3', name: 'Option 3 — High-Commit Variant (Shows Unused Commit Waste)',
+                lines: [
+                  { id: 'k-301', lineType: 'seat', name: 'Vanguard Core Ledger — Enterprise Edition', listPrice: 336000, partnerFactor: 0.85, extraFactor: 0.70, termMonths: 36, seats: 350, seatGrowthPct: 0 },
+                  { id: 'k-302', lineType: 'seat', name: 'Regulatory Archiver — Standard Seat', listPrice: 126000, partnerFactor: 0.85, extraFactor: 0.75, termMonths: 36, seats: 350, seatGrowthPct: 0 },
+                  { id: 'k-303', lineType: 'usage', name: 'Neural Document Parser — AI Token Pool', unitName: '1M Tokens', commitMode: 'dollar', listPrice: 132000, unitListRate: 600, partnerFactor: 0.85, extraFactor: 0.75, termMonths: 36, includedUnits: 220, overageRate: 400, forecastUnits: 185 }
+                ]
+              }
+            ]
+          };
+        },
+        'sample-3': function () {
+          return {
+            sampleKey: 'sample-3', currentOptionId: 'opt-1', proposedOptionId: 'opt-2',
+            editingSkuKey: null, editingUnitKey: null, editingOptionId: null,
+            context: {
+              salesRep: 'Claire Vance', operator: 'Marcus Thorne',
+              oppLink: 'https://crm.northstar-internal.example/opp/OPP-2026-5512',
+              caseLink: 'DD-91220 / https://desk.northstar-internal.example/cases/91220',
+              customerName: 'Helios BioSciences Group', partnerName: 'Helix Channel Partners',
+              requestType: 'Pricing Approval',
+              criteriaReason: 'Consolidating two legacy point SKUs into Unified Platform Edition with 20% annual compounding seat ramp vs 10% baseline growth.',
+              eduGovFlag: 'N', prevContract: 'AGR-2023-6100', prevStartDate: '2023-09-01',
+              programApplies: false, freeMonths: 0, missingInfo: [],
+              validationChecks: [
+                'Verify retirement schedule of Legacy Lab Data Manager & Assay Workflow keys upon platform cutover',
+                'Confirm annual seat step-up schedule (Y1: 300, Y2: 360, Y3: 432) is attached to order form'
+              ]
+            },
+            options: [
+              {
+                id: 'opt-1', name: 'Option 1 — Current Point Products (10% Annual Seat Growth)',
+                lines: [
+                  { id: 'h-101', lineType: 'seat', name: 'Legacy Lab Data Manager — Perpetual', listPrice: 150000, partnerFactor: 0.90, extraFactor: 0.85, termMonths: 36, seats: 250, seatGrowthPct: 10 },
+                  { id: 'h-102', lineType: 'seat', name: 'Legacy Assay Workflow Pro — Perpetual', listPrice: 120000, partnerFactor: 0.90, extraFactor: 0.85, termMonths: 36, seats: 250, seatGrowthPct: 10 }
+                ]
+              },
+              {
+                id: 'opt-2', name: 'Option 2 — Proposed Unified Platform (20% Annual Seat Growth)',
+                lines: [
+                  { id: 'h-201', lineType: 'seat', name: 'Helios Unified R&D Cloud — Platform Perpetual', listPrice: 360000, partnerFactor: 0.85, extraFactor: 0.68, termMonths: 36, seats: 300, seatGrowthPct: 20 },
+                  { id: 'h-202', lineType: 'usage', name: 'Genomic Compute Credits — Commit Tier', unitName: '1k Credits', commitMode: 'unit', listPrice: 60000, unitListRate: 500, partnerFactor: 0.85, extraFactor: 0.80, termMonths: 36, includedUnits: 120, overageRate: 390, forecastUnits: 140 }
+                ]
+              }
+            ]
+          };
+        },
+        'sample-4': function () {
+          return {
+            sampleKey: 'sample-4', currentOptionId: 'opt-1', proposedOptionId: 'opt-2',
+            editingSkuKey: null, editingUnitKey: null, editingOptionId: null,
+            context: {
+              salesRep: 'Nathaniel Brooks', operator: 'Jordan Vance',
+              oppLink: 'https://crm.northstar-internal.example/opp/OPP-2026-9904',
+              caseLink: 'DD-93011 / https://desk.northstar-internal.example/cases/93011',
+              customerName: 'Aegis Sovereign Defense Systems', partnerName: 'Federal Capitol Integrators',
+              requestType: 'Pricing Approval',
+              criteriaReason: 'Renewal-with-ratchet exception: customer divested 150 seats; deal maintains +11.2% TCV ratchet via Telemetry Ingest Commit floor.',
+              eduGovFlag: 'Y (Gov)', prevContract: 'GOV-2023-0118', prevStartDate: '2023-10-01',
+              programApplies: true, freeMonths: 2,
+              missingInfo: [
+                'Divestiture spin-off letter confirming seat reduction from 500 to 350 operators',
+                'Signed Federal Rider acknowledging prepaid ingest commitment floor'
+              ],
+              validationChecks: [
+                'Confirm net proposed TCV exceeds prior contract TCV per policy ratchet',
+                'Validate unused commitment ($14,025 modeled waste) is accepted as minimum spend floor'
+              ]
+            },
+            options: [
+              {
+                id: 'opt-1', name: 'Option 1 — Current Expiring Contract (500 Seats)',
+                lines: [
+                  { id: 'a-101', lineType: 'seat', name: 'Command Core — Sovereign Perpetual Edition', listPrice: 450000, partnerFactor: 0.90, extraFactor: 0.75, termMonths: 36, seats: 500, seatGrowthPct: 0 },
+                  { id: 'a-102', lineType: 'usage', name: 'High-Throughput Telemetry Ingest', unitName: 'TB Ingest', commitMode: 'dollar', listPrice: 80000, unitListRate: 1000, partnerFactor: 0.90, extraFactor: 0.90, termMonths: 36, includedUnits: 80, overageRate: 850, forecastUnits: 80 }
+                ]
+              },
+              {
+                id: 'opt-2', name: 'Option 2 — Proposed Ratchet Renewal (350 Seats + Commit Floor)',
+                lines: [
+                  { id: 'a-201', lineType: 'seat', name: 'Command Core — Sovereign Perpetual Edition', listPrice: 378000, partnerFactor: 0.85, extraFactor: 0.72, termMonths: 36, seats: 350, seatGrowthPct: 5 },
+                  { id: 'a-202', lineType: 'usage', name: 'High-Throughput Telemetry Ingest', unitName: 'TB Ingest', commitMode: 'dollar', listPrice: 240000, unitListRate: 1000, partnerFactor: 0.85, extraFactor: 0.75, termMonths: 36, includedUnits: 240, overageRate: 700, forecastUnits: 218 }
+                ]
+              }
+            ]
+          };
+        }
+      };
+
+      let state = SAMPLE_LIBRARY['sample-1']();
+      let blanksDemoActive = false;
+
+      function computeLineMetrics(line) {
+        const lineType = line.lineType === 'usage' ? 'usage' : 'seat';
+        const partnerFactor = Math.min(1, Math.max(0, Number(line.partnerFactor) || 0));
+        const extraFactor = Math.min(1, Math.max(0, Number(line.extraFactor) || 0));
+        const termMonths = Math.max(1, Number(line.termMonths) || 1);
+        const years = termMonths / 12;
+        const partnerDiscountPct = (1 - partnerFactor) * 100;
+        const extraDiscountPct = (1 - extraFactor) * 100;
+
+        if (lineType === 'usage') {
+          const unitName = (line.unitName || 'Units').trim() || 'Units';
+          const commitMode = line.commitMode === 'unit' ? 'unit' : 'dollar';
+          const includedUnits = Math.max(0, Number(line.includedUnits) || 0);
+          const unitListRate = Math.max(0, Number(line.unitListRate) || 0);
+          const rawListCommit = Math.max(0, Number(line.listPrice) || 0);
+          const listPrice = commitMode === 'unit' ? (includedUnits * unitListRate) : rawListCommit;
+
+          const commitValue = listPrice * partnerFactor * extraFactor;
+          const effectiveUnitPrice = includedUnits > 0 ? (commitValue / includedUnits) : 0;
+          const overageRate = Math.max(0, Number(line.overageRate) || 0);
+          const forecastUnits = Math.max(0, Number(line.forecastUnits) || 0);
+          const overageUnits = Math.max(0, forecastUnits - includedUnits);
+          const overageValue = overageUnits * overageRate;
+          const payingPrice = commitValue + overageValue;
+          const tcv = payingPrice;
+          const acv = years > 0 ? (payingPrice / years) : 0;
+          const consumedAtEffectiveRate = forecastUnits * effectiveUnitPrice;
+          const unusedCommitment = Math.max(0, commitValue - consumedAtEffectiveRate);
+          const combinedDiscountPct = listPrice > 0 ? (1 - (commitValue / listPrice)) * 100 : 0;
+
+          return {
+            lineType: 'usage', unitName, commitMode, listPrice, unitListRate,
+            partnerFactor, extraFactor, termMonths, years,
+            includedUnits, overageRate, forecastUnits, overageUnits,
+            commitValue, effectiveUnitPrice, overageValue, unusedCommitment,
+            payingPrice, tcv, acv, pupy: 0, pupm: 0,
+            seats: 0, initialSeats: 0, exitSeats: 0, avgSeats: 0, seatGrowthPct: 0, seatsByYear: [],
+            partnerDiscountPct, extraDiscountPct, combinedDiscountPct
+          };
+        }
+
+        const baseListPrice = Math.max(0, Number(line.listPrice) || 0);
+        const initialSeats = Math.max(1, Math.round(Number(line.seats) || 1));
+        const seatGrowthPct = Math.max(0, Number(line.seatGrowthPct) || 0);
+        const numYears = Math.max(1, Math.ceil(termMonths / 12));
+        const seatsByYear = [];
+        let weightedSeatMonths = 0;
+
+        for (let y = 1; y <= numYears; y++) {
+          const grownSeats = seatGrowthPct > 0
+            ? Math.round(initialSeats * Math.pow(1 + seatGrowthPct / 100, y - 1))
+            : initialSeats;
+          const monthsInSlice = (y < numYears) ? 12 : (termMonths - 12 * (numYears - 1));
+          const activeMonths = monthsInSlice > 0 ? monthsInSlice : 12;
+          seatsByYear.push({ year: y, seats: grownSeats, months: activeMonths });
+          weightedSeatMonths += grownSeats * activeMonths;
+        }
+
+        const avgSeats = termMonths > 0 ? (weightedSeatMonths / termMonths) : initialSeats;
+        const exitSeats = seatsByYear[seatsByYear.length - 1].seats;
+        const growthScaleFactor = initialSeats > 0 ? (avgSeats / initialSeats) : 1;
+        const listPrice = baseListPrice * growthScaleFactor;
+        const payingPrice = listPrice * partnerFactor * extraFactor;
+        const tcv = payingPrice;
+        const acv = years > 0 ? (payingPrice / years) : 0;
+        const pupy = (avgSeats > 0 && years > 0) ? (payingPrice / avgSeats / years) : 0;
+        const pupm = pupy / 12;
+        const combinedDiscountPct = listPrice > 0 ? (1 - (payingPrice / listPrice)) * 100 : 0;
+
+        return {
+          lineType: 'seat', listPrice, baseListPrice, partnerFactor, extraFactor, termMonths, years,
+          seats: initialSeats, initialSeats, exitSeats, avgSeats, seatGrowthPct, seatsByYear,
+          payingPrice, tcv, acv, pupy, pupm,
+          commitValue: 0, overageValue: 0, unusedCommitment: 0,
+          partnerDiscountPct, extraDiscountPct, combinedDiscountPct
+        };
+      }
+
+      function computeOptionMetrics(option) {
+        const computedLines = option.lines.map(line => ({ ...line, calc: computeLineMetrics(line) }));
+        const totalList = computedLines.reduce((acc, l) => acc + l.calc.listPrice, 0);
+        const totalPaying = computedLines.reduce((acc, l) => acc + l.calc.payingPrice, 0);
+        const totalTcv = computedLines.reduce((acc, l) => acc + l.calc.tcv, 0);
+        const totalAcv = computedLines.reduce((acc, l) => acc + l.calc.acv, 0);
+
+        const seatLines = computedLines.filter(l => l.calc.lineType === 'seat');
+        const usageLines = computedLines.filter(l => l.calc.lineType === 'usage');
+
+        const totalInitialSeats = seatLines.reduce((acc, l) => acc + l.calc.initialSeats, 0);
+        const totalExitSeats = seatLines.reduce((acc, l) => acc + l.calc.exitSeats, 0);
+        const totalAvgSeats = seatLines.reduce((acc, l) => acc + l.calc.avgSeats, 0);
+        const hasSeatGrowth = seatLines.some(l => l.calc.seatGrowthPct > 0);
+        const modeledSeats = hasSeatGrowth ? totalExitSeats : totalInitialSeats;
+
+        const seatAcv = seatLines.reduce((acc, l) => acc + l.calc.acv, 0);
+        const blendedPupy = totalAvgSeats > 0 ? (seatAcv / totalAvgSeats) : 0;
+        const blendedPupm = blendedPupy / 12;
+
+        const totalUsageCommit = usageLines.reduce((acc, l) => acc + l.calc.commitValue, 0);
+        const totalUsageOverage = usageLines.reduce((acc, l) => acc + l.calc.overageValue, 0);
+        const totalUsageNet = usageLines.reduce((acc, l) => acc + l.calc.payingPrice, 0);
+        const totalUnusedCommit = usageLines.reduce((acc, l) => acc + l.calc.unusedCommitment, 0);
+
+        const dominantTerm = computedLines.length > 0 ? computedLines[0].calc.termMonths : 36;
+        const listAfterPartner = computedLines.reduce((acc, l) => acc + (l.calc.listPrice * l.calc.partnerFactor), 0);
+        const weightedPartnerDiscountPct = totalList > 0 ? (1 - (listAfterPartner / totalList)) * 100 : 0;
+        const effectiveDiscountPct = totalList > 0 ? (1 - (totalPaying / totalList)) * 100 : 0;
+
+        return {
+          ...option, computedLines, totalList, totalPaying, totalTcv, totalAcv,
+          totalSeats: modeledSeats, totalInitialSeats, totalExitSeats, totalAvgSeats, hasSeatGrowth,
+          dominantTerm, blendedPupy, blendedPupm,
+          totalUsageCommit, totalUsageOverage, totalUsageNet, totalUnusedCommit,
+          usageLineCount: usageLines.length, seatLineCount: seatLines.length,
+          weightedPartnerDiscountPct, effectiveDiscountPct
+        };
+      }
+
+      const usdFmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const usdWholeFmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      function fmtMoney(val) { return usdFmt.format(Number(val) || 0); }
+      function fmtPct(val, d = 1) { return (Number(val) || 0).toFixed(d) + '%'; }
+      function fmtSignedPct(val, d = 1) { const n = Number(val) || 0; return (n > 0 ? '+' : '') + n.toFixed(d) + '%'; }
+      function escapeHtml(str) { return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+      function fmtSeatSchedule(seatsByYear) { return (seatsByYear || []).map(s => `Y${s.year}: ${s.seats}`).join(' → '); }
+
+      function buildApprovalNote(computedOptions) {
+        const currentOpt = computedOptions.find(o => o.id === state.currentOptionId) || computedOptions[0];
+        const proposedOpt = computedOptions.find(o => o.id === state.proposedOptionId) || computedOptions[computedOptions.length - 1];
+        const ctx = state.context;
+        const blocks = [];
+
+        const rep = (ctx.salesRep || '').trim();
+        const op = (ctx.operator || '').trim();
+        const greetingLine = rep ? `Hi ${rep},` : 'Hello,';
+        const introLine = op
+          ? `Below is the structured pricing approval summary prepared by ${op} (Deal Desk). Please note: the approval system covers pricing approvals only.`
+          : `Below is the structured pricing approval summary from Deal Desk. Please note: the approval system covers pricing approvals only.`;
+        blocks.push(`${greetingLine}\n${introLine}`);
+
+        const refLines = [];
+        if ((ctx.oppLink || '').trim()) refLines.push(`- Opportunity Link: ${ctx.oppLink.trim()}`);
+        if ((ctx.caseLink || '').trim()) refLines.push(`- Case Number / Link: ${ctx.caseLink.trim()}`);
+        if (refLines.length > 0) blocks.push(`DEAL REFERENCES\n${refLines.join('\n')}`);
+
+        const summaryLines = [];
+        if ((ctx.customerName || '').trim()) summaryLines.push(`- Customer Name: ${ctx.customerName.trim()}`);
+        if ((ctx.partnerName || '').trim()) summaryLines.push(`- Partner Name: ${ctx.partnerName.trim()}`);
+        if ((ctx.requestType || '').trim()) summaryLines.push(`- Request Type: ${ctx.requestType.trim()}`);
+        if ((ctx.criteriaReason || '').trim()) summaryLines.push(`- Pricing Criteria Not Met: ${ctx.criteriaReason.trim()}`);
+        if ((ctx.eduGovFlag || '').trim()) summaryLines.push(`- EDU / Non-Profit / Gov: ${ctx.eduGovFlag.trim()}`);
+
+        if (currentOpt && proposedOpt && currentOpt.totalTcv > 0) {
+          const tcvYoY = ((proposedOpt.totalTcv - currentOpt.totalTcv) / currentOpt.totalTcv) * 100;
+          summaryLines.push(`- Customer TCV YoY Increase %: ${fmtSignedPct(tcvYoY, 1)} (${fmtMoney(currentOpt.totalTcv)} -> ${fmtMoney(proposedOpt.totalTcv)})`);
+        }
+        if (currentOpt && proposedOpt && currentOpt.totalInitialSeats > 0) {
+          const currBase = currentOpt.totalSeats;
+          const propTarget = proposedOpt.totalSeats;
+          const seatsYoY = ((propTarget - currBase) / currBase) * 100;
+          const growthNote = (currentOpt.hasSeatGrowth || proposedOpt.hasSeatGrowth)
+            ? ` (modeled w/ compound growth: Current ${currentOpt.totalInitialSeats}->${currentOpt.totalExitSeats} vs Proposed ${proposedOpt.totalInitialSeats}->${proposedOpt.totalExitSeats})`
+            : '';
+          summaryLines.push(`- Seats Quantity YoY Increase %: ${fmtSignedPct(seatsYoY, 1)}${growthNote}`);
+        }
+        if (currentOpt && currentOpt.totalInitialSeats > 0) {
+          const existStr = currentOpt.hasSeatGrowth
+            ? `${currentOpt.totalInitialSeats} Y1 -> ${currentOpt.totalExitSeats} Exit (avg ${Math.round(currentOpt.totalAvgSeats)}/yr)`
+            : `${currentOpt.totalInitialSeats}`;
+          summaryLines.push(`- Existing Seats (Total): ${existStr}`);
+        }
+        if ((ctx.prevContract || '').trim()) summaryLines.push(`- Previous Contract: ${ctx.prevContract.trim()}`);
+        if ((ctx.prevStartDate || '').trim()) summaryLines.push(`- Previous Contract Start Date: ${ctx.prevStartDate.trim()}`);
+
+        if (proposedOpt) {
+          const termMo = proposedOpt.dominantTerm;
+          const freeMo = ctx.programApplies && Number(ctx.freeMonths) > 0 ? Number(ctx.freeMonths) : 0;
+          summaryLines.push(`- Deal Term in Months: ${freeMo > 0 ? `${termMo} (${freeMo} free)` : `${termMo}`}`);
+          summaryLines.push(`- Partner Discount %: ${fmtPct(proposedOpt.weightedPartnerDiscountPct, 1)}`);
+        }
+        if (summaryLines.length > 0) blocks.push(`SALES REQUEST SUMMARY\n${summaryLines.join('\n')}`);
+
+        if (currentOpt && proposedOpt) {
+          const skuNames = [];
+          currentOpt.computedLines.forEach(l => { if (!skuNames.includes(l.name)) skuNames.push(l.name); });
+          proposedOpt.computedLines.forEach(l => { if (!skuNames.includes(l.name)) skuNames.push(l.name); });
+
+          const formatSkuSide = (label, lineObj) => {
+            if (!lineObj) {
+              return label === 'Current Deal '
+                ? `   ${label} | Not in baseline contract (New SKU)`
+                : `   ${label} | Consolidated / Removed in proposed option`;
+            }
+            const c = lineObj.calc;
+            if (c.lineType === 'usage') {
+              return `   ${label} | Usage (${c.unitName}) | Commit: ${fmtMoney(c.commitValue)} USD (Add'l Disc: ${fmtPct(c.extraDiscountPct, 1)}) | Included: ${c.includedUnits} ${c.unitName} (Eff. Unit Price: ${fmtMoney(c.effectiveUnitPrice)}) | Overage Rate: ${fmtMoney(c.overageRate)}/${c.unitName} | Forecast Usage: ${c.forecastUnits} ${c.unitName} (Overage: ${fmtMoney(c.overageValue)} USD) | Unused Commitment: ${fmtMoney(c.unusedCommitment)} USD | Total SKU Net: ${fmtMoney(c.payingPrice)} USD`;
+            }
+            const seatDesc = c.seatGrowthPct > 0
+              ? `${c.initialSeats} seats (${fmtPct(c.seatGrowthPct, 0)}/yr growth: ${fmtSeatSchedule(c.seatsByYear)})`
+              : `${c.initialSeats} seats`;
+            return `   ${label} | Quantity: ${seatDesc} | Additional Discount on List: ${fmtPct(c.extraDiscountPct, 1)} | PUPY: ${fmtMoney(c.pupy)} USD | Total SKU Net: ${fmtMoney(c.payingPrice)} USD`;
+          };
+
+          const skuLines = [];
+          skuNames.forEach((skuName, idx) => {
+            const cLine = currentOpt.computedLines.find(l => l.name === skuName);
+            const pLine = proposedOpt.computedLines.find(l => l.name === skuName);
+            skuLines.push(`${idx + 1}. SKU: ${skuName}`);
+            skuLines.push(formatSkuSide('Current Deal ', cLine));
+            skuLines.push(formatSkuSide('Proposed Deal', pLine));
+          });
+          if (skuLines.length > 0) blocks.push(`PER-SKU INFO — CURRENT DEAL vs PROPOSED DEAL\n${skuLines.join('\n')}`);
+        }
+
+        if (ctx.programApplies && proposedOpt) {
+          const progLines = [];
+          const freeMo = Math.max(0, Number(ctx.freeMonths) || 0);
+          if (freeMo > 0) progLines.push(`- Free Months (Total): ${freeMo}`);
+
+          const dvParts = proposedOpt.computedLines.map(l => {
+            const c = l.calc;
+            const monthlyRate = c.termMonths > 0 ? (c.payingPrice / c.termMonths) : 0;
+            const dv = freeMo > 0 ? (monthlyRate * freeMo) : c.payingPrice;
+            return `${l.name}: ${fmtMoney(dv)} USD`;
+          });
+          if (dvParts.length > 0) progLines.push(`- ${freeMo > 0 ? 'DV per SKU (Free Months Value)' : 'DV per SKU'}: ${dvParts.join(' | ')}`);
+
+          const existingSeats = currentOpt ? currentOpt.totalSeats : 0;
+          const proposedSeats = proposedOpt.totalSeats;
+          const netNew = proposedSeats - existingSeats;
+          progLines.push(`- Existing Seats vs New Seats (Total): ${existingSeats} existing vs ${netNew >= 0 ? '+' + netNew + ' new' : netNew + ' adjusted'} (${proposedSeats} total modeled seats)`);
+          blocks.push(`PROGRAM DETAILS\n${progLines.join('\n')}`);
+        }
+
+        const activeMissing = (ctx.missingInfo || []).map(s => s.trim()).filter(Boolean);
+        if (activeMissing.length > 0) {
+          blocks.push(`MISSING INFORMATION\nPlease provide the following missing items before final pricing sign-off:\n${activeMissing.map((item, i) => `${i + 1}. ${item}`).join('\n')}`);
+        }
+
+        const activeValidation = (ctx.validationChecks || []).map(s => s.trim()).filter(Boolean);
+        if (activeValidation.length > 0) {
+          blocks.push(`VALIDATION\nPlease re-validate the following checks prior to order booking:\n${activeValidation.map((item, i) => `${i + 1}. ${item}`).join('\n')}`);
+        }
+
+        return blocks.join('\n\n');
+      }
+
+      function renderSummaryStrip(computedOptions) {
+        const container = document.getElementById('summaryStripGrid');
+        const currentOpt = computedOptions.find(o => o.id === state.currentOptionId) || computedOptions[0];
+        const proposedOpt = computedOptions.find(o => o.id === state.proposedOptionId) || computedOptions[computedOptions.length - 1];
+
+        let html = computedOptions.map(opt => {
+          const isCurrent = opt.id === state.currentOptionId;
+          const isProposed = opt.id === state.proposedOptionId;
+          const cardClass = isProposed ? 'strip-card is-proposed' : (isCurrent ? 'strip-card is-current' : 'strip-card');
+          const pillClass = isProposed ? 'role-pill proposed' : (isCurrent ? 'role-pill current' : 'role-pill variant');
+          const pillText = isProposed ? 'Proposed Deal' : (isCurrent ? 'Current Deal' : 'Variant');
+          const seatSub = opt.hasSeatGrowth ? `${opt.totalInitialSeats}→${opt.totalExitSeats} seats (grown)` : `${opt.totalInitialSeats} seats`;
+
+          return `
+            <div class="${cardClass}">
+              <div class="strip-card-top">
+                <span class="strip-opt-name">${escapeHtml(opt.name)}</span>
+                <span class="${pillClass}">${pillText}</span>
+              </div>
+              <div class="strip-metrics tabular">
+                <div><span class="strip-metric-label">Paying Price (TCV)</span><span class="strip-metric-val accent-val">${fmtMoney(opt.totalPaying)}</span><span class="strip-metric-sub">${fmtPct(opt.effectiveDiscountPct, 1)} off list</span></div>
+                <div><span class="strip-metric-label">ACV (1-Yr Value)</span><span class="strip-metric-val">${usdWholeFmt.format(opt.totalAcv)}</span><span class="strip-metric-sub">${opt.dominantTerm} mo term</span></div>
+                <div><span class="strip-metric-label">PUPY / PUPM (Seats)</span><span class="strip-metric-val">${fmtMoney(opt.blendedPupy)}</span><span class="strip-metric-sub">${fmtMoney(opt.blendedPupm)}/mo · ${seatSub}</span></div>
+                <div><span class="strip-metric-label">Usage Commit + Ovg</span><span class="strip-metric-val">${usdWholeFmt.format(opt.totalUsageNet)}</span><span class="strip-metric-sub">Commit: ${usdWholeFmt.format(opt.totalUsageCommit)}</span></div>
+                <div><span class="strip-metric-label">Unused Commit (Waste)</span><span class="strip-metric-val ${opt.totalUnusedCommit > 0 ? 'accent-val' : ''}">${fmtMoney(opt.totalUnusedCommit)}</span><span class="strip-metric-sub">${opt.usageLineCount} usage line(s)</span></div>
+                <div><span class="strip-metric-label">Overage Total</span><span class="strip-metric-val">${fmtMoney(opt.totalUsageOverage)}</span><span class="strip-metric-sub">beyond commit</span></div>
+              </div>
+            </div>`;
+        }).join('');
+
+        if (currentOpt && proposedOpt && currentOpt.id !== proposedOpt.id) {
+          const deltaTcv = proposedOpt.totalTcv - currentOpt.totalTcv;
+          const deltaTcvPct = currentOpt.totalTcv > 0 ? (deltaTcv / currentOpt.totalTcv) * 100 : 0;
+          const deltaAcv = proposedOpt.totalAcv - currentOpt.totalAcv;
+          const deltaPupy = proposedOpt.blendedPupy - currentOpt.blendedPupy;
+          const deltaSeats = proposedOpt.totalSeats - currentOpt.totalSeats;
+          const deltaSeatsPct = currentOpt.totalSeats > 0 ? (deltaSeats / currentOpt.totalSeats) * 100 : 0;
+          const deltaUsage = proposedOpt.totalUsageNet - currentOpt.totalUsageNet;
+          const deltaWaste = proposedOpt.totalUnusedCommit - currentOpt.totalUnusedCommit;
+
+          html += `
+            <div class="strip-card is-delta">
+              <div class="strip-card-top">
+                <span class="strip-opt-name">Delta (Proposed vs Current)</span>
+                <span class="role-pill variant">Variance</span>
+              </div>
+              <div class="strip-metrics tabular">
+                <div><span class="strip-metric-label">TCV / Paying Δ</span><span class="strip-metric-val accent-val">${deltaTcv >= 0 ? '+' : ''}${usdWholeFmt.format(deltaTcv)}</span><span class="strip-metric-sub">${fmtSignedPct(deltaTcvPct, 1)} YoY</span></div>
+                <div><span class="strip-metric-label">ACV Δ</span><span class="strip-metric-val">${deltaAcv >= 0 ? '+' : ''}${usdWholeFmt.format(deltaAcv)}</span><span class="strip-metric-sub">annualized</span></div>
+                <div><span class="strip-metric-label">Modeled Seats Δ</span><span class="strip-metric-val">${deltaSeats >= 0 ? '+' : ''}${deltaSeats}</span><span class="strip-metric-sub">${fmtSignedPct(deltaSeatsPct, 1)} YoY</span></div>
+                <div><span class="strip-metric-label">Seat PUPY Δ</span><span class="strip-metric-val">${deltaPupy >= 0 ? '+' : ''}${fmtMoney(deltaPupy)}</span><span class="strip-metric-sub">blended</span></div>
+                <div><span class="strip-metric-label">Usage Total Δ</span><span class="strip-metric-val">${deltaUsage >= 0 ? '+' : ''}${usdWholeFmt.format(deltaUsage)}</span><span class="strip-metric-sub">commit + overage</span></div>
+                <div><span class="strip-metric-label">Unused Commit Δ</span><span class="strip-metric-val">${deltaWaste >= 0 ? '+' : ''}${fmtMoney(deltaWaste)}</span><span class="strip-metric-sub">waste variance</span></div>
+              </div>
+            </div>`;
+        }
+        container.innerHTML = html;
+      }
+
+      function renderOptionsBuilder(computedOptions) {
+        const container = document.getElementById('optionsContainer');
+        container.innerHTML = computedOptions.map(opt => {
+          const isCurrent = opt.id === state.currentOptionId;
+          const isProposed = opt.id === state.proposedOptionId;
+          const isEditingTitle = state.editingOptionId === opt.id;
+
+          const rowsHtml = opt.computedLines.map(line => {
+            const skuKey = `${opt.id}::${line.id}`;
+            const isEditingSku = state.editingSkuKey === skuKey;
+            const isEditingUnit = state.editingUnitKey === skuKey;
+            const c = line.calc;
+            const isUsage = c.lineType === 'usage';
+
+            const colBaseHtml = isUsage
+              ? (c.commitMode === 'unit'
+                ? `<div class="factor-wrap"><div style="display:flex;gap:4px;align-items:center;"><span class="usage-param-lbl">Rate $:</span><input type="number" class="num-input short-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="unitListRate" min="0" step="10" value="${c.unitListRate}" /></div><span class="factor-hint js-cell-commit-sub">List: ${usdWholeFmt.format(c.listPrice)} · Net: ${usdWholeFmt.format(c.commitValue)}</span><button type="button" class="btn-icon js-toggle-commit-mode" data-opt="${opt.id}" data-line="${line.id}">Switch to $ Commit</button></div>`
+                : `<div class="factor-wrap"><input type="number" class="num-input price-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="listPrice" min="0" step="1000" value="${line.listPrice}" /><span class="factor-hint js-cell-commit-sub">Net Commit: ${fmtMoney(c.commitValue)}</span><button type="button" class="btn-icon js-toggle-commit-mode" data-opt="${opt.id}" data-line="${line.id}">Switch to Unit Commit</button></div>`)
+              : `<div class="factor-wrap"><input type="number" class="num-input price-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="listPrice" min="0" step="500" value="${line.listPrice}" /><span class="factor-hint js-cell-commit-sub">${c.seatGrowthPct > 0 ? 'Grown List: ' + usdWholeFmt.format(c.listPrice) : 'Static List'}</span></div>`;
+
+            const colVolumeHtml = isUsage
+              ? `<div class="usage-params-grid"><span class="usage-param-lbl">Incl (${escapeHtml(c.unitName)}):</span><input type="number" class="num-input short-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="includedUnits" min="0" step="5" value="${c.includedUnits}" /><span class="usage-param-lbl">Ovg $/unit:</span><input type="number" class="num-input short-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="overageRate" min="0" step="5" value="${c.overageRate}" /><span class="usage-param-lbl">Forecast:</span><input type="number" class="num-input short-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="forecastUnits" min="0" step="5" value="${c.forecastUnits}" /></div>`
+              : `<div class="usage-params-grid"><span class="usage-param-lbl">Y1 Seats:</span><input type="number" class="num-input short-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="seats" min="1" step="10" value="${line.seats}" /><span class="usage-param-lbl">Growth %/yr:</span><input type="number" class="num-input short-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="seatGrowthPct" min="0" max="200" step="1" value="${line.seatGrowthPct || 0}" /></div><span class="sub-detail js-seat-schedule">${c.seatGrowthPct > 0 ? fmtSeatSchedule(c.seatsByYear) : 'Static across term'}</span>`;
+
+            const colUnitEconHtml = isUsage
+              ? `<div>Eff: ${fmtMoney(c.effectiveUnitPrice)}/${escapeHtml(c.unitName)}</div><div class="sub-detail">Ovg: ${fmtMoney(c.overageValue)} (${c.overageUnits} u)</div><span class="waste-tag">Unused (Waste): ${fmtMoney(c.unusedCommitment)}</span>`
+              : `<div>PUPY: ${fmtMoney(c.pupy)}</div><div class="sub-detail">PUPM: ${fmtMoney(c.pupm)}</div>`;
+
+            return `
+              <tr data-opt-id="${opt.id}" data-line-id="${line.id}">
+                <td>
+                  ${isEditingSku
+                    ? `<div style="display:flex;gap:4px;align-items:center;"><input type="text" class="field-input js-line-name-input" value="${escapeHtml(line.name)}" data-opt="${opt.id}" data-line="${line.id}" style="width:100%;" /><button type="button" class="btn btn-sm js-finish-sku-name">Done</button></div>`
+                    : `<div class="sku-label-wrap"><span class="sku-name-text">${escapeHtml(line.name)}</span><button type="button" class="btn-icon js-edit-sku-name" data-sku-key="${skuKey}" title="Rename SKU line">✎</button></div>`}
+                  <div class="line-type-row">
+                    <span class="type-badge ${isUsage ? 'usage' : ''}">${isUsage ? 'USAGE COMMIT' : 'SEAT LINE'}</span>
+                    <button type="button" class="btn-icon js-toggle-line-type" data-opt="${opt.id}" data-line="${line.id}">⇄ Switch Type</button>
+                    ${isUsage ? (isEditingUnit
+                      ? `<span style="display:inline-flex;gap:4px;align-items:center;"><input type="text" class="field-input js-unit-name-input" value="${escapeHtml(c.unitName)}" data-opt="${opt.id}" data-line="${line.id}" style="width:80px;font-size:12px;" /><button type="button" class="btn btn-sm js-finish-unit-name">OK</button></span>`
+                      : `<span style="font-size:12px;color:var(--text-grey);">Unit: <strong>${escapeHtml(c.unitName)}</strong> <button type="button" class="btn-icon js-edit-unit-name" data-sku-key="${skuKey}" title="Edit unit label">✎</button></span>`) : ''}
+                  </div>
+                </td>
+                <td>${colBaseHtml}</td>
+                <td><div class="factor-wrap"><input type="number" class="num-input short-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="partnerFactor" min="0" max="1" step="0.01" value="${line.partnerFactor}" /><span class="factor-hint js-hint-partner">${fmtPct(c.partnerDiscountPct, 0)} off</span></div></td>
+                <td><div class="factor-wrap"><input type="number" class="num-input short-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="extraFactor" min="0" max="1" step="0.01" value="${line.extraFactor}" /><span class="factor-hint js-hint-extra">${fmtPct(c.extraDiscountPct, 0)} off</span></div></td>
+                <td><input type="number" class="num-input short-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="termMonths" min="1" max="120" step="1" value="${line.termMonths}" /></td>
+                <td>${colVolumeHtml}</td>
+                <td class="computed-cell js-cell-unitecon">${colUnitEconHtml}</td>
+                <td class="computed-cell js-cell-acv">${fmtMoney(c.acv)}</td>
+                <td class="computed-cell strong js-cell-tcv">${fmtMoney(c.tcv)}</td>
+                <td style="text-align:center;width:28px;">${opt.computedLines.length > 1 ? `<button type="button" class="btn-icon js-delete-line" data-opt="${opt.id}" data-line="${line.id}" title="Remove line">✕</button>` : ''}</td>
+              </tr>`;
+          }).join('');
+
+          const footSeatsText = opt.hasSeatGrowth ? `${opt.totalInitialSeats}→${opt.totalExitSeats} seats` : `${opt.totalInitialSeats} seats`;
+
+          return `
+            <div class="option-card ${isProposed ? 'is-proposed' : ''}" data-opt-card="${opt.id}">
+              <div class="option-bar">
+                <div class="option-title-wrap">
+                  ${isEditingTitle
+                    ? `<input type="text" class="field-input js-opt-name-input" data-opt="${opt.id}" value="${escapeHtml(opt.name)}" style="width:240px;" /><button type="button" class="btn btn-sm js-finish-opt-name">Done</button>`
+                    : `<h3 class="option-title-text">${escapeHtml(opt.name)}</h3><button type="button" class="btn-icon js-edit-opt-name" data-opt="${opt.id}" title="Rename Option">✎</button>`}
+                  ${isCurrent ? '<span class="role-pill current">Current Deal</span>' : ''}
+                  ${isProposed ? '<span class="role-pill proposed">Proposed Deal</span>' : ''}
+                </div>
+                <div class="option-controls">
+                  ${!isCurrent ? `<button type="button" class="btn btn-sm js-set-current" data-opt="${opt.id}">Set Current</button>` : ''}
+                  ${!isProposed ? `<button type="button" class="btn btn-sm js-set-proposed" data-opt="${opt.id}">Set Proposed</button>` : ''}
+                  <button type="button" class="btn btn-sm js-add-seat-line" data-opt="${opt.id}">+ Seat Line</button>
+                  <button type="button" class="btn btn-sm js-add-usage-line" data-opt="${opt.id}">+ Usage Line</button>
+                  <button type="button" class="btn btn-sm js-clone-opt" data-opt="${opt.id}">Clone</button>
+                  ${computedOptions.length > 2 ? `<button type="button" class="btn-icon js-delete-opt" data-opt="${opt.id}" title="Delete Option">✕</button>` : ''}
+                </div>
+              </div>
+              <div class="table-scroll">
+                <table class="deal-table tabular">
+                  <thead>
+                    <tr>
+                      <th>SKU / Line Item</th>
+                      <th>Base List / Commit</th>
+                      <th>Partner</th>
+                      <th>Extra</th>
+                      <th>Term (Mo)</th>
+                      <th>Seats &amp; Growth / Usage Commit</th>
+                      <th class="computed-col">PUPY · Eff Rate · Waste</th>
+                      <th class="computed-col">ACV (1-Yr)</th>
+                      <th class="computed-col">Paying Price (TCV)</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>${rowsHtml}</tbody>
+                  <tfoot>
+                    <tr data-opt-foot="${opt.id}">
+                      <td>Option Total (${opt.computedLines.length} lines)</td>
+                      <td class="js-foot-list">${fmtMoney(opt.totalList)}</td>
+                      <td class="js-foot-pdisc">${fmtPct(opt.weightedPartnerDiscountPct, 1)} disc</td>
+                      <td class="js-foot-edisc">${fmtPct(opt.effectiveDiscountPct, 1)} net off</td>
+                      <td class="js-foot-term">${opt.dominantTerm} mo</td>
+                      <td class="js-foot-seats">${footSeatsText} · ${opt.usageLineCount} usage</td>
+                      <td class="js-foot-econ">PUPY: ${fmtMoney(opt.blendedPupy)} · Waste: ${fmtMoney(opt.totalUnusedCommit)}</td>
+                      <td class="js-foot-acv">${fmtMoney(opt.totalAcv)}</td>
+                      <td class="js-foot-tcv">${fmtMoney(opt.totalTcv)}</td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>`;
+        }).join('');
+      }
+
+      function renderAutoComputedContext(computedOptions) {
+        const currentOpt = computedOptions.find(o => o.id === state.currentOptionId) || computedOptions[0];
+        const proposedOpt = computedOptions.find(o => o.id === state.proposedOptionId) || computedOptions[computedOptions.length - 1];
+        const ctx = state.context;
+
+        const tcvYoY = (currentOpt && proposedOpt && currentOpt.totalTcv > 0) ? ((proposedOpt.totalTcv - currentOpt.totalTcv) / currentOpt.totalTcv) * 100 : 0;
+        const seatsYoY = (currentOpt && proposedOpt && currentOpt.totalSeats > 0) ? ((proposedOpt.totalSeats - currentOpt.totalSeats) / currentOpt.totalSeats) * 100 : 0;
+        const existingSeatsStr = currentOpt ? (currentOpt.hasSeatGrowth ? `${currentOpt.totalInitialSeats}→${currentOpt.totalExitSeats}` : `${currentOpt.totalInitialSeats}`) : '0';
+        const freeMo = ctx.programApplies && Number(ctx.freeMonths) > 0 ? Number(ctx.freeMonths) : 0;
+        const termDisplay = proposedOpt ? (freeMo > 0 ? `${proposedOpt.dominantTerm} (${freeMo} free)` : `${proposedOpt.dominantTerm}`) : '—';
+        const partnerDiscDisplay = proposedOpt ? fmtPct(proposedOpt.weightedPartnerDiscountPct, 1) : '—';
+        const wasteDisplay = proposedOpt ? fmtMoney(proposedOpt.totalUnusedCommit) : '$0.00';
+
+        document.getElementById('autoComputedSummaryStrip').innerHTML = `
+          <div class="auto-metric-item"><span class="auto-metric-label">Auto · TCV YoY Increase</span><span class="auto-metric-value">${fmtSignedPct(tcvYoY, 1)}</span></div>
+          <div class="auto-metric-item"><span class="auto-metric-label">Auto · Modeled Seats YoY</span><span class="auto-metric-value">${fmtSignedPct(seatsYoY, 1)}</span></div>
+          <div class="auto-metric-item"><span class="auto-metric-label">Auto · Existing Seats</span><span class="auto-metric-value">${existingSeatsStr} seats</span></div>
+          <div class="auto-metric-item"><span class="auto-metric-label">Auto · Deal Term (Mo)</span><span class="auto-metric-value">${termDisplay}</span></div>
+          <div class="auto-metric-item"><span class="auto-metric-label">Auto · Partner Discount</span><span class="auto-metric-value">${partnerDiscDisplay}</span></div>
+          <div class="auto-metric-item"><span class="auto-metric-label">Auto · Unused Commit</span><span class="auto-metric-value">${wasteDisplay}</span></div>`;
+
+        const progPreview = document.getElementById('programComputedPreview');
+        if (ctx.programApplies && proposedOpt) {
+          const dvStrings = proposedOpt.computedLines.map(l => {
+            const c = l.calc;
+            const monthlyRate = c.termMonths > 0 ? (c.payingPrice / c.termMonths) : 0;
+            const dv = freeMo > 0 ? (monthlyRate * freeMo) : c.payingPrice;
+            return `${escapeHtml(l.name)}: ${fmtMoney(dv)}`;
+          });
+          const existingModeled = currentOpt ? currentOpt.totalSeats : 0;
+          const netNew = proposedOpt.totalSeats - existingModeled;
+          progPreview.innerHTML = `Auto-pulled into Program Block → <strong>DV per SKU:</strong> ${dvStrings.join(' · ')} | <strong>Seats:</strong> ${existingModeled} existing vs ${netNew >= 0 ? '+' + netNew : netNew} new (${proposedOpt.totalSeats} total)`;
+        } else {
+          progPreview.innerHTML = `Program block is currently inactive and omitted from the approval note.`;
+        }
+      }
+
+      function renderDynamicLists() {
+        document.getElementById('missingList').innerHTML = state.context.missingInfo.map((item, idx) =>
+          `<li class="list-item-row"><span><span class="list-item-num">${idx + 1}.</span>${escapeHtml(item)}</span><button type="button" class="btn-icon js-remove-missing" data-idx="${idx}" title="Remove item">✕</button></li>`
+        ).join('');
+        document.getElementById('validationList').innerHTML = state.context.validationChecks.map((item, idx) =>
+          `<li class="list-item-row"><span><span class="list-item-num">${idx + 1}.</span>${escapeHtml(item)}</span><button type="button" class="btn-icon js-remove-validation" data-idx="${idx}" title="Remove check">✕</button></li>`
+        ).join('');
+      }
+
+      function syncFormInputsFromState() {
+        const ctx = state.context;
+        document.getElementById('sampleDealPicker').value = state.sampleKey || 'sample-1';
+        document.getElementById('ctxSalesRep').value = ctx.salesRep;
+        document.getElementById('ctxOperator').value = ctx.operator;
+        document.getElementById('ctxOppLink').value = ctx.oppLink;
+        document.getElementById('ctxCaseLink').value = ctx.caseLink;
+        document.getElementById('ctxCustomer').value = ctx.customerName;
+        document.getElementById('ctxPartner').value = ctx.partnerName;
+        document.getElementById('ctxRequestType').value = ctx.requestType;
+        document.getElementById('ctxReason').value = ctx.criteriaReason;
+        document.getElementById('ctxEduGov').value = ctx.eduGovFlag;
+        document.getElementById('ctxPrevContract').value = ctx.prevContract;
+        document.getElementById('ctxPrevStart').value = ctx.prevStartDate;
+        document.getElementById('ctxProgramApplies').checked = Boolean(ctx.programApplies);
+        document.getElementById('ctxFreeMonths').value = ctx.freeMonths;
+      }
+
+      function updateNoteOutput(computedOptions) {
+        const noteText = buildApprovalNote(computedOptions);
+        document.getElementById('approvalNoteOutput').textContent = noteText;
+        const currentOpt = computedOptions.find(o => o.id === state.currentOptionId) || computedOptions[0];
+        const proposedOpt = computedOptions.find(o => o.id === state.proposedOptionId) || computedOptions[computedOptions.length - 1];
+        document.getElementById('noteComparisonLabel').textContent = `${currentOpt ? currentOpt.name : 'Current'} → ${proposedOpt ? proposedOpt.name : 'Proposed'}`;
+        document.getElementById('noteStats').textContent = `${noteText.split('\n').length} lines · ${noteText.length} chars`;
+      }
+
+      function renderAll(rebuildTables = true) {
+        const computedOptions = state.options.map(computeOptionMetrics);
+        renderSummaryStrip(computedOptions);
+        if (rebuildTables) renderOptionsBuilder(computedOptions);
+        renderAutoComputedContext(computedOptions);
+        renderDynamicLists();
+        updateNoteOutput(computedOptions);
+      }
+
+      document.getElementById('sampleDealPicker').addEventListener('change', function (e) {
+        const key = e.target.value;
+        if (SAMPLE_LIBRARY[key]) {
+          state = SAMPLE_LIBRARY[key]();
+          blanksDemoActive = false;
+          document.getElementById('btnToggleBlanksDemo').textContent = 'Test Skip-the-Blanks';
+          syncFormInputsFromState();
+          renderAll(true);
+        }
+      });
+
+      document.getElementById('optionsContainer').addEventListener('input', function (e) {
+        const target = e.target;
+        if (target.classList.contains('js-line-field')) {
+          const optId = target.getAttribute('data-opt');
+          const lineId = target.getAttribute('data-line');
+          const field = target.getAttribute('data-field');
+          const opt = state.options.find(o => o.id === optId);
+          const line = opt && opt.lines.find(l => l.id === lineId);
+          if (!line) return;
+          line[field] = parseFloat(target.value) || 0;
+
+          const computedOptions = state.options.map(computeOptionMetrics);
+          const compOpt = computedOptions.find(o => o.id === optId);
+          const compLine = compOpt.computedLines.find(l => l.id === lineId);
+          const row = target.closest('tr');
+          if (row && compLine) {
+            const c = compLine.calc;
+            row.querySelector('.js-hint-partner').textContent = fmtPct(c.partnerDiscountPct, 0) + ' off';
+            row.querySelector('.js-hint-extra').textContent = fmtPct(c.extraDiscountPct, 0) + ' off';
+            row.querySelector('.js-cell-acv').textContent = fmtMoney(c.acv);
+            row.querySelector('.js-cell-tcv').textContent = fmtMoney(c.tcv);
+            const commitSub = row.querySelector('.js-cell-commit-sub');
+            if (commitSub) {
+              commitSub.textContent = c.lineType === 'usage'
+                ? (c.commitMode === 'unit' ? `List: ${usdWholeFmt.format(c.listPrice)} · Net: ${usdWholeFmt.format(c.commitValue)}` : `Net Commit: ${fmtMoney(c.commitValue)}`)
+                : (c.seatGrowthPct > 0 ? `Grown List: ${usdWholeFmt.format(c.listPrice)}` : 'Static List');
+            }
+            const schedEl = row.querySelector('.js-seat-schedule');
+            if (schedEl && c.lineType === 'seat') schedEl.textContent = c.seatGrowthPct > 0 ? fmtSeatSchedule(c.seatsByYear) : 'Static across term';
+            const econCell = row.querySelector('.js-cell-unitecon');
+            if (econCell) {
+              econCell.innerHTML = c.lineType === 'usage'
+                ? `<div>Eff: ${fmtMoney(c.effectiveUnitPrice)}/${escapeHtml(c.unitName)}</div><div class="sub-detail">Ovg: ${fmtMoney(c.overageValue)} (${c.overageUnits} u)</div><span class="waste-tag">Unused (Waste): ${fmtMoney(c.unusedCommitment)}</span>`
+                : `<div>PUPY: ${fmtMoney(c.pupy)}</div><div class="sub-detail">PUPM: ${fmtMoney(c.pupm)}</div>`;
+            }
+          }
+          const foot = document.querySelector(`tr[data-opt-foot="${optId}"]`);
+          if (foot && compOpt) {
+            const footSeatsText = compOpt.hasSeatGrowth ? `${compOpt.totalInitialSeats}→${compOpt.totalExitSeats} seats` : `${compOpt.totalInitialSeats} seats`;
+            foot.querySelector('.js-foot-list').textContent = fmtMoney(compOpt.totalList);
+            foot.querySelector('.js-foot-pdisc').textContent = fmtPct(compOpt.weightedPartnerDiscountPct, 1) + ' disc';
+            foot.querySelector('.js-foot-edisc').textContent = fmtPct(compOpt.effectiveDiscountPct, 1) + ' net off';
+            foot.querySelector('.js-foot-term').textContent = compOpt.dominantTerm + ' mo';
+            foot.querySelector('.js-foot-seats').textContent = `${footSeatsText} · ${compOpt.usageLineCount} usage`;
+            foot.querySelector('.js-foot-econ').textContent = `PUPY: ${fmtMoney(compOpt.blendedPupy)} · Waste: ${fmtMoney(compOpt.totalUnusedCommit)}`;
+            foot.querySelector('.js-foot-acv').textContent = fmtMoney(compOpt.totalAcv);
+            foot.querySelector('.js-foot-tcv').textContent = fmtMoney(compOpt.totalTcv);
+          }
+          renderSummaryStrip(computedOptions);
+          renderAutoComputedContext(computedOptions);
+          updateNoteOutput(computedOptions);
+        } else if (target.classList.contains('js-line-name-input')) {
+          const opt = state.options.find(o => o.id === target.getAttribute('data-opt'));
+          const line = opt && opt.lines.find(l => l.id === target.getAttribute('data-line'));
+          if (line) { line.name = target.value; updateNoteOutput(state.options.map(computeOptionMetrics)); }
+        } else if (target.classList.contains('js-unit-name-input')) {
+          const opt = state.options.find(o => o.id === target.getAttribute('data-opt'));
+          const line = opt && opt.lines.find(l => l.id === target.getAttribute('data-line'));
+          if (line) { line.unitName = target.value; updateNoteOutput(state.options.map(computeOptionMetrics)); }
+        } else if (target.classList.contains('js-opt-name-input')) {
+          const opt = state.options.find(o => o.id === target.getAttribute('data-opt'));
+          if (opt) {
+            opt.name = target.value;
+            const computedOptions = state.options.map(computeOptionMetrics);
+            renderSummaryStrip(computedOptions);
+            updateNoteOutput(computedOptions);
+          }
+        }
+      });
+
+      document.getElementById('optionsContainer').addEventListener('click', function (e) {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const optId = btn.getAttribute('data-opt');
+        const lineId = btn.getAttribute('data-line');
+
+        if (btn.classList.contains('js-set-current')) {
+          state.currentOptionId = optId; renderAll(true);
+        } else if (btn.classList.contains('js-set-proposed')) {
+          state.proposedOptionId = optId; renderAll(true);
+        } else if (btn.classList.contains('js-add-seat-line')) {
+          const opt = state.options.find(o => o.id === optId);
+          if (opt) {
+            const newId = 'line-' + Date.now();
+            opt.lines.push({ id: newId, lineType: 'seat', name: 'Additional Perpetual Seat Module — SKU ' + (opt.lines.length + 1), listPrice: 54000, partnerFactor: 0.85, extraFactor: 0.75, termMonths: opt.lines[0] ? opt.lines[0].termMonths : 36, seats: 200, seatGrowthPct: 0 });
+            state.editingSkuKey = `${optId}::${newId}`; renderAll(true);
+          }
+        } else if (btn.classList.contains('js-add-usage-line')) {
+          const opt = state.options.find(o => o.id === optId);
+          if (opt) {
+            const newId = 'line-' + Date.now();
+            opt.lines.push({ id: newId, lineType: 'usage', name: 'AI Token & API Telemetry Commit — SKU ' + (opt.lines.length + 1), unitName: '1M Tokens', commitMode: 'dollar', listPrice: 60000, unitListRate: 500, partnerFactor: 0.85, extraFactor: 0.80, termMonths: opt.lines[0] ? opt.lines[0].termMonths : 36, includedUnits: 120, overageRate: 380, forecastUnits: 140 });
+            state.editingSkuKey = `${optId}::${newId}`; renderAll(true);
+          }
+        } else if (btn.classList.contains('js-toggle-line-type')) {
+          const opt = state.options.find(o => o.id === optId);
+          const line = opt && opt.lines.find(l => l.id === lineId);
+          if (line) {
+            if (line.lineType === 'usage') {
+              line.lineType = 'seat'; line.seats = line.seats || 200; line.seatGrowthPct = line.seatGrowthPct || 0;
+            } else {
+              line.lineType = 'usage'; line.unitName = line.unitName || '1M Tokens'; line.commitMode = line.commitMode || 'dollar';
+              line.unitListRate = line.unitListRate || 500; line.includedUnits = line.includedUnits || 150;
+              line.overageRate = line.overageRate || 400; line.forecastUnits = line.forecastUnits || 175;
+            }
+            renderAll(true);
+          }
+        } else if (btn.classList.contains('js-toggle-commit-mode')) {
+          const opt = state.options.find(o => o.id === optId);
+          const line = opt && opt.lines.find(l => l.id === lineId);
+          if (line) {
+            line.commitMode = line.commitMode === 'unit' ? 'dollar' : 'unit';
+            if (!line.unitListRate) line.unitListRate = line.includedUnits > 0 ? Math.round(line.listPrice / line.includedUnits) : 500;
+            renderAll(true);
+          }
+        } else if (btn.classList.contains('js-delete-line')) {
+          const opt = state.options.find(o => o.id === optId);
+          if (opt && opt.lines.length > 1) { opt.lines = opt.lines.filter(l => l.id !== lineId); renderAll(true); }
+        } else if (btn.classList.contains('js-clone-opt')) {
+          const src = state.options.find(o => o.id === optId);
+          if (src) {
+            const newOptId = 'opt-' + Date.now();
+            state.options.push({ id: newOptId, name: `Option ${state.options.length + 1} — Variant of ${src.name.replace(/^Option \d+ — /, '')}`, lines: src.lines.map((l, i) => ({ ...l, id: `line-${Date.now()}-${i}` })) });
+            state.proposedOptionId = newOptId; renderAll(true);
+          }
+        } else if (btn.classList.contains('js-delete-opt')) {
+          if (state.options.length > 2) {
+            state.options = state.options.filter(o => o.id !== optId);
+            if (state.currentOptionId === optId) state.currentOptionId = state.options[0].id;
+            if (state.proposedOptionId === optId) state.proposedOptionId = state.options[state.options.length - 1].id;
+            renderAll(true);
+          }
+        } else if (btn.classList.contains('js-edit-sku-name')) {
+          state.editingSkuKey = btn.getAttribute('data-sku-key'); renderAll(true);
+        } else if (btn.classList.contains('js-finish-sku-name')) {
+          state.editingSkuKey = null; renderAll(true);
+        } else if (btn.classList.contains('js-edit-unit-name')) {
+          state.editingUnitKey = btn.getAttribute('data-sku-key'); renderAll(true);
+        } else if (btn.classList.contains('js-finish-unit-name')) {
+          state.editingUnitKey = null; renderAll(true);
+        } else if (btn.classList.contains('js-edit-opt-name')) {
+          state.editingOptionId = optId; renderAll(true);
+        } else if (btn.classList.contains('js-finish-opt-name')) {
+          state.editingOptionId = null; renderAll(true);
+        }
+      });
+
+      function addNewOptionVariant() {
+        const base = state.options[state.options.length - 1] || state.options[0];
+        const newOptId = 'opt-' + Date.now();
+        state.options.push({
+          id: newOptId,
+          name: `Option ${state.options.length + 1} — 24M Phased Variant`,
+          lines: base.lines.map((l, idx) => ({ ...l, id: `line-${Date.now()}-${idx}`, termMonths: 24, extraFactor: Math.min(1, Number((l.extraFactor + 0.05).toFixed(2))) }))
+        });
+        state.proposedOptionId = newOptId; renderAll(true);
+      }
+
+      document.getElementById('btnAddOption').addEventListener('click', addNewOptionVariant);
+      document.getElementById('btnAddOptionInline').addEventListener('click', addNewOptionVariant);
+
+      document.getElementById('btnResetSample').addEventListener('click', function () {
+        const key = state.sampleKey || 'sample-1';
+        state = (SAMPLE_LIBRARY[key] || SAMPLE_LIBRARY['sample-1'])();
+        blanksDemoActive = false;
+        document.getElementById('btnToggleBlanksDemo').textContent = 'Test Skip-the-Blanks';
+        syncFormInputsFromState();
+        renderAll(true);
+      });
+
+      const contextBindings = [
+        ['ctxSalesRep', 'salesRep'], ['ctxOperator', 'operator'], ['ctxOppLink', 'oppLink'],
+        ['ctxCaseLink', 'caseLink'], ['ctxCustomer', 'customerName'], ['ctxPartner', 'partnerName'],
+        ['ctxRequestType', 'requestType'], ['ctxReason', 'criteriaReason'], ['ctxEduGov', 'eduGovFlag'],
+        ['ctxPrevContract', 'prevContract'], ['ctxPrevStart', 'prevStartDate']
+      ];
+      contextBindings.forEach(([elId, key]) => {
+        document.getElementById(elId).addEventListener('input', function (e) {
+          state.context[key] = e.target.value;
+          updateNoteOutput(state.options.map(computeOptionMetrics));
+        });
+      });
+
+      document.getElementById('ctxProgramApplies').addEventListener('change', function (e) { state.context.programApplies = e.target.checked; renderAll(false); });
+      document.getElementById('ctxFreeMonths').addEventListener('input', function (e) { state.context.freeMonths = parseInt(e.target.value, 10) || 0; renderAll(false); });
+
+      document.getElementById('btnAddMissing').addEventListener('click', function () {
+        const input = document.getElementById('inputNewMissing');
+        if (input.value.trim()) { state.context.missingInfo.push(input.value.trim()); input.value = ''; renderAll(false); }
+      });
+      document.getElementById('inputNewMissing').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btnAddMissing').click(); }
+      });
+      document.getElementById('missingList').addEventListener('click', function (e) {
+        const btn = e.target.closest('.js-remove-missing');
+        if (btn) { state.context.missingInfo.splice(Number(btn.getAttribute('data-idx')), 1); renderAll(false); }
+      });
+      document.getElementById('btnClearMissing').addEventListener('click', function () { state.context.missingInfo = []; renderAll(false); });
+
+      document.getElementById('btnAddValidation').addEventListener('click', function () {
+        const input = document.getElementById('inputNewValidation');
+        if (input.value.trim()) { state.context.validationChecks.push(input.value.trim()); input.value = ''; renderAll(false); }
+      });
+      document.getElementById('inputNewValidation').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btnAddValidation').click(); }
+      });
+      document.getElementById('validationList').addEventListener('click', function (e) {
+        const btn = e.target.closest('.js-remove-validation');
+        if (btn) { state.context.validationChecks.splice(Number(btn.getAttribute('data-idx')), 1); renderAll(false); }
+      });
+      document.getElementById('btnClearValidation').addEventListener('click', function () { state.context.validationChecks = []; renderAll(false); });
+
+      document.getElementById('btnToggleBlanksDemo').addEventListener('click', function () {
+        blanksDemoActive = !blanksDemoActive;
+        if (blanksDemoActive) {
+          state.context.oppLink = ''; state.context.caseLink = ''; state.context.eduGovFlag = '';
+          state.context.prevContract = ''; state.context.prevStartDate = ''; state.context.programApplies = false;
+          state.context.missingInfo = [];
+          this.textContent = 'Restore All Context Fields';
+        } else {
+          const def = (SAMPLE_LIBRARY[state.sampleKey || 'sample-1'])().context;
+          state.context = { ...def };
+          this.textContent = 'Test Skip-the-Blanks';
+        }
+        syncFormInputsFromState();
+        renderAll(false);
+      });
+
+      function copyNoteToClipboard() {
+        const computedOptions = state.options.map(computeOptionMetrics);
+        updateNoteOutput(computedOptions);
+        const text = document.getElementById('approvalNoteOutput').textContent;
+        const badge = document.getElementById('copyFeedback');
+        const showToast = () => { badge.style.display = 'inline-flex'; setTimeout(() => { badge.style.display = 'none'; }, 2400); };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text, showToast));
+        } else {
+          fallbackCopy(text, showToast);
+        }
+      }
+
+      function fallbackCopy(text, callback) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); callback(); } catch (err) {}
+        document.body.removeChild(ta);
+      }
+
+      document.getElementById('btnCopyNote').addEventListener('click', copyNoteToClipboard);
+      document.getElementById('btnHeaderCopy').addEventListener('click', copyNoteToClipboard);
+      document.getElementById('btnGenerateNote').addEventListener('click', function () {
+        renderAll(false);
+        document.getElementById('approvalNoteOutput').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+
+      syncFormInputsFromState();
+      renderAll(true);
+    })();
+  </script>
+
+<section class="page-copy site-bottom-copy" aria-label="How It Works and Next Step">
+  <div class="site-copy-wrap">
+    <div class="site-reading-box">
+      <h2 class="site-section-h2">How it works</h2>
+    </div>
+
+    <div class="site-how-grid">
+      <div class="site-how-card">
+        <h3>1. Build the options</h3>
+        <p>Start with a current deal and a proposed deal—and add more option variants if needed—each built from individual SKU lines compared side by side.</p>
+      </div>
+      <div class="site-how-card">
+        <h3>2. Two kinds of lines</h3>
+        <p>SEAT lines price as list price × partner factor × extra factor, with seats able to compound at a yearly growth rate. USAGE/COMMIT lines price a prepaid commit plus overage past the included units, with any unused commitment shown as its own waste line.</p>
+      </div>
+      <div class="site-how-card">
+        <h3>3. The note</h3>
+        <p>The approval request is written from the deal as you build it. Any fields you leave blank drop out of the note automatically—copy it and send it.</p>
+      </div>
+    </div>
+
+    <div class="site-gloss-box">
+      <p><strong>Partner factor</strong> — what is left of list after the partner's margin: 0.85 means the partner keeps 15%.</p>
+      <p><strong>Extra factor</strong> — a further discount stacked on top, as a multiplier: 0.80 is another 20% off.</p>
+    </div>
+
+    <p class="site-honesty-line">The four sample deals are fictional, built to show the shapes this tool handles.</p>
+
+    <div class="site-next-block">
+      <h2 class="site-section-h2">Next — Put this to work on a real decision.</h2>
+      <p>The paid next step is <strong>The Deal Check — Contract &amp; Revenue Diagnostic</strong>, a fixed-fee diagnostic at $6,500 that finds what is stalling a deal and turns it into a simple rule so the deal moves.</p>
+      <a class="site-cta-link" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer"><div class="wrap"><p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p></div></footer>
+</body>
+</html>
