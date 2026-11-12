@@ -2,15 +2,18 @@
    S6-P01a-deal-pricing-calculator.css — styles for the Deal Pricing
    Calculator on the S6-P01.a tool page (/tools/deal-pricing-solver/).
    Every rule is scoped under .calc so it cannot disturb the shared site
-   styles (../../assets/styles.css, the D01 token system — the token VALUES
-   here match D01: warm paper, navy ink, one teal accent, hairlines).
+   styles (../../assets/styles.css — the token VALUES here track the shared
+   sheet; Nov 11, 2026 bank restyle: paper/ink/line/muted moved to the
+   institutional navy palette with it, while --accent keeps its functional
+   green — it marks positive results and pass flags, like the workbooks'
+   green output cells).
    Loaded only by S6-P01a-deal-pricing-solver.html.
    Companion files: S6-P01a-deal-pricing-calculator.js (the math + wiring).
    Rule: any change is recorded in ../../CHANGELOG.md with the CODE-MAP
    updated in the same change (Code Labeling System, Rule 3).
    ========================================================================== */
 :root{
-    --paper:#FAFAF8; --ink:#1B2A41; --accent:#0E6B5C; --line:#D8D8D2; --muted:#5A6572;
+    --paper:#F8F8F5; --ink:#0F1E38; --accent:#0E6B5C; --line:#D9DCE1; --muted:#5F6B7A;
     --input:#FFF3B0; --outbg:#E4F0E6; --warn:#8A5A00; --warnbg:#FFF4D6; --bad:#8E2F2F; --badbg:#FBE9E9;
     --s-8:8px; --s-12:12px; --s-16:16px; --s-24:24px; --s-32:32px;
   }
