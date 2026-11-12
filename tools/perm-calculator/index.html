@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tool 3.2 — Perpetual License & Usage Commit Structurer</title>
+  <title>Perm Calculator — Fractional Deal Desk &amp; Contract Management</title>
   <style>
     :root {
       --paper-bg: #F8F8F5;
@@ -22,7 +22,7 @@
       --radius: 2px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background-color: var(--paper-bg); color: var(--ink); font-family: var(--font-sans); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    html, body { background-color: var(--paper-bg); color: var(--ink); font-family: var(--font-sans); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
     .tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
 
     /* TOOL HEADER (NO SITE CHROME — TOOL BAR ONLY) */
@@ -31,11 +31,11 @@
     .header-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
     .brand-col { display: flex; flex-direction: column; gap: 4px; }
     .tool-badge { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--panel-bg); background: var(--accent); border: 1px solid var(--accent-dark); padding: 4px 8px; border-radius: var(--radius); width: fit-content; }
-    .tool-header h1 { font-family: var(--font-serif); font-weight: 400; font-size: 30px; color: var(--panel-bg); line-height: 1.2; }
+    .tool-header h1 { font-family: var(--font-serif); font-weight: 600; font-size: 30px; color: var(--panel-bg); line-height: 1.2; }
     .tool-prose-lead { font-size: 18px; line-height: 1.6; color: var(--surface-sec); max-width: 640px; }
     .header-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
     .sample-picker-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: var(--ink-soft); border: var(--hairline); padding: 8px 12px; border-radius: var(--radius); }
-    .picker-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--surface-sec); }
+    .picker-label { font-size: 12px; font-weight: 600; color: var(--surface-sec); }
     .sample-select { font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--panel-bg); border: var(--hairline); border-radius: var(--radius); padding: 4px 8px; min-width: 240px; }
     .header-btn-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
@@ -53,7 +53,7 @@
     /* STICKY SIDE-BY-SIDE OPTION TOTALS STRIP */
     .summary-strip-wrap { background: var(--surface-sec); border-bottom: var(--hairline); padding: 12px 16px; position: sticky; top: 0; z-index: 40; }
     .strip-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; flex-wrap: wrap; }
-    .strip-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-dark); }
+    .strip-title { font-size: 12px; font-weight: 600; color: var(--accent-dark); }
     .strip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
     .strip-card { background: var(--panel-bg); border: var(--hairline); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 8px; }
     .strip-card.is-proposed { border-color: var(--accent); background: var(--paper-bg); }
@@ -177,13 +177,70 @@
       .note-pre { font-size: 12px; padding: 12px; }
     }
   </style>
+  <style>
+    /* SCOPED SITE FRAME & PAGE COPY STYLES */
+    .site-header { background: #F8F8F5; border-top: 3px solid #0F1E38; border-bottom: 1px solid #D9DCE1; }
+    .site-header .wrap { max-width: 1120px; margin: 0 auto; min-height: 64px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .site-header .brand { font-family: Georgia, "Times New Roman", serif; font-weight: 700; font-size: 18px; color: #0F1E38; letter-spacing: .01em; }
+    .site-header nav { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .site-header nav a { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 16px; color: #33445E; text-decoration: none; }
+    .site-header nav a:hover { color: #6E5716; }
+
+    .page-copy { background: #F8F8F5; color: #0F1E38; border-bottom: 1px solid #D9DCE1; }
+    .page-copy.site-bottom-copy { border-top: 1px solid #D9DCE1; border-bottom: none; }
+    .page-copy .site-copy-wrap { max-width: 1120px; margin: 0 auto; padding: 48px 24px; }
+    .page-copy .site-reading-box { max-width: 680px; text-align: left; }
+    .page-copy .site-eyebrow { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-variant: small-caps; color: #8A6D1F; margin-bottom: 12px; }
+    .page-copy .site-lead-title { font-family: Georgia, "Times New Roman", serif; font-size: 36px; font-weight: 600; line-height: 1.2; color: #0F1E38; margin-bottom: 16px; }
+    .page-copy .site-section-h2 { font-family: Georgia, "Times New Roman", serif; font-size: 24px; font-weight: 600; line-height: 1.3; color: #0F1E38; margin-bottom: 16px; }
+    .page-copy p { font-size: 18px; line-height: 1.6; color: #33445E; margin-bottom: 16px; }
+    .page-copy p:last-child { margin-bottom: 0; }
+    .page-copy .site-how-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 24px; margin-bottom: 24px; }
+    .page-copy .site-how-card { background: #FFFFFF; border: 1px solid #D9DCE1; border-radius: 2px; padding: 20px; }
+    .page-copy .site-how-card h3 { font-family: Georgia, "Times New Roman", serif; font-size: 18px; font-weight: 600; color: #0F1E38; margin-bottom: 8px; }
+    .page-copy .site-how-card p { font-size: 16px; line-height: 1.6; color: #33445E; margin: 0; }
+    .page-copy .site-gloss-box { max-width: 680px; background: #ECEEF1; border: 1px solid #D9DCE1; border-left: 3px solid #8A6D1F; border-radius: 2px; padding: 16px 20px; margin-bottom: 16px; }
+    .page-copy .site-gloss-box p { font-size: 16px; line-height: 1.6; color: #0F1E38; margin-bottom: 8px; }
+    .page-copy .site-gloss-box p:last-child { margin-bottom: 0; }
+    .page-copy .site-honesty-line { font-size: 16px; color: #5F6B7A; font-style: italic; }
+    .page-copy .site-next-block { margin-top: 48px; padding-top: 32px; border-top: 1px solid #D9DCE1; max-width: 680px; }
+    .page-copy .site-cta-link { display: inline-block; margin-top: 8px; background: #8A6D1F; color: #FFFFFF; border: 1px solid #6E5716; border-radius: 2px; font-size: 16px; font-weight: 600; padding: 12px 24px; text-decoration: none; }
+    .page-copy .site-cta-link:hover { background: #6E5716; }
+
+    .site-footer { background: #0F1E38; border-top: 3px solid #8A6D1F; padding: 48px 0; }
+    .site-footer .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+    .site-footer p { font-size: 14px; color: #D8DCE3; margin: 0; }
+
+    @media (max-width: 840px) {
+      .page-copy .site-how-grid { grid-template-columns: 1fr; }
+      .page-copy .site-lead-title { font-size: 30px; }
+    }
+    @media (max-width: 640px) {
+      .site-header .wrap { padding: 12px 16px; }
+      .site-header nav { gap: 12px; }
+      .page-copy .site-copy-wrap { padding: 32px 16px; }
+    }
+  </style>
 </head>
 <body>
+<header class="site-header"><div class="wrap"><span class="brand">Fractional Deal Desk &amp; Contract Management</span><nav><a href="../../">Home</a><a href="../../services/">Services &amp; Pricing</a><a href="../../tools/">Proof of Work</a><a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a></nav></div></header>
+
+<section class="page-copy" aria-label="Tool Introduction">
+  <div class="site-copy-wrap">
+    <div class="site-reading-box">
+      <span class="site-eyebrow">Proof of Work · Pricing Engines</span>
+      <h2 class="site-lead-title">One deal, structured several ways at once.</h2>
+      <p>This tool builds the same perpetual deal as several options side by side—combining seat lines and usage or commit lines—re-prices every option live as you type, and writes the approval note immediately.</p>
+      <p>The model behind this tool is the operator’s own working perpetual-deal workbook, rebuilt as a clean web template; the deals loaded in it are fictional samples. The operator brings 15+ years in commercial contracts, deal desk, and revenue operations, working in corporate roles since 2006 (Eton, Reco, Apple, Raytheon, Meta, Google), and has governed contracts up to $300M and priced 3,000+ SKUs.</p>
+    </div>
+  </div>
+</section>
+
 
   <header class="tool-header">
     <div class="wrap-1120 header-inner">
       <div class="brand-col">
-        <span class="tool-badge">Tool 3.2 · Deal Desk</span>
+        <span class="tool-badge">Tool 3 · Deal Desk</span>
         <h1>Perpetual License &amp; Usage Commit Structurer</h1>
         <p class="tool-prose-lead">Structure perpetual seat lines, compound seat growth, and prepaid usage/token commitments side by side; generate the skip-the-blanks approval note immediately.</p>
       </div>
@@ -1330,5 +1387,43 @@
       renderAll(true);
     })();
   </script>
+
+<section class="page-copy site-bottom-copy" aria-label="How It Works and Next Step">
+  <div class="site-copy-wrap">
+    <div class="site-reading-box">
+      <h2 class="site-section-h2">How it works</h2>
+    </div>
+
+    <div class="site-how-grid">
+      <div class="site-how-card">
+        <h3>1. Build the options</h3>
+        <p>Start with a current deal and a proposed deal—and add more option variants if needed—each built from individual SKU lines compared side by side.</p>
+      </div>
+      <div class="site-how-card">
+        <h3>2. Two kinds of lines</h3>
+        <p>SEAT lines price as list price × partner factor × extra factor, with seats able to compound at a yearly growth rate. USAGE/COMMIT lines price a prepaid commit plus overage past the included units, with any unused commitment shown as its own waste line.</p>
+      </div>
+      <div class="site-how-card">
+        <h3>3. The note</h3>
+        <p>The approval request is written from the deal as you build it. Any fields you leave blank drop out of the note automatically—copy it and send it.</p>
+      </div>
+    </div>
+
+    <div class="site-gloss-box">
+      <p><strong>Partner factor</strong> — what is left of list after the partner's margin: 0.85 means the partner keeps 15%.</p>
+      <p><strong>Extra factor</strong> — a further discount stacked on top, as a multiplier: 0.80 is another 20% off.</p>
+    </div>
+
+    <p class="site-honesty-line">The four sample deals are fictional, built to show the shapes this tool handles.</p>
+
+    <div class="site-next-block">
+      <h2 class="site-section-h2">Next — Put this to work on a real decision.</h2>
+      <p>The paid next step is <strong>The Deal Check — Contract &amp; Revenue Diagnostic</strong>, a fixed-fee diagnostic at $6,500 that finds what is stalling a deal and turns it into a simple rule so the deal moves.</p>
+      <a class="site-cta-link" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer"><div class="wrap"><p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p></div></footer>
 </body>
 </html>
