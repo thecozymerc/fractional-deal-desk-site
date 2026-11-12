@@ -19,6 +19,14 @@
      SENIORITY PASS (Nov 11, 2026, Lucky's order): hero tenure line +
      proof-strip scale anchors added; 'sometimes nerdy' removed from
      the Operator paragraph; identity photo 120px -> 160px. CHANGELOG.
+     BANK PASS (Nov 11, 2026, Lucky's order): hero tenure line cut to the
+     corporate line (the 'Working since age 14' opener removed); hero
+     caption reworded so the typing clearly happens on the solver's own
+     page; Section 06 gained the fourteen-tool bucket grid and lost the
+     Tech Contracts Academy disclaimer block (it lives on the Contracts
+     Library page); the Operator section now leads with the suit portrait
+     (assets/business-photo.jpg) at 320px beside the credential text.
+     Design: the shared stylesheet's bank restyle. CHANGELOG.
      Rule: any change to this file is recorded in CHANGELOG.md, and the
      CODE-MAP entry is updated in the same change (Code Labeling, Rule 3).
      ========================================================================== -->
@@ -64,7 +72,7 @@
           <a class="btn btn-quiet" href="#proof">Try a tool — no email</a>
         </div>
         <p class="cta-note">Contract &amp; Revenue Diagnostic — $6,500 fixed fee. Contracts-only audit — $5,000.</p>
-        <p class="cta-note"><strong>Working since age 14. Corporate since 2006 — Eton, Reco, Apple, Raytheon, Meta, Google — with 15+ years in commercial contracts, deal desk, and revenue operations. MBA.</strong></p>
+        <p class="cta-note"><strong>Corporate since 2006 — Eton, Reco, Apple, Raytheon, Meta, Google — with 15+ years in commercial contracts, deal desk, and revenue operations. MBA.</strong></p>
       </div>
       <div class="tool-frame">
         <p class="eyebrow">Working proof — the actual workbook</p>
@@ -80,7 +88,7 @@
           <div class="pv-row"><span>Partner Margin — in dollars ($) <em class="kind">OUTPUT</em></span><strong>1,200.00</strong></div>
         </div>
         <p><a class="btn btn-primary" href="tools/deal-pricing-solver/">Run the solver</a></p>
-        <p class="small">The actual workbook — both sheets, its own numbers, its own calculations — is live on its own page. Type in the yellow cells and the green results move. The formulas stay under the hood.</p>
+        <p class="small">A sample of what it returns. The actual workbook — both sheets, its own numbers, its own calculations — is live on its own page: run the solver and type in the yellow cells there, and the green results move. The formulas stay under the hood.</p>
       </div>
     </div>
   </section>
@@ -246,8 +254,41 @@
         </div>
       </div>
       <div class="reading" style="margin-top: var(--s-32);">
+        <p>Every working tool on the site, grouped by the job it does:</p>
+      </div>
+      <div class="bucket-grid">
+        <div class="bucket">
+          <h3>Pricing &amp; Margin</h3>
+          <ul>
+            <li><a href="tools/deal-pricing-solver/">Deal Pricing Solver</a><span class="tool-note">List price, discount, and partner margin — give it two, it solves the third.</span></li>
+            <li><a href="tools/perpetual-to-saas-conversion/">Perpetual-to-SaaS Conversion Calculator</a><span class="tool-note">Stay-put cost against three SaaS options, break-even and crossover.</span></li>
+            <li><a href="tools/perm-calculator/">Perm Calculator</a><span class="tool-note">One deal structured several ways — upgrade, discount shapes, seats, add-ons.</span></li>
+            <li><a href="tools/cloud-commit-playbook/">Cloud Commit &amp; Usage Playbook</a><span class="tool-note">Discount matrix, renewal ratchet, and commit math with the unused commitment showing.</span></li>
+            <li><a href="tools/bundling-sandbox/">Bundling Sandbox</a><span class="tool-note">Rate-card bundling against a budget ceiling and a margin floor.</span></li>
+          </ul>
+        </div>
+        <div class="bucket">
+          <h3>Contract Risk &amp; Redlining</h3>
+          <ul>
+            <li><a href="tools/redlining-playbook/">Redlining Playbook</a><span class="tool-note">Clause-by-clause fallback positions from my own playbook.</span></li>
+            <li><a href="tools/contract-analyzer/">Contract Analyzer</a><span class="tool-note">Upload or paste a contract — scans, coverage checks, and an AI read.</span></li>
+            <li><a href="tools/contract-migration-triage/">Contract Migration &amp; Triage Tracker</a><span class="tool-note">Migration register with metadata and tiering.</span></li>
+          </ul>
+        </div>
+        <div class="bucket">
+          <h3>QTC &amp; Deal Governance</h3>
+          <ul>
+            <li><a href="tools/spend-variance/">Spend Variance &amp; Renewal Tracker</a><span class="tool-note">Forecast against actual spend, renewal dates flagged.</span></li>
+            <li><a href="tools/intake-gate/">Intake Gate</a><span class="tool-note">Pre-sales qualification — is the deal ready to move?</span></li>
+            <li><a href="tools/qtc-diagnostic/">QTC Diagnostic</a><span class="tool-note">Quote-to-cash control points scored by maturity and risk.</span></li>
+            <li><a href="tools/case-operations-capacity/">Case Operations Triage Tool</a><span class="tool-note">Case register, KPI counts, and a capacity simulator.</span></li>
+            <li><a href="tools/weighted-decision-scoring/">Weighted Decision Scoring Tool</a><span class="tool-note">The scoring framework with a worked vendor example.</span></li>
+            <li><a href="tools/executive-dashboard/">Executive Dashboard</a><span class="tool-note">The live case sample, rolled up for executives.</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="reading" style="margin-top: var(--s-32);">
         <p>Fifteen adapted contract forms are shown as annotated cards, not downloads. Each card explains what I check and redline before that kind of paper moves. <a href="tools/contracts-library/">See the Contracts Library</a></p>
-        <p class="small">Adapted from Tech Contracts Academy / David Tollen, under Tech Contracts Academy Terms of Use §C.3. Not claimed as original work. Not for sale or resale. Sample only, not legal advice. A sample must not be used in a real transaction without customization and review by a qualified attorney.</p>
       </div>
     </div>
   </section>
@@ -257,19 +298,19 @@
     <div class="wrap">
       <p class="eyebrow">The Operator</p>
       <h2>Sat on both sides of the table.</h2>
-      <div class="reading">
-        <p>My background is sell-side deal governance at Google, Meta, and Apple — and buy-side procurement at Raytheon. I have sat on both sides of the table.</p>
-        <p>At the core, I am a problem solver: direct, honest, and I genuinely solve the problem.</p>
-        <p>That is the pattern: find the real blocker, push through the right door, and leave a process behind instead of a one-time exception.</p>
-        <div class="id-block">
-          <img src="assets/about-photo.jpg" alt="Joseph Conte" width="160" height="160">
-          <div>
-            <p class="id-name">Joseph Conte</p>
-            <p class="id-role">Fractional Deal Desk &amp; Contract Management</p>
-            <p class="id-links"><a href="https://www.linkedin.com/in/conteworks">Connect on LinkedIn</a></p>
-          </div>
+      <div class="op-grid">
+        <div class="op-photo">
+          <img src="assets/business-photo.jpg" alt="Joseph Conte" width="320" height="320">
+          <p class="id-name">Joseph Conte</p>
+          <p class="id-role">Fractional Deal Desk &amp; Contract Management</p>
+          <p class="id-links"><a href="https://www.linkedin.com/in/conteworks">Connect on LinkedIn</a></p>
         </div>
-        <p><a href="about/">More about the operator</a></p>
+        <div class="reading">
+          <p>My background is sell-side deal governance at Google, Meta, and Apple — and buy-side procurement at Raytheon. I have sat on both sides of the table.</p>
+          <p>At the core, I am a problem solver: direct, honest, and I genuinely solve the problem.</p>
+          <p>That is the pattern: find the real blocker, push through the right door, and leave a process behind instead of a one-time exception.</p>
+          <p><a href="about/">More about the operator</a></p>
+        </div>
       </div>
     </div>
   </section>
