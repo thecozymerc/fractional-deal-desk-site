@@ -1,5 +1,11 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-11 — Seniority pass: tenure up front, 'nerdy' out (P01, P03) — Lucky's order
+- P01 Homepage: tenure line added under the hero price note (working since age 14; corporate since 2006 — Eton, Reco, Apple, Raytheon, Meta, Google; 15+ years in commercial contracts, deal desk, and revenue operations; MBA); proof strip gained the $300M / 3,000+ SKUs / 300-page pricing wiki facts; identity photo 120px → 160px; Operator paragraph: 'sometimes nerdy' removed.
+- P03 About: the same tenure line added after the background paragraph; 'sometimes nerdy' removed.
+- Numbers counted from Lucky's LinkedIn profile (sent Nov 11, 2026): the commercial contracts / RevOps line Reco Jan 2008–May 2015 → Google Nov 2022–Jul 2024 = 15 yrs 7 mos; corporate since Eton (Mar 2006) = 19 yrs 2 mos with one gap (Jun 2015–Oct 2016); total working = 26 years since age 14. The old '9+' figure is retired.
+- Copy discipline: this pass changes copy at Lucky's explicit order (his seniority ruling) — the standing words-untouched rule is overridden for these lines only.
+
 ## 2026-11-11 — Research applied: photo hierarchy (v47)
 - Per Lucky's ruling on the peer-reviewed photo/attire research: homepage = casual photo only; About leads with the casual photo; the formal headshot moves to a small secondary note ('And when the room calls for it.'); both v46 captions removed. Name + LinkedIn/Book a Call furniture unchanged.
 
