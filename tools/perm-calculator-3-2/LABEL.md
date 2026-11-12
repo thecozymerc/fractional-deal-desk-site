@@ -1,8 +1,0 @@
-# Tool 3.2 — Perpetual License & Usage Commit Structurer (Argon build 2)
-
-- **Address:** /tools/perm-calculator-3-2/
-- **What it is:** The enhanced second Argon build of the Perm Calculator redesign (Tool 3.1's successor candidate): adds USAGE lines (commits, included units, overage, unused-commitment waste line), seat-growth % on BOTH current and proposed deals, a 4-sample deal library (Baseline Perpetual Expansion · AI Token Commit & Overage Expansion · Platform Consolidation & Dual Seat Growth · Renewal with TCV Ratchet & Commit Floor), and the site design re-skin (bank tokens: #F8F8F5 paper, #0F1E38 ink, #8A6D1F brass, 2px squared corners, hairlines, Georgia/system fonts, no webfonts).
-- **Provenance:** Written by Argon from the combined prompt (enhancements + design compliance) Muse wrote from Lucky's Nov 12 rulings. A first attempt truncated at 98,064 B mid-script and was never published (archived in ~/workspace/tool32-build/); Argon's next export was complete (94,561 B).
-- **Muse's only edit:** the version label "Tool 3.1" → "Tool 3.2" (title + badge, 2 occurrences) so the three-way comparison reads correctly. Code, math, samples, and design are Argon's as exported.
-- **Verified before publish:** JS syntax clean; DOM render with zero errors; baseline sample ties to Tool 3.1's numbers ($226,800); usage math hand-verified to the specified chain (Sample 2: commit 90,000 × 0.85 × 0.80 = $61,200; overage 35 units × $420 = $14,700; Option 3 unused commitment $84,150 − 185 × $382.50 = $13,387.50 — all exact); all 4 samples load and re-price.
-- **Status:** LIVE on both hosts as the third comparison candidate beside Tool 3 (/tools/perm-calculator/) and Tool 3.1 (/tools/perm-calculator-3-1/). Nothing swaps without Lucky's ruling.
