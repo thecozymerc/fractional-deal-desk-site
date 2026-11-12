@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     LABEL — S6-P01.c — Perm Calculator (tool page; Tool / piece ID: Tool 3 —
+     Perm Calculator, address: /tools/perm-calculator/)
+     What this page holds: the Perm Calculator's write-up and the ACTUAL
+     workbook embedded below it — the scrubbed sample of Lucky's working
+     deal-structuring workbook: 22 tabs, its own figures, its own formulas
+     (6,100 of them, cross-tab included) run by the formula engine, which
+     learned cross-sheet references, TEXT(), and the sheet's array-formula
+     list extraction for this build. Formulas are never shown.
+     Every non-formula cell is a live input — in the real sheet, every
+     non-formula cell is typeable. The sheet speaks in factors (0.65 means
+     35% off); by Lucky's ruling (Nov 11, 2026 — "we do both") the values
+     stay exactly as the file has them AND a plain-English gloss beside
+     each factor input translates it live ("— that's 35% off").
+     Uses: ../../assets/styles.css + ../../assets/spreadsheet-tool.js +
+     ../../assets/formula-engine.js + this folder's data file (converted
+     from "Perm Calculator — SCRUBBED SAMPLE v2.xlsx" by
+     convert-workbook.py, ALLINPUT mode). Verified cell-for-cell against
+     a LibreOffice recalculation: defaults plus five scenarios (price/
+     margin changes, a term change, summary text flow, hostile values,
+     blanked inputs) — zero differences in 6,099 compared formulas per
+     scenario; two documented residuals (LibreOffice cannot evaluate
+     TEXTJOIN; one scratch-sheet text cell where a stale cached string
+     in the source export differs from a fresh recalculation, which the
+     engine matches).
+     Map: site/CODE-MAP.md ("tools/perm-calculator/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S6-P01.c — Perm Calculator · Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="One deal, structured several ways at once. This is the working workbook I used to price enterprise deals: each option tab builds the same deal a different way.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/perm-calculator/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="S6-P01.c — Perm Calculator · Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="One deal, structured several ways at once. This is the working workbook I used to price enterprise deals: each option tab builds the same deal a different way.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/perm-calculator/">
+<link rel="stylesheet" href="../../assets/styles.css">
+<style>
+  .wb-gloss { display: block; font-size: 12.5px; line-height: 1.35; color: #0E6B5C; margin-top: 2px; white-space: normal; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../services/">Services &amp; Pricing</a>
+      <a href="../../tools/">Proof of Work</a>
+      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section">
+    <p class="kicker">Proof of Work · Pricing Engines</p>
+    <h1>Perm Calculator.</h1>
+    <p class="lede">One deal, structured several ways at once. This is the working workbook I used to price enterprise deals: each option tab builds the same deal a different way — an upgrade path, a deeper discount, more seats, vouchers instead of a straight cut — and a compiled tab lines the versions up, so the difference between structures is a number, not an argument.</p>
+    <p>Below is the actual workbook — all 22 tabs, scrubbed: every name and link from the working file has been replaced with a sample label, and the figures are the model's own, kept so the calculations run end to end. Pick an option tab and change the inputs — list price, the partner-margin factor, the extra-discount factor, the term in months, the seats — and the tab answers with the price after margin, the paying price, the price per user per year, the cost per license, and the annual and total contract values, plus the seat tallies and the differences. The factors are how the real model speaks: you type 0.65 and it means 35% off. So nobody has to learn that dialect to read this sheet, the page says it in plain words beside every factor, and the translation updates as you type. The Compiled Results tab gathers the totals and per-SKU sections from the option tabs in one place, and the Summary tabs draft the approval summary from the numbers. The first tab, START HERE, is the sheet's own instructions, in its own words.</p>
+
+    <h3>How the 22 tabs fit together</h3>
+    <ul>
+      <li><strong>Start:</strong> START HERE is the workbook's own instruction tab, in its own words.</li>
+      <li><strong>The model tabs:</strong> the “Enterprise standard…” tab is the base version, and OPT 1, OPT 1.2, OPT 2 and OPT 3 structure the same deal four more ways. Three further tabs price the upgrade from the standard edition (ES) to the plus edition (E+): OPT 2 at a 35% discount, OPT 3 at 29.17%, and OPT 4 with 1,000 extra seats a year. ES and E+ are the file's own shorthand, kept as the file has them.</li>
+      <li><strong>Working variations:</strong> Pivot 1, Pivot 2 and Scenarios 1–5 re-run the model with different assumptions — an add-on version, a vouchers version, re-cuts of the options.</li>
+      <li><strong>The summary:</strong> Summary Form and Summary Pattern hold the approval-summary template the option tabs pull their summary lines from; Flex Explanations explains the flex factors.</li>
+      <li><strong>The comparison:</strong> Compiled Results gathers every option's totals and per-SKU sections in one place — the strip below shows its headline totals. Document pointers and Combining information are reference tabs from the original file.</li>
+      <li><strong>The empty space is the model, not a bug:</strong> each tab is a wide grid — a handful of live lines spread across many columns — so most of the grid is empty working space, exactly as the file has it. On a phone the answers sit far to the right; the strip below keeps the totals where you can see them.</li>
+    </ul>
+
+    <div class="m-summary" id="perm-summary" aria-label="Compiled option totals from the workbook">
+      <div class="m-summary-row">
+        <span class="m-summary-item"><span class="m-summary-k">OPT 1 TCV</span> <span class="m-summary-v" id="ps-o1">—</span></span>
+        <span class="m-summary-item"><span class="m-summary-k">OPT 2 TCV</span> <span class="m-summary-v" id="ps-o2">—</span></span>
+        <span class="m-summary-item"><span class="m-summary-k">OPT 3 TCV</span> <span class="m-summary-v" id="ps-o3">—</span></span>
+        <span class="m-summary-item"><span class="m-summary-k">OPT 4 TCV</span> <span class="m-summary-v" id="ps-o4">—</span></span>
+      </div>
+      <p class="m-summary-note">Live from the Compiled Results tab — type in any option tab and these move. OPT 2–4 read current deal → proposed deal; OPT 4's proposed total is the full 60-month figure.</p>
+    </div>
+
+    <div class="tool-frame">
+      <div id="wb-tool"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span class="no">Next</span> — Put this to work on a real decision.</h2>
+    <p><a class="btn" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book on my calendar</a></p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
+  </div>
+</footer>
+
+<script src="S6-P01c-perm-calculator-data.js"></script>
+<script src="../../assets/formula-engine.js"></script>
+<script src="../../assets/spreadsheet-tool.js"></script>
+<script>
+  window.renderWorkbook(document.getElementById("wb-tool"),
+    window.PERM_CALCULATOR_DATA);
+</script>
+<script>
+  /* Plain-English gloss (Lucky's ruling, Nov 11, 2026 — "we do both"):
+     the workbook's factor values stay exactly as the file has them, and
+     beside each factor input the page translates the factor into plain
+     words, live as the visitor types — 0.65 reads "— that's 35% off",
+     a partner-margin factor reads "— the partner keeps 20%". The map
+     below was built from the workbook itself: a factor's kind comes
+     from the sheet's own labels (the "Partner discount" and "Extra
+     discount" columns are discounts; the partner-margin columns are
+     margins). Display only — the gloss never touches a value. */
+  (function () {
+    var GLOSS = {"Enterprise standard to enterpri":{"B13":"margin","B17":"margin","C27":"discount","C28":"discount","C29":"discount","D29":"discount","C30":"discount","D30":"discount","C37":"discount","D37":"discount","C38":"discount","D38":"discount","C39":"discount","C40":"discount","D40":"discount"},"OPT 1 (upgrade to e standard) U":{"B13":"margin","E16":"margin","G17":"discount","J22":"margin","J23":"margin","B31":"margin","B35":"margin","B37":"margin","D50":"discount","E50":"discount","D51":"discount","E51":"discount","D52":"discount","E52":"discount","D53":"discount","E53":"discount","D60":"discount","E60":"discount","D61":"discount","D62":"discount","E62":"discount","D63":"discount","E63":"discount"},"OPT 1.2 $ - R$":{"B13":"margin","E16":"margin","G17":"discount","J24":"margin","J25":"margin","B33":"margin","B37":"margin","B39":"margin","D52":"discount","E52":"discount","D53":"discount","E53":"discount","D54":"discount","E54":"discount","D55":"discount","E55":"discount","D62":"discount","E62":"discount","D63":"discount","D64":"discount","E64":"discount","D65":"discount","E65":"discount"},"OPT 2":{"B13":"margin","E16":"margin","G17":"discount","J22":"margin","J23":"margin","B31":"margin","B35":"margin","B37":"margin","D50":"discount","E50":"discount","D51":"discount","E51":"discount","D52":"discount","E52":"discount","D53":"discount","E53":"discount","D60":"discount","E60":"discount","D61":"discount","D62":"discount","D63":"discount","E63":"discount"},"OPT 3":{"B13":"margin","E16":"margin","G17":"discount","J22":"margin","J23":"margin","B31":"margin","B35":"margin","B37":"margin","D50":"discount","E50":"discount","D51":"discount","E51":"discount","D52":"discount","E52":"discount","D53":"discount","E53":"discount","D60":"discount","E60":"discount","D61":"discount","E61":"discount","D62":"discount","D63":"discount","E63":"discount"},"Pivot 1":{"B13":"margin","E16":"margin","G17":"discount","J22":"margin","J23":"margin","B31":"margin","B35":"margin","B37":"margin","D50":"discount","E50":"discount","D51":"discount","E51":"discount","D52":"discount","E52":"discount","D53":"discount","E53":"discount","D60":"discount","E60":"discount","D61":"discount","E61":"discount","D62":"discount","E62":"discount","D63":"discount","E63":"discount","AE70":"margin","AE71":"margin","AE72":"margin"},"Scenario 1":{"B13":"margin","F16":"margin","H17":"discount","M22":"margin","M23":"margin","B31":"margin","B35":"margin","B37":"margin","E50":"discount","F50":"discount","E51":"discount","F51":"discount","E52":"discount","F52":"discount","E53":"discount","F53":"discount","E71":"discount","G71":"discount","E72":"discount","G72":"discount","AJ81":"margin","AJ82":"margin","AJ83":"margin"},"Scenario 2":{"B13":"margin","F16":"margin","H17":"discount","M22":"margin","M23":"margin","B31":"margin","B35":"margin","B37":"margin","E50":"discount","F50":"discount","E51":"discount","F51":"discount","E52":"discount","F52":"discount","E53":"discount","F53":"discount","E71":"discount","G71":"discount","E72":"discount","G72":"discount","AJ86":"margin","AJ87":"margin","AJ88":"margin"},"Scenario 3":{"B13":"margin","G16":"margin","I17":"discount","N22":"margin","N23":"margin","B31":"margin","B35":"margin","B37":"margin","E50":"discount","G50":"discount","E51":"discount","E52":"discount","A64":"discount","AK87":"margin","AK88":"margin","AK89":"margin"},"Scenario 4 - Add-on":{"B13":"margin","G16":"margin","I17":"discount","N22":"margin","N23":"margin","B31":"margin","B35":"margin","B37":"margin","E50":"discount","E51":"discount","E52":"discount","A64":"discount","AK88":"margin","AK89":"margin","AK90":"margin"},"Scenario 5 - Vouchers":{"B13":"margin","G16":"margin","I17":"discount","N22":"margin","N23":"margin","B31":"margin","B35":"margin","B37":"margin","E50":"discount","E51":"discount","E52":"discount","A64":"discount","AK87":"margin","AK88":"margin","AK89":"margin"},"Pivot 2 (40% on B plus)":{"B13":"margin","F16":"margin","H17":"discount","M22":"margin","M23":"margin","B31":"margin","B35":"margin","B37":"margin","E50":"discount","F50":"discount","E51":"discount","F51":"discount","E52":"discount","F52":"discount","E53":"discount","F53":"discount","E60":"discount","G60":"discount","E61":"discount","G61":"discount","E62":"discount","G62":"discount","E63":"discount","G63":"discount","AJ70":"margin","AJ71":"margin","AJ72":"margin"},"Flex Explanations":{"D4":"margin"},"OPT 2 (35% discount) ES to E-pl":{"B13":"margin","B17":"margin","B19":"margin","C27":"discount","C28":"discount","D28":"discount","C29":"discount","D29":"discount","C30":"discount","D30":"discount","C37":"discount","D37":"discount","C38":"discount","D38":"discount","C39":"discount","C40":"discount"},"OPT 3 (29.17%) ES to E+ ":{"B13":"margin","B17":"margin","B19":"margin","C27":"discount","C28":"discount","C29":"discount","D29":"discount","C30":"discount","D30":"discount","C37":"discount","C38":"discount","D38":"discount","C39":"discount","C40":"discount"},"OPT 4 ES to E+ (additional 1000":{"B13":"margin","B17":"margin","B19":"margin","C27":"discount","C28":"discount","C29":"discount","D29":"discount","C30":"discount","D30":"discount","D38":"discount","D39":"discount","E39":"discount","D40":"discount","D41":"discount","E41":"discount","D42":"discount","D43":"discount","E43":"discount"}};
+    var data = window.PERM_CALCULATOR_DATA;
+    if (!data) return;
+    function pct(x) { return String(Math.round(x * 100) / 100); }
+    function phrase(kind, v) {
+      if (isNaN(v)) return "";
+      if (kind === "discount") {
+        if (v === 1) return "— that's no discount";
+        if (v === 0) return "— that's 100% off — free";
+        if (v > 0 && v < 1) return "— that's " + pct((1 - v) * 100) + "% off";
+        if (v > 1) return "— that's " + pct((v - 1) * 100) + "% above list — a markup";
+        return "— that's more than 100% off";
+      }
+      if (v === 1) return "— no partner margin";
+      if (v >= 0 && v < 1) return "— the partner keeps " + pct((1 - v) * 100) + "%";
+      if (v < 0) return "— the partner keeps more than the price";
+      return "— above list — a negative margin";
+    }
+    var panels = document.querySelectorAll("#wb-tool .wb-panel");
+    data.sheets.forEach(function (sh, si) {
+      var map = GLOSS[sh.name];
+      var panel = panels[si];
+      if (!map || !panel) return;
+      panel.querySelectorAll("input.wb-input").forEach(function (input) {
+        var kind = map[input.getAttribute("aria-label")];
+        if (!kind) return;
+        var span = document.createElement("span");
+        span.className = "wb-gloss";
+        input.parentNode.appendChild(span);
+        var paint = function () { span.textContent = phrase(kind, parseFloat(input.value)); };
+        input.addEventListener("input", paint);
+        paint();
+      });
+    });
+  })();
+</script>
+<script>
+  /* Phone summary strip (added Nov 11, 2026, on Lucky's "it's a mess on my
+     end" report): the option tabs are wide grids, so on a phone the re-priced
+     totals sit far off-screen and typing looks like it does nothing. The
+     strip carries the Compiled Results headline totals — the comparison —
+     above the workbook, live as the visitor types in any tab. It computes
+     from the same converted workbook data through the shared formula engine
+     (its own registry, so it can read across all 22 tabs); the workbook
+     itself is untouched. Recompute is debounced (200 ms) because this is
+     the big workbook — 6,100 formulas — and a phone should not rebuild on
+     every keystroke. */
+  (function () {
+    var data = window.PERM_CALCULATOR_DATA;
+    var mount = document.getElementById("wb-tool");
+    if (!data || !mount || typeof FormulaEngine === "undefined") return;
+    var overrides = {}; // sheetName -> { addr: value }
+
+    function buildRegistry() {
+      var registry = {};
+      data.sheets.forEach(function (sh) {
+        var map = {};
+        sh.rows.forEach(function (row) {
+          row.cells.forEach(function (c) {
+            map[c.a] = c.t === "formula" ? { kind: "formula", value: c.f }
+                                         : { kind: "value", value: c.v };
+          });
+        });
+        var ov = overrides[sh.name];
+        if (ov) Object.keys(ov).forEach(function (a) { map[a] = { kind: "value", value: ov[a] }; });
+        registry[sh.name] = FormulaEngine.createSheet(map, {
+          resolve: function (name, addr) {
+            var t = registry[name];
+            return t ? t.get(addr) : "#REF!";
+          }
+        });
+      });
+      return registry;
+    }
+
+    function money(v) {
+      return (typeof v === "number" && isFinite(v)) ? "$" + Math.round(v).toLocaleString("en-US") : "—";
+    }
+    function arrow(a, b) {
+      return (typeof a === "number" && isFinite(a) && typeof b === "number" && isFinite(b))
+        ? money(a) + " → " + money(b) : "—";
+    }
+
+    function compute() {
+      var reg = buildRegistry();
+      var comp = reg["Compiled Results"];
+      if (!comp) return;
+      var get = function (a) { try { return comp.get(a); } catch (e) { return null; } };
+      document.getElementById("ps-o1").textContent = money(get("F7"));
+      document.getElementById("ps-o2").textContent = arrow(get("C26"), get("C36"));
+      document.getElementById("ps-o3").textContent = arrow(get("C44"), get("C54"));
+      document.getElementById("ps-o4").textContent = arrow(get("D62"), get("D82"));
+    }
+
+    var timer = null;
+    function schedule() {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(compute, 200);
+    }
+
+    // Sync the strip with what the visitor types into the workbook's own
+    // inputs: panel i belongs to sheet i (the renderer builds one panel per
+    // sheet, in order). Numeric cells parse like the renderer parses them;
+    // everything else is stored as the raw text.
+    var panels = mount.querySelectorAll(".wb-panel");
+    data.sheets.forEach(function (sh, si) {
+      var panel = panels[si];
+      if (!panel) return;
+      var defs = {};
+      sh.rows.forEach(function (row) {
+        row.cells.forEach(function (c) { if (c.t === "input") defs[c.a] = c; });
+      });
+      panel.querySelectorAll("input.wb-input").forEach(function (input) {
+        var addr = input.getAttribute("aria-label");
+        var def = defs[addr];
+        if (!def) return;
+        input.addEventListener("input", function () {
+          var raw = input.value;
+          var v;
+          if (typeof def.v === "number") {
+            if (raw === "") v = "";
+            else {
+              var parsed = parseFloat(raw);
+              v = isNaN(parsed) ? 0 : (def.fmt === "pct" ? parsed / 100 : parsed);
+            }
+          } else {
+            v = raw;
+          }
+          if (!overrides[sh.name]) overrides[sh.name] = {};
+          overrides[sh.name][addr] = v;
+          schedule();
+        });
+      });
+    });
+
+    compute();
+  })();
+</script>
+</body>
+</html>
