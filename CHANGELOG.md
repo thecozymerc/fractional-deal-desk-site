@@ -6,6 +6,7 @@
 - Delivery, recorded honestly: Argon's return first truncated mid-script (94,534 bytes), then arrived in 3 parts with overlapping seams. Every part aligned verbatim against the proven script with zero gaps, and the assembled file is byte-identical to the independently built candidate (Argon's CSS + paragraph, proven script grafted), which had already passed the 240-check battery (240/240) and a live desktop browser pass (structure clean, totals $226,800 / $294,907.50 exact, Generate Note working, no page overflow).
 - Design caveat, flagged to Lucky: at desktop width the Section 01 tables scroll sideways inside their card, so the PUPY / ACV / TCV columns start clipped. Built to the spec given; his call whether Argon gets a follow-up to fit the columns.
 - Archival: the superseded wrapped build (3.3) joins the GitHub branch tool-3-iterations as the next iteration (branch README still pending Argon's writing); the candidate address /tools/perm-calculator-3-4/ is retired. Records: CODE-MAP v53; this entry; LABEL.md; Drive mirror + Page Text Sheet; Tool Review Checklist (3.3 row marked archived iteration, responsive build row added as adopted; verdict columns untouched).
+- Page/tool: S6-P01.c / Tool 3 — Perm Calculator.
 
 
 ## 2026-11-12 — WRAP PROMOTED: Tool 3.3 (Argon frame + words, 3.2 tool core) becomes the Perm Calculator — Lucky's ruling
@@ -14,6 +15,7 @@
 - Font note (Lucky's catch): the families already matched the site (Georgia + the same system stack); what differed was treatment — 14px base vs the site's 18/1.6 pattern, title weight 400 vs 600, spaced-capital labels. Aligned in this build.
 - Archival: the 3.1 / 3.2 / 3.3 candidate addresses are off the live site. The retired builds (workbook Tool 3, 3.1, 3.2) are preserved on the GitHub branch `tool-3-iterations` with a README lineage, in the Drive mirror, and in the local build records. The canonical page's provenance is stated on the page itself.
 - Records: CODE-MAP v52; this entry; LABEL.md (perm-calculator); Plans tab -19 Log 49; Tool Review Checklist rows for 3.1/3.2 marked archived, new row for Tool 3.3 marked adopted (verdict columns untouched); Drive mirror S6-P01.c folder updated in the same pass.
+- Page/tool: S6-P01.c / Tool 3 — Perm Calculator.
 
 
 ## 2026-11-12 — SWAP: Tool 3.2 (Argon build) replaces the workbook-converted Tool 3 at /tools/perm-calculator/ — Lucky's ruling
