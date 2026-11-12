@@ -1,5 +1,8 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-11 — Research applied: photo hierarchy (v47)
+- Per Lucky's ruling on the peer-reviewed photo/attire research: homepage = casual photo only; About leads with the casual photo; the formal headshot moves to a small secondary note ('And when the room calls for it.'); both v46 captions removed. Name + LinkedIn/Book a Call furniture unchanged.
+
 ## 2026-11-11 — Identity pass: name + photo (Joseph Conte)
 - About: identity block at the top of the story section (photo + name + role + LinkedIn + Book a Call). Homepage: the same block in the Operator section above 'More about the operator'. Photos: BOTH of Lucky's Nov 11 shots, side by side per his follow-up order ('the casual vs business guy') — casual denim photo as assets/about-photo.jpg ('In person') and the formal studio headshot as assets/business-photo.jpg ('In the boardroom'); square crops, 600×600, on both trees. styles.css gained .id-block rules. No locked copy edited.
 
