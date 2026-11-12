@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tool 3.1 — Perpetual Deal Structurer & Approval Note Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy-950: #091326;
+      --navy-900: #0F1E38;
+      --navy-800: #162B4D;
+      --brass-600: #9E7B1C;
+      --brass-500: #B8912A;
+      --brass-400: #D4AF37;
+      --brass-50:  #FDFBF5;
+      --slate-900: #0F172A;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748B;
+      --slate-400: #94A3B8;
+      --slate-300: #CBD5E1;
+      --slate-200: #E2E8F0;
+      --slate-100: #F1F5F9;
+      --slate-50:  #F8FAFC;
+      --paper:     #FFFFFF;
+      --bg:        #F3F5F8;
+      --emerald-700: #047857;
+      --emerald-50:  #ECFDF5;
+      --crimson-700: #B91C1C;
+      --hairline: 1px solid #D8E0EA;
+      --hairline-dark: 1px solid rgba(255, 255, 255, 0.14);
+      --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      --radius: 4px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background-color: var(--bg);
+      color: var(--slate-900);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    .tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+    /* MASTHEAD */
+    .masthead {
+      background: var(--navy-900);
+      color: #FFFFFF;
+      border-bottom: 2px solid var(--brass-500);
+      padding: 12px 20px;
+    }
+    .masthead-inner {
+      max-width: 1560px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .brand-group { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    .tool-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--brass-400);
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      background: rgba(212, 175, 55, 0.1);
+      padding: 2px 7px;
+      border-radius: 2px;
+    }
+    .masthead h1 {
+      font-family: var(--font-serif);
+      font-weight: 400;
+      font-size: 26px;
+      color: #FFFFFF;
+      line-height: 1.1;
+    }
+    .masthead-sub { font-size: 12px; color: var(--slate-300); }
+    .masthead-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      white-space: nowrap;
+    }
+    .btn-brass { background: var(--brass-500); color: #FFFFFF; border-color: var(--brass-400); }
+    .btn-brass:hover { background: var(--brass-600); }
+    .btn-navy-outline {
+      background: rgba(255, 255, 255, 0.06);
+      color: #FFFFFF;
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+    .btn-navy-outline:hover { background: rgba(255, 255, 255, 0.14); }
+    .btn-ghost { background: var(--paper); color: var(--navy-900); border: var(--hairline); }
+    .btn-ghost:hover { background: var(--slate-100); border-color: var(--slate-400); }
+    .btn-sm { font-size: 11px; padding: 4px 8px; }
+    .btn-icon {
+      background: transparent;
+      border: none;
+      color: var(--slate-500);
+      cursor: pointer;
+      padding: 3px 5px;
+      border-radius: 3px;
+      font-size: 12px;
+      line-height: 1;
+    }
+    .btn-icon:hover { color: var(--navy-900); background: var(--slate-200); }
+    .btn-icon.danger:hover { color: var(--crimson-700); background: #FEE2E2; }
+
+    /* STICKY SIDE-BY-SIDE OPTION TOTALS STRIP */
+    .summary-strip-wrap {
+      background: var(--navy-950);
+      border-bottom: var(--hairline);
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      box-shadow: 0 4px 12px rgba(9, 19, 38, 0.16);
+    }
+    .summary-strip-inner { max-width: 1560px; margin: 0 auto; }
+    .strip-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 7px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .strip-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--brass-400);
+    }
+    .strip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
+      gap: 10px;
+    }
+    .strip-card {
+      background: var(--navy-900);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius);
+      padding: 9px 12px;
+      color: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .strip-card.is-proposed {
+      border-color: var(--brass-400);
+      background: linear-gradient(180deg, rgba(212, 175, 55, 0.11) 0%, rgba(15, 30, 56, 0.96) 100%);
+    }
+    .strip-card.is-current { border-color: rgba(148, 163, 184, 0.45); }
+    .strip-card.is-delta {
+      background: rgba(9, 19, 38, 0.78);
+      border: 1px dashed rgba(212, 175, 55, 0.45);
+    }
+    .strip-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border-bottom: var(--hairline-dark);
+      padding-bottom: 5px;
+    }
+    .strip-opt-name {
+      font-weight: 600;
+      font-size: 12.5px;
+      color: #FFFFFF;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .role-pill {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 6px;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+    .role-pill.current {
+      background: rgba(148, 163, 184, 0.2);
+      color: #E2E8F0;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+    .role-pill.proposed { background: var(--brass-500); color: #FFFFFF; }
+    .role-pill.variant { background: rgba(255, 255, 255, 0.08); color: var(--slate-300); }
+    .strip-metrics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .strip-metric-label {
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--slate-400);
+      display: block;
+      margin-bottom: 1px;
+    }
+    .strip-metric-val {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: #FFFFFF;
+      white-space: nowrap;
+    }
+    .strip-metric-val.highlight { color: var(--brass-400); }
+    .strip-metric-sub {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      color: var(--slate-400);
+      display: block;
+    }
+
+    /* MAIN WORKSPACE */
+    .workspace {
+      max-width: 1560px;
+      margin: 0 auto;
+      padding: 16px 20px 40px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(380px, 0.95fr);
+      gap: 18px;
+      align-items: start;
+    }
+    .col-stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+    /* PANELS */
+    .panel {
+      background: var(--paper);
+      border: var(--hairline);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 2px rgba(15, 30, 56, 0.04);
+      overflow: hidden;
+    }
+    .panel-header {
+      background: var(--slate-50);
+      border-bottom: var(--hairline);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .panel-header-navy {
+      background: var(--navy-900);
+      color: #FFFFFF;
+      border-bottom: 2px solid var(--brass-500);
+      padding: 11px 14px;
+    }
+    .panel-title-group { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    .panel-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--navy-900);
+      line-height: 1.15;
+    }
+    .panel-header-navy .panel-title { color: #FFFFFF; }
+    .panel-kicker {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--brass-600);
+    }
+    .panel-header-navy .panel-kicker { color: var(--brass-400); }
+    .panel-body { padding: 14px; }
+
+    /* OPTION BUILDER CARDS */
+    .option-card {
+      border: var(--hairline);
+      border-radius: var(--radius);
+      background: var(--paper);
+      overflow: hidden;
+    }
+    .option-card.is-proposed {
+      border-color: var(--brass-500);
+      box-shadow: 0 0 0 1px rgba(184, 145, 42, 0.25);
+    }
+    .option-bar {
+      background: var(--slate-100);
+      border-bottom: var(--hairline);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .option-card.is-proposed .option-bar {
+      background: var(--brass-50);
+      border-bottom-color: rgba(184, 145, 42, 0.35);
+    }
+    .option-title-wrap { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .option-title-text {
+      font-family: var(--font-serif);
+      font-size: 19px;
+      color: var(--navy-900);
+      line-height: 1.1;
+    }
+    .option-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+    /* PRICING LINE TABLE */
+    .table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .deal-table { width: 100%; border-collapse: collapse; min-width: 720px; }
+    .deal-table th {
+      background: var(--slate-50);
+      border-bottom: var(--hairline);
+      padding: 7px 8px;
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--slate-600);
+      text-align: right;
+      white-space: nowrap;
+    }
+    .deal-table th:first-child { text-align: left; padding-left: 12px; }
+    .deal-table th.computed-col { background: #F4F6FA; color: var(--navy-800); }
+    .deal-table td {
+      border-bottom: var(--hairline);
+      padding: 6px 8px;
+      vertical-align: middle;
+      text-align: right;
+    }
+    .deal-table td:first-child { text-align: left; padding-left: 12px; min-width: 185px; }
+    .deal-table tbody tr:hover { background: #FAFBFD; }
+    .deal-table td.computed-cell {
+      background: #F8FAFC;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--navy-900);
+      white-space: nowrap;
+    }
+    .deal-table td.computed-cell.strong { font-weight: 600; color: var(--navy-950); }
+    .deal-table tfoot td {
+      background: var(--navy-900);
+      color: #FFFFFF;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px;
+      border-bottom: none;
+      white-space: nowrap;
+    }
+    .deal-table tfoot td:first-child {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--brass-400);
+      padding-left: 12px;
+    }
+
+    .sku-label-wrap { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+    .sku-name-text { font-weight: 600; color: var(--navy-900); font-size: 12.5px; }
+
+    /* INPUT FIELDS — ONLY TRUE INPUTS */
+    .field-input, .num-input, .select-input {
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      color: var(--slate-900);
+      background: var(--paper);
+      border: 1px solid var(--slate-300);
+      border-radius: 3px;
+      padding: 5px 7px;
+      transition: border-color 0.12s ease, box-shadow 0.12s ease;
+    }
+    .field-input:focus, .num-input:focus, .select-input:focus {
+      outline: none;
+      border-color: var(--navy-800);
+      box-shadow: 0 0 0 2px rgba(15, 30, 56, 0.12);
+    }
+    .num-input { font-family: var(--font-mono); font-size: 12px; text-align: right; width: 82px; }
+    .num-input.price-w { width: 96px; }
+    .num-input.short-w { width: 62px; }
+    .factor-wrap { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+    .factor-hint { font-family: var(--font-mono); font-size: 9.5px; color: var(--slate-500); line-height: 1.1; }
+
+    /* CONTEXT FORM GRID */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: var(--hairline);
+      padding-bottom: 5px;
+      margin: 14px 0 10px;
+    }
+    .section-divider:first-child { margin-top: 0; }
+    .section-divider-title {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--navy-900);
+    }
+    .section-divider-meta { font-size: 11px; color: var(--slate-500); }
+    .form-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .form-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .field-group { display: flex; flex-direction: column; gap: 4px; }
+    .field-group.span-2 { grid-column: span 2; }
+    .field-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--slate-700);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .field-label-tag { font-family: var(--font-mono); font-size: 9.5px; font-weight: 500; color: var(--slate-400); }
+
+    /* AUTO-COMPUTED READOUTS (PLAIN TEXT — NEVER INPUTS) */
+    .auto-metrics-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+      gap: 8px;
+      background: var(--slate-50);
+      border: var(--hairline);
+      border-radius: var(--radius);
+      padding: 9px 11px;
+      margin-top: 10px;
+    }
+    .auto-metric-item { display: flex; flex-direction: column; gap: 2px; }
+    .auto-metric-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--slate-500);
+    }
+    .auto-metric-value { font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; color: var(--navy-900); }
+
+    .program-box {
+      border: var(--hairline);
+      background: var(--brass-50);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: var(--navy-900);
+      cursor: pointer;
+      user-select: none;
+    }
+    .checkbox-row input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--navy-900); cursor: pointer; }
+
+    /* LIST BUILDERS */
+    .list-builder { display: flex; flex-direction: column; gap: 6px; }
+    .list-items { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .list-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--slate-50);
+      border: var(--hairline);
+      border-radius: 3px;
+      padding: 5px 8px;
+      font-size: 12px;
+      color: var(--slate-900);
+    }
+    .list-item-num { font-family: var(--font-mono); font-weight: 600; color: var(--brass-600); margin-right: 6px; }
+    .list-add-row { display: flex; gap: 6px; }
+    .list-add-row .field-input { flex: 1; }
+
+    /* STICKY RIGHT COLUMN: THE APPROVAL NOTE */
+    .note-sticky-col {
+      position: sticky;
+      top: 98px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .note-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 14px;
+      background: var(--brass-50);
+      border-bottom: 1px solid rgba(184, 145, 42, 0.35);
+      flex-wrap: wrap;
+    }
+    .note-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--navy-900);
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--emerald-700); display: inline-block; }
+    .note-output-wrap { padding: 14px; background: var(--navy-950); }
+    .note-pre {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.55;
+      color: #F1F5F9;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: var(--navy-900);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      max-height: 540px;
+      overflow-y: auto;
+    }
+    .note-footer {
+      padding: 9px 14px;
+      background: var(--slate-50);
+      border-top: var(--hairline);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--slate-600);
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .copy-toast {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--emerald-700);
+      background: var(--emerald-50);
+      border: 1px solid #A7F3D0;
+      padding: 3px 8px;
+      border-radius: 3px;
+    }
+
+    /* RESPONSIVE DOWN TO 390PX */
+    @media (max-width: 1120px) {
+      .workspace { grid-template-columns: 1fr; }
+      .note-sticky-col, .summary-strip-wrap { position: static; }
+    }
+    @media (max-width: 640px) {
+      .masthead { padding: 10px 12px; }
+      .masthead h1 { font-size: 21px; }
+      .summary-strip-wrap { padding: 10px 12px; }
+      .strip-metrics { grid-template-columns: repeat(3, 1fr); }
+      .workspace { padding: 12px 10px 32px; gap: 14px; }
+      .panel-body { padding: 10px; }
+      .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+      .field-group.span-2 { grid-column: span 1; }
+      .note-pre { font-size: 11px; padding: 10px 12px; max-height: 440px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- INSTITUTIONAL HEADER -->
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="brand-group">
+        <span class="tool-badge">Tool 3.1 · Deal Desk</span>
+        <h1>Perpetual License Structurer &amp; Approval Note</h1>
+        <span class="masthead-sub">Multi-option perpetual pricing chain with skip-the-blanks approval note assembly</span>
+      </div>
+      <div class="masthead-actions">
+        <button type="button" class="btn btn-navy-outline" id="btnAddOption">+ Add Option Variant</button>
+        <button type="button" class="btn btn-navy-outline" id="btnResetSample">Reset Sample Deal</button>
+        <button type="button" class="btn btn-brass" id="btnHeaderCopy">Copy Approval Note</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ALWAYS-VISIBLE SIDE-BY-SIDE OPTION TOTALS STRIP -->
+  <section class="summary-strip-wrap" aria-label="Side-by-Side Option Totals">
+    <div class="summary-strip-inner">
+      <div class="strip-header">
+        <span class="strip-title">Side-by-Side Option Totals · Computed Values Only (Paying Price · PUPM / PUPY · ACV · TCV)</span>
+      </div>
+      <div class="strip-grid" id="summaryStripGrid"></div>
+    </div>
+  </section>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="workspace">
+
+    <!-- LEFT COLUMN: OPTIONS & DEAL CONTEXT -->
+    <div class="col-stack">
+
+      <!-- SECTION 1: DEAL OPTIONS & LINE PRICING -->
+      <section class="panel" aria-label="Deal Options Builder">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span class="panel-kicker">Section 01</span>
+            <h2 class="panel-title">Deal Options &amp; Perpetual SKU Lines</h2>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <span style="font-size:11.5px; color:var(--slate-600);">Factors are decimal complements (1.00 = 0% off; 0.65 = 35% off)</span>
+            <button type="button" class="btn btn-ghost btn-sm" id="btnAddOptionInline">+ New Option</button>
+          </div>
+        </div>
+        <div class="panel-body" style="display:flex; flex-direction:column; gap:16px;" id="optionsContainer"></div>
+      </section>
+
+      <!-- SECTION 2: APPROVAL REQUEST CONTEXT & SKIP-THE-BLANKS FIELDS -->
+      <section class="panel" aria-label="Approval Context & Program Details">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span class="panel-kicker">Section 02</span>
+            <h2 class="panel-title">Approval Request Context &amp; Program Rules</h2>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" id="btnToggleBlanksDemo">Test Skip-the-Blanks</button>
+        </div>
+
+        <div class="panel-body">
+          <div class="section-divider">
+            <span class="section-divider-title">Greeting &amp; Deal References</span>
+            <span class="section-divider-meta">Blank fields drop out of note automatically</span>
+          </div>
+          <div class="form-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="ctxSalesRep">Sales Representative (To) <span class="field-label-tag">Optional</span></label>
+              <input type="text" id="ctxSalesRep" class="field-input" placeholder="e.g. Elena Rostova" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxOperator">Deal Desk Operator (From) <span class="field-label-tag">Optional</span></label>
+              <input type="text" id="ctxOperator" class="field-input" placeholder="e.g. Marcus Thorne" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxOppLink">Opportunity Link / ID <span class="field-label-tag">Deal Reference</span></label>
+              <input type="text" id="ctxOppLink" class="field-input" placeholder="https://crm.example.internal/opp/..." />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxCaseLink">Case Number / Link <span class="field-label-tag">Deal Reference</span></label>
+              <input type="text" id="ctxCaseLink" class="field-input" placeholder="DD-88412 / https://desk.example.internal/..." />
+            </div>
+          </div>
+
+          <div class="section-divider">
+            <span class="section-divider-title">Sales Request Summary</span>
+            <span class="section-divider-meta">Combined with auto-computed metrics below</span>
+          </div>
+          <div class="form-grid-3">
+            <div class="field-group">
+              <label class="field-label" for="ctxCustomer">Customer Name</label>
+              <input type="text" id="ctxCustomer" class="field-input" placeholder="Customer legal name" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxPartner">Partner Name</label>
+              <input type="text" id="ctxPartner" class="field-input" placeholder="Channel partner / reseller" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxRequestType">Request Type</label>
+              <input type="text" id="ctxRequestType" class="field-input" placeholder="Pricing Approval" />
+            </div>
+            <div class="field-group span-2">
+              <label class="field-label" for="ctxReason">Pricing Criteria Not Met (Reason)</label>
+              <input type="text" id="ctxReason" class="field-input" placeholder="Reason approval is required" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxEduGov">EDU / Non-Profit / Gov Flag</label>
+              <select id="ctxEduGov" class="select-input">
+                <option value="">— Leave Blank (Omit) —</option>
+                <option value="N">N</option>
+                <option value="Y (EDU)">Y (EDU)</option>
+                <option value="Y (Non-Profit)">Y (Non-Profit)</option>
+                <option value="Y (Gov)">Y (Gov)</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxPrevContract">Previous Contract</label>
+              <input type="text" id="ctxPrevContract" class="field-input" placeholder="Prior contract ID" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ctxPrevStart">Previous Contract Start Date</label>
+              <input type="text" id="ctxPrevStart" class="field-input" placeholder="YYYY-MM-DD" />
+            </div>
+          </div>
+
+          <!-- Auto-Computed Summary Fields (Plain Text Readout — Never Typed) -->
+          <div class="auto-metrics-strip" id="autoComputedSummaryStrip" aria-label="Auto-Computed Note Fields"></div>
+
+          <!-- Program Block -->
+          <div class="section-divider">
+            <span class="section-divider-title">Program Block</span>
+            <span class="section-divider-meta">Included in note only when a program applies</span>
+          </div>
+          <div class="program-box">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+              <label class="checkbox-row">
+                <input type="checkbox" id="ctxProgramApplies" />
+                <span>Promotional / Concession Program Applies to Proposed Deal</span>
+              </label>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <label class="field-label" for="ctxFreeMonths" style="margin:0;">Free Months (Total):</label>
+                <input type="number" id="ctxFreeMonths" class="num-input short-w" min="0" max="60" step="1" />
+              </div>
+            </div>
+            <div id="programComputedPreview" style="margin-top:8px; font-size:11.5px; color:var(--slate-700); font-family:var(--font-mono);"></div>
+          </div>
+
+          <!-- Missing Information & Validation Lists -->
+          <div class="form-grid-2" style="margin-top:14px;">
+            <div>
+              <div class="section-divider" style="margin-top:0;">
+                <span class="section-divider-title">Missing Information</span>
+                <button type="button" class="btn-icon" id="btnClearMissing">Clear all</button>
+              </div>
+              <div class="list-builder">
+                <ul class="list-items" id="missingList"></ul>
+                <div class="list-add-row">
+                  <input type="text" id="inputNewMissing" class="field-input" placeholder="Add missing info item..." />
+                  <button type="button" class="btn btn-ghost btn-sm" id="btnAddMissing">+ Add</button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="section-divider" style="margin-top:0;">
+                <span class="section-divider-title">Validation Checks</span>
+                <button type="button" class="btn-icon" id="btnClearValidation">Clear all</button>
+              </div>
+              <div class="list-builder">
+                <ul class="list-items" id="validationList"></ul>
+                <div class="list-add-row">
+                  <input type="text" id="inputNewValidation" class="field-input" placeholder="Add check to re-validate..." />
+                  <button type="button" class="btn btn-ghost btn-sm" id="btnAddValidation">+ Add</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- RIGHT COLUMN: INSTANT APPROVAL NOTE GENERATOR -->
+    <aside class="note-sticky-col" aria-label="Approval Request Note Output">
+      <section class="panel" style="border-color: var(--navy-800); box-shadow: 0 6px 20px rgba(15, 30, 56, 0.10);">
+        <div class="panel-header panel-header-navy">
+          <div class="panel-title-group">
+            <span class="panel-kicker">Primary Output</span>
+            <h2 class="panel-title">Approval Request Note</h2>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button type="button" class="btn btn-navy-outline btn-sm" id="btnGenerateNote">Generate Note</button>
+            <button type="button" class="btn btn-brass" id="btnCopyNote">Copy Note</button>
+          </div>
+        </div>
+
+        <div class="note-toolbar">
+          <div class="note-status">
+            <span class="status-dot"></span>
+            <span id="noteComparisonLabel">Comparing Current Deal vs Proposed Deal</span>
+          </div>
+          <span id="copyFeedback" class="copy-toast" style="display:none;">Copied to clipboard ✓</span>
+        </div>
+
+        <div class="note-output-wrap">
+          <pre class="note-pre tabular" id="approvalNoteOutput"></pre>
+        </div>
+
+        <div class="note-footer">
+          <span>Assembled from filled fields only · Computed fields pulled automatically</span>
+          <span id="noteStats" class="tabular"></span>
+        </div>
+      </section>
+    </aside>
+
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      function createDefaultState() {
+        return {
+          currentOptionId: 'opt-1',
+          proposedOptionId: 'opt-2',
+          editingSkuKey: null,
+          editingOptionId: null,
+          context: {
+            salesRep: 'Elena Rostova',
+            operator: 'Marcus Thorne',
+            oppLink: 'https://crm.northstar-internal.example/opp/OPP-2026-4190',
+            caseLink: 'DD-88412 / https://desk.northstar-internal.example/cases/88412',
+            customerName: 'Northstar Meridian Logistics',
+            partnerName: 'Vanguard Systems Integration',
+            requestType: 'Pricing Approval',
+            criteriaReason: 'Extra discount exceeds 25% standard threshold on expansion seats; includes 6-month promotional ramp.',
+            eduGovFlag: 'N',
+            prevContract: 'AGR-2023-0942',
+            prevStartDate: '2023-12-01',
+            programApplies: true,
+            freeMonths: 6,
+            missingInfo: [
+              'Partner non-standard margin acknowledgment email from Vanguard channel manager'
+            ],
+            validationChecks: [
+              'Confirm order form payment terms remain Net 30 per standard perpetual policy',
+              'Re-validate existing perpetual seat keys under AGR-2023-0942 prior to provisioning expansion'
+            ]
+          },
+          options: [
+            {
+              id: 'opt-1',
+              name: 'Option 1 — Current Deal (Baseline)',
+              lines: [
+                { id: 'line-101', name: 'Enterprise Core Platform — Perpetual', listPrice: 180000, partnerFactor: 0.90, extraFactor: 0.85, termMonths: 36, seats: 200 },
+                { id: 'line-102', name: 'Automated Workflow Engine — Perpetual', listPrice: 72000, partnerFactor: 0.90, extraFactor: 0.90, termMonths: 36, seats: 200 },
+                { id: 'line-103', name: 'Audit & Compliance Telemetry — Perpetual', listPrice: 36000, partnerFactor: 0.90, extraFactor: 0.95, termMonths: 36, seats: 100 }
+              ]
+            },
+            {
+              id: 'opt-2',
+              name: 'Option 2 — Proposed 36M Expansion',
+              lines: [
+                { id: 'line-201', name: 'Enterprise Core Platform — Perpetual', listPrice: 315000, partnerFactor: 0.85, extraFactor: 0.65, termMonths: 36, seats: 350 },
+                { id: 'line-202', name: 'Automated Workflow Engine — Perpetual', listPrice: 126000, partnerFactor: 0.85, extraFactor: 0.70, termMonths: 36, seats: 350 },
+                { id: 'line-203', name: 'Audit & Compliance Telemetry — Perpetual', listPrice: 72000, partnerFactor: 0.85, extraFactor: 0.75, termMonths: 36, seats: 200 }
+              ]
+            }
+          ]
+        };
+      }
+
+      let state = createDefaultState();
+      let blanksDemoActive = false;
+
+      // PRICING MATH: paying price = list * partnerFactor * extraFactor; PUPY spreads paying price across users and years
+      function computeLineMetrics(line) {
+        const listPrice = Math.max(0, Number(line.listPrice) || 0);
+        const partnerFactor = Math.min(1, Math.max(0, Number(line.partnerFactor) || 0));
+        const extraFactor = Math.min(1, Math.max(0, Number(line.extraFactor) || 0));
+        const termMonths = Math.max(1, Number(line.termMonths) || 1);
+        const seats = Math.max(1, Number(line.seats) || 1);
+
+        const years = termMonths / 12;
+        const payingPrice = listPrice * partnerFactor * extraFactor;
+        const tcv = payingPrice;
+        const acv = years > 0 ? payingPrice / years : 0;
+        const pupy = (seats > 0 && years > 0) ? payingPrice / seats / years : 0;
+        const pupm = (seats > 0 && termMonths > 0) ? payingPrice / seats / termMonths : 0;
+
+        const partnerDiscountPct = (1 - partnerFactor) * 100;
+        const extraDiscountPct = (1 - extraFactor) * 100;
+        const combinedDiscountPct = listPrice > 0 ? (1 - (payingPrice / listPrice)) * 100 : 0;
+
+        return {
+          listPrice, partnerFactor, extraFactor, termMonths, seats, years,
+          payingPrice, tcv, acv, pupy, pupm,
+          partnerDiscountPct, extraDiscountPct, combinedDiscountPct
+        };
+      }
+
+      function computeOptionMetrics(option) {
+        const computedLines = option.lines.map(line => ({ ...line, calc: computeLineMetrics(line) }));
+        const totalList = computedLines.reduce((acc, l) => acc + l.calc.listPrice, 0);
+        const totalPaying = computedLines.reduce((acc, l) => acc + l.calc.payingPrice, 0);
+        const totalTcv = computedLines.reduce((acc, l) => acc + l.calc.tcv, 0);
+        const totalAcv = computedLines.reduce((acc, l) => acc + l.calc.acv, 0);
+        const totalSeats = computedLines.reduce((acc, l) => acc + l.calc.seats, 0);
+        const dominantTerm = computedLines.length > 0 ? computedLines[0].calc.termMonths : 12;
+        const blendedPupy = totalSeats > 0 ? totalAcv / totalSeats : 0;
+        const blendedPupm = blendedPupy / 12;
+
+        const listAfterPartner = computedLines.reduce((acc, l) => acc + (l.calc.listPrice * l.calc.partnerFactor), 0);
+        const weightedPartnerDiscountPct = totalList > 0 ? (1 - (listAfterPartner / totalList)) * 100 : 0;
+        const effectiveDiscountPct = totalList > 0 ? (1 - (totalPaying / totalList)) * 100 : 0;
+
+        return {
+          ...option, computedLines, totalList, totalPaying, totalTcv, totalAcv,
+          totalSeats, dominantTerm, blendedPupy, blendedPupm,
+          weightedPartnerDiscountPct, effectiveDiscountPct
+        };
+      }
+
+      const usdFmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const usdWholeFmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      function fmtMoney(val) { return usdFmt.format(Number(val) || 0); }
+      function fmtPct(val, d = 1) { return (Number(val) || 0).toFixed(d) + '%'; }
+      function fmtSignedPct(val, d = 1) {
+        const n = Number(val) || 0;
+        return (n > 0 ? '+' : '') + n.toFixed(d) + '%';
+      }
+      function escapeHtml(str) {
+        return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      // SKIP-THE-BLANKS NOTE ASSEMBLER
+      function buildApprovalNote(computedOptions) {
+        const currentOpt = computedOptions.find(o => o.id === state.currentOptionId) || computedOptions[0];
+        const proposedOpt = computedOptions.find(o => o.id === state.proposedOptionId) || computedOptions[computedOptions.length - 1];
+        const ctx = state.context;
+        const blocks = [];
+
+        // 1. Greeting + intro + standing line
+        const rep = (ctx.salesRep || '').trim();
+        const op = (ctx.operator || '').trim();
+        const greetingLine = rep ? `Hi ${rep},` : 'Hello,';
+        const introLine = op
+          ? `Below is the structured pricing approval summary prepared by ${op} (Deal Desk). Please note: the approval system covers pricing approvals only.`
+          : `Below is the structured pricing approval summary from Deal Desk. Please note: the approval system covers pricing approvals only.`;
+        blocks.push(`${greetingLine}\n${introLine}`);
+
+        // 2. DEAL REFERENCES
+        const refLines = [];
+        if ((ctx.oppLink || '').trim()) refLines.push(`- Opportunity Link: ${ctx.oppLink.trim()}`);
+        if ((ctx.caseLink || '').trim()) refLines.push(`- Case Number / Link: ${ctx.caseLink.trim()}`);
+        if (refLines.length > 0) blocks.push(`DEAL REFERENCES\n${refLines.join('\n')}`);
+
+        // 3. SALES REQUEST SUMMARY
+        const summaryLines = [];
+        if ((ctx.customerName || '').trim()) summaryLines.push(`- Customer Name: ${ctx.customerName.trim()}`);
+        if ((ctx.partnerName || '').trim()) summaryLines.push(`- Partner Name: ${ctx.partnerName.trim()}`);
+        if ((ctx.requestType || '').trim()) summaryLines.push(`- Request Type: ${ctx.requestType.trim()}`);
+        if ((ctx.criteriaReason || '').trim()) summaryLines.push(`- Pricing Criteria Not Met: ${ctx.criteriaReason.trim()}`);
+        if ((ctx.eduGovFlag || '').trim()) summaryLines.push(`- EDU / Non-Profit / Gov: ${ctx.eduGovFlag.trim()}`);
+
+        if (currentOpt && proposedOpt && currentOpt.totalTcv > 0) {
+          const tcvYoY = ((proposedOpt.totalTcv - currentOpt.totalTcv) / currentOpt.totalTcv) * 100;
+          summaryLines.push(`- Customer TCV YoY Increase %: ${fmtSignedPct(tcvYoY, 1)} (${fmtMoney(currentOpt.totalTcv)} -> ${fmtMoney(proposedOpt.totalTcv)})`);
+        }
+        if (currentOpt && proposedOpt && currentOpt.totalSeats > 0) {
+          const seatsYoY = ((proposedOpt.totalSeats - currentOpt.totalSeats) / currentOpt.totalSeats) * 100;
+          summaryLines.push(`- Seats Quantity YoY Increase %: ${fmtSignedPct(seatsYoY, 1)}`);
+        }
+        if (currentOpt && currentOpt.totalSeats > 0) {
+          summaryLines.push(`- Existing Seats (Total): ${currentOpt.totalSeats}`);
+        }
+        if ((ctx.prevContract || '').trim()) summaryLines.push(`- Previous Contract: ${ctx.prevContract.trim()}`);
+        if ((ctx.prevStartDate || '').trim()) summaryLines.push(`- Previous Contract Start Date: ${ctx.prevStartDate.trim()}`);
+
+        if (proposedOpt) {
+          const termMo = proposedOpt.dominantTerm;
+          const freeMo = ctx.programApplies && Number(ctx.freeMonths) > 0 ? Number(ctx.freeMonths) : 0;
+          summaryLines.push(`- Deal Term in Months: ${freeMo > 0 ? `${termMo} (${freeMo} free)` : `${termMo}`}`);
+          summaryLines.push(`- Partner Discount %: ${fmtPct(proposedOpt.weightedPartnerDiscountPct, 1)}`);
+        }
+        if (summaryLines.length > 0) blocks.push(`SALES REQUEST SUMMARY\n${summaryLines.join('\n')}`);
+
+        // 4. PER-SKU INFO — CURRENT DEAL vs PROPOSED DEAL
+        if (currentOpt && proposedOpt) {
+          const skuNames = [];
+          currentOpt.computedLines.forEach(l => { if (!skuNames.includes(l.name)) skuNames.push(l.name); });
+          proposedOpt.computedLines.forEach(l => { if (!skuNames.includes(l.name)) skuNames.push(l.name); });
+
+          const skuLines = [];
+          skuNames.forEach((skuName, idx) => {
+            const cLine = currentOpt.computedLines.find(l => l.name === skuName);
+            const pLine = proposedOpt.computedLines.find(l => l.name === skuName);
+            skuLines.push(`${idx + 1}. SKU: ${skuName}`);
+            skuLines.push(cLine
+              ? `   Current Deal  | Quantity: ${cLine.calc.seats} seats | Additional Discount on List: ${fmtPct(cLine.calc.extraDiscountPct, 1)} | PUPY: ${fmtMoney(cLine.calc.pupy)} USD | Total SKU Net: ${fmtMoney(cLine.calc.payingPrice)} USD`
+              : `   Current Deal  | Not in baseline contract (New SKU)`
+            );
+            skuLines.push(pLine
+              ? `   Proposed Deal | Quantity: ${pLine.calc.seats} seats | Additional Discount on List: ${fmtPct(pLine.calc.extraDiscountPct, 1)} | PUPY: ${fmtMoney(pLine.calc.pupy)} USD | Total SKU Net: ${fmtMoney(pLine.calc.payingPrice)} USD`
+              : `   Proposed Deal | Removed in proposed option`
+            );
+          });
+          if (skuLines.length > 0) blocks.push(`PER-SKU INFO — CURRENT DEAL vs PROPOSED DEAL\n${skuLines.join('\n')}`);
+        }
+
+        // 5. PROGRAM BLOCK (only when programApplies is true)
+        if (ctx.programApplies && proposedOpt) {
+          const progLines = [];
+          const freeMo = Math.max(0, Number(ctx.freeMonths) || 0);
+          if (freeMo > 0) progLines.push(`- Free Months (Total): ${freeMo}`);
+
+          const dvParts = proposedOpt.computedLines.map(l => {
+            const dv = freeMo > 0 ? (l.calc.pupm * l.calc.seats * freeMo) : l.calc.payingPrice;
+            return `${l.name}: ${fmtMoney(dv)} USD`;
+          });
+          if (dvParts.length > 0) {
+            progLines.push(`- ${freeMo > 0 ? 'DV per SKU (Free Months Value)' : 'DV per SKU'}: ${dvParts.join(' | ')}`);
+          }
+
+          const existingSeats = currentOpt ? currentOpt.totalSeats : 0;
+          const proposedSeats = proposedOpt.totalSeats;
+          const netNew = proposedSeats - existingSeats;
+          progLines.push(`- Existing Seats vs New Seats (Total): ${existingSeats} existing vs ${netNew >= 0 ? '+' + netNew + ' new' : netNew + ' adjusted'} (${proposedSeats} total seats)`);
+          blocks.push(`PROGRAM DETAILS\n${progLines.join('\n')}`);
+        }
+
+        // 6. MISSING INFORMATION (only when used)
+        const activeMissing = (ctx.missingInfo || []).map(s => s.trim()).filter(Boolean);
+        if (activeMissing.length > 0) {
+          blocks.push(`MISSING INFORMATION\nPlease provide the following missing items before final pricing sign-off:\n${activeMissing.map((item, i) => `${i + 1}. ${item}`).join('\n')}`);
+        }
+
+        // 7. VALIDATION (only when used)
+        const activeValidation = (ctx.validationChecks || []).map(s => s.trim()).filter(Boolean);
+        if (activeValidation.length > 0) {
+          blocks.push(`VALIDATION\nPlease re-validate the following checks prior to order booking:\n${activeValidation.map((item, i) => `${i + 1}. ${item}`).join('\n')}`);
+        }
+
+        return blocks.join('\n\n');
+      }
+
+      // RENDERERS
+      function renderSummaryStrip(computedOptions) {
+        const container = document.getElementById('summaryStripGrid');
+        const currentOpt = computedOptions.find(o => o.id === state.currentOptionId) || computedOptions[0];
+        const proposedOpt = computedOptions.find(o => o.id === state.proposedOptionId) || computedOptions[computedOptions.length - 1];
+
+        let html = computedOptions.map(opt => {
+          const isCurrent = opt.id === state.currentOptionId;
+          const isProposed = opt.id === state.proposedOptionId;
+          const cardClass = isProposed ? 'strip-card is-proposed' : (isCurrent ? 'strip-card is-current' : 'strip-card');
+          const pillClass = isProposed ? 'role-pill proposed' : (isCurrent ? 'role-pill current' : 'role-pill variant');
+          const pillText = isProposed ? 'Proposed Deal' : (isCurrent ? 'Current Deal' : 'Variant');
+
+          return `
+            <div class="${cardClass}">
+              <div class="strip-card-top">
+                <span class="strip-opt-name">${escapeHtml(opt.name)}</span>
+                <span class="${pillClass}">${pillText}</span>
+              </div>
+              <div class="strip-metrics tabular">
+                <div>
+                  <span class="strip-metric-label">Paying Price</span>
+                  <span class="strip-metric-val highlight">${fmtMoney(opt.totalPaying)}</span>
+                  <span class="strip-metric-sub">${fmtPct(opt.effectiveDiscountPct, 1)} off list</span>
+                </div>
+                <div>
+                  <span class="strip-metric-label">PUPM</span>
+                  <span class="strip-metric-val">${fmtMoney(opt.blendedPupm)}</span>
+                  <span class="strip-metric-sub">per user/mo</span>
+                </div>
+                <div>
+                  <span class="strip-metric-label">PUPY</span>
+                  <span class="strip-metric-val">${fmtMoney(opt.blendedPupy)}</span>
+                  <span class="strip-metric-sub">per user/yr</span>
+                </div>
+                <div>
+                  <span class="strip-metric-label">ACV (1-Yr)</span>
+                  <span class="strip-metric-val">${usdWholeFmt.format(opt.totalAcv)}</span>
+                  <span class="strip-metric-sub">${opt.dominantTerm} mo term</span>
+                </div>
+                <div>
+                  <span class="strip-metric-label">TCV (Full)</span>
+                  <span class="strip-metric-val">${usdWholeFmt.format(opt.totalTcv)}</span>
+                  <span class="strip-metric-sub">${opt.totalSeats} total seats</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        if (currentOpt && proposedOpt && currentOpt.id !== proposedOpt.id) {
+          const deltaTcv = proposedOpt.totalTcv - currentOpt.totalTcv;
+          const deltaTcvPct = currentOpt.totalTcv > 0 ? (deltaTcv / currentOpt.totalTcv) * 100 : 0;
+          const deltaAcv = proposedOpt.totalAcv - currentOpt.totalAcv;
+          const deltaPupy = proposedOpt.blendedPupy - currentOpt.blendedPupy;
+          const deltaPupm = proposedOpt.blendedPupm - currentOpt.blendedPupm;
+          const deltaSeats = proposedOpt.totalSeats - currentOpt.totalSeats;
+          const deltaSeatsPct = currentOpt.totalSeats > 0 ? (deltaSeats / currentOpt.totalSeats) * 100 : 0;
+
+          html += `
+            <div class="strip-card is-delta">
+              <div class="strip-card-top">
+                <span class="strip-opt-name">Delta (Proposed vs Current)</span>
+                <span class="role-pill variant">Variance</span>
+              </div>
+              <div class="strip-metrics tabular">
+                <div>
+                  <span class="strip-metric-label">Paying Δ</span>
+                  <span class="strip-metric-val highlight">${deltaTcv >= 0 ? '+' : ''}${usdWholeFmt.format(deltaTcv)}</span>
+                  <span class="strip-metric-sub">${fmtSignedPct(deltaTcvPct, 1)} YoY</span>
+                </div>
+                <div>
+                  <span class="strip-metric-label">PUPM Δ</span>
+                  <span class="strip-metric-val">${deltaPupm >= 0 ? '+' : ''}${fmtMoney(deltaPupm)}</span>
+                  <span class="strip-metric-sub">blended</span>
+                </div>
+                <div>
+                  <span class="strip-metric-label">PUPY Δ</span>
+                  <span class="strip-metric-val">${deltaPupy >= 0 ? '+' : ''}${fmtMoney(deltaPupy)}</span>
+                  <span class="strip-metric-sub">blended</span>
+                </div>
+                <div>
+                  <span class="strip-metric-label">ACV Δ</span>
+                  <span class="strip-metric-val">${deltaAcv >= 0 ? '+' : ''}${usdWholeFmt.format(deltaAcv)}</span>
+                  <span class="strip-metric-sub">annualized</span>
+                </div>
+                <div>
+                  <span class="strip-metric-label">Seats Δ</span>
+                  <span class="strip-metric-val">${deltaSeats >= 0 ? '+' : ''}${deltaSeats}</span>
+                  <span class="strip-metric-sub">${fmtSignedPct(deltaSeatsPct, 1)} YoY</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        container.innerHTML = html;
+      }
+
+      function renderOptionsBuilder(computedOptions) {
+        const container = document.getElementById('optionsContainer');
+        container.innerHTML = computedOptions.map(opt => {
+          const isCurrent = opt.id === state.currentOptionId;
+          const isProposed = opt.id === state.proposedOptionId;
+          const isEditingTitle = state.editingOptionId === opt.id;
+
+          const rowsHtml = opt.computedLines.map(line => {
+            const skuKey = `${opt.id}::${line.id}`;
+            const isEditingSku = state.editingSkuKey === skuKey;
+            const c = line.calc;
+            return `
+              <tr data-opt-id="${opt.id}" data-line-id="${line.id}">
+                <td>
+                  ${isEditingSku ? `
+                    <div style="display:flex; gap:4px; align-items:center;">
+                      <input type="text" class="field-input js-line-name-input" value="${escapeHtml(line.name)}" data-opt="${opt.id}" data-line="${line.id}" style="width:100%;" />
+                      <button type="button" class="btn btn-ghost btn-sm js-finish-sku-name">Done</button>
+                    </div>
+                  ` : `
+                    <div class="sku-label-wrap">
+                      <span class="sku-name-text">${escapeHtml(line.name)}</span>
+                      <button type="button" class="btn-icon js-edit-sku-name" data-sku-key="${skuKey}" title="Rename SKU line">✎</button>
+                    </div>
+                  `}
+                </td>
+                <td>
+                  <input type="number" class="num-input price-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="listPrice" min="0" step="500" value="${line.listPrice}" />
+                </td>
+                <td>
+                  <div class="factor-wrap">
+                    <input type="number" class="num-input short-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="partnerFactor" min="0" max="1" step="0.01" value="${line.partnerFactor}" />
+                    <span class="factor-hint js-hint-partner">${fmtPct(c.partnerDiscountPct, 0)} off</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="factor-wrap">
+                    <input type="number" class="num-input short-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="extraFactor" min="0" max="1" step="0.01" value="${line.extraFactor}" />
+                    <span class="factor-hint js-hint-extra">${fmtPct(c.extraDiscountPct, 0)} off</span>
+                  </div>
+                </td>
+                <td>
+                  <input type="number" class="num-input short-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="termMonths" min="1" max="120" step="1" value="${line.termMonths}" />
+                </td>
+                <td>
+                  <input type="number" class="num-input short-w js-line-field" data-opt="${opt.id}" data-line="${line.id}" data-field="seats" min="1" step="10" value="${line.seats}" />
+                </td>
+                <td class="computed-cell strong js-cell-paying">${fmtMoney(c.payingPrice)}</td>
+                <td class="computed-cell js-cell-pupm">${fmtMoney(c.pupm)}</td>
+                <td class="computed-cell js-cell-pupy">${fmtMoney(c.pupy)}</td>
+                <td class="computed-cell js-cell-acv">${fmtMoney(c.acv)}</td>
+                <td class="computed-cell strong js-cell-tcv">${fmtMoney(c.tcv)}</td>
+                <td style="text-align:center; width:32px;">
+                  ${opt.computedLines.length > 1 ? `<button type="button" class="btn-icon danger js-delete-line" data-opt="${opt.id}" data-line="${line.id}" title="Remove line">✕</button>` : ''}
+                </td>
+              </tr>
+            `;
+          }).join('');
+
+          return `
+            <div class="option-card ${isProposed ? 'is-proposed' : ''}" data-opt-card="${opt.id}">
+              <div class="option-bar">
+                <div class="option-title-wrap">
+                  ${isEditingTitle ? `
+                    <input type="text" class="field-input js-opt-name-input" data-opt="${opt.id}" value="${escapeHtml(opt.name)}" style="width:240px;" />
+                    <button type="button" class="btn btn-ghost btn-sm js-finish-opt-name">Done</button>
+                  ` : `
+                    <h3 class="option-title-text">${escapeHtml(opt.name)}</h3>
+                    <button type="button" class="btn-icon js-edit-opt-name" data-opt="${opt.id}" title="Rename Option">✎</button>
+                  `}
+                  ${isCurrent ? '<span class="role-pill current">Current Deal (Baseline)</span>' : ''}
+                  ${isProposed ? '<span class="role-pill proposed">Proposed Deal (Note Target)</span>' : ''}
+                </div>
+                <div class="option-controls">
+                  ${!isCurrent ? `<button type="button" class="btn btn-ghost btn-sm js-set-current" data-opt="${opt.id}">Set as Current</button>` : ''}
+                  ${!isProposed ? `<button type="button" class="btn btn-ghost btn-sm js-set-proposed" data-opt="${opt.id}">Set as Proposed</button>` : ''}
+                  <button type="button" class="btn btn-ghost btn-sm js-add-line" data-opt="${opt.id}">+ Add Line</button>
+                  <button type="button" class="btn btn-ghost btn-sm js-clone-opt" data-opt="${opt.id}">Clone</button>
+                  ${computedOptions.length > 2 ? `<button type="button" class="btn-icon danger js-delete-opt" data-opt="${opt.id}" title="Delete Option">🗑</button>` : ''}
+                </div>
+              </div>
+              <div class="table-scroll">
+                <table class="deal-table tabular">
+                  <thead>
+                    <tr>
+                      <th>SKU / Line Item</th>
+                      <th>List Price ($)</th>
+                      <th>Partner Factor</th>
+                      <th>Extra Factor</th>
+                      <th>Term (Mo)</th>
+                      <th>Seats</th>
+                      <th class="computed-col">Paying Price</th>
+                      <th class="computed-col">PUPM</th>
+                      <th class="computed-col">PUPY</th>
+                      <th class="computed-col">ACV (1-Yr)</th>
+                      <th class="computed-col">TCV (Full)</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>${rowsHtml}</tbody>
+                  <tfoot>
+                    <tr data-opt-foot="${opt.id}">
+                      <td>Option Total (${opt.computedLines.length} lines)</td>
+                      <td class="js-foot-list">${fmtMoney(opt.totalList)}</td>
+                      <td class="js-foot-pdisc">${fmtPct(opt.weightedPartnerDiscountPct, 1)} disc</td>
+                      <td class="js-foot-edisc">${fmtPct(opt.effectiveDiscountPct, 1)} net off</td>
+                      <td class="js-foot-term">${opt.dominantTerm} mo</td>
+                      <td class="js-foot-seats">${opt.totalSeats} seats</td>
+                      <td class="js-foot-paying">${fmtMoney(opt.totalPaying)}</td>
+                      <td class="js-foot-pupm">${fmtMoney(opt.blendedPupm)}</td>
+                      <td class="js-foot-pupy">${fmtMoney(opt.blendedPupy)}</td>
+                      <td class="js-foot-acv">${fmtMoney(opt.totalAcv)}</td>
+                      <td class="js-foot-tcv">${fmtMoney(opt.totalTcv)}</td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderAutoComputedContext(computedOptions) {
+        const currentOpt = computedOptions.find(o => o.id === state.currentOptionId) || computedOptions[0];
+        const proposedOpt = computedOptions.find(o => o.id === state.proposedOptionId) || computedOptions[computedOptions.length - 1];
+        const ctx = state.context;
+
+        const tcvYoY = (currentOpt && proposedOpt && currentOpt.totalTcv > 0)
+          ? ((proposedOpt.totalTcv - currentOpt.totalTcv) / currentOpt.totalTcv) * 100 : 0;
+        const seatsYoY = (currentOpt && proposedOpt && currentOpt.totalSeats > 0)
+          ? ((proposedOpt.totalSeats - currentOpt.totalSeats) / currentOpt.totalSeats) * 100 : 0;
+        const existingSeats = currentOpt ? currentOpt.totalSeats : 0;
+        const freeMo = ctx.programApplies && Number(ctx.freeMonths) > 0 ? Number(ctx.freeMonths) : 0;
+        const termDisplay = proposedOpt ? (freeMo > 0 ? `${proposedOpt.dominantTerm} (${freeMo} free)` : `${proposedOpt.dominantTerm}`) : '—';
+        const partnerDiscDisplay = proposedOpt ? fmtPct(proposedOpt.weightedPartnerDiscountPct, 1) : '—';
+
+        document.getElementById('autoComputedSummaryStrip').innerHTML = `
+          <div class="auto-metric-item"><span class="auto-metric-label">Auto · TCV YoY Increase</span><span class="auto-metric-value">${fmtSignedPct(tcvYoY, 1)}</span></div>
+          <div class="auto-metric-item"><span class="auto-metric-label">Auto · Seats YoY Increase</span><span class="auto-metric-value">${fmtSignedPct(seatsYoY, 1)}</span></div>
+          <div class="auto-metric-item"><span class="auto-metric-label">Auto · Existing Seats</span><span class="auto-metric-value">${existingSeats} seats</span></div>
+          <div class="auto-metric-item"><span class="auto-metric-label">Auto · Deal Term (Months)</span><span class="auto-metric-value">${termDisplay}</span></div>
+          <div class="auto-metric-item"><span class="auto-metric-label">Auto · Partner Discount</span><span class="auto-metric-value">${partnerDiscDisplay}</span></div>
+        `;
+
+        const progPreview = document.getElementById('programComputedPreview');
+        if (ctx.programApplies && proposedOpt) {
+          const dvStrings = proposedOpt.computedLines.map(l => {
+            const dv = freeMo > 0 ? (l.calc.pupm * l.calc.seats * freeMo) : l.calc.payingPrice;
+            return `${escapeHtml(l.name)}: ${fmtMoney(dv)}`;
+          });
+          const netNew = proposedOpt.totalSeats - existingSeats;
+          progPreview.innerHTML = `Auto-pulled into Program Block → <strong>DV per SKU:</strong> ${dvStrings.join(' · ')} | <strong>Seats:</strong> ${existingSeats} existing vs ${netNew >= 0 ? '+' + netNew : netNew} new (${proposedOpt.totalSeats} total)`;
+        } else {
+          progPreview.innerHTML = `Program block is currently inactive and omitted from the approval note.`;
+        }
+      }
+
+      function renderDynamicLists() {
+        document.getElementById('missingList').innerHTML = state.context.missingInfo.map((item, idx) => `
+          <li class="list-item-row">
+            <span><span class="list-item-num">${idx + 1}.</span>${escapeHtml(item)}</span>
+            <button type="button" class="btn-icon danger js-remove-missing" data-idx="${idx}" title="Remove item">✕</button>
+          </li>
+        `).join('');
+
+        document.getElementById('validationList').innerHTML = state.context.validationChecks.map((item, idx) => `
+          <li class="list-item-row">
+            <span><span class="list-item-num">${idx + 1}.</span>${escapeHtml(item)}</span>
+            <button type="button" class="btn-icon danger js-remove-validation" data-idx="${idx}" title="Remove check">✕</button>
+          </li>
+        `).join('');
+      }
+
+      function syncFormInputsFromState() {
+        const ctx = state.context;
+        document.getElementById('ctxSalesRep').value = ctx.salesRep;
+        document.getElementById('ctxOperator').value = ctx.operator;
+        document.getElementById('ctxOppLink').value = ctx.oppLink;
+        document.getElementById('ctxCaseLink').value = ctx.caseLink;
+        document.getElementById('ctxCustomer').value = ctx.customerName;
+        document.getElementById('ctxPartner').value = ctx.partnerName;
+        document.getElementById('ctxRequestType').value = ctx.requestType;
+        document.getElementById('ctxReason').value = ctx.criteriaReason;
+        document.getElementById('ctxEduGov').value = ctx.eduGovFlag;
+        document.getElementById('ctxPrevContract').value = ctx.prevContract;
+        document.getElementById('ctxPrevStart').value = ctx.prevStartDate;
+        document.getElementById('ctxProgramApplies').checked = Boolean(ctx.programApplies);
+        document.getElementById('ctxFreeMonths').value = ctx.freeMonths;
+      }
+
+      function updateNoteOutput(computedOptions) {
+        const noteText = buildApprovalNote(computedOptions);
+        document.getElementById('approvalNoteOutput').textContent = noteText;
+        const currentOpt = computedOptions.find(o => o.id === state.currentOptionId) || computedOptions[0];
+        const proposedOpt = computedOptions.find(o => o.id === state.proposedOptionId) || computedOptions[computedOptions.length - 1];
+        document.getElementById('noteComparisonLabel').textContent =
+          `${currentOpt ? currentOpt.name : 'Current'} → ${proposedOpt ? proposedOpt.name : 'Proposed'}`;
+        document.getElementById('noteStats').textContent = `${noteText.split('\n').length} lines · ${noteText.length} chars`;
+      }
+
+      function renderAll(rebuildTables = true) {
+        const computedOptions = state.options.map(computeOptionMetrics);
+        renderSummaryStrip(computedOptions);
+        if (rebuildTables) renderOptionsBuilder(computedOptions);
+        renderAutoComputedContext(computedOptions);
+        renderDynamicLists();
+        updateNoteOutput(computedOptions);
+      }
+
+      // LIVE NUMERIC UPDATES WITHOUT LOSING FOCUS
+      document.getElementById('optionsContainer').addEventListener('input', function (e) {
+        const target = e.target;
+        if (target.classList.contains('js-line-field')) {
+          const optId = target.getAttribute('data-opt');
+          const lineId = target.getAttribute('data-line');
+          const field = target.getAttribute('data-field');
+          const opt = state.options.find(o => o.id === optId);
+          if (!opt) return;
+          const line = opt.lines.find(l => l.id === lineId);
+          if (!line) return;
+          line[field] = parseFloat(target.value) || 0;
+
+          const computedOptions = state.options.map(computeOptionMetrics);
+          const compOpt = computedOptions.find(o => o.id === optId);
+          const compLine = compOpt.computedLines.find(l => l.id === lineId);
+          const row = target.closest('tr');
+          if (row && compLine) {
+            row.querySelector('.js-hint-partner').textContent = fmtPct(compLine.calc.partnerDiscountPct, 0) + ' off';
+            row.querySelector('.js-hint-extra').textContent = fmtPct(compLine.calc.extraDiscountPct, 0) + ' off';
+            row.querySelector('.js-cell-paying').textContent = fmtMoney(compLine.calc.payingPrice);
+            row.querySelector('.js-cell-pupm').textContent = fmtMoney(compLine.calc.pupm);
+            row.querySelector('.js-cell-pupy').textContent = fmtMoney(compLine.calc.pupy);
+            row.querySelector('.js-cell-acv').textContent = fmtMoney(compLine.calc.acv);
+            row.querySelector('.js-cell-tcv').textContent = fmtMoney(compLine.calc.tcv);
+          }
+          const foot = document.querySelector(`tr[data-opt-foot="${optId}"]`);
+          if (foot && compOpt) {
+            foot.querySelector('.js-foot-list').textContent = fmtMoney(compOpt.totalList);
+            foot.querySelector('.js-foot-pdisc').textContent = fmtPct(compOpt.weightedPartnerDiscountPct, 1) + ' disc';
+            foot.querySelector('.js-foot-edisc').textContent = fmtPct(compOpt.effectiveDiscountPct, 1) + ' net off';
+            foot.querySelector('.js-foot-term').textContent = compOpt.dominantTerm + ' mo';
+            foot.querySelector('.js-foot-seats').textContent = compOpt.totalSeats + ' seats';
+            foot.querySelector('.js-foot-paying').textContent = fmtMoney(compOpt.totalPaying);
+            foot.querySelector('.js-foot-pupm').textContent = fmtMoney(compOpt.blendedPupm);
+            foot.querySelector('.js-foot-pupy').textContent = fmtMoney(compOpt.blendedPupy);
+            foot.querySelector('.js-foot-acv').textContent = fmtMoney(compOpt.totalAcv);
+            foot.querySelector('.js-foot-tcv').textContent = fmtMoney(compOpt.totalTcv);
+          }
+          renderSummaryStrip(computedOptions);
+          renderAutoComputedContext(computedOptions);
+          updateNoteOutput(computedOptions);
+        } else if (target.classList.contains('js-line-name-input')) {
+          const opt = state.options.find(o => o.id === target.getAttribute('data-opt'));
+          const line = opt && opt.lines.find(l => l.id === target.getAttribute('data-line'));
+          if (line) {
+            line.name = target.value;
+            updateNoteOutput(state.options.map(computeOptionMetrics));
+          }
+        } else if (target.classList.contains('js-opt-name-input')) {
+          const opt = state.options.find(o => o.id === target.getAttribute('data-opt'));
+          if (opt) {
+            opt.name = target.value;
+            const computedOptions = state.options.map(computeOptionMetrics);
+            renderSummaryStrip(computedOptions);
+            updateNoteOutput(computedOptions);
+          }
+        }
+      });
+
+      // OPTION & LINE ACTION CLICKS
+      document.getElementById('optionsContainer').addEventListener('click', function (e) {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const optId = btn.getAttribute('data-opt');
+        const lineId = btn.getAttribute('data-line');
+
+        if (btn.classList.contains('js-set-current')) {
+          state.currentOptionId = optId;
+          renderAll(true);
+        } else if (btn.classList.contains('js-set-proposed')) {
+          state.proposedOptionId = optId;
+          renderAll(true);
+        } else if (btn.classList.contains('js-add-line')) {
+          const opt = state.options.find(o => o.id === optId);
+          if (opt) {
+            const newId = 'line-' + Date.now();
+            opt.lines.push({
+              id: newId,
+              name: 'Additional Perpetual Module — SKU ' + (opt.lines.length + 1),
+              listPrice: 54000,
+              partnerFactor: 0.85,
+              extraFactor: 0.75,
+              termMonths: opt.lines[0] ? opt.lines[0].termMonths : 36,
+              seats: opt.lines[0] ? opt.lines[0].seats : 200
+            });
+            state.editingSkuKey = `${optId}::${newId}`;
+            renderAll(true);
+          }
+        } else if (btn.classList.contains('js-delete-line')) {
+          const opt = state.options.find(o => o.id === optId);
+          if (opt && opt.lines.length > 1) {
+            opt.lines = opt.lines.filter(l => l.id !== lineId);
+            renderAll(true);
+          }
+        } else if (btn.classList.contains('js-clone-opt')) {
+          const src = state.options.find(o => o.id === optId);
+          if (src) {
+            const newOptId = 'opt-' + Date.now();
+            state.options.push({
+              id: newOptId,
+              name: `Option ${state.options.length + 1} — Variant of ${src.name.replace(/^Option \d+ — /, '')}`,
+              lines: src.lines.map((l, i) => ({ ...l, id: `line-${Date.now()}-${i}` }))
+            });
+            state.proposedOptionId = newOptId;
+            renderAll(true);
+          }
+        } else if (btn.classList.contains('js-delete-opt')) {
+          if (state.options.length > 2) {
+            state.options = state.options.filter(o => o.id !== optId);
+            if (state.currentOptionId === optId) state.currentOptionId = state.options[0].id;
+            if (state.proposedOptionId === optId) state.proposedOptionId = state.options[state.options.length - 1].id;
+            renderAll(true);
+          }
+        } else if (btn.classList.contains('js-edit-sku-name')) {
+          state.editingSkuKey = btn.getAttribute('data-sku-key');
+          renderAll(true);
+        } else if (btn.classList.contains('js-finish-sku-name')) {
+          state.editingSkuKey = null;
+          renderAll(true);
+        } else if (btn.classList.contains('js-edit-opt-name')) {
+          state.editingOptionId = optId;
+          renderAll(true);
+        } else if (btn.classList.contains('js-finish-opt-name')) {
+          state.editingOptionId = null;
+          renderAll(true);
+        }
+      });
+
+      function addNewOptionVariant() {
+        const base = state.options[state.options.length - 1] || state.options[0];
+        const newOptId = 'opt-' + Date.now();
+        state.options.push({
+          id: newOptId,
+          name: `Option ${state.options.length + 1} — 24M Phased Variant`,
+          lines: base.lines.map((l, idx) => ({
+            ...l,
+            id: `line-${Date.now()}-${idx}`,
+            termMonths: 24,
+            extraFactor: Math.min(1, Number((l.extraFactor + 0.05).toFixed(2)))
+          }))
+        });
+        state.proposedOptionId = newOptId;
+        renderAll(true);
+      }
+
+      document.getElementById('btnAddOption').addEventListener('click', addNewOptionVariant);
+      document.getElementById('btnAddOptionInline').addEventListener('click', addNewOptionVariant);
+
+      document.getElementById('btnResetSample').addEventListener('click', function () {
+        state = createDefaultState();
+        blanksDemoActive = false;
+        document.getElementById('btnToggleBlanksDemo').textContent = 'Test Skip-the-Blanks';
+        syncFormInputsFromState();
+        renderAll(true);
+      });
+
+      // CONTEXT INPUT BINDINGS
+      const contextBindings = [
+        ['ctxSalesRep', 'salesRep'],
+        ['ctxOperator', 'operator'],
+        ['ctxOppLink', 'oppLink'],
+        ['ctxCaseLink', 'caseLink'],
+        ['ctxCustomer', 'customerName'],
+        ['ctxPartner', 'partnerName'],
+        ['ctxRequestType', 'requestType'],
+        ['ctxReason', 'criteriaReason'],
+        ['ctxEduGov', 'eduGovFlag'],
+        ['ctxPrevContract', 'prevContract'],
+        ['ctxPrevStart', 'prevStartDate']
+      ];
+      contextBindings.forEach(([elId, key]) => {
+        document.getElementById(elId).addEventListener('input', function (e) {
+          state.context[key] = e.target.value;
+          updateNoteOutput(state.options.map(computeOptionMetrics));
+        });
+      });
+
+      document.getElementById('ctxProgramApplies').addEventListener('change', function (e) {
+        state.context.programApplies = e.target.checked;
+        renderAll(false);
+      });
+      document.getElementById('ctxFreeMonths').addEventListener('input', function (e) {
+        state.context.freeMonths = parseInt(e.target.value, 10) || 0;
+        renderAll(false);
+      });
+
+      // MISSING INFO & VALIDATION LIST CONTROLS
+      document.getElementById('btnAddMissing').addEventListener('click', function () {
+        const input = document.getElementById('inputNewMissing');
+        if (input.value.trim()) {
+          state.context.missingInfo.push(input.value.trim());
+          input.value = '';
+          renderAll(false);
+        }
+      });
+      document.getElementById('inputNewMissing').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btnAddMissing').click(); }
+      });
+      document.getElementById('missingList').addEventListener('click', function (e) {
+        const btn = e.target.closest('.js-remove-missing');
+        if (btn) {
+          state.context.missingInfo.splice(Number(btn.getAttribute('data-idx')), 1);
+          renderAll(false);
+        }
+      });
+      document.getElementById('btnClearMissing').addEventListener('click', function () {
+        state.context.missingInfo = [];
+        renderAll(false);
+      });
+
+      document.getElementById('btnAddValidation').addEventListener('click', function () {
+        const input = document.getElementById('inputNewValidation');
+        if (input.value.trim()) {
+          state.context.validationChecks.push(input.value.trim());
+          input.value = '';
+          renderAll(false);
+        }
+      });
+      document.getElementById('inputNewValidation').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btnAddValidation').click(); }
+      });
+      document.getElementById('validationList').addEventListener('click', function (e) {
+        const btn = e.target.closest('.js-remove-validation');
+        if (btn) {
+          state.context.validationChecks.splice(Number(btn.getAttribute('data-idx')), 1);
+          renderAll(false);
+        }
+      });
+      document.getElementById('btnClearValidation').addEventListener('click', function () {
+        state.context.validationChecks = [];
+        renderAll(false);
+      });
+
+      // TEST SKIP-THE-BLANKS TOGGLE
+      document.getElementById('btnToggleBlanksDemo').addEventListener('click', function () {
+        blanksDemoActive = !blanksDemoActive;
+        if (blanksDemoActive) {
+          state.context.oppLink = '';
+          state.context.caseLink = '';
+          state.context.eduGovFlag = '';
+          state.context.prevContract = '';
+          state.context.prevStartDate = '';
+          state.context.programApplies = false;
+          state.context.missingInfo = [];
+          this.textContent = 'Restore All Context Fields';
+        } else {
+          const def = createDefaultState().context;
+          state.context = { ...def };
+          this.textContent = 'Test Skip-the-Blanks';
+        }
+        syncFormInputsFromState();
+        renderAll(false);
+      });
+
+      // GENERATE & COPY BUTTONS
+      function copyNoteToClipboard() {
+        const computedOptions = state.options.map(computeOptionMetrics);
+        updateNoteOutput(computedOptions);
+        const text = document.getElementById('approvalNoteOutput').textContent;
+        const badge = document.getElementById('copyFeedback');
+
+        const showToast = () => {
+          badge.style.display = 'inline-flex';
+          setTimeout(() => { badge.style.display = 'none'; }, 2400);
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text, showToast));
+        } else {
+          fallbackCopy(text, showToast);
+        }
+      }
+
+      function fallbackCopy(text, callback) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); callback(); } catch (err) {}
+        document.body.removeChild(ta);
+      }
+
+      document.getElementById('btnCopyNote').addEventListener('click', copyNoteToClipboard);
+      document.getElementById('btnHeaderCopy').addEventListener('click', copyNoteToClipboard);
+      document.getElementById('btnGenerateNote').addEventListener('click', function () {
+        renderAll(false);
+        document.getElementById('approvalNoteOutput').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+
+      // INITIALIZE ON LOAD
+      syncFormInputsFromState();
+      renderAll(true);
+    })();
+  </script>
+</body>
+</html>
