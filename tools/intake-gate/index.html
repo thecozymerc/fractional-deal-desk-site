@@ -897,14 +897,6 @@
       padding: 0.1rem 0.35rem;
     }
 
-    .deal-check-closing {
-      background-color: var(--bg-navy);
-      color: var(--ink-on-navy);
-      border: 2px solid var(--border-strong);
-      border-top: 5px solid var(--brass);
-      padding: 2rem 1.5rem;
-      margin-bottom: 2.5rem;
-    }
     .closing-eyebrow {
       font-family: var(--font-mono);
       font-size: 0.75rem;
@@ -913,12 +905,6 @@
       letter-spacing: 0.08em;
       color: var(--brass-light);
       margin-bottom: 0.5rem;
-    }
-    .deal-check-closing h2 {
-      font-family: var(--font-serif);
-      font-size: clamp(1.4rem, 2.6vw, 2rem);
-      color: #FFFFFF;
-      margin: 0 0 1rem 0;
     }
     .closing-grid {
       display: grid;
@@ -1063,7 +1049,7 @@
         <a href="../perm-calculator/">Tool 3: Perm Calculator</a>
         <a href="../spend-variance/">Tool 4: Spend Variance</a>
         <a href="../qtc-diagnostic/">Tool 7: QTC Diagnostic</a>
-        <a href="../deal-check/" class="nav-cta">The Deal Check ($6,500)</a>
+        <a href="../deal-check/" class="nav-cta">The Deal Check</a>
       </nav>
     </div>
   </header>
@@ -1249,34 +1235,6 @@
       </div>
     </section>
 
-    <!-- Closing Block: The Deal Check ($6,500, fixed) -->
-    <section class="deal-check-closing" aria-labelledby="heading-deal-check">
-      <div class="closing-eyebrow">Paid Diagnostic · Fixed Scope · Senior Operator</div>
-      <h2 id="heading-deal-check">When a Tool Is Not Enough: The Deal Check ($6,500)</h2>
-      <div class="closing-grid">
-        <div class="closing-copy">
-          <p>
-            If your pipeline looks like <strong>DEAL-102</strong>, <strong>DEAL-103</strong>, and <strong>DEAL-105</strong>—discounts approved before anyone checked the basics, reps routing around the desk, and no record of what was missing—a standalone calculator will not enforce the gate.
-          </p>
-          <p>
-            <strong>The Deal Check</strong> is a fixed-fee diagnostic ($6,500) run directly by a senior operator with 15+ years in commercial contracts, deal desk, and revenue operations (corporate roles since 2006, contracts up to $300M, 3,000+ SKUs under management). You receive a complete audit of your recent deal submissions, a custom intake gate and discount approval matrix calibrated to your catalog, and a working Gate Report workflow your team can run on day one.
-          </p>
-          <ul class="closing-deliverables">
-            <li>▪ Audit of 25–50 live deal submissions &amp; discount exceptions</li>
-            <li>▪ Custom 5-point intake gate &amp; CRM routing rules</li>
-            <li>▪ Calibrated discount approval matrix &amp; escalation thresholds</li>
-            <li>▪ Written findings report, Gate Log workbook &amp; readout</li>
-          </ul>
-        </div>
-        <div class="closing-cta-box">
-          <span class="price-tag">$6,500</span>
-          <span class="price-sub">Fixed Fee · Written Findings &amp; Working Gate</span>
-          <a href="../deal-check/" class="btn btn-brass" style="width: 100%; margin-bottom: 0.65rem;">Book The Deal Check ($6,500) →</a>
-          <a href="../../tools/" class="btn btn-secondary" style="width: 100%; background: transparent; color: #FFFFFF; border-color: var(--brass-light);">Return to Proof of Work Hub</a>
-        </div>
-      </div>
-    </section>
-
     <!-- Related Tools (Internal Links per Part D) -->
     <section class="section-block" aria-labelledby="heading-related">
       <div class="section-header">
@@ -1326,7 +1284,7 @@
         <a href="../spend-variance/">Tool 4: Spend Variance</a>
         <a href="../intake-gate/">Tool 5: Intake Gate</a>
         <a href="../qtc-diagnostic/">Tool 7: QTC Diagnostic</a>
-        <a href="../deal-check/">The Deal Check ($6,500)</a>
+        <a href="../deal-check/">The Deal Check</a>
       </nav>
     </div>
   </footer>
@@ -1665,7 +1623,6 @@
         }
         out.push("====================================================================");
         out.push("Source: https://fractional-deal-desk-site.pages.dev/tools/intake-gate/");
-        out.push("Next Step: The Deal Check ($6,500 fixed-fee diagnostic)");
 
         var txt = out.join("\n");
         document.getElementById("gate-report-text").textContent = txt;
