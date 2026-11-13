@@ -1,5 +1,29 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-13 — correction (Lucky's ruling)
+
+- Page/tool: S6-P05.1 / Tool 5, S6-P02 / Tool 4, S6-P01.c / Tool 3,
+  S6-P01.a / Tool 1 — NO-SELLING CORRECTION. Lucky's ruling (Nov 13):
+  tool pages demonstrate; they never pitch — "does Apple ever say
+  buy the iPhone on their page, or just demonstrate it and there's
+  an option to buy?" All Deal Check sales copy stripped from the
+  four tool pages that carried it: Tool 5's closing sales section
+  ("When a Tool Is Not Enough", price tag, Book button), its
+  price-tagged nav/footer links (now plain "The Deal Check" links),
+  and the "Next Step" sales line inside the Gate Report output;
+  Tool 4's "Commission The Deal Check ($6,500)" sentence; Tool 3's
+  "The paid next step is…" paragraph; Tool 1's "Book the
+  diagnostic" button + price note. Origin of the defect: the
+  "tool pages end with the paid next step" idea was item 7 of the
+  parked SPCL audit — a proposal Lucky never ruled on — which Muse
+  hardened into the Argon template's Part A goal ("sell The Deal
+  Check") and into Tools 3/4/5. Template Part A now carries the
+  standing rule: demonstrate, never sell; the only commerce on a
+  tool page is a plain descriptive link; pitch copy lives only on
+  the Deal Check page and Services. Pages verified after the cut:
+  anchors intact (Tool 5: 5 · 2 · 40% · 2 · 1, zero page errors),
+  zero price/pitch strings on all four live routes.
+
 ## 2026-11-13 (later still)
 
 - Page/tool: S6-P05.1 / Tool 5 — ARGON REBUILD (TOOL 5.1) replaces
