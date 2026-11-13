@@ -29,3 +29,12 @@
   context, set once. Group subtotals: Apex +$3,530 (+0.7%) ·
   Northwind +$1,136 (+0.4%) · Cascade +$28,069 (+2.4%) · Harborview
   −$3,775 (−1.9%). Sample data byte-identical; anchors unchanged.
+
+- **Cascade fix (Nov 13, 2026):** battery found one defect — deleting
+  a register contract removed its group and invoices from view but
+  its forecast lines kept counting in the totals. Argon fix: totals
+  count only contracts present in the register, deletion removes the
+  contract's lines and invoices entirely, and contract-ID edits
+  cascade to lines and invoices. Verified 255/255 checks, including
+  the post-delete figures (YTD forecast $2,001,996 · actual
+  $2,034,731 · REVIEW 3 / 2 after deleting Harborview).
