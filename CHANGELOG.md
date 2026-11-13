@@ -1,5 +1,25 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-13 — S6-P05 partition renamed on Tool 5 (Argon naming)
+
+- Page/tool: S6-P05.1 / Tool 5 — the S6-P05 partition is renamed
+  from "Stories & Sandboxes" to DEAL DESK CONTROLS (Argon's first
+  recommendation; alternates: Commercial Controls, Deal Governance
+  — Lucky may veto, the swap is mechanical). Argon's return could
+  NOT be promoted as delivered: the export was truncated mid-script
+  (no closing </html>) and was built on the pre-correction page
+  (280 diff lines vs the live file). The rename was therefore
+  ported mechanically onto the verified live page: badge now
+  "Tool 5 · Deal Desk Controls", a Deal Desk Controls level added
+  to the visible breadcrumb and the JSON-LD BreadcrumbList, and
+  applicationSubCategory set. Breadcrumb links still point at the
+  partition's current address (/tools/stories-and-sandboxes/) —
+  the partition page, the hub label, and the URL itself rename in
+  a later pass once Lucky rules on the story-removal scope
+  questions. Anchors re-verified after the port (5 · 2 · 40% · 2
+  · 1); JSON-LD parses. Argon's full return incl. its manifest is
+  preserved at tool5-build/argon-tool-5-rename-return.html.
+
 ## 2026-11-13 — correction (Lucky's ruling)
 
 - SITE-WIDE: "corporate (roles) since 2006" RETIRED. Lucky's ruling
