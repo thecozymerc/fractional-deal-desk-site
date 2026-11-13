@@ -1,5 +1,19 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-13 — Tool 3 QA fixes (Argon, master QA prompt, Deliverable 1)
+
+- S6-P01.c / Tool 3 (Perm Calculator): meta description and
+  self-referential canonical added (QA findings F1/F2 closed for
+  this page); favicon link tags added (the icon file itself is a
+  later deliverable in the same Argon run); the --text-light token
+  darkened #98A1AD -> #5F6B7A per Argon's C4 contrast decision
+  (5.10:1 on paper, was 2.46:1) with --grey-light declared at the
+  same value. Everything else byte-identical to the prior build —
+  verified by full diff, the 240-check battery (240/240), and a
+  clean 10-width ladder sweep. Argon delivered the file in 3 parts
+  (its own split); the parts were joined byte-clean by the
+  executor and the join verified against the original.
+
 ## 2026-11-13 — Full-site proofread (spelling / capitalization / spacing)
 
 - At Lucky's direction, a spelling + capitalization + spacing pass over
