@@ -1,5 +1,15 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-13 — Full-site proofread (spelling / capitalization / spacing)
+
+- At Lucky's direction, a spelling + capitalization + spacing pass over
+  every page's visible text. Result: ONE correction — "most-favoured-nation"
+  -> "most-favored-nation" on S6-P03b / Tool 9 (US spelling; the workbook
+  itself says "MFN clauses"). No capitalization errors and no rendered
+  spacing errors found; every other candidate was a legitimate word, a
+  proper name (David Tollen), a correct form (SaaS, SoW, LoL), or an
+  abbreviation (U.S., vs.). Words and context untouched, per his scope.
+
 ## 2026-11-13 — Tool 7 REBUILT by Argon (QTC Diagnostic)
 
 - Page/tool: S6-P05.3 / Tool 7 — Argon's full rebuild promoted,
