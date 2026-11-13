@@ -2,6 +2,23 @@
 
 ## 2026-11-13 — correction (Lucky's ruling)
 
+- SITE-WIDE: "corporate (roles) since 2006" RETIRED. Lucky's ruling
+  (Nov 13): nobody prices a start date; the seniority is carried by
+  years-in-the-line + scale. The clause was cut from the Tool 3,
+  Tool 4, and Tool 5 provenance lines (and Tool 5's footer anchor
+  strip) and from the Homepage + About roster lines, which now lead
+  with the roster itself: "Eton, Reco, Apple, Raytheon, Meta,
+  Google — with 15+ years in commercial contracts, deal desk, and
+  revenue operations." The three-part field phrase was checked
+  against the counted record (15y7m line: Reco contracts, Apple,
+  Mailchimp, Raytheon procurement, Meta, Google Deal Strategy /
+  Rev Ops) and stands as the accurate form — "revenue operations"
+  alone would claim the procurement years, "operations" alone
+  would undersell. Argon template Part B anchors updated so future
+  builds do not reintroduce the date clause.
+
+## 2026-11-13 — correction (Lucky's ruling)
+
 - Page/tool: S6-P05.1 / Tool 5, S6-P02 / Tool 4, S6-P01.c / Tool 3,
   S6-P01.a / Tool 1 — NO-SELLING CORRECTION. Lucky's ruling (Nov 13):
   tool pages demonstrate; they never pitch — "does Apple ever say
