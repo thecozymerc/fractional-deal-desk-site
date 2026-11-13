@@ -1,5 +1,19 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-13
+
+- Page/tool: S6-P02 / Tool 4 — CASCADE FIX (Argon). A 190-check
+  combination battery found one defect: deleting a contract from the
+  register removed its forecast group and invoices from view, but
+  its forecast lines kept counting in the KPI strip, footer totals,
+  REVIEW count, and Brief. Fix: totals count only contracts present
+  in the register; deleting a contract removes its forecast lines
+  and invoices entirely; editing a contract ID cascades to its lines
+  and invoices. Verified 255/255 (battery extended with the delete
+  and ID-edit cases plus the exact post-delete figures: YTD forecast
+  $2,001,996, actual $2,034,731, REVIEW 3 / invoices 2). CODE-MAP
+  stays v54.
+
 ## 2026-11-12 (later still)
 
 - Page/tool: S6-P02 / Tool 4 — GROUPING REVISION (Argon, same day).
