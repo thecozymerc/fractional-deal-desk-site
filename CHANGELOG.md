@@ -1,5 +1,19 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-12 (later still)
+
+- Page/tool: S6-P02 / Tool 4 — GROUPING REVISION (Argon, same day).
+  Actual vs Forecast rebuilt as per-contract groups with subtotals
+  (register generates the groups; empty contracts collapse to one
+  compact line); Invoice Audit contract column is now printed text
+  with a single add-time picker. Every per-row contract dropdown
+  removed at Lucky's ruling (client usability: the contract is
+  context, set once — a dropdown per row is a data-entry grid).
+  Group subtotals verified: Apex +$3,530 (+0.7%), Northwind +$1,136
+  (+0.4%), Cascade +$28,069 (+2.4%), Harborview −$3,775 (−1.9%);
+  page anchors unchanged; sample data byte-identical. CODE-MAP
+  stays v54.
+
 ## 2026-11-12 (later)
 
 - Page/tool: S6-P02 / Tool 4 — Spend Variance & Renewal Tracker
