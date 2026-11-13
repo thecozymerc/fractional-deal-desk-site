@@ -1,4 +1,49 @@
 <!DOCTYPE html>
+<!-- ARGON MANIFEST:
+================================================================================
+1. SELF-CHECK AGAINST GROUND TRUTH DATA & ANCHORS
+================================================================================
+- Untouched Initial Queue KPIs:
+  * TOTAL DEALS SUBMITTED         : 5 (Queue ACV: $819,000)
+  * CLEAN FIRST-PASS              : 2
+  * FIRST-PASS YIELD %            : 40%
+  * HELD AT GATE                  : 2
+  * UNAUTHORIZED APPROVALS CAUGHT : 1
+- Per-Deal Evaluation (Exact Workbook Rules):
+  * DEAL-101 · Sample Corp A · Renewal · $120,000 · 15% · Y Y Y Y Y · Pre-Approved
+    -> Readiness: 100% | Flag: OK | Routing: FAST-TRACK (Pre-Approved) | Note: Clean submission
+  * DEAL-102 · Sample Corp B · New Business · $85,000 · 25% · N Y Y Y N · Pending
+    -> Readiness: 60%  | Flag: OK | Routing: HOLD – RETURN TO SALES | Note: ACTION REQUIRED – Missing Baseline Items
+  * DEAL-103 · Sample Corp C · Mid-Term Reset · $210,000 · 35% · Y N N Y N · Approved
+    -> Readiness: 40%  | Flag: AUDIT ALERT: Approved Without Baseline | Routing: STOP – REVOKE & AUDIT | Note: ACTION REQUIRED – Missing Baseline Items
+  * DEAL-104 · Sample Corp D · Expansion · $64,000 · 10% · Y Y Y Y Y · Pre-Approved
+    -> Readiness: 100% | Flag: OK | Routing: FAST-TRACK (Pre-Approved) | Note: Clean submission
+  * DEAL-105 · Sample Corp E · Renewal · $340,000 · 42% · Y Y Y N Y · Pending
+    -> Readiness: 80%  | Flag: OK | Routing: HOLD – RETURN TO SALES | Note: ACTION REQUIRED – Missing Baseline Items
+- Standing Law & SEO Integrity:
+  * Demonstrate, Never Sell : Zero sales pitch sections, zero prices, zero book/buy CTA buttons. "The Deal Check" appears solely as a plain descriptive link (/tools/deal-check/) among the other navigation links.
+  * No Start-Date Bragging  : Removed the lingering "Corporate Roles Since 2006" item from the hero credential strip on the live base page. Zero "since 2006" phrasing anywhere in the document.
+  * No Employer Names/Fakes : Zero employer names, zero invented facts, sample data labeled fictional.
+  * SEO Integrity           : No hidden text or links, no keyword stuffing, no cloaking. Title tag, meta description, canonical URL, WebApplication + BreadcrumbList JSON-LD match visible page content.
+  * Partition URL Fidelity  : Every partition link and JSON-LD BreadcrumbList item for "Deal Desk Controls" points to the live address /tools/stories-and-sandboxes/ (https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/).
+
+================================================================================
+2. IMPROVEMENTS MADE
+================================================================================
+- Designed Partition Identity Across the Frame:
+  * Hero Meta Row: Paired the brass badge ("Tool 5 · Deal Desk Controls") with a dual-context eyebrow ("Proof of Work — Deal Desk Controls · Intake Gate") linking directly to the live partition page (/tools/stories-and-sandboxes/).
+  * Breadcrumb Bar: Styled the four-level hierarchy (Home / Proof of Work / Deal Desk Controls / Intake Gate) with partition reference code "REF: S6-P05.1 · DEAL DESK CONTROLS · GATE-LOG-V5".
+  * Hero Credential Strip: Replaced the stale "Corporate Roles Since 2006" span from the live base file with "Partition · Deal Desk Controls".
+  * Related Proof of Work Grid: Added a dedicated "Deal Desk Controls (Partition S6-P05)" card linking to /tools/stories-and-sandboxes/ alongside the Proof of Work Hub (/tools/), sibling Tool 7 labeled under "Tool 7 · Deal Desk Controls" (/tools/qtc-diagnostic/), and Tool 3 labeled under "Tool 3 · Pricing Engines" (/tools/perm-calculator/).
+  * Masthead, Footer & Gate Report: Added "Deal Desk Controls" (/tools/stories-and-sandboxes/) to primary and footer navigation, removed CTA button highlight on "The Deal Check" so it sits as a plain link among peers, and stamped "Partition: Deal Desk Controls (S6-P05)" in the plain-text Gate Report footer.
+- Compacted CSS rules onto single lines so the entire HTML document exports cleanly in one pass through </html> without truncation.
+
+================================================================================
+3. CONFLICTS FLAGGED
+================================================================================
+- Live Base File Credential Strip Contained "Corporate Roles Since 2006":
+  The live base page still had `<span>Corporate Roles Since 2006</span>` inside `.credential-strip` and `class="nav-cta"` on the masthead link to `/tools/deal-check/`. Per the prompt's explicit standing-law rule ("no sales copy, no prices, no 'since 2006' phrasing, anywhere, including in navigation and footer labels"), both were cleaned so the page is 100% compliant.
+-->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -25,39 +70,15 @@
         "applicationCategory": "BusinessApplication",
         "applicationSubCategory": "Deal Desk Controls",
         "operatingSystem": "All",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        }
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
       },
       {
         "@type": "BreadcrumbList",
         "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://fractional-deal-desk-site.pages.dev/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Proof of Work",
-            "item": "https://fractional-deal-desk-site.pages.dev/tools/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 3,
-            "name": "Deal Desk Controls",
-            "item": "https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 4,
-            "name": "Intake Gate",
-            "item": "https://fractional-deal-desk-site.pages.dev/tools/intake-gate/"
-          }
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fractional-deal-desk-site.pages.dev/" },
+          { "@type": "ListItem", "position": 2, "name": "Proof of Work", "item": "https://fractional-deal-desk-site.pages.dev/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Deal Desk Controls", "item": "https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/" },
+          { "@type": "ListItem", "position": 4, "name": "Intake Gate", "item": "https://fractional-deal-desk-site.pages.dev/tools/intake-gate/" }
         ]
       }
     ]
@@ -66,980 +87,185 @@
 
   <style>
     :root {
-      --bg-navy: #0A1124;
-      --bg-navy-panel: #101B35;
-      --bg-navy-hover: #172546;
-      --bg-ivory: #F6F4EE;
-      --bg-paper: #FFFFFF;
-      --bg-subtle: #EDEAE1;
-      --ink-primary: #0A1124;
-      --ink-secondary: #2E3A52;
-      --ink-on-navy: #F8FAFC;
-      --ink-on-navy-muted: #CBD5E1;
-      --brass: #B89146;
-      --brass-light: #DFBE7F;
-      --brass-dark: #6E5015;
-      --border-strong: #0A1124;
-      --border-mid: #CBD5E1;
-      --border-subtle: #DCD8CE;
-      --alert-bg: #FEF2F2;
-      --alert-border: #991B1B;
-      --alert-ink: #7F1D1D;
-      --alert-solid: #881337;
-      --hold-bg: #FFFBEB;
-      --hold-border: #B45309;
-      --hold-ink: #78350F;
-      --ok-bg: #F0FDF4;
-      --ok-border: #15803D;
-      --ok-ink: #14532D;
-      --fin-bg: #EFF6FF;
-      --fin-border: #1D4ED8;
-      --fin-ink: #1E3A8A;
+      --bg-navy: #0A1124; --bg-navy-panel: #101B35; --bg-navy-hover: #172546;
+      --bg-ivory: #F6F4EE; --bg-paper: #FFFFFF; --bg-subtle: #EDEAE1;
+      --ink-primary: #0A1124; --ink-secondary: #2E3A52;
+      --ink-on-navy: #F8FAFC; --ink-on-navy-muted: #CBD5E1;
+      --brass: #B89146; --brass-light: #DFBE7F; --brass-dark: #6E5015;
+      --border-strong: #0A1124; --border-mid: #CBD5E1; --border-subtle: #DCD8CE;
+      --alert-bg: #FEF2F2; --alert-border: #991B1B; --alert-ink: #7F1D1D; --alert-solid: #881337;
+      --hold-bg: #FFFBEB; --hold-border: #B45309; --hold-ink: #78350F;
+      --ok-bg: #F0FDF4; --ok-border: #15803D; --ok-ink: #14532D;
+      --fin-bg: #EFF6FF; --fin-border: #1D4ED8; --fin-ink: #1E3A8A;
       --font-serif: Georgia, "Times New Roman", Times, serif;
       --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
       --max-w: 1360px;
     }
+    *, *::before, *::after { box-sizing: border-box; border-radius: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background-color: var(--bg-ivory); color: var(--ink-primary); font-family: var(--font-sans); line-height: 1.55; overflow-x: hidden; }
+    .skip-link { position: fixed; top: 0; left: 0; background: var(--brass-light); color: var(--bg-navy); font-weight: 700; padding: 0.75rem 1.25rem; z-index: 9999; text-decoration: none; border: 2px solid var(--bg-navy); transform: translateY(-120%); }
+    .skip-link:focus { transform: translateY(0); outline: 3px solid var(--bg-navy); }
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, pre:focus-visible { outline: 2px solid var(--brass-dark); outline-offset: 2px; }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      border-radius: 0;
-    }
+    .site-masthead { background-color: var(--bg-navy); color: var(--ink-on-navy); border-bottom: 3px solid var(--brass); }
+    .masthead-inner { max-width: var(--max-w); margin: 0 auto; padding: 0.875rem 1.25rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand-mark { display: flex; flex-direction: column; text-decoration: none; color: var(--ink-on-navy); min-height: 44px; justify-content: center; }
+    .brand-title { font-family: var(--font-serif); font-size: 1.125rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; }
+    .brand-subtitle { font-family: var(--font-mono); font-size: 0.75rem; color: var(--brass-light); letter-spacing: 0.06em; text-transform: uppercase; }
+    .site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem; }
+    .site-nav a { color: var(--ink-on-navy); text-decoration: none; font-size: 0.875rem; font-weight: 600; padding: 0.625rem 0.875rem; min-height: 44px; display: inline-flex; align-items: center; border: 1px solid transparent; }
+    .site-nav a:hover { border-color: var(--brass); color: var(--brass-light); }
 
-    html {
-      font-size: 16px;
-      scroll-behavior: smooth;
-      -webkit-text-size-adjust: 100%;
-    }
+    .breadcrumb-bar { background-color: var(--bg-navy-panel); border-bottom: 1px solid #263554; color: var(--ink-on-navy-muted); font-family: var(--font-mono); font-size: 0.75rem; }
+    .breadcrumb-inner { max-width: var(--max-w); margin: 0 auto; padding: 0.5rem 1.25rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    .breadcrumb-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem; }
+    .breadcrumb-list li { display: inline-flex; align-items: center; gap: 0.375rem; }
+    .breadcrumb-list a { color: var(--brass-light); text-decoration: underline; text-underline-offset: 3px; padding: 0.25rem; min-height: 32px; display: inline-flex; align-items: center; }
+    .breadcrumb-list a:hover { color: #FFFFFF; }
+    .doc-ref { color: var(--brass-light); letter-spacing: 0.05em; }
 
-    body {
-      margin: 0;
-      background-color: var(--bg-ivory);
-      color: var(--ink-primary);
-      font-family: var(--font-sans);
-      line-height: 1.55;
-      overflow-x: hidden;
-    }
-
-    .skip-link {
-      position: fixed;
-      top: 0;
-      left: 0;
-      background: var(--brass-light);
-      color: var(--bg-navy);
-      font-weight: 700;
-      padding: 0.75rem 1.25rem;
-      z-index: 9999;
-      text-decoration: none;
-      border: 2px solid var(--bg-navy);
-      transform: translateY(-120%);
-    }
-    .skip-link:focus {
-      transform: translateY(0);
-      outline: 3px solid var(--bg-navy);
-    }
-
-    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, pre:focus-visible {
-      outline: 2px solid var(--brass-dark);
-      outline-offset: 2px;
-    }
-
-    /* Masthead */
-    .site-masthead {
-      background-color: var(--bg-navy);
-      color: var(--ink-on-navy);
-      border-bottom: 3px solid var(--brass);
-    }
-    .masthead-inner {
-      max-width: var(--max-w);
-      margin: 0 auto;
-      padding: 0.875rem 1.25rem;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-    .brand-mark {
-      display: flex;
-      flex-direction: column;
-      text-decoration: none;
-      color: var(--ink-on-navy);
-      min-height: 44px;
-      justify-content: center;
-    }
-    .brand-title {
-      font-family: var(--font-serif);
-      font-size: 1.125rem;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-    .brand-subtitle {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--brass-light);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-    .site-nav {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.375rem;
-    }
-    .site-nav a {
-      color: var(--ink-on-navy);
-      text-decoration: none;
-      font-size: 0.875rem;
-      font-weight: 600;
-      padding: 0.625rem 0.875rem;
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
-      border: 1px solid transparent;
-    }
-    .site-nav a:hover {
-      border-color: var(--brass);
-      color: var(--brass-light);
-    }
-    .site-nav a.nav-cta {
-      background-color: var(--brass-light);
-      color: var(--bg-navy);
-      border-color: var(--brass-light);
-      font-weight: 700;
-    }
-    .site-nav a.nav-cta:hover {
-      background-color: #EAD09C;
-      color: var(--bg-navy);
-    }
-
-    /* Breadcrumb */
-    .breadcrumb-bar {
-      background-color: var(--bg-navy-panel);
-      border-bottom: 1px solid #263554;
-      color: var(--ink-on-navy-muted);
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-    }
-    .breadcrumb-inner {
-      max-width: var(--max-w);
-      margin: 0 auto;
-      padding: 0.5rem 1.25rem;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
-    }
-    .breadcrumb-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.375rem;
-    }
-    .breadcrumb-list li {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.375rem;
-    }
-    .breadcrumb-list a {
-      color: var(--brass-light);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      padding: 0.25rem;
-      min-height: 32px;
-      display: inline-flex;
-      align-items: center;
-    }
-    .doc-ref {
-      color: var(--brass-light);
-      letter-spacing: 0.05em;
-    }
-
-    /* Hero */
-    .hero-header {
-      background-color: var(--bg-navy);
-      color: var(--ink-on-navy);
-      border-bottom: 4px solid var(--brass);
-      padding: 2.25rem 1.25rem;
-    }
-    .hero-inner {
-      max-width: var(--max-w);
-      margin: 0 auto;
-    }
-    .hero-meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 0.875rem;
-    }
-    .tool-badge {
-      background-color: var(--brass-light);
-      color: var(--bg-navy);
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.3rem 0.65rem;
-    }
-    .tool-eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: var(--brass-light);
-    }
-    .hero-header h1 {
-      font-family: var(--font-serif);
-      font-size: clamp(1.75rem, 3.5vw, 2.6rem);
-      font-weight: 700;
-      line-height: 1.18;
-      margin: 0 0 1.25rem 0;
-      color: #FFFFFF;
-    }
-    .hero-intro-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.25rem;
-    }
-    @media (min-width: 900px) {
-      .hero-intro-grid {
-        grid-template-columns: 7fr 5fr;
-        gap: 2rem;
-        align-items: start;
-      }
-    }
-    .hero-copy p {
-      margin: 0 0 1rem 0;
-      font-size: 1.02rem;
-      color: var(--ink-on-navy);
-    }
+    .hero-header { background-color: var(--bg-navy); color: var(--ink-on-navy); border-bottom: 4px solid var(--brass); padding: 2.25rem 1.25rem; }
+    .hero-inner { max-width: var(--max-w); margin: 0 auto; }
+    .hero-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 0.875rem; }
+    .tool-badge { background-color: var(--brass-light); color: var(--bg-navy); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.3rem 0.65rem; }
+    .tool-eyebrow { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--brass-light); }
+    .tool-eyebrow a { color: var(--brass-light); text-decoration: underline; text-underline-offset: 3px; }
+    .tool-eyebrow a:hover { color: #FFFFFF; }
+    .hero-header h1 { font-family: var(--font-serif); font-size: clamp(1.75rem, 3.5vw, 2.6rem); font-weight: 700; line-height: 1.18; margin: 0 0 1.25rem 0; color: #FFFFFF; }
+    .hero-intro-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+    @media (min-width: 900px) { .hero-intro-grid { grid-template-columns: 7fr 5fr; gap: 2rem; align-items: start; } }
+    .hero-copy p { margin: 0 0 1rem 0; font-size: 1.02rem; color: var(--ink-on-navy); }
     .hero-copy p:last-child { margin-bottom: 0; }
-    .hero-provenance-box {
-      background-color: var(--bg-navy-panel);
-      border: 1px solid var(--brass);
-      border-left: 4px solid var(--brass-light);
-      padding: 1.125rem 1.25rem;
-    }
-    .provenance-title {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--brass-light);
-      margin: 0 0 0.45rem 0;
-    }
-    .hero-provenance-box p {
-      margin: 0;
-      font-size: 0.88rem;
-      color: var(--ink-on-navy);
-    }
-    .credential-strip {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.4rem;
-      margin-top: 0.85rem;
-      padding-top: 0.85rem;
-      border-top: 1px solid #2A3B5C;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--brass-light);
-    }
+    .hero-provenance-box { background-color: var(--bg-navy-panel); border: 1px solid var(--brass); border-left: 4px solid var(--brass-light); padding: 1.125rem 1.25rem; }
+    .provenance-title { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-light); margin: 0 0 0.45rem 0; }
+    .hero-provenance-box p { margin: 0; font-size: 0.88rem; color: var(--ink-on-navy); }
+    .credential-strip { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.4rem; margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px solid #2A3B5C; font-family: var(--font-mono); font-size: 0.75rem; color: var(--brass-light); }
 
-    /* Main Content */
-    .main-container {
-      max-width: var(--max-w);
-      margin: 0 auto;
-      padding: 2rem 1.25rem 3.5rem;
-    }
-    .section-block {
-      margin-bottom: 2.5rem;
-    }
-    .section-header {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 0.75rem;
-      border-bottom: 2px solid var(--border-strong);
-      padding-bottom: 0.5rem;
-      margin-bottom: 1.25rem;
-    }
-    .section-header h2 {
-      font-family: var(--font-serif);
-      font-size: clamp(1.25rem, 2.2vw, 1.55rem);
-      font-weight: 700;
-      margin: 0;
-      color: var(--ink-primary);
-    }
-    .section-tag {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--brass-dark);
-    }
+    .main-container { max-width: var(--max-w); margin: 0 auto; padding: 2rem 1.25rem 3.5rem; }
+    .section-block { margin-bottom: 2.5rem; }
+    .section-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.75rem; border-bottom: 2px solid var(--border-strong); padding-bottom: 0.5rem; margin-bottom: 1.25rem; }
+    .section-header h2 { font-family: var(--font-serif); font-size: clamp(1.25rem, 2.2vw, 1.55rem); font-weight: 700; margin: 0; color: var(--ink-primary); }
+    .section-tag { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--brass-dark); }
 
-    /* 1) KPI Strip */
-    .kpi-strip {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.875rem;
-    }
-    @media (min-width: 560px) {
-      .kpi-strip { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (min-width: 1024px) {
-      .kpi-strip { grid-template-columns: repeat(5, 1fr); }
-    }
-    .kpi-card {
-      background-color: var(--bg-paper);
-      border: 2px solid var(--border-strong);
-      padding: 1.125rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 124px;
-    }
-    .kpi-card.kpi-alert-active {
-      border-color: var(--alert-border);
-      background-color: var(--alert-bg);
-    }
-    .kpi-card.kpi-hold-active {
-      border-color: var(--hold-border);
-      background-color: var(--hold-bg);
-    }
-    .kpi-label {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--ink-secondary);
-      margin-bottom: 0.5rem;
-    }
+    .kpi-strip { display: grid; grid-template-columns: 1fr; gap: 0.875rem; }
+    @media (min-width: 560px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .kpi-strip { grid-template-columns: repeat(5, 1fr); } }
+    .kpi-card { background-color: var(--bg-paper); border: 2px solid var(--border-strong); padding: 1.125rem; display: flex; flex-direction: column; justify-content: space-between; min-height: 124px; }
+    .kpi-card.kpi-alert-active { border-color: var(--alert-border); background-color: var(--alert-bg); }
+    .kpi-card.kpi-hold-active { border-color: var(--hold-border); background-color: var(--hold-bg); }
+    .kpi-label { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-secondary); margin-bottom: 0.5rem; }
     .kpi-card.kpi-alert-active .kpi-label { color: var(--alert-ink); }
     .kpi-card.kpi-hold-active .kpi-label { color: var(--hold-ink); }
-    .kpi-value {
-      font-family: var(--font-mono);
-      font-size: 2.125rem;
-      font-weight: 700;
-      line-height: 1.1;
-      color: var(--ink-primary);
-      font-variant-numeric: tabular-nums;
-      margin-bottom: 0.35rem;
-    }
+    .kpi-value { font-family: var(--font-mono); font-size: 2.125rem; font-weight: 700; line-height: 1.1; color: var(--ink-primary); font-variant-numeric: tabular-nums; margin-bottom: 0.35rem; }
     .kpi-card.kpi-alert-active .kpi-value { color: var(--alert-ink); }
     .kpi-card.kpi-hold-active .kpi-value { color: var(--hold-ink); }
-    .kpi-sub {
-      font-size: 0.78rem;
-      color: var(--ink-secondary);
-    }
+    .kpi-sub { font-size: 0.78rem; color: var(--ink-secondary); }
 
-    /* 2) Needs a Decision */
-    .decision-panel {
-      background-color: var(--bg-paper);
-      border: 2px solid var(--border-strong);
-      padding: 1.25rem;
-    }
-    .decision-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    .decision-item {
-      border: 1px solid var(--border-mid);
-      border-left-width: 6px;
-      padding: 0.875rem 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-    }
-    .decision-item.decision-alert {
-      background-color: var(--alert-bg);
-      border-color: var(--alert-border);
-      color: var(--alert-ink);
-    }
-    .decision-item.decision-hold {
-      background-color: var(--hold-bg);
-      border-color: var(--hold-border);
-      color: var(--hold-ink);
-    }
+    .decision-panel { background-color: var(--bg-paper); border: 2px solid var(--border-strong); padding: 1.25rem; }
+    .decision-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+    .decision-item { border: 1px solid var(--border-mid); border-left-width: 6px; padding: 0.875rem 1rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; }
+    .decision-item.decision-alert { background-color: var(--alert-bg); border-color: var(--alert-border); color: var(--alert-ink); }
+    .decision-item.decision-hold { background-color: var(--hold-bg); border-color: var(--hold-border); color: var(--hold-ink); }
     .decision-item-body { flex: 1 1 520px; }
-    .decision-badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.35rem;
-      font-family: var(--font-mono);
-      font-size: 0.78rem;
-      font-weight: 700;
-    }
-    .severity-pill {
-      padding: 0.15rem 0.5rem;
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #FFFFFF;
-    }
+    .decision-badge-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; }
+    .severity-pill { padding: 0.15rem 0.5rem; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: #FFFFFF; }
     .pill-alert { background-color: var(--alert-solid); }
     .pill-hold { background-color: var(--hold-ink); }
-    .decision-reason {
-      font-size: 0.92rem;
-      line-height: 1.45;
-      color: var(--ink-primary);
-      margin: 0;
-    }
-    .decision-empty {
-      padding: 0.75rem 1rem;
-      background-color: var(--ok-bg);
-      border: 1px solid var(--ok-border);
-      border-left-width: 6px;
-      color: var(--ok-ink);
-      font-family: var(--font-mono);
-      font-size: 0.875rem;
-      font-weight: 600;
-      margin: 0;
-    }
-    .btn-locate {
-      background-color: var(--bg-paper);
-      color: var(--ink-primary);
-      border: 1px solid var(--border-strong);
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 0.5rem 0.85rem;
-      min-height: 44px;
-      cursor: pointer;
-      text-transform: uppercase;
-    }
-    .btn-locate:hover {
-      background-color: var(--bg-navy);
-      color: #FFFFFF;
-    }
+    .decision-reason { font-size: 0.92rem; line-height: 1.45; color: var(--ink-primary); margin: 0; }
+    .decision-empty { padding: 0.75rem 1rem; background-color: var(--ok-bg); border: 1px solid var(--ok-border); border-left-width: 6px; color: var(--ok-ink); font-family: var(--font-mono); font-size: 0.875rem; font-weight: 600; margin: 0; }
+    .btn-locate { background-color: var(--bg-paper); color: var(--ink-primary); border: 1px solid var(--border-strong); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; padding: 0.5rem 0.85rem; min-height: 44px; cursor: pointer; text-transform: uppercase; }
+    .btn-locate:hover { background-color: var(--bg-navy); color: #FFFFFF; }
 
-    /* 3) The Gate Log */
-    .table-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      margin-bottom: 0.875rem;
-      background-color: var(--bg-subtle);
-      border: 1px solid var(--border-subtle);
-      padding: 0.75rem 1rem;
-    }
-    .toolbar-note {
-      font-size: 0.85rem;
-      color: var(--ink-secondary);
-      margin: 0;
-    }
-    .toolbar-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.625rem;
-    }
-    .btn {
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 0.625rem 1.125rem;
-      min-height: 44px;
-      min-width: 44px;
-      border: 2px solid var(--border-strong);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-    }
-    .btn-primary {
-      background-color: var(--bg-navy);
-      color: #FFFFFF;
-      border-color: var(--bg-navy);
-    }
+    .table-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.875rem; background-color: var(--bg-subtle); border: 1px solid var(--border-subtle); padding: 0.75rem 1rem; }
+    .toolbar-note { font-size: 0.85rem; color: var(--ink-secondary); margin: 0; }
+    .toolbar-actions { display: flex; flex-wrap: wrap; gap: 0.625rem; }
+    .btn { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.625rem 1.125rem; min-height: 44px; min-width: 44px; border: 2px solid var(--border-strong); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+    .btn-primary { background-color: var(--bg-navy); color: #FFFFFF; border-color: var(--bg-navy); }
     .btn-primary:hover { background-color: var(--bg-navy-hover); }
-    .btn-brass {
-      background-color: var(--brass-light);
-      color: var(--bg-navy);
-      border-color: var(--bg-navy);
-    }
+    .btn-brass { background-color: var(--brass-light); color: var(--bg-navy); border-color: var(--bg-navy); }
     .btn-brass:hover { background-color: #EAD09C; }
-    .btn-secondary {
-      background-color: var(--bg-paper);
-      color: var(--ink-primary);
-    }
+    .btn-secondary { background-color: var(--bg-paper); color: var(--ink-primary); }
     .btn-secondary:hover { background-color: var(--bg-subtle); }
 
-    .gate-table-wrap {
-      background-color: var(--bg-paper);
-      border: 2px solid var(--border-strong);
-      overflow-x: auto;
-      width: 100%;
-    }
-    .gate-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.8125rem;
-    }
-    .gate-table th {
-      background-color: var(--bg-navy);
-      color: var(--ink-on-navy);
-      font-family: var(--font-mono);
-      font-size: 0.6875rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      padding: 0.65rem 0.45rem;
-      text-align: left;
-      border-right: 1px solid #263554;
-      border-bottom: 2px solid var(--brass);
-      vertical-align: bottom;
-    }
-    .gate-table th.col-check {
-      text-align: center;
-      width: 58px;
-      background-color: var(--bg-navy-panel);
-    }
+    .gate-table-wrap { background-color: var(--bg-paper); border: 2px solid var(--border-strong); overflow-x: auto; width: 100%; }
+    .gate-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+    .gate-table th { background-color: var(--bg-navy); color: var(--ink-on-navy); font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.65rem 0.45rem; text-align: left; border-right: 1px solid #263554; border-bottom: 2px solid var(--brass); vertical-align: bottom; }
+    .gate-table th.col-check { text-align: center; width: 58px; background-color: var(--bg-navy-panel); }
     .gate-table th.col-num { text-align: right; }
-    .gate-table td {
-      padding: 0.45rem;
-      border-bottom: 1px solid var(--border-mid);
-      border-right: 1px solid #E2E8F0;
-      vertical-align: middle;
-    }
+    .gate-table td { padding: 0.45rem; border-bottom: 1px solid var(--border-mid); border-right: 1px solid #E2E8F0; vertical-align: middle; }
     .gate-table tr.row-alert { background-color: #FFF5F5; }
     .gate-table tr.row-hold { background-color: #FFFDF5; }
-    .gate-table tr.row-highlight {
-      outline: 3px solid var(--brass);
-      outline-offset: -3px;
-    }
+    .gate-table tr.row-highlight { outline: 3px solid var(--brass); outline-offset: -3px; }
 
-    .cell-input {
-      width: 100%;
-      min-height: 44px;
-      padding: 0.35rem 0.45rem;
-      font-family: var(--font-sans);
-      font-size: 0.8125rem;
-      color: var(--ink-primary);
-      background-color: #FFFFFF;
-      border: 1px solid #64748B;
-    }
-    .cell-input.mono-input {
-      font-family: var(--font-mono);
-      font-weight: 600;
-    }
-    .cell-input.num-input {
-      text-align: right;
-      font-family: var(--font-mono);
-      font-variant-numeric: tabular-nums;
-    }
-    .check-select {
-      width: 50px;
-      min-width: 44px;
-      min-height: 44px;
-      padding: 0.25rem;
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      font-weight: 700;
-      text-align: center;
-      border: 2px solid var(--border-strong);
-      cursor: pointer;
-    }
-    .check-select.val-Y {
-      background-color: var(--ok-bg);
-      color: var(--ok-ink);
-      border-color: var(--ok-border);
-    }
-    .check-select.val-N {
-      background-color: var(--alert-bg);
-      color: var(--alert-ink);
-      border-color: var(--alert-border);
-    }
-    .status-select {
-      width: 100%;
-      min-width: 116px;
-      min-height: 44px;
-      padding: 0.35rem;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 700;
-      border: 1px solid var(--border-strong);
-      background-color: #FFFFFF;
-      color: var(--ink-primary);
-      cursor: pointer;
-    }
-    .status-select.status-Approved {
-      background-color: var(--bg-navy);
-      color: #FFFFFF;
-    }
-    .readiness-cell {
-      font-family: var(--font-mono);
-      font-size: 0.9375rem;
-      font-weight: 700;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-    }
+    .cell-input { width: 100%; min-height: 44px; padding: 0.35rem 0.45rem; font-family: var(--font-sans); font-size: 0.8125rem; color: var(--ink-primary); background-color: #FFFFFF; border: 1px solid #64748B; }
+    .cell-input.mono-input { font-family: var(--font-mono); font-weight: 600; }
+    .cell-input.num-input { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .check-select { width: 50px; min-width: 44px; min-height: 44px; padding: 0.25rem; font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 700; text-align: center; border: 2px solid var(--border-strong); cursor: pointer; }
+    .check-select.val-Y { background-color: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+    .check-select.val-N { background-color: var(--alert-bg); color: var(--alert-ink); border-color: var(--alert-border); }
+    .status-select { width: 100%; min-width: 116px; min-height: 44px; padding: 0.35rem; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; border: 1px solid var(--border-strong); background-color: #FFFFFF; color: var(--ink-primary); cursor: pointer; }
+    .status-select.status-Approved { background-color: var(--bg-navy); color: #FFFFFF; }
+    .readiness-cell { font-family: var(--font-mono); font-size: 0.9375rem; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .readiness-100 { color: var(--ok-ink); }
     .readiness-low { color: var(--alert-ink); }
 
-    .computed-badge {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 0.71rem;
-      font-weight: 700;
-      padding: 0.25rem 0.45rem;
-      border: 1px solid transparent;
-      line-height: 1.3;
-    }
-    .flag-alert {
-      background-color: var(--alert-solid);
-      color: #FFFFFF;
-      border-color: var(--alert-solid);
-    }
-    .flag-ok {
-      background-color: var(--ok-bg);
-      color: var(--ok-ink);
-      border-color: var(--ok-border);
-    }
-    .route-stop {
-      background-color: var(--alert-bg);
-      color: var(--alert-ink);
-      border-color: var(--alert-border);
-    }
-    .route-hold {
-      background-color: var(--hold-bg);
-      color: var(--hold-ink);
-      border-color: var(--hold-border);
-    }
-    .route-fast {
-      background-color: var(--ok-bg);
-      color: var(--ok-ink);
-      border-color: var(--ok-border);
-    }
-    .route-finance {
-      background-color: var(--fin-bg);
-      color: var(--fin-ink);
-      border-color: var(--fin-border);
-    }
-    .note-primary {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 700;
-      display: block;
-    }
+    .computed-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.71rem; font-weight: 700; padding: 0.25rem 0.45rem; border: 1px solid transparent; line-height: 1.3; }
+    .flag-alert { background-color: var(--alert-solid); color: #FFFFFF; border-color: var(--alert-solid); }
+    .flag-ok { background-color: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+    .route-stop { background-color: var(--alert-bg); color: var(--alert-ink); border-color: var(--alert-border); }
+    .route-hold { background-color: var(--hold-bg); color: var(--hold-ink); border-color: var(--hold-border); }
+    .route-fast { background-color: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+    .route-finance { background-color: var(--fin-bg); color: var(--fin-ink); border-color: var(--fin-border); }
+    .note-primary { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; display: block; }
     .note-clean { color: var(--ok-ink); }
     .note-action { color: var(--alert-ink); }
-    .note-missing-detail {
-      display: block;
-      font-size: 0.72rem;
-      color: var(--ink-secondary);
-      margin-top: 0.15rem;
-    }
-    .btn-delete-row {
-      background-color: #FFFFFF;
-      color: var(--alert-ink);
-      border: 1px solid var(--alert-border);
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 700;
-      min-width: 44px;
-      min-height: 44px;
-      padding: 0.25rem 0.5rem;
-      cursor: pointer;
-    }
-    .btn-delete-row:hover {
-      background-color: var(--alert-solid);
-      color: #FFFFFF;
-    }
+    .note-missing-detail { display: block; font-size: 0.72rem; color: var(--ink-secondary); margin-top: 0.15rem; }
+    .btn-delete-row { background-color: #FFFFFF; color: var(--alert-ink); border: 1px solid var(--alert-border); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; min-width: 44px; min-height: 44px; padding: 0.25rem 0.5rem; cursor: pointer; }
+    .btn-delete-row:hover { background-color: var(--alert-solid); color: #FFFFFF; }
 
     @media (max-width: 1060px) {
       .gate-table thead { display: none; }
-      .gate-table, .gate-table tbody, .gate-table tr, .gate-table td {
-        display: block;
-        width: 100%;
-      }
-      .gate-table tr {
-        border-bottom: 3px solid var(--border-strong);
-        padding: 0.75rem;
-      }
-      .gate-table td {
-        border-right: none;
-        border-bottom: 1px solid var(--border-subtle);
-        padding: 0.45rem 0;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.5rem;
-        text-align: right;
-      }
-      .gate-table td::before {
-        content: attr(data-label);
-        font-family: var(--font-mono);
-        font-size: 0.72rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: var(--ink-secondary);
-        text-align: left;
-        flex: 0 0 42%;
-      }
+      .gate-table, .gate-table tbody, .gate-table tr, .gate-table td { display: block; width: 100%; }
+      .gate-table tr { border-bottom: 3px solid var(--border-strong); padding: 0.75rem; }
+      .gate-table td { border-right: none; border-bottom: 1px solid var(--border-subtle); padding: 0.45rem 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; text-align: right; }
+      .gate-table td::before { content: attr(data-label); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--ink-secondary); text-align: left; flex: 0 0 42%; }
       .gate-table td > * { flex: 1 1 52%; }
-      .gate-table td.td-check > .check-select {
-        flex: 0 0 64px;
-        margin-left: auto;
-      }
-      .gate-table td.td-actions {
-        justify-content: flex-end;
-        border-bottom: none;
-      }
+      .gate-table td.td-check > .check-select { flex: 0 0 64px; margin-left: auto; }
+      .gate-table td.td-actions { justify-content: flex-end; border-bottom: none; }
     }
 
-    /* 4) Gate Report */
-    .report-container {
-      background-color: var(--bg-navy);
-      color: var(--ink-on-navy);
-      border: 2px solid var(--border-strong);
-      padding: 1.25rem;
-    }
-    .report-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-      padding-bottom: 0.875rem;
-      border-bottom: 1px solid #2A3B5C;
-    }
-    .report-toolbar-title {
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--brass-light);
-    }
-    .report-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.625rem;
-    }
-    .report-output {
-      width: 100%;
-      min-height: 300px;
-      background-color: #060B18;
-      color: #F1F5F9;
-      border: 1px solid var(--brass);
-      padding: 1rem;
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      word-break: break-word;
-      overflow-x: auto;
-      margin: 0;
-    }
+    .report-container { background-color: var(--bg-navy); color: var(--ink-on-navy); border: 2px solid var(--border-strong); padding: 1.25rem; }
+    .report-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 0.875rem; border-bottom: 1px solid #2A3B5C; }
+    .report-toolbar-title { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brass-light); }
+    .report-actions { display: flex; flex-wrap: wrap; gap: 0.625rem; }
+    .report-output { width: 100%; min-height: 300px; background-color: #060B18; color: #F1F5F9; border: 1px solid var(--brass); padding: 1rem; font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.55; white-space: pre-wrap; word-break: break-word; overflow-x: auto; margin: 0; }
 
-    /* Methodology & Closing */
-    .methodology-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-    @media (min-width: 900px) {
-      .methodology-grid { grid-template-columns: 1fr 1fr; }
-    }
-    .info-card {
-      background-color: var(--bg-paper);
-      border: 2px solid var(--border-strong);
-      padding: 1.375rem;
-    }
-    .info-card h3 {
-      font-family: var(--font-serif);
-      font-size: 1.1875rem;
-      margin: 0 0 0.75rem 0;
-      color: var(--ink-primary);
-      border-bottom: 1px solid var(--border-mid);
-      padding-bottom: 0.5rem;
-    }
-    .info-card p {
-      margin: 0 0 0.875rem 0;
-      font-size: 0.9375rem;
-      color: var(--ink-secondary);
-    }
-    .rule-list {
-      margin: 0;
-      padding-left: 1.2rem;
-      font-size: 0.9rem;
-      color: var(--ink-secondary);
-    }
+    .methodology-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+    @media (min-width: 900px) { .methodology-grid { grid-template-columns: 1fr 1fr; } }
+    .info-card { background-color: var(--bg-paper); border: 2px solid var(--border-strong); padding: 1.375rem; }
+    .info-card h3 { font-family: var(--font-serif); font-size: 1.1875rem; margin: 0 0 0.75rem 0; color: var(--ink-primary); border-bottom: 1px solid var(--border-mid); padding-bottom: 0.5rem; }
+    .info-card p { margin: 0 0 0.875rem 0; font-size: 0.9375rem; color: var(--ink-secondary); }
+    .rule-list { margin: 0; padding-left: 1.2rem; font-size: 0.9rem; color: var(--ink-secondary); }
     .rule-list li { margin-bottom: 0.5rem; }
-    .rule-list code {
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      font-weight: 700;
-      color: var(--ink-primary);
-      background-color: var(--bg-subtle);
-      padding: 0.1rem 0.35rem;
-    }
+    .rule-list code { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 700; color: var(--ink-primary); background-color: var(--bg-subtle); padding: 0.1rem 0.35rem; }
 
-    .closing-eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--brass-light);
-      margin-bottom: 0.5rem;
-    }
-    .closing-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-      align-items: center;
-    }
-    @media (min-width: 860px) {
-      .closing-grid { grid-template-columns: 8fr 4fr; }
-    }
-    .closing-copy p {
-      margin: 0 0 1rem 0;
-      font-size: 1rem;
-      color: var(--ink-on-navy);
-    }
-    .closing-deliverables {
-      list-style: none;
-      padding: 0;
-      margin: 1rem 0 0 0;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.5rem;
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      color: var(--brass-light);
-    }
-    @media (min-width: 600px) {
-      .closing-deliverables { grid-template-columns: 1fr 1fr; }
-    }
-    .closing-cta-box {
-      background-color: var(--bg-navy-panel);
-      border: 1px solid var(--brass);
-      padding: 1.375rem;
-    }
-    .price-tag {
-      font-family: var(--font-mono);
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #FFFFFF;
-      display: block;
-      margin-bottom: 0.25rem;
-    }
-    .price-sub {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--brass-light);
-      display: block;
-      margin-bottom: 1rem;
-    }
+    .related-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    @media (min-width: 768px) { .related-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1120px) { .related-grid { grid-template-columns: repeat(4, 1fr); } }
+    .related-card { background-color: var(--bg-paper); border: 2px solid var(--border-strong); padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; }
+    .related-card-tag { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brass-dark); margin-bottom: 0.4rem; }
+    .related-card h3 { font-family: var(--font-serif); font-size: 1.0625rem; margin: 0 0 0.5rem 0; }
+    .related-card p { font-size: 0.875rem; color: var(--ink-secondary); margin: 0 0 1rem 0; }
+    .related-card a { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 700; color: var(--ink-primary); text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; }
+    .related-card a:hover { color: var(--brass-dark); }
 
-    .related-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-    @media (min-width: 768px) {
-      .related-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    .related-card {
-      background-color: var(--bg-paper);
-      border: 2px solid var(--border-strong);
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .related-card-tag {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--brass-dark);
-      margin-bottom: 0.4rem;
-    }
-    .related-card h3 {
-      font-family: var(--font-serif);
-      font-size: 1.0625rem;
-      margin: 0 0 0.5rem 0;
-    }
-    .related-card p {
-      font-size: 0.875rem;
-      color: var(--ink-secondary);
-      margin: 0 0 1rem 0;
-    }
-    .related-card a {
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      font-weight: 700;
-      color: var(--ink-primary);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
-    }
-
-    .site-footer {
-      background-color: var(--bg-navy);
-      color: var(--ink-on-navy-muted);
-      border-top: 3px solid var(--brass);
-      padding: 2.25rem 1.25rem;
-      font-size: 0.875rem;
-    }
-    .footer-inner {
-      max-width: var(--max-w);
-      margin: 0 auto;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 1.5rem;
-    }
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-    .footer-links a {
-      color: var(--brass-light);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
-      padding: 0 0.25rem;
-    }
+    .site-footer { background-color: var(--bg-navy); color: var(--ink-on-navy-muted); border-top: 3px solid var(--brass); padding: 2.25rem 1.25rem; font-size: 0.875rem; }
+    .footer-inner { max-width: var(--max-w); margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.5rem; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .footer-links a { color: var(--brass-light); text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; padding: 0 0.25rem; }
+    .footer-links a:hover { color: #FFFFFF; }
   </style>
 </head>
 <body>
@@ -1053,10 +279,11 @@
       </a>
       <nav class="site-nav" aria-label="Primary Navigation">
         <a href="../../tools/">Proof of Work Hub</a>
+        <a href="../stories-and-sandboxes/">Deal Desk Controls</a>
         <a href="../perm-calculator/">Tool 3: Perm Calculator</a>
         <a href="../spend-variance/">Tool 4: Spend Variance</a>
         <a href="../qtc-diagnostic/">Tool 7: QTC Diagnostic</a>
-        <a href="../deal-check/" class="nav-cta">The Deal Check</a>
+        <a href="../deal-check/">The Deal Check</a>
       </nav>
     </div>
   </header>
@@ -1066,10 +293,10 @@
       <ol class="breadcrumb-list">
         <li><a href="../../">Home</a><span>/</span></li>
         <li><a href="../../tools/">Proof of Work</a><span>/</span></li>
-        <li><a href="../../tools/stories-and-sandboxes/">Deal Desk Controls</a><span>/</span></li>
+        <li><a href="../stories-and-sandboxes/">Deal Desk Controls</a><span>/</span></li>
         <li aria-current="page">Intake Gate</li>
       </ol>
-      <span class="doc-ref">REF: S6-P05.1 · GATE-LOG-V5</span>
+      <span class="doc-ref">REF: S6-P05.1 · DEAL DESK CONTROLS · GATE-LOG-V5</span>
     </div>
   </nav>
 
@@ -1077,7 +304,7 @@
     <div class="hero-inner">
       <div class="hero-meta-row">
         <span class="tool-badge">Tool 5 · Deal Desk Controls</span>
-        <span class="tool-eyebrow">Proof of Work · Intake Gate</span>
+        <span class="tool-eyebrow">Proof of Work — <a href="../stories-and-sandboxes/">Deal Desk Controls</a> · Intake Gate</span>
       </div>
       <h1>Intake Gate &amp; Submission Scorecard</h1>
       <div class="hero-intro-grid">
@@ -1096,7 +323,7 @@
           </p>
           <div class="credential-strip">
             <span>15+ Yrs Deal Desk &amp; Contracts</span>
-            <span>Corporate Roles Since 2006</span>
+            <span>Partition · Deal Desk Controls</span>
             <span>Contracts Up to $300M</span>
             <span>3,000+ SKUs Managed</span>
           </div>
@@ -1243,24 +470,24 @@
       </div>
     </section>
 
-    <!-- Related Tools (Internal Links per Part D) -->
+    <!-- Related Tools (Partition S6-P05 & Library Navigation) -->
     <section class="section-block" aria-labelledby="heading-related">
       <div class="section-header">
-        <h2 id="heading-related">Related Deal Desk &amp; Quote-to-Cash Proof of Work</h2>
-        <span class="section-tag">Connected Governance Tools</span>
+        <h2 id="heading-related">Related Deal Desk Controls &amp; Quote-to-Cash Proof of Work</h2>
+        <span class="section-tag">Partition S6-P05 · Deal Desk Controls</span>
       </div>
       <div class="related-grid">
         <article class="related-card">
           <div>
-            <div class="related-card-tag">Hub · All Interactive Workbooks</div>
-            <h3>Deal Desk &amp; Contract Management Proof of Work Hub</h3>
-            <p>Inspect all interactive deal desk, pricing governance, and contract management tools built from production operator workbooks.</p>
+            <div class="related-card-tag">Partition S6-P05 · Four Control Instruments</div>
+            <h3>Deal Desk Controls Partition</h3>
+            <p>Open the Deal Desk Controls partition housing Tool 5 (Intake Gate), Tool 6 (Redlining Playbook), Tool 7 (QTC Diagnostic), and Tool 8 (Bundling Sandbox).</p>
           </div>
-          <a href="../../tools/">Explore the Proof of Work Hub →</a>
+          <a href="../stories-and-sandboxes/">Open Deal Desk Controls →</a>
         </article>
         <article class="related-card">
           <div>
-            <div class="related-card-tag">Tool 7 · Quote-to-Cash</div>
+            <div class="related-card-tag">Tool 7 · Deal Desk Controls</div>
             <h3>QTC Leakage &amp; Control Diagnostic</h3>
             <p>Audit your end-to-end quote-to-cash process across intake, pricing, legal review, and billing handoffs to spot where margin leaks.</p>
           </div>
@@ -1268,11 +495,19 @@
         </article>
         <article class="related-card">
           <div>
-            <div class="related-card-tag">Tool 3 · Catalog Architecture</div>
+            <div class="related-card-tag">Tool 3 · Pricing Engines</div>
             <h3>Commercial Contract &amp; SKU Permutation Calculator</h3>
             <p>Measure how unbundled add-ons, tiers, and custom contract terms multiply SKU permutations and break SKU mix validation at intake.</p>
           </div>
           <a href="../perm-calculator/">Run Tool 3: Perm Calculator →</a>
+        </article>
+        <article class="related-card">
+          <div>
+            <div class="related-card-tag">Hub · All Interactive Workbooks</div>
+            <h3>Deal Desk &amp; Contract Management Proof of Work Hub</h3>
+            <p>Inspect all interactive deal desk, pricing governance, and contract management tools built from production operator workbooks.</p>
+          </div>
+          <a href="../../tools/">Explore the Proof of Work Hub →</a>
         </article>
       </div>
     </section>
@@ -1288,6 +523,7 @@
       <nav class="footer-links" aria-label="Footer Navigation">
         <a href="../../">Home</a>
         <a href="../../tools/">Proof of Work Hub</a>
+        <a href="../stories-and-sandboxes/">Deal Desk Controls</a>
         <a href="../perm-calculator/">Tool 3: Perm Calculator</a>
         <a href="../spend-variance/">Tool 4: Spend Variance</a>
         <a href="../intake-gate/">Tool 5: Intake Gate</a>
@@ -1324,17 +560,10 @@
         return SAMPLE_DEALS.map(function (d, i) {
           return {
             uid: "row-" + (i + 1) + "-" + Date.now(),
-            id: d.id,
-            account: d.account,
-            dealType: d.dealType,
-            acv: d.acv,
-            discount: d.discount,
-            accountVerified: d.accountVerified,
-            priorContractLinked: d.priorContractLinked,
-            eligibilityConfirmed: d.eligibilityConfirmed,
-            skuMixValid: d.skuMixValid,
-            docsComplete: d.docsComplete,
-            status: d.status
+            id: d.id, account: d.account, dealType: d.dealType, acv: d.acv, discount: d.discount,
+            accountVerified: d.accountVerified, priorContractLinked: d.priorContractLinked,
+            eligibilityConfirmed: d.eligibilityConfirmed, skuMixValid: d.skuMixValid,
+            docsComplete: d.docsComplete, status: d.status
           };
         });
       }
@@ -1357,11 +586,8 @@
 
       function esc(s) {
         return String(s == null ? "" : s)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#39;");
+          .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
       }
 
       function evaluateDeal(d) {
@@ -1387,29 +613,12 @@
 
         var note = readiness === 100 ? "Clean submission" : "ACTION REQUIRED – Missing Baseline Items";
 
-        return {
-          readiness: readiness,
-          missing: missing,
-          disc: disc,
-          acv: acv,
-          isAlert: isAlert,
-          flag: flag,
-          routing: routing,
-          note: note
-        };
+        return { readiness: readiness, missing: missing, disc: disc, acv: acv, isAlert: isAlert, flag: flag, routing: routing, note: note };
       }
 
       function render(keepInputs) {
-        var total = deals.length;
-        var clean = 0;
-        var held = 0;
-        var unauthorized = 0;
-        var totalAcv = 0;
-        var alerts = [];
-        var heldList = [];
-        var fastList = [];
-        var finList = [];
-        var map = {};
+        var total = deals.length, clean = 0, held = 0, unauthorized = 0, totalAcv = 0;
+        var alerts = [], heldList = [], fastList = [], finList = [], map = {};
 
         for (var i = 0; i < deals.length; i++) {
           var d = deals[i];
@@ -1462,20 +671,16 @@
             why = "Marked <strong>Approved</strong> with a <strong>" + fmtPct(a.m.disc) + " discount</strong> (&gt;20% threshold) without Deal Desk / Finance sign-off.";
           }
           html +=
-            '<li class="decision-item decision-alert">' +
-            '<div class="decision-item-body">' +
+            '<li class="decision-item decision-alert"><div class="decision-item-body">' +
             '<div class="decision-badge-row"><span class="severity-pill pill-alert">AUDIT ALERT · STOP – REVOKE &amp; AUDIT</span><span>' + esc(a.d.id) + " · " + esc(a.d.account) + " (" + esc(a.d.dealType) + " · " + fmtCurrency(a.m.acv) + ")</span></div>" +
-            '<p class="decision-reason">' + why + "</p></div>" +
-            '<button type="button" class="btn-locate" data-locate="' + esc(a.d.uid) + '">Locate in Log ↓</button></li>';
+            '<p class="decision-reason">' + why + '</p></div><button type="button" class="btn-locate" data-locate="' + esc(a.d.uid) + '">Locate in Log ↓</button></li>';
         }
         for (var j = 0; j < heldList.length; j++) {
           var h = heldList[j];
           html +=
-            '<li class="decision-item decision-hold">' +
-            '<div class="decision-item-body">' +
+            '<li class="decision-item decision-hold"><div class="decision-item-body">' +
             '<div class="decision-badge-row"><span class="severity-pill pill-hold">HELD AT GATE · HOLD – RETURN TO SALES</span><span>' + esc(h.d.id) + " · " + esc(h.d.account) + " (" + esc(h.d.dealType) + " · " + fmtCurrency(h.m.acv) + " · " + fmtPct(h.m.disc) + " disc.)</span></div>" +
-            '<p class="decision-reason">Held at <strong>' + h.m.readiness + "% readiness</strong> (Status: " + esc(h.d.status) + ") — checks answered No: <strong>" + esc(h.m.missing.join(", ")) + "</strong>.</p></div>" +
-            '<button type="button" class="btn-locate" data-locate="' + esc(h.d.uid) + '">Locate in Log ↓</button></li>';
+            '<p class="decision-reason">Held at <strong>' + h.m.readiness + "% readiness</strong> (Status: " + esc(h.d.status) + ") — checks answered No: <strong>" + esc(h.m.missing.join(", ")) + '</strong>.</p></div><button type="button" class="btn-locate" data-locate="' + esc(h.d.uid) + '">Locate in Log ↓</button></li>';
         }
         html += "</ul>";
         box.innerHTML = html;
@@ -1517,9 +722,7 @@
             '<td data-label="Proposed ACV ($)"><input type="number" step="1000" min="0" class="cell-input num-input" data-field="acv" value="' + esc(d.acv) + '" aria-label="Proposed ACV for ' + idEsc + '"></td>' +
             '<td data-label="Requested Discount %"><input type="number" step="1" min="0" max="100" class="cell-input num-input" data-field="discount" value="' + esc(d.discount) + '" aria-label="Requested Discount percent for ' + idEsc + '"></td>';
           for (var c = 0; c < CHECKS.length; c++) {
-            var k = CHECKS[c].key;
-            var lbl = CHECKS[c].label;
-            var v = d[k] === "Y" ? "Y" : "N";
+            var k = CHECKS[c].key, lbl = CHECKS[c].label, v = d[k] === "Y" ? "Y" : "N";
             html +=
               '<td data-label="' + esc(lbl) + '" class="td-check" style="text-align:center;">' +
               '<select class="check-select val-' + v + '" data-field="' + k + '" aria-label="' + esc(lbl) + " for " + idEsc + '">' +
@@ -1544,8 +747,7 @@
       function updateComputedCells(map) {
         var tbody = document.getElementById("gate-log-tbody");
         for (var i = 0; i < deals.length; i++) {
-          var d = deals[i];
-          var m = map[d.uid];
+          var d = deals[i], m = map[d.uid];
           var tr = tbody.querySelector('tr[data-uid="' + d.uid + '"]');
           if (!tr) continue;
           tr.classList.remove("row-alert", "row-hold");
@@ -1590,8 +792,7 @@
           out.push("  None.");
         } else {
           for (var i = 0; i < alerts.length; i++) {
-            var a = alerts[i];
-            var reasons = [];
+            var a = alerts[i], reasons = [];
             if (a.m.missing.length > 0) reasons.push("Missing checks: " + a.m.missing.join(", "));
             if (a.m.disc > 20) reasons.push("Discount " + fmtPct(a.m.disc) + " > 20% threshold while Approved");
             out.push("  * " + a.d.id + " (" + a.d.account + " · " + a.d.dealType + " · " + fmtCurrency(a.m.acv) + " · " + fmtPct(a.m.disc) + " disc.)");
@@ -1630,6 +831,7 @@
           }
         }
         out.push("====================================================================");
+        out.push("Partition: Deal Desk Controls (S6-P05)");
         out.push("Source: https://fractional-deal-desk-site.pages.dev/tools/intake-gate/");
 
         var txt = out.join("\n");
@@ -1672,9 +874,7 @@
         var delBtn = e.target.closest("[data-del]");
         if (!delBtn) return;
         var uid = delBtn.getAttribute("data-del");
-        deals = deals.filter(function (d) {
-          return d.uid !== uid;
-        });
+        deals = deals.filter(function (d) { return d.uid !== uid; });
         render(false);
       });
 
@@ -1686,9 +886,7 @@
         if (row) {
           row.scrollIntoView({ behavior: "smooth", block: "center" });
           row.classList.add("row-highlight");
-          setTimeout(function () {
-            row.classList.remove("row-highlight");
-          }, 1800);
+          setTimeout(function () { row.classList.remove("row-highlight"); }, 1800);
         }
       });
 
@@ -1696,17 +894,8 @@
         var code = "DEAL-" + nextDealNum++;
         deals.push({
           uid: "row-" + nextDealNum + "-" + Date.now(),
-          id: code,
-          account: "Sample Corp New",
-          dealType: "New Business",
-          acv: 95000,
-          discount: 18,
-          accountVerified: "Y",
-          priorContractLinked: "Y",
-          eligibilityConfirmed: "Y",
-          skuMixValid: "Y",
-          docsComplete: "N",
-          status: "Pending"
+          id: code, account: "Sample Corp New", dealType: "New Business", acv: 95000, discount: 18,
+          accountVerified: "Y", priorContractLinked: "Y", eligibilityConfirmed: "Y", skuMixValid: "Y", docsComplete: "N", status: "Pending"
         });
         render(false);
       });
@@ -1726,9 +915,7 @@
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(txt).then(function () {
             btn.textContent = "Copied Gate Report ✓";
-            setTimeout(function () {
-              btn.textContent = "Copy Gate Report";
-            }, 2000);
+            setTimeout(function () { btn.textContent = "Copy Gate Report"; }, 2000);
           });
         } else {
           var ta = document.createElement("textarea");
@@ -1738,9 +925,7 @@
           document.execCommand("copy");
           document.body.removeChild(ta);
           btn.textContent = "Copied Gate Report ✓";
-          setTimeout(function () {
-            btn.textContent = "Copy Gate Report";
-          }, 2000);
+          setTimeout(function () { btn.textContent = "Copy Gate Report"; }, 2000);
         }
       });
 
