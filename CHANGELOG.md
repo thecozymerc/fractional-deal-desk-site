@@ -1,5 +1,38 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-13 — Tool 7 REBUILT by Argon (QTC Diagnostic)
+
+- Page/tool: S6-P05.3 / Tool 7 — Argon's full rebuild promoted,
+  replacing the first-generation workbook-embed build (retired to
+  the GitHub branch tool-7-iterations + local snapshot). Answers
+  first: KPI strip (Readiness % · Earned of Max · P1 count),
+  Needs a Decision (P1 stages worst-first, each with the
+  workbook's finding & fix), the five-stage Scorecard (one-tap
+  Maturity 0-3 and Risk Weight 1-3 segmented controls — no
+  dropdowns), copyable QTC Readout + Reset. Measured context
+  (cycle days, error rate) shown as static text, never scored —
+  the workbook's own rule. Math UNALTERED from the workbook
+  (declared in Argon's in-file manifest). ONE mechanical
+  correction by the executor, authorized by Lucky as a defect
+  fix: the "Clear All P1 Stages" preset label said 86% while
+  the tool's own math produces 88% (37 of 42) — the label now
+  reads 88%; Argon's manifest comment is untouched as the
+  record of its claim. The first export Lucky received was a
+  15 KB tail fragment (Argon crash); the complete 71 KB return
+  followed and is what shipped. Verified before promotion:
+  exhaustive battery — every Maturity x Risk Weight combination
+  on every stage (60 probes) vs an independent oracle, KPIs and
+  flags exact; boundaries (all Maturity 3 -> 100% / 42 / P1 0;
+  Intake 0->3 -> 60% / 25 / P1 2; all-zero -> 0%); zero page
+  errors; standing-law body scan clean; JSON-LD parses;
+  width-ladder sweep zero overflow at all 10 widths on the new
+  page and 27 of 27 pages sitewide after install; phone +
+  desktop screenshots reviewed. Story 3 retired with the embed
+  build (preserved in the archive). Argon improvements
+  (declared in manifest): Raise-to-3 buttons on P1 decision
+  cards, four-state preset test bar, per-stage headroom,
+  pipeline jump bar, scoring rubric strip.
+
 ## 2026-11-13 — Tool 6 REBUILT by Argon (Redlining Playbook)
 
 - Page/tool: S6-P05.2 / Tool 6 — Argon's full rebuild promoted,
