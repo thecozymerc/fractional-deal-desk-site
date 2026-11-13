@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     LABEL — S6-P05.3 — Quote-to-Cash Process Diagnostic & Bottleneck
+     Scorecard + Story 3 (tool page; Tool / piece ID: Tool 7 — QTC
+     Diagnostic, address: /tools/qtc-diagnostic/)
+     What this page holds: the tool's write-up and the ACTUAL workbook
+     embedded below it — the Quote-to-Cash Process Diagnostic & 
+     Bottleneck Scorecard (SAMPLE): 2 tabs (QTC_Audit_Scorecard,
+     Diagnostic_Summary_Dashboard), 90 cells, 24 of the workbook's own
+     formulas run by the formula engine. Formulas are never shown.
+     Every non-formula cell is a live input — in the real sheet, every
+     non-formula cell is typeable.
+     PROVENANCE (stated plainly, Lucky's rule): the embedded workbook
+     is the Section 6 restart's verified v2 build of the diagnostic
+     sample — it carries two optional context columns (actual cycle
+     days, error rate %) that NO formula reads; the workbook's own
+     note under the table says they are never scored. The page's
+     directions are the build spec's corrected directions, pasted in
+     (SPEC — QTC Diagnostic.md), and the story below is Story 3, the
+     diagnostic's companion text, in its own words. Every score,
+     rating, and finding is illustrative sample data — the file says
+     so itself.
+     ENGINE NOTE: verifying this tool caught the shared engine letting
+     an Excel error inside a summed range slip past as a skipped cell
+     (order-dependent — an error arriving by throw propagated, one
+     arriving as a cached value did not). SUM, AVERAGE, MIN and MAX
+     now propagate range errors the way Excel and LibreOffice do
+     (COUNT keeps ignoring them and COUNTA keeps counting them —
+     both probed against LibreOffice). Every earlier tool was
+     re-verified after the change (Tools 2–6 — zero differences).
+     Uses: ../../assets/styles.css + ../../assets/spreadsheet-tool.js +
+     ../../assets/formula-engine.js + this folder's data file
+     (converted from "Quote-to-Cash Process Diagnostic — SAMPLE
+     v2.xlsx" by convert-workbook.py, ALLINPUT mode; the workbook's
+     one formatted column — error rate %, at 0% — is mapped to
+     whole-percent display, and its Health % column carries no
+     format in the file, so it displays as the raw decimal,
+     exactly as the sheet itself does).
+     Verified cell-for-cell against a LibreOffice recalculation:
+     defaults plus five scenarios (all stages mature, all maturity
+     zero, all risk weights low, fractional scores, hostile values) —
+     zero differences in 24 compared formulas per scenario. Phone
+     summary strip on this page only: it reads the Diagnostic Summary
+     Dashboard from its own engine instance fed by the same typed
+     values, so the readiness verdict sits above the tool on a phone
+     instead of behind the last tab.
+     Map: site/CODE-MAP.md ("tools/qtc-diagnostic/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S6-P05.3 — Quote-to-Cash Process Diagnostic &amp; Bottleneck Scorecard · Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="When a commercial operation is broken, the official explanation inside the company rarely matches what is actually happening. People blame slow legal.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/qtc-diagnostic/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="S6-P05.3 — Quote-to-Cash Process Diagnostic &amp; Bottleneck Scorecard · Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="When a commercial operation is broken, the official explanation inside the company rarely matches what is actually happening. People blame slow legal.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/qtc-diagnostic/">
+<link rel="stylesheet" href="../../assets/styles.css">
+<style>.tool-frame .wb-tabs { max-width: 100%; overflow-x: auto; } .tool-frame .wb-tab { min-width: 0; overflow: hidden; text-overflow: ellipsis; } main section p { overflow-wrap: anywhere; }</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../services/">Services &amp; Pricing</a>
+      <a href="../../tools/">Proof of Work</a>
+      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section">
+    <p class="kicker">Proof of Work · Stories &amp; Sandboxes</p>
+    <h1>Quote-to-Cash Process Diagnostic &amp; Bottleneck Scorecard.</h1>
+    <p class="lede">When a commercial operation is broken, the official explanation inside the company rarely matches what is actually happening. People blame slow legal turnarounds or rigid finance approvals, when the real breakdown is upstream: unverified accounts, wordy runbooks and knowledge bases that are too hard to use in the moment, disjointed spreadsheets that leak margin, or unclear responsibilities where one person is compensating for everyone else. Mistaking a surface symptom for the root problem just moves the bottleneck to the next team. This is the diagnostic that reads the process first: five quote-to-cash stages, one control point each in this sample, scored on maturity and risk — the weakest high-risk controls flag P1, fix first, and the dashboard rolls everything into one readiness number. Every score, rating, and finding in it is sample data.</p>
+    <p><strong>Directions:</strong> Work through the five stages — Intake, Pricing, Approvals, Redlining, and Billing &amp; Renewals. For each stage's control point, score how mature the control is today (0 to 3) and how much risk it carries (1 to 3). The scorecard multiplies maturity by risk weight, flags the weakest high-risk controls P1 — fix first — and rolls everything into one readiness percentage on the dashboard. Raise a stage's maturity score and watch its flag clear and overall readiness climb.</p>
+
+    <div class="m-summary" id="m-summary" aria-label="Diagnostic summary totals"></div>
+
+    <div class="tool-frame">
+      <div id="wb-tool"></div>
+    </div>
+
+    <h2>Inputs, logic, limits</h2>
+    <p>Inputs: a Maturity score (0–3) and a Risk Weight (1–3) per control point, plus the owner and finding/fix text. The inputs are maturity and risk scores only — there are no cycle-time or error-rate inputs to the scoring. (The sheet also carries two optional context columns, actual cycle days and error rate %, as measured context for the conversation; no formula reads them and they never change a score — the workbook's own note under the table says so.) Logic: the weighted score is maturity × risk weight; the max score is 3 × risk weight; health % is weighted ÷ max; the priority flag follows the maturity-and-weight rules — P1 CRITICAL FIX FIRST, P2 FIX NEXT, P3 SIMPLIFY, or PASS; the dashboard totals earned points against max points into the Overall QTC Readiness % and counts the P1 bottlenecks. Limits: sample data only — one control point per stage, findings pre-filled. The P1 flag is a scoring signal, not a measured bottleneck in days or errors.</p>
+  </section>
+
+  <section class="section">
+    <h2>Story 3 — Read the process before you fix it.</h2>
+    <p><strong>What this piece shows.</strong> This two-tab workbook (QTC_Audit_Scorecard and Diagnostic_Summary_Dashboard) is the diagnostic engine used to audit a complicated deal operation from end to end. It evaluates the commercial operation across five stages: (1) Deal Intake &amp; Eligibility, (2) Pricing Engine &amp; Margin Guardrails, (3) Approval Routing &amp; Escalation SLAs, (4) Contract Redlining &amp; Playbook Controls, and (5) Order Booking, Billing Handoff &amp; Renewal Tracking. Each control point is scored on a 0-to-3 maturity scale (0 = Missing/Ad-Hoc, 1 = Loose/Manual, 2 = Usable/Wordy, 3 = Audit-Proof &amp; Enforced) and weighted from 1 to 3 based on its commercial risk to deal velocity and margin. Live formulas calculate weighted health scores by stage, flag high-risk gaps as “P1 - CRITICAL FIX FIRST,” and map each gap to a single accountable owner and a prescribed system fix.</p>
+    <p><strong>How a buyer uses it.</strong> At the start of an engagement, each control point across the deal process is audited and scored in the first tab. The Diagnostic Summary Dashboard automatically calculates the operation's overall readiness percentage, breaks down health by stage, and surfaces the exact P1 bottlenecks that are stalling deals or leaking margin. It gives leadership an objective, mathematical map of what is broken, what to fix first, and who owns each step.</p>
+    <p><strong>The point it proves.</strong> Process diagnosis comes first. Before you can fix a stuck deal operation, you have to read the process, find the signal, replace wordy manual steps with intuitive tools, and build real accountability — clear ownership, decision rights, escalation paths, and consequences — directly into the system so the fix stays fixed.</p>
+  </section>
+
+  <section class="section">
+    <h2><span class="no">Next</span> — Put this to work on a real operation.</h2>
+    <p><a class="btn" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book on my calendar</a></p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
+  </div>
+</footer>
+
+<script src="S6-P05c-qtc-diagnostic-data.js"></script>
+<script src="../../assets/formula-engine.js"></script>
+<script src="../../assets/spreadsheet-tool.js"></script>
+<script>
+  window.renderWorkbook(document.getElementById("wb-tool"),
+    window.QTC_DIAGNOSTIC_DATA);
+</script>
+<script>
+  /* Phone summary strip (this page only, same pattern as Tools 2, 4,
+     5, 6): the Diagnostic Summary Dashboard is the LAST tab, so on a
+     phone the readiness verdict sits far from the score inputs a
+     visitor is typing. The strip builds its own engine instance from
+     the same data file, feeds it every value typed into the rendered
+     workbook (matched to its sheet by panel), and shows the dashboard
+     totals above the tool. It only reads; it never writes back. */
+  (function () {
+    var strip = document.getElementById("m-summary");
+    var data = window.QTC_DIAGNOSTIC_DATA;
+    if (!strip || !data || !window.FormulaEngine) return;
+    var overrides = {}; // sheetName -> { addr: rawValue }
+    function compute() {
+      var reg = {};
+      data.sheets.forEach(function (sh) {
+        var m = {};
+        sh.rows.forEach(function (r) { r.cells.forEach(function (c) {
+          m[c.a] = c.t === "formula" ? { kind: "formula", value: c.f } : { kind: "value", value: c.v };
+        }); });
+        var ov = overrides[sh.name] || {};
+        Object.keys(ov).forEach(function (a) { m[a] = { kind: "value", value: ov[a] }; });
+        reg[sh.name] = window.FormulaEngine.createSheet(m, { resolve: function (name, addr) {
+          var t = reg[name]; return t ? t.get(addr) : "#REF!";
+        } });
+      });
+      var d = reg["Diagnostic_Summary_Dashboard"];
+      function num(v) { return (typeof v === "number" && isFinite(v)) ? String(Math.round(v)) : "—"; }
+      function pct(v) { return (typeof v === "number" && isFinite(v)) ? (v * 100).toFixed(0) + "%" : "—"; }
+      strip.innerHTML =
+        "<div><span>Earned points</span><strong>" + num(d.get("B2")) + " of " + num(d.get("B3")) + "</strong></div>" +
+        "<div><span>QTC readiness</span><strong>" + pct(d.get("B4")) + "</strong></div>" +
+        "<div><span>P1 bottlenecks</span><strong>" + num(d.get("B5")) + "</strong></div>";
+    }
+    var panels = document.querySelectorAll("#wb-tool .wb-panel");
+    document.getElementById("wb-tool").addEventListener("input", function (e) {
+      var input = e.target;
+      if (!input.classList || !input.classList.contains("wb-input")) return;
+      var addr = input.getAttribute("aria-label");
+      var panel = input.closest ? input.closest(".wb-panel") : null;
+      var si = panel ? Array.prototype.indexOf.call(panels, panel) : -1;
+      if (!addr || si < 0) return;
+      var name = data.sheets[si].name;
+      var cell = null;
+      data.sheets[si].rows.forEach(function (r) { r.cells.forEach(function (c) { if (c.a === addr) cell = c; }); });
+      var raw = input.value;
+      var v;
+      if (cell && cell.fmt === "pct") { v = raw === "" ? "" : parseFloat(raw) / 100; }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && String(parseFloat(raw)) === raw.trim().replace(/,/g, "")) { v = parseFloat(raw); }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && cell && typeof cell.v === "number") { v = parseFloat(raw); }
+      else { v = raw; }
+      (overrides[name] = overrides[name] || {})[addr] = v;
+      compute();
+    });
+    compute();
+  })();
+</script>
+</body>
+</html>
