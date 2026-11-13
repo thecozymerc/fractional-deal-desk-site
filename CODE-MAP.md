@@ -55,3 +55,11 @@ Every change is also recorded in CHANGELOG.md.
 - `tools/deal-pricing-solver/S6-P01a-deal-pricing-solver-data-revised.js` — the REVISED DESCRIPTIONS data: converted from "Deal Pricing Solver — SAMPLE (Revised Descriptions).xlsx" (in the tool-builds folder, next to the untouched original). Every description, label, and note is reworded to read better on screen; every number and input is identical (verified by diff — only text cells differ). **Loaded by the P01 homepage hero embed only** (the S6-P01.a tool page carries the calculator since Nov 8, 2026).
 - Retired Nov 8 (later): `tools/deal-pricing-solver/S6-P01a-deal-pricing-solver-compute.js` — the hand-written calculation module. Lucky's call: embed the sheet and let its own formulas do the work. Replaced by the formula engine; the file is in the trash, recoverable.
 - Retired: `assets/mini-solver.js` (Nov 7, invented shortcut — trashed) and `assets/homepage-solver.js` (Nov 8, hand-built replica — trashed). Lucky's rule, restated Nov 8: site tools are the actual spreadsheet, usable, minus the formulas — never a hand-made miniature or replica.
+
+- **/tools/spend-variance/** — Tool 4 — Spend Variance & Renewal Tracker
+  — REBUILT Nov 12, 2026 (Argon full rebuild under Muse's prompt +
+  completeness/freedom addendum). The workbook-embed page is retired
+  as an iteration (branch `tool-4-iterations`, folder
+  `tool-4-workbook/`; Drive "Tool 4 — Workbook Embed (retired)").
+  New build: KPI strip + Needs a Decision + 3 editable tables +
+  Portfolio Brief; sample data and anchors unchanged.

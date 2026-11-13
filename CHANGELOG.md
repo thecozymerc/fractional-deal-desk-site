@@ -1,5 +1,17 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-12 (later)
+
+- Page/tool: S6-P02 / Tool 4 — Spend Variance & Renewal Tracker
+  REBUILT (Argon). Control-board page replaces the workbook embed:
+  sticky KPI strip, Needs a Decision exception list, editable
+  register (notice window editable) / forecast (threshold editable) /
+  invoice audit tables, copyable Portfolio Brief. Verified anchors
+  unchanged: $4,542,500 · notices 6 · YTD variance $28,960 (1.3%) ·
+  REVIEW 4 / 3. The workbook-embed build is deprecated as an
+  iteration (GitHub branch tool-4-iterations; Drive archive folder;
+  local snapshot in tool4-build/). CODE-MAP v54.
+
 ## 2026-11-12 — RESPONSIVE REVISION PROMOTED: Perm Calculator gains phone + desktop layouts; roster trimmed — Lucky's ruling
 - Argon wrote the responsive pass (CSS only) and the trimmed intro paragraph; Muse executed and verified. One file, two shapes: phone <=760px single column with a compact totals strip; desktop >=1024px two-column workspace with strip card titles in full (the truncation is fixed).
 - Roster rule applied (Lucky, Nov 12): the intro provenance paragraph names no employers — 15+ years in commercial contracts, deal desk, and revenue operations; corporate since 2006; contracts up to $300M; 3,000+ SKUs priced. The employer roster stays on the Homepage and About pages only. A full text diff confirms this paragraph is the ONLY words that changed on the page.
