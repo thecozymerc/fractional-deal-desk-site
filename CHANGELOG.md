@@ -1,5 +1,36 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-13 — QA fixes wave 2 (Argon master QA prompt, Deliverables 2–7)
+
+- S6-P02 / Tool 4 (Spend Variance): meta description + canonical
+  added (findings F1/F2 closed for this page); favicon link tags
+  added. Contrast check: Tool 4's :root never carried #98A1AD —
+  its light token was already the compliant value, so no token
+  change. Everything else byte-identical (verified by full diff;
+  live KPI anchors re-probed: $4,542,500 / $2,196,996 /
+  $2,225,956 / $28,960, zero page errors).
+- NEW root files, all live on Cloudflare: robots.txt (allow all
+  + sitemap declaration — F3 closed); sitemap.xml (exactly the
+  27 canonical URLs — F4 closed); 404.html in the site frame
+  with absolute paths (live test: a bogus URL returns HTTP 404
+  with this page — F6 closed); favicon.svg (Argon's design:
+  navy field, brass rule, white D with brass counter; legible
+  at 16px — F5 closed) + favicon link tags installed on every
+  page of the site.
+- _headers: the full safe set shipped (HSTS, nosniff,
+  Referrer-Policy, X-Frame-Options SAMEORIGIN,
+  Permissions-Policy). Live test: Cloudflare applies nosniff +
+  Referrer-Policy on pages.dev but does NOT apply HSTS,
+  X-Frame-Options, or Permissions-Policy from _headers on this
+  host (HSTS is a zone-level setting — it needs a custom
+  domain). F7 therefore stands PARTIALLY closed; the file
+  itself is correct and complete for any future host.
+- Still outstanding from the same Argon run: Deliverable 8
+  (Homepage photo treatment) arrived truncated and Deliverable
+  9 (About photo treatment) was never produced; a continuation
+  is queued. The CSP recommendation Argon owed in its closing
+  inventory is also outstanding with them.
+
 ## 2026-11-13 — Tool 3 QA fixes (Argon, master QA prompt, Deliverable 1)
 
 - S6-P01.c / Tool 3 (Perm Calculator): meta description and

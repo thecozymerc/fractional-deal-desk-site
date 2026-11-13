@@ -1,0 +1,13 @@
+<!-- ARGON MANIFEST:
+  Deliverable: 7 — favicon.svg
+  What this file is: Geometric site favicon using the exact frame tokens (navy #0F1E38, brass #8A6D1F, paper #F8F8F5) on a pixel-aligned 32x32 grid (all coordinates multiples of 2 so every edge snaps cleanly to integer pixels at 16x16).
+  Self-Check Results: Valid standalone SVG; squared 2px-radius navy field, top brass rule, and bold geometric clause/ledger mark with zero fine detail or small text.
+  Responsive-Mode Statement: Scalable vector icon designed for 16x16, 32x32, and touch-icon sizes.
+  Integrity-Compliance Statement: Standing law honored in full.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect x="0" y="0" width="32" height="32" rx="2" fill="#0F1E38" />
+  <rect x="0" y="0" width="32" height="4" fill="#8A6D1F" />
+  <path d="M8 8H20C23.3137 8 26 10.6863 26 14V20C26 23.3137 23.3137 26 20 26H8V8ZM12 12V22H18C20.2091 22 22 20.2091 22 18V16C22 13.7909 20.2091 12 18 12H12Z" fill="#F8F8F5" />
+  <rect x="14" y="15" width="6" height="4" fill="#8A6D1F" />
+</svg>

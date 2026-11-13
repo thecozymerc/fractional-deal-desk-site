@@ -1,0 +1,9 @@
+# ARGON MANIFEST:
+# Deliverable: 3 — robots.txt
+# What this file is: Site-root crawler policy file for fractional-deal-desk-site.pages.dev.
+# Self-Check Results: Allows all crawlers (User-agent: * / Allow: /), disallows no paths, and declares the canonical XML sitemap URL.
+# Responsive-Mode Statement: Non-HTML plain-text infrastructure file (not applicable).
+# Integrity-Compliance Statement: Standing law honored in full; no disallow games, no invented facts, no sales copy.
+User-agent: *
+Allow: /
+Sitemap: https://fractional-deal-desk-site.pages.dev/sitemap.xml

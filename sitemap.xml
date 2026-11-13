@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ARGON MANIFEST:
+  Deliverable: 4 — sitemap.xml
+  What this file is: Canonical XML sitemap for https://fractional-deal-desk-site.pages.dev/.
+  Self-Check Results: Contains exactly the 27 canonical URLs specified on the primary host, no more and no fewer.
+  Responsive-Mode Statement: Non-HTML XML infrastructure file (not applicable).
+  Integrity-Compliance Statement: Standing law honored in full; exact canonical URL inventory only.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://fractional-deal-desk-site.pages.dev/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/services/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/about/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/pricing-engines/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/deal-pricing-solver/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/perpetual-to-saas-conversion/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/perm-calculator/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/cloud-commit-playbook/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/spend-variance/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/intake-gate/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/redlining-playbook/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/qtc-diagnostic/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/bundling-sandbox/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/contract-operations/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/deal-check/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/contract-migration-triage/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/case-operations-capacity/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/contract-analyzer/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/contracts-library/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/contracts-library/tier-1/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/contracts-library/tier-2/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/contracts-library/tier-3/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/executive-intelligence/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/weighted-decision-scoring/</loc></url>
+  <url><loc>https://fractional-deal-desk-site.pages.dev/tools/executive-dashboard/</loc></url>
+</urlset>

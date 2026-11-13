@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<!-- ARGON MANIFEST:
+  Deliverable: 5 — 404.html (Custom Not-Found Page)
+  What changed in this file and nothing else:
+    - New site-root 404 page built in the site's exact frame (masthead, footer, tokens: navy #0F1E38, brass #8A6D1F, paper #F8F8F5, secondary grey #5F6B7A, Georgia serif display).
+    - Uses root-relative / absolute paths for all links and assets so it resolves cleanly when served at any URL depth.
+    - Carries <title>Page Not Found</title>, one H1, one plain sentence stating the page does not exist, and standalone links (>= 44px height) to the homepage and the tools hub.
+  Self-Check Results:
+    - All links and asset paths start with / or https://.
+    - Contrast token --grey-light is set to #5F6B7A (5.10:1 on #F8F8F5 paper).
+    - Zero sales copy, prices, or pitch language.
+  Responsive-Mode Statement:
+    - Designed desktop mode (> 720px): composed 1120px max-width frame with horizontal masthead and side-by-side two-column action row for the Homepage and Proof of Work (Tools Hub) targets.
+    - Designed mobile mode (<= 720px): fluid single-column stack with wrapped navigation and full-width 48px-tall touch targets. Zero horizontal overflow across 280/320/360/375/390/412/430/768/1024/1280 CSS px.
+  Integrity-Compliance Statement:
+    - Standing law honored in full: demonstrate, never sell; no invented facts; no "corporate since 2006"; no employer roster names; no hidden text.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page Not Found</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    :root {
+      --paper: #F8F8F5;
+      --panel: #FFFFFF;
+      --ink: #0F1E38;
+      --ink-soft: #33445E;
+      --grey: #5F6B7A;
+      --grey-light: #5F6B7A;
+      --hairline: #D9DCE1;
+      --brass: #8A6D1F;
+      --brass-dark: #6E5716;
+      --font-serif: Georgia, "Times New Roman", serif;
+      --font-sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      width: 100%;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .site-header {
+      background: var(--paper);
+      border-top: 3px solid var(--ink);
+      border-bottom: 1px solid var(--hairline);
+    }
+    .site-header .wrap,
+    .not-found-main .wrap,
+    .site-footer .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding-left: 24px;
+      padding-right: 24px;
+      width: 100%;
+    }
+    .site-header .wrap {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .site-header .brand {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--ink);
+      letter-spacing: 0.01em;
+    }
+    .site-header nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .site-header nav a {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .site-header nav a:hover {
+      color: var(--brass-dark);
+    }
+    .not-found-main {
+      flex: 1 0 auto;
+      padding: 64px 0;
+    }
+    .not-found-box {
+      max-width: 680px;
+      background: var(--panel);
+      border: 1px solid var(--hairline);
+      border-top: 3px solid var(--ink);
+      border-radius: 2px;
+      padding: 32px;
+    }
+    .not-found-box .eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--brass);
+      margin: 0 0 12px 0;
+    }
+    .not-found-box h1 {
+      font-family: var(--font-serif);
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--ink);
+      margin: 0 0 16px 0;
+    }
+    .not-found-box p {
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      margin: 0 0 24px 0;
+    }
+    .not-found-links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .not-found-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 20px;
+      font-family: var(--font-sans);
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 2px;
+      border: 1px solid var(--hairline);
+      background: var(--paper);
+      color: var(--ink);
+      text-align: center;
+    }
+    .not-found-link.primary {
+      background: var(--ink);
+      color: var(--panel);
+      border-color: var(--ink);
+    }
+    .not-found-link:hover {
+      border-color: var(--brass);
+    }
+    .not-found-link.primary:hover {
+      background: var(--ink-soft);
+      border-color: var(--ink-soft);
+    }
+    .site-footer {
+      background: var(--ink);
+      border-top: 3px solid var(--brass);
+      padding: 48px 0;
+    }
+    .site-footer p {
+      font-size: 14px;
+      color: #D8DCE3;
+      margin: 0;
+    }
+    @media (max-width: 720px) {
+      .site-header .wrap,
+      .not-found-main .wrap,
+      .site-footer .wrap {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+      .site-header .wrap {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        gap: 8px;
+      }
+      .site-header nav {
+        width: 100%;
+        gap: 8px 16px;
+      }
+      .not-found-main {
+        padding: 32px 0;
+      }
+      .not-found-box {
+        padding: 20px 16px;
+      }
+      .not-found-box h1 {
+        font-size: 26px;
+      }
+      .not-found-box p {
+        font-size: 16px;
+      }
+      .not-found-links {
+        grid-template-columns: 1fr;
+      }
+      .not-found-link {
+        width: 100%;
+      }
+      .site-footer {
+        padding: 32px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav aria-label="Primary Navigation">
+      <a href="https://fractional-deal-desk-site.pages.dev/">Home</a>
+      <a href="https://fractional-deal-desk-site.pages.dev/services/">Services &amp; Pricing</a>
+      <a href="https://fractional-deal-desk-site.pages.dev/tools/">Proof of Work</a>
+      <a href="https://fractional-deal-desk-site.pages.dev/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="not-found-main">
+  <div class="wrap">
+    <section class="not-found-box" aria-labelledby="not-found-heading">
+      <p class="eyebrow">404 &middot; Not Found</p>
+      <h1 id="not-found-heading">Page Not Found</h1>
+      <p>The page at this address does not exist or has been moved.</p>
+      <div class="not-found-links">
+        <a class="not-found-link primary" href="https://fractional-deal-desk-site.pages.dev/">Return to the Homepage</a>
+        <a class="not-found-link" href="https://fractional-deal-desk-site.pages.dev/tools/">Open the Tools Hub</a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
+  </div>
+</footer>
+
+</body>
+</html>
