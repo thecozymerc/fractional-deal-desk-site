@@ -1,5 +1,45 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-13 — Tool 6 REBUILT by Argon (Redlining Playbook)
+
+- Page/tool: S6-P05.2 / Tool 6 — Argon's full rebuild promoted,
+  replacing the first-generation workbook-embed build (retired to
+  the GitHub branch tool-6-iterations + local snapshot). Answers
+  first: KPI strip, Needs a Decision (worst first), the full 8-clause
+  Playbook Matrix verbatim, the Redline Scorer (one-tap segmented
+  tier controls — no dropdowns), copyable Redline Brief + Reset.
+  Hybrid style: bank frame, research voice. Math UNALTERED from the
+  workbook (declared in Argon's in-file manifest). Verified before
+  promotion: complete file DOCTYPE-</html>; sample data identical
+  to the workbook; DOM battery — anchors 9 · 2 · ESCALATION
+  REQUIRED - Finance/Legal · points 1,1,0,0,1,3,0,3 · escalation 2;
+  32 combination probes vs an independent oracle, 0 mismatches;
+  boundary states (all Tier 0 -> FAST-TRACK; CL-06 Tier 3 ->
+  BLOCKED) pass; standing-law body scan clean (no prices, no sales
+  copy, no "since 2006", no employer names, no Story 2 in the body);
+  JSON-LD parses; width-ladder sweep zero overflow at all 10
+  widths; phone + desktop screenshots reviewed. No story block —
+  Story 2 retired with the embed build (preserved in the archive).
+  Argon improvements (declared in manifest): matrix-scorer
+  highlight sync, one-tap boundary preset bar, Give-Get surfaced
+  in scorer rows, sticky live verdict bar.
+
+## 2026-11-13 — Width-ladder defect fixes (Tier 1 library page, Tool 7)
+
+- Pages/tools: S6-P06 tier-1 (/tools/contracts-library/tier-1/)
+  and S6-P05.3 / Tool 7 (/tools/qtc-diagnostic/) — the first
+  width-ladder sweep (all 27 pages x 280-1280 CSS px, real
+  Chromium) found horizontal overflow on two first-generation
+  pages. Tier 1: +7px at 320 (unbreakable preview strings inside
+  the form cards). Tool 7: +27px at 280 (sheet tab wider than its
+  strip; an unbreakable string in the Story 3 block). Fixed with
+  page-local CSS only (overflow-wrap on card/prose text; tab cap
+  + internal tab-strip scroll) — no copy, no design, no math
+  changes; authorized by Lucky as mechanical defect repair.
+  Re-sweep after the fix: 27 of 27 pages, zero overflow at every
+  width, zero regressions. The sweep is now a standing item in
+  the Argon Prompt Checklist (AFTER THE RETURN).
+
 ## 2026-11-13 — Tool 5 rename COMPLETED by Argon (Deal Desk Controls)
 
 - Page/tool: S6-P05.1 / Tool 5 — Argon's completion build is
