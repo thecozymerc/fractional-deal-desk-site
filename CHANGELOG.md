@@ -1,5 +1,25 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-13 — Tool 5 rename COMPLETED by Argon (Deal Desk Controls)
+
+- Page/tool: S6-P05.1 / Tool 5 — Argon's completion build is
+  promoted, superseding the executor's mechanical port (preserved
+  in GitHub history and locally). Argon placed the Deal Desk
+  Controls rename in its own design (badge, eyebrow, breadcrumbs,
+  structured data; "Deal Desk Controls" x15 on the page) and
+  removed a lingering start-date item from the base it was handed.
+  Verified before promotion: complete file; zero prices / sales
+  copy / "since 2006" / employer names in the body; sample data and
+  logic identical to the workbook ground truth; DOM battery —
+  anchors 5 · 2 · 40% · 2 · 1, DEAL-102 fix probe (3 · 60% · 1),
+  DEAL-105 approval probe (unauthorized 2), reset restores, zero
+  page errors; JSON-LD parses. Executor's promotion step was the
+  standard mechanical conversion of Argon's 8 root-relative link
+  targets to the site's relative scheme (targets unchanged).
+  Partition links still resolve to /tools/stories-and-sandboxes/;
+  the partition page, hub label, and URL rename in the pending
+  story-removal pass.
+
 ## 2026-11-13 — S6-P05 partition renamed on Tool 5 (Argon naming)
 
 - Page/tool: S6-P05.1 / Tool 5 — the S6-P05 partition is renamed
