@@ -240,11 +240,18 @@
       justify-content: center;
       gap: 6px;
       transition: background-color 0.12s ease, border-color 0.12s ease;
+      white-space: nowrap;
     }
 
     .btn:hover {
       background-color: var(--paper);
       border-color: var(--soft-ink);
+    }
+
+    .btn-sm {
+      font-size: 0.8125rem;
+      padding: 6px 12px;
+      min-height: 40px;
     }
 
     .btn-primary {
@@ -423,7 +430,6 @@
     .decision-grid {
       display: grid;
       grid-template-columns: 1fr;
-      divide-y: 1px solid var(--hairline);
     }
 
     .decision-group {
@@ -502,6 +508,80 @@
       font-style: italic;
     }
 
+    /* SECTION 02 — CONTRACT GROUPS */
+    .forecast-groups-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .forecast-group {
+      border-bottom: 1px solid var(--hairline);
+      background-color: var(--panel);
+    }
+
+    .forecast-group:last-child {
+      border-bottom: none;
+    }
+
+    .forecast-group-header {
+      padding: 12px 18px;
+      background-color: var(--paper);
+      border-bottom: 1px solid var(--hairline);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .forecast-group-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .forecast-group-title {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--ink);
+    }
+
+    .forecast-group-subtotal {
+      font-size: 0.84rem;
+      color: var(--soft-ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .forecast-group-empty {
+      padding: 10px 18px;
+      background-color: var(--panel);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .forecast-empty-text {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+    }
+
+    .forecast-empty-vendor {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .forecast-empty-note {
+      color: var(--grey);
+      font-style: italic;
+      font-size: 0.85rem;
+    }
+
     /* TABLES */
     .table-scroll {
       width: 100%;
@@ -550,6 +630,11 @@
       border-top: 2px solid var(--hairline);
       border-bottom: none;
       padding: 10px;
+    }
+
+    .printed-contract {
+      font-weight: 500;
+      color: var(--ink);
     }
 
     /* TABLE INPUTS */
@@ -603,7 +688,7 @@
     }
 
     .table-input.month-input {
-      width: 100px;
+      width: 110px;
       font-family: var(--font-mono);
     }
 
@@ -611,12 +696,14 @@
       min-width: 210px;
     }
 
-    .table-select.contract-select {
-      min-width: 220px;
-    }
-
     .table-select.status-select {
       min-width: 130px;
+    }
+
+    .header-picker-select {
+      width: auto;
+      min-width: 230px;
+      background-color: var(--paper);
     }
 
     /* STATUS PILLS */
@@ -849,9 +936,15 @@
       }
       .tool-header-card,
       .panel-header,
+      .forecast-group-header,
+      .forecast-group-empty,
       .decision-group,
       .closing-block {
         padding: 14px 12px;
+      }
+      .header-picker-select {
+        min-width: 0;
+        width: 100%;
       }
     }
   </style>
@@ -907,7 +1000,7 @@
         <div class="kpi-card">
           <div class="kpi-label">Total Book Value</div>
           <div class="kpi-value" id="kpi-book-value">$4,542,500</div>
-          <div class="kpi-sub" id="kpi-book-sub">10 active register contracts</div>
+          <div class="kpi-sub" id="kpi-book-sub">10 register contracts</div>
         </div>
         <div class="kpi-card kpi-accent">
           <div class="kpi-label">Notices Due &le; 90 Days</div>
@@ -964,7 +1057,9 @@
               <div id="decision-invoices-list"></div>
             </div>
           </div>
-        </section>        <!-- SECTION 01 — CONTRACT REGISTER -->
+        </section>
+
+        <!-- SECTION 01 — CONTRACT REGISTER -->
         <section class="panel-card" aria-labelledby="sec01-heading">
           <div class="panel-header">
             <div class="panel-title-group">
@@ -1005,7 +1100,7 @@
           </div>
         </section>
 
-        <!-- SECTION 02 — ACTUAL VS FORECAST -->
+        <!-- SECTION 02 — ACTUAL VS FORECAST (GROUPED BY CONTRACT) -->
         <section class="panel-card" aria-labelledby="sec02-heading">
           <div class="panel-header">
             <div class="panel-title-group">
@@ -1017,32 +1112,20 @@
                 <span>Threshold (%)</span>
                 <input type="number" id="variance-threshold" class="table-input days-input" value="10" min="0" max="100" step="0.5">
               </label>
-              <button type="button" class="btn" id="btn-add-forecast">+ Add Monthly Line</button>
             </div>
           </div>
+
+          <div id="forecast-groups-container" class="forecast-groups-wrap"></div>
+
           <div class="table-scroll">
-            <table class="data-table" id="forecast-table">
-              <thead>
-                <tr>
-                  <th>Month</th>
-                  <th>Contract</th>
-                  <th class="num">Forecast ($)</th>
-                  <th class="num">Actual ($)</th>
-                  <th class="num">Variance ($)</th>
-                  <th class="num">Variance (%)</th>
-                  <th>Flag</th>
-                  <th aria-label="Remove Row"></th>
-                </tr>
-              </thead>
-              <tbody id="forecast-tbody"></tbody>
+            <table class="data-table" id="forecast-footer-table" aria-label="Actual vs Forecast Totals">
               <tfoot>
                 <tr>
-                  <td colspan="2">YTD Totals</td>
-                  <td class="num" id="forecast-total-f">$2,196,996</td>
-                  <td class="num" id="forecast-total-a">$2,225,956</td>
-                  <td class="num" id="forecast-total-v">$28,960</td>
-                  <td class="num" id="forecast-total-pct">1.3%</td>
-                  <td colspan="2" id="forecast-total-flags">4 REVIEW</td>
+                  <td>YTD Totals</td>
+                  <td class="num">Forecast: <span id="forecast-total-f">$2,196,996</span></td>
+                  <td class="num">Actual: <span id="forecast-total-a">$2,225,956</span></td>
+                  <td class="num">Variance: <span id="forecast-total-v">$28,960</span> (<span id="forecast-total-pct">1.3%</span>)</td>
+                  <td class="num" id="forecast-total-flags">4 REVIEW</td>
                 </tr>
               </tfoot>
             </table>
@@ -1057,6 +1140,10 @@
               <h3 id="sec03-heading" class="panel-title">Invoice Audit Log</h3>
             </div>
             <div class="panel-actions">
+              <label class="control-field" for="new-invoice-contract">
+                <span>Contract</span>
+                <select id="new-invoice-contract" class="table-select header-picker-select" aria-label="Select contract for new invoice"></select>
+              </label>
               <button type="button" class="btn" id="btn-add-invoice">+ Add Invoice</button>
             </div>
           </div>
@@ -1158,7 +1245,9 @@
   <!-- FOOTER -->
   <footer class="site-footer">
     <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
-  </footer>  <script>
+  </footer>
+
+  <script>
     (function () {
       'use strict';
 
@@ -1291,18 +1380,20 @@
         return Math.round((targetMs - baseMs) / 86400000);
       }
 
-      function fmtCurrency(val, showPlus) {
+      function fmtCurrency(val, showPlus, useUnicodeMinus) {
         var n = Math.round(Number(val) || 0);
         var absStr = '$' + Math.abs(n).toLocaleString('en-US');
-        if (n < 0) return '-' + absStr;
+        var minusChar = useUnicodeMinus ? '−' : '-';
+        if (n < 0) return minusChar + absStr;
         if (showPlus && n > 0) return '+' + absStr;
         return absStr;
       }
 
-      function fmtPercent(ratio, showPlus) {
+      function fmtPercent(ratio, showPlus, useUnicodeMinus) {
         var pct = (Number(ratio) || 0) * 100;
         var fixed = Math.abs(pct).toFixed(1) + '%';
-        if (pct < -0.0001) return '-' + fixed;
+        var minusChar = useUnicodeMinus ? '−' : '-';
+        if (pct < -0.0001) return minusChar + fixed;
         if (showPlus && pct > 0.0001) return '+' + fixed;
         return fixed;
       }
@@ -1326,25 +1417,30 @@
         return map;
       }
 
-      function buildContractOptionsHtml(selectedId) {
+      function formatPrintedContract(contractId, vendorMap) {
+        var v = vendorMap[contractId];
+        if (v) return contractId + ' — ' + v;
+        return contractId || 'Unassigned';
+      }
+
+      function populateNewInvoicePicker() {
+        var selectEl = document.getElementById('new-invoice-contract');
+        if (!selectEl) return;
+        var currentVal = selectEl.value;
         var html = '';
-        var found = false;
         for (var i = 0; i < state.register.length; i++) {
           var c = state.register[i];
-          var isSel = c.id === selectedId;
-          if (isSel) found = true;
+          var isSel = (c.id === currentVal) || (!currentVal && i === 0);
           html += '<option value="' + escHtml(c.id) + '"' + (isSel ? ' selected' : '') + '>' +
             escHtml(c.id + ' — ' + (c.vendor || 'Unnamed')) + '</option>';
         }
-        if (!found && selectedId) {
-          html = '<option value="' + escHtml(selectedId) + '" selected>' + escHtml(selectedId + ' (Unlisted)') + '</option>' + html;
-        }
-        return html;
+        selectEl.innerHTML = html;
       }
 
       function renderTables() {
         renderRegisterTable();
-        renderForecastTable();
+        renderForecastGroups();
+        populateNewInvoicePicker();
         renderInvoiceTable();
         recalculateAll();
       }
@@ -1378,34 +1474,89 @@
         tbody.innerHTML = html;
       }
 
-      function renderForecastTable() {
-        var tbody = document.getElementById('forecast-tbody');
+      function renderForecastGroups() {
+        var container = document.getElementById('forecast-groups-container');
         var html = '';
-        for (var i = 0; i < state.forecast.length; i++) {
-          var f = state.forecast[i];
-          html += '<tr data-index="' + i + '">' +
-            '<td><input type="text" class="table-input month-input" data-table="forecast" data-field="month" data-index="' + i + '" value="' + escHtml(f.month) + '" aria-label="Month"></td>' +
-            '<td><select class="table-select contract-select" data-table="forecast" data-field="contractId" data-index="' + i + '" aria-label="Contract">' + buildContractOptionsHtml(f.contractId) + '</select></td>' +
-            '<td class="num"><input type="number" class="table-input num-input" data-table="forecast" data-field="forecast" data-index="' + i + '" value="' + Number(f.forecast || 0) + '" step="100" aria-label="Forecast Amount"></td>' +
-            '<td class="num"><input type="number" class="table-input num-input" data-table="forecast" data-field="actual" data-index="' + i + '" value="' + Number(f.actual || 0) + '" step="100" aria-label="Actual Amount"></td>' +
-            '<td class="num" id="fc-var-dlr-' + i + '"></td>' +
-            '<td class="num" id="fc-var-pct-' + i + '"></td>' +
-            '<td id="fc-flag-' + i + '"></td>' +
-            '<td><button type="button" class="btn-delete" data-action="delete-forecast" data-index="' + i + '" title="Delete forecast row">&times;</button></td>' +
-            '</tr>';
+
+        for (var g = 0; g < state.register.length; g++) {
+          var reg = state.register[g];
+          var cid = reg.id;
+          var vendorTitle = (reg.vendor || 'Unnamed Vendor') + ' — ' + cid;
+
+          var lineIndices = [];
+          for (var i = 0; i < state.forecast.length; i++) {
+            if (state.forecast[i].contractId === cid) {
+              lineIndices.push(i);
+            }
+          }
+
+          if (lineIndices.length === 0) {
+            html += '<div class="forecast-group" data-group-index="' + g + '">' +
+              '<div class="forecast-group-empty">' +
+                '<div class="forecast-empty-text">' +
+                  '<span class="forecast-empty-vendor" id="fc-group-title-' + g + '">' + escHtml(vendorTitle) + '</span>' +
+                  '<span>&middot;</span>' +
+                  '<span class="forecast-empty-note">No forecast lines yet</span>' +
+                '</div>' +
+                '<button type="button" class="btn btn-sm" data-action="add-forecast-line" data-reg-index="' + g + '">+ Add Line</button>' +
+              '</div>' +
+            '</div>';
+          } else {
+            html += '<div class="forecast-group" data-group-index="' + g + '">' +
+              '<div class="forecast-group-header">' +
+                '<div class="forecast-group-info">' +
+                  '<div class="forecast-group-title" id="fc-group-title-' + g + '">' + escHtml(vendorTitle) + '</div>' +
+                  '<div class="forecast-group-subtotal" id="fc-group-subtotal-' + g + '"></div>' +
+                '</div>' +
+                '<button type="button" class="btn btn-sm" data-action="add-forecast-line" data-reg-index="' + g + '">+ Add Line</button>' +
+              '</div>' +
+              '<div class="table-scroll">' +
+                '<table class="data-table">' +
+                  '<thead>' +
+                    '<tr>' +
+                      '<th>Month</th>' +
+                      '<th class="num">Forecast ($)</th>' +
+                      '<th class="num">Actual ($)</th>' +
+                      '<th class="num">Variance ($)</th>' +
+                      '<th class="num">Variance (%)</th>' +
+                      '<th>Flag</th>' +
+                      '<th aria-label="Remove Row"></th>' +
+                    '</tr>' +
+                  '</thead>' +
+                  '<tbody>';
+
+            for (var k = 0; k < lineIndices.length; k++) {
+              var fIdx = lineIndices[k];
+              var f = state.forecast[fIdx];
+              html += '<tr data-index="' + fIdx + '">' +
+                '<td><input type="text" class="table-input month-input" data-table="forecast" data-field="month" data-index="' + fIdx + '" value="' + escHtml(f.month) + '" aria-label="Month"></td>' +
+                '<td class="num"><input type="number" class="table-input num-input" data-table="forecast" data-field="forecast" data-index="' + fIdx + '" value="' + Number(f.forecast || 0) + '" step="100" aria-label="Forecast Amount"></td>' +
+                '<td class="num"><input type="number" class="table-input num-input" data-table="forecast" data-field="actual" data-index="' + fIdx + '" value="' + Number(f.actual || 0) + '" step="100" aria-label="Actual Amount"></td>' +
+                '<td class="num" id="fc-var-dlr-' + fIdx + '"></td>' +
+                '<td class="num" id="fc-var-pct-' + fIdx + '"></td>' +
+                '<td id="fc-flag-' + fIdx + '"></td>' +
+                '<td><button type="button" class="btn-delete" data-action="delete-forecast" data-index="' + fIdx + '" title="Delete forecast row">&times;</button></td>' +
+              '</tr>';
+            }
+
+            html += '</tbody></table></div></div>';
+          }
         }
-        tbody.innerHTML = html;
+
+        container.innerHTML = html;
       }
 
       function renderInvoiceTable() {
         var tbody = document.getElementById('invoice-tbody');
+        var vendorMap = getVendorMap();
         var html = '';
         for (var i = 0; i < state.invoices.length; i++) {
           var inv = state.invoices[i];
+          var printedContract = formatPrintedContract(inv.contractId, vendorMap);
           html += '<tr data-index="' + i + '">' +
             '<td><input type="text" class="table-input id-input" data-table="invoices" data-field="invoiceNo" data-index="' + i + '" value="' + escHtml(inv.invoiceNo) + '" aria-label="Invoice Number"></td>' +
             '<td><input type="text" class="table-input id-input" data-table="invoices" data-field="poNo" data-index="' + i + '" value="' + escHtml(inv.poNo) + '" aria-label="PO Number"></td>' +
-            '<td><select class="table-select contract-select" data-table="invoices" data-field="contractId" data-index="' + i + '" aria-label="Contract">' + buildContractOptionsHtml(inv.contractId) + '</select></td>' +
+            '<td class="printed-contract" id="inv-contract-text-' + i + '">' + escHtml(printedContract) + '</td>' +
             '<td class="num"><input type="number" class="table-input num-input" data-table="invoices" data-field="poAmount" data-index="' + i + '" value="' + Number(inv.poAmount || 0) + '" step="100" aria-label="PO Amount"></td>' +
             '<td class="num"><input type="number" class="table-input num-input" data-table="invoices" data-field="invoiced" data-index="' + i + '" value="' + Number(inv.invoiced || 0) + '" step="100" aria-label="Invoiced Amount"></td>' +
             '<td class="num"><input type="number" class="table-input num-input" data-table="invoices" data-field="accrued" data-index="' + i + '" value="' + Number(inv.accrued || 0) + '" step="100" aria-label="Accrued Amount"></td>' +
@@ -1418,21 +1569,22 @@
         tbody.innerHTML = html;
       }
 
-      function refreshContractSelects() {
-        var fcSelects = document.querySelectorAll('select[data-table="forecast"][data-field="contractId"]');
-        for (var i = 0; i < fcSelects.length; i++) {
-          var idx = parseInt(fcSelects[i].getAttribute('data-index'), 10);
-          if (state.forecast[idx]) {
-            fcSelects[i].innerHTML = buildContractOptionsHtml(state.forecast[idx].contractId);
+      function refreshCascadedContractText() {
+        var vendorMap = getVendorMap();
+        for (var g = 0; g < state.register.length; g++) {
+          var reg = state.register[g];
+          var titleEl = document.getElementById('fc-group-title-' + g);
+          if (titleEl) {
+            titleEl.textContent = (reg.vendor || 'Unnamed Vendor') + ' — ' + reg.id;
           }
         }
-        var invSelects = document.querySelectorAll('select[data-table="invoices"][data-field="contractId"]');
-        for (var j = 0; j < invSelects.length; j++) {
-          var jdx = parseInt(invSelects[j].getAttribute('data-index'), 10);
-          if (state.invoices[jdx]) {
-            invSelects[j].innerHTML = buildContractOptionsHtml(state.invoices[jdx].contractId);
+        for (var i = 0; i < state.invoices.length; i++) {
+          var cell = document.getElementById('inv-contract-text-' + i);
+          if (cell) {
+            cell.textContent = formatPrintedContract(state.invoices[i].contractId, vendorMap);
           }
         }
+        populateNewInvoicePicker();
       }
 
       function recalculateAll() {
@@ -1489,10 +1641,15 @@
           return a.noticeMs - b.noticeMs;
         });
 
-        // 2. Actual vs Forecast Calculations
+        // 2. Actual vs Forecast Calculations (Per Line + Per Register Group)
         var totalForecast = 0;
         var totalActual = 0;
         var flaggedForecastList = [];
+        var groupTotals = {};
+
+        for (var g = 0; g < state.register.length; g++) {
+          groupTotals[state.register[g].id] = { forecast: 0, actual: 0 };
+        }
 
         for (var fIdx = 0; fIdx < state.forecast.length; fIdx++) {
           var f = state.forecast[fIdx];
@@ -1505,12 +1662,17 @@
           totalForecast += fcVal;
           totalActual += acVal;
 
+          if (groupTotals[f.contractId]) {
+            groupTotals[f.contractId].forecast += fcVal;
+            groupTotals[f.contractId].actual += acVal;
+          }
+
           var vDlrCell = document.getElementById('fc-var-dlr-' + fIdx);
           var vPctCell = document.getElementById('fc-var-pct-' + fIdx);
           var vFlagCell = document.getElementById('fc-flag-' + fIdx);
 
-          if (vDlrCell) vDlrCell.textContent = fmtCurrency(varDlr, true);
-          if (vPctCell) vPctCell.textContent = fmtPercent(varPct, true);
+          if (vDlrCell) vDlrCell.textContent = fmtCurrency(varDlr, true, true);
+          if (vPctCell) vPctCell.textContent = fmtPercent(varPct, true, true);
           if (vFlagCell) {
             vFlagCell.innerHTML = isReview
               ? '<span class="pill pill-review">REVIEW</span>'
@@ -1527,6 +1689,23 @@
               varDlr: varDlr,
               varPct: varPct
             });
+          }
+        }
+
+        // Update each group's subtotal line
+        for (var gIdx = 0; gIdx < state.register.length; gIdx++) {
+          var regItem = state.register[gIdx];
+          var subEl = document.getElementById('fc-group-subtotal-' + gIdx);
+          if (subEl && groupTotals[regItem.id]) {
+            var gf = groupTotals[regItem.id].forecast;
+            var ga = groupTotals[regItem.id].actual;
+            var gv = ga - gf;
+            var gPct = gf === 0 ? 0 : (gv / gf);
+            subEl.textContent =
+              'forecast ' + fmtCurrency(gf, false, true) +
+              ' · actual ' + fmtCurrency(ga, false, true) +
+              ' · variance ' + fmtCurrency(gv, true, true) +
+              ' (' + fmtPercent(gPct, true, true) + ')';
           }
         }
 
@@ -1554,7 +1733,7 @@
           var dispCell = document.getElementById('inv-disp-' + invIdx);
           var statCell = document.getElementById('inv-status-' + invIdx);
 
-          if (dispCell) dispCell.textContent = fmtCurrency(disp, true);
+          if (dispCell) dispCell.textContent = fmtCurrency(disp, true, false);
           if (statCell) {
             statCell.innerHTML = isMismatch
               ? '<span class="pill pill-review">REVIEW</span>'
@@ -1574,32 +1753,32 @@
         }
 
         // 4. Update KPI Strip & Table Footers
-        document.getElementById('kpi-book-value').textContent = fmtCurrency(totalBookValue, false);
+        document.getElementById('kpi-book-value').textContent = fmtCurrency(totalBookValue, false, false);
         document.getElementById('kpi-book-sub').textContent = state.register.length + ' register contracts';
 
         document.getElementById('kpi-notices-due').textContent = String(noticesDueList.length);
         document.getElementById('kpi-notices-sub').textContent = overdueCount + ' overdue · ' + upcoming90Count + ' within 90d';
 
-        document.getElementById('kpi-ytd-variance').textContent = fmtCurrency(ytdVarianceDlr, false) + ' (' + fmtPercent(ytdVariancePct, false) + ')';
-        document.getElementById('kpi-ytd-sub').textContent = 'YTD forecast ' + fmtCurrency(totalForecast, false) + ' · YTD actual ' + fmtCurrency(totalActual, false);
+        document.getElementById('kpi-ytd-variance').textContent = fmtCurrency(ytdVarianceDlr, false, false) + ' (' + fmtPercent(ytdVariancePct, false, false) + ')';
+        document.getElementById('kpi-ytd-sub').textContent = 'YTD forecast ' + fmtCurrency(totalForecast, false, false) + ' · YTD actual ' + fmtCurrency(totalActual, false, false);
 
         document.getElementById('kpi-variance-review').textContent = String(flaggedForecastList.length);
         document.getElementById('kpi-variance-sub').textContent = 'Lines past ' + state.threshold + '% threshold';
 
         document.getElementById('kpi-invoices-review').textContent = String(flaggedInvoicesList.length);
 
-        document.getElementById('register-total-value').textContent = fmtCurrency(totalBookValue, false);
-        document.getElementById('forecast-total-f').textContent = fmtCurrency(totalForecast, false);
-        document.getElementById('forecast-total-a').textContent = fmtCurrency(totalActual, false);
-        document.getElementById('forecast-total-v').textContent = fmtCurrency(ytdVarianceDlr, false);
-        document.getElementById('forecast-total-pct').textContent = fmtPercent(ytdVariancePct, false);
+        document.getElementById('register-total-value').textContent = fmtCurrency(totalBookValue, false, false);
+        document.getElementById('forecast-total-f').textContent = fmtCurrency(totalForecast, false, false);
+        document.getElementById('forecast-total-a').textContent = fmtCurrency(totalActual, false, false);
+        document.getElementById('forecast-total-v').textContent = fmtCurrency(ytdVarianceDlr, false, false);
+        document.getElementById('forecast-total-pct').textContent = fmtPercent(ytdVariancePct, false, false);
         document.getElementById('forecast-total-flags').textContent = flaggedForecastList.length + ' REVIEW';
 
         var totalDisp = totalInvoiced - totalPo;
-        document.getElementById('invoice-total-po').textContent = fmtCurrency(totalPo, false);
-        document.getElementById('invoice-total-inv').textContent = fmtCurrency(totalInvoiced, false);
-        document.getElementById('invoice-total-acc').textContent = fmtCurrency(totalAccrued, false);
-        document.getElementById('invoice-total-disp').textContent = fmtCurrency(totalDisp, true);
+        document.getElementById('invoice-total-po').textContent = fmtCurrency(totalPo, false, false);
+        document.getElementById('invoice-total-inv').textContent = fmtCurrency(totalInvoiced, false, false);
+        document.getElementById('invoice-total-acc').textContent = fmtCurrency(totalAccrued, false, false);
+        document.getElementById('invoice-total-disp').textContent = fmtCurrency(totalDisp, true, false);
         document.getElementById('invoice-total-flags').textContent = flaggedInvoicesList.length + ' REVIEW';
 
         // 5. Render Needs a Decision
@@ -1640,7 +1819,7 @@
                 '<span>&middot;</span>' +
                 '<span><strong>' + escHtml(dayLabel) + '</strong></span>' +
                 '<span>&middot;</span>' +
-                '<span>' + fmtCurrency(n.annualValue, false) + '/yr</span>' +
+                '<span>' + fmtCurrency(n.annualValue, false, false) + '/yr</span>' +
               '</span>' +
             '</li>';
           }
@@ -1660,7 +1839,7 @@
               '<span class="decision-meta">' +
                 '<span>Month: <strong>' + escHtml(v.month) + '</strong></span>' +
                 '<span>&middot;</span>' +
-                '<span>Variance: <strong>' + fmtPercent(v.varPct, true) + '</strong> (' + fmtCurrency(v.varDlr, true) + ')</span>' +
+                '<span>Variance: <strong>' + fmtPercent(v.varPct, true, false) + '</strong> (' + fmtCurrency(v.varDlr, true, false) + ')</span>' +
               '</span>' +
             '</li>';
           }
@@ -1678,7 +1857,7 @@
             iHtml += '<li class="decision-item">' +
               '<span class="decision-main">' + escHtml(inv.invoiceNo) + ' — ' + escHtml(inv.vendor) + '</span>' +
               '<span class="decision-meta">' +
-                '<span>Disparity: <strong>' + fmtCurrency(inv.disparity, true) + '</strong></span>' +
+                '<span>Disparity: <strong>' + fmtCurrency(inv.disparity, true, false) + '</strong></span>' +
                 (inv.note ? '<span>&middot; ' + escHtml(inv.note) + '</span>' : '') +
               '</span>' +
             '</li>';
@@ -1694,11 +1873,11 @@
         lines.push('As of Date: ' + data.asOf);
         lines.push('----------------------------------------');
         lines.push('KPI SUMMARY');
-        lines.push('• Total Book Value: ' + fmtCurrency(data.totalBookValue, false));
+        lines.push('• Total Book Value: ' + fmtCurrency(data.totalBookValue, false, false));
         lines.push('• Notices Due <= 90 Days: ' + data.noticesDueCount);
-        lines.push('• YTD Forecast: ' + fmtCurrency(data.totalForecast, false));
-        lines.push('• YTD Actual: ' + fmtCurrency(data.totalActual, false));
-        lines.push('• YTD Variance: ' + fmtCurrency(data.ytdVarianceDlr, false) + ' (' + fmtPercent(data.ytdVariancePct, false) + ')');
+        lines.push('• YTD Forecast: ' + fmtCurrency(data.totalForecast, false, false));
+        lines.push('• YTD Actual: ' + fmtCurrency(data.totalActual, false, false));
+        lines.push('• YTD Variance: ' + fmtCurrency(data.ytdVarianceDlr, false, false) + ' (' + fmtPercent(data.ytdVariancePct, false, false) + ')');
         lines.push('• Variance REVIEW Lines: ' + data.variances.length + ' (>' + data.threshold + '% threshold)');
         lines.push('• Invoices REVIEW: ' + data.invoices.length);
         lines.push('');
@@ -1711,7 +1890,7 @@
             var statusTag = n.daysToNotice < 0
               ? (Math.abs(n.daysToNotice) + 'd OVERDUE')
               : (n.daysToNotice + 'd left');
-            lines.push('- ' + n.vendor + ' (' + n.id + ') | Notice: ' + n.noticeDate + ' (' + statusTag + ') | ' + fmtCurrency(n.annualValue, false));
+            lines.push('- ' + n.vendor + ' (' + n.id + ') | Notice: ' + n.noticeDate + ' (' + statusTag + ') | ' + fmtCurrency(n.annualValue, false, false));
           }
         }
         lines.push('');
@@ -1721,7 +1900,7 @@
         } else {
           for (var j = 0; j < data.variances.length; j++) {
             var v = data.variances[j];
-            lines.push('- ' + v.vendor + ' | ' + v.month + ' | ' + fmtPercent(v.varPct, true) + ' (' + fmtCurrency(v.varDlr, true) + ')');
+            lines.push('- ' + v.vendor + ' | ' + v.month + ' | ' + fmtPercent(v.varPct, true, false) + ' (' + fmtCurrency(v.varDlr, true, false) + ')');
           }
         }
         lines.push('');
@@ -1732,7 +1911,7 @@
           for (var k = 0; k < data.invoices.length; k++) {
             var inv = data.invoices[k];
             var notePart = inv.note ? ' [' + inv.note + ']' : '';
-            lines.push('- ' + inv.invoiceNo + ' | ' + inv.vendor + ' | Disparity: ' + fmtCurrency(inv.disparity, true) + notePart);
+            lines.push('- ' + inv.invoiceNo + ' | ' + inv.vendor + ' | Disparity: ' + fmtCurrency(inv.disparity, true, false) + notePart);
           }
         }
 
@@ -1774,14 +1953,35 @@
         var rowObj = state[tbl] && state[tbl][idx];
         if (!rowObj) return;
 
+        if (tbl === 'register' && fld === 'id') {
+          var oldId = rowObj.id;
+          var newId = t.value;
+          rowObj.id = newId;
+          if (oldId && oldId !== newId) {
+            for (var f = 0; f < state.forecast.length; f++) {
+              if (state.forecast[f].contractId === oldId) {
+                state.forecast[f].contractId = newId;
+              }
+            }
+            for (var iv = 0; iv < state.invoices.length; iv++) {
+              if (state.invoices[iv].contractId === oldId) {
+                state.invoices[iv].contractId = newId;
+              }
+            }
+          }
+          refreshCascadedContractText();
+          recalculateAll();
+          return;
+        }
+
         if (t.type === 'number') {
           rowObj[fld] = parseFloat(t.value) || 0;
         } else {
           rowObj[fld] = t.value;
         }
 
-        if (tbl === 'register' && (fld === 'id' || fld === 'vendor')) {
-          refreshContractSelects();
+        if (tbl === 'register' && fld === 'vendor') {
+          refreshCascadedContractText();
         }
 
         recalculateAll();
@@ -1813,25 +2013,33 @@
           return;
         }
 
-        if (btn.id === 'btn-add-forecast') {
-          var defaultContract = state.register[0] ? state.register[0].id : 'CTR-2024-0117';
+        var action = btn.getAttribute('data-action');
+
+        if (action === 'add-forecast-line') {
+          var regIdx = parseInt(btn.getAttribute('data-reg-index'), 10);
+          var regContract = state.register[regIdx];
+          if (!regContract) return;
+          var defaultMonthly = Math.round((Number(regContract.annualValue) || 0) / 12);
           state.forecast.push({
             month: '2026-12',
-            contractId: defaultContract,
-            forecast: 25000,
-            actual: 25000
+            contractId: regContract.id,
+            forecast: defaultMonthly,
+            actual: defaultMonthly
           });
-          renderForecastTable();
+          renderForecastGroups();
           recalculateAll();
           return;
         }
 
         if (btn.id === 'btn-add-invoice') {
-          var defCid = state.register[0] ? state.register[0].id : 'CTR-2024-0117';
+          var picker = document.getElementById('new-invoice-contract');
+          var selectedCid = (picker && picker.value)
+            ? picker.value
+            : (state.register[0] ? state.register[0].id : 'CTR-2024-0117');
           state.invoices.push({
             invoiceNo: 'INV-2026-' + (3300 + state.invoices.length),
             poNo: 'PO-2026-1290',
-            contractId: defCid,
+            contractId: selectedCid,
             poAmount: 25000,
             invoiced: 25000,
             accrued: 25000,
@@ -1864,14 +2072,13 @@
           return;
         }
 
-        var action = btn.getAttribute('data-action');
         var rIdx = parseInt(btn.getAttribute('data-index'), 10);
         if (action === 'delete-register' && !isNaN(rIdx)) {
           state.register.splice(rIdx, 1);
           renderTables();
         } else if (action === 'delete-forecast' && !isNaN(rIdx)) {
           state.forecast.splice(rIdx, 1);
-          renderForecastTable();
+          renderForecastGroups();
           recalculateAll();
         } else if (action === 'delete-invoice' && !isNaN(rIdx)) {
           state.invoices.splice(rIdx, 1);
