@@ -1,5 +1,41 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-13 (later still)
+
+- Page/tool: S6-P05.1 / Tool 5 — ARGON REBUILD (TOOL 5.1) replaces
+  the workbook embed. First build under the standing Argon prompt
+  template: goal (sell The Deal Check; the DEAL-103 audit-alert
+  moment is the proof), bank/senior look rules, answers-first
+  structure (KPI strip, Needs a Decision, editable gate log,
+  copyable Gate Report + mailto report button), SEO per Google's
+  published principles, the SEO-integrity never-list (no hidden
+  text, no stuffing), and the Website QA Checklist as the build
+  standard. Verified: anchors (5 · 2 · 40% · 2 · 1), per-deal
+  routing, interaction battery (check flips move yield/routing;
+  approving an 80%-ready deal fires the audit alert; delete-all
+  safe; reset restores), zero page errors. Argon's Deal Check link
+  (/the-deal-check/, a non-existent address) and its absolute
+  internal links were corrected to the site's relative scheme at
+  promotion (../deal-check/ etc.). Embed build deprecated as an
+  iteration (see the Tool 4 entry pattern): local snapshot, GitHub
+  branch tool-5-iterations, Drive archive folder. CODE-MAP v55.
+
+## 2026-11-13 (later)
+
+- SITE-WIDE CLOUDFLARE FIX: Lucky found Tool 5 (Intake Gate) 404ing
+  on the Cloudflare host while the GitHub mirror served it fine.
+  Cause: page folders carried only their ID-named HTML file;
+  Cloudflare Pages needs an index.html in each folder to serve the
+  directory URL. Only Tools 3 and 4 folders had one (both promoted
+  by hand most recently). The publish tree's other index copies had
+  been stripped by rsync --delete promotion passes mirroring site/
+  (which lacked them), taking down every other route on Cloudflare,
+  homepage included; the mirror masked it because GitHub batches had
+  uploaded index copies all along. Fix: index.html copies generated
+  from each folder's page file INSIDE site/ (25 created) so they are
+  source files the sync can no longer remove; redeployed; all 27
+  routes verified 200 with correct titles on Cloudflare.
+
 ## 2026-11-13
 
 - Page/tool: S6-P02 / Tool 4 — CASCADE FIX (Argon). A 190-check
