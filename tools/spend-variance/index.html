@@ -1,154 +1,1888 @@
 <!DOCTYPE html>
-<!-- ==========================================================================
-     LABEL — S6-P02 — Spend Variance & Renewal Tracker (tool page; Tool /
-     piece ID: Tool 4 — Spend Variance, address: /tools/spend-variance/)
-     What this page holds: the tracker's write-up (Draft 1.11 copy) and the
-     ACTUAL workbook embedded below it — Lucky's Contract Spend Variance &
-     Renewal Tracker: 5 tabs (README, Contract Register, Actual vs Forecast,
-     Invoice Audit Log, Dashboard), 668 cells, 192 of the workbook's own
-     formulas run by the formula engine, which learned TODAY() for this
-     build (the Dashboard's 90-day renewal count runs off it). Formulas are
-     never shown. Every non-formula cell is a live input — in the real
-     sheet, every non-formula cell is typeable.
-     Uses: ../../assets/styles.css + ../../assets/spreadsheet-tool.js +
-     ../../assets/formula-engine.js + this folder's data file (converted
-     from "Contract Spend Variance & Renewal Tracker.xlsx" by
-     convert-workbook.py, ALLINPUT mode, with the workbook's own number
-     formats mapped: "$"#,##0, yyyy-mm-dd, 0.0%). Verified cell-for-cell
-     against a LibreOffice recalculation: defaults plus six scenarios
-     (spend changes, invoice changes, a register change, hostile values,
-     fractions, blanked inputs) — zero differences in 192 compared
-     formulas per scenario. Phone summary strip on this page only: it
-     reads the Dashboard KPIs from its own engine instance fed by the
-     same typed values, so the headline numbers sit above the tool on a
-     phone instead of behind the last tab.
-     Map: site/CODE-MAP.md ("tools/spend-variance/").
-     Rule: any change here is recorded in site/CHANGELOG.md with the
-     CODE-MAP and this folder's LABEL.md updated in the same change
-     (Code Labeling System, Rule 3).
-     ========================================================================== -->
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>S6-P02 — Spend Variance &amp; Renewal Tracker · Fractional Deal Desk &amp; Contract Management</title>
-  <meta name="description" content="Unmanaged vendor contracts leak money quietly: spend drifts above forecast, invoices arrive that do not match the PO, and renewal notice dates pass while.">
-  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/spend-variance/">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="S6-P02 — Spend Variance &amp; Renewal Tracker · Fractional Deal Desk &amp; Contract Management">
-  <meta property="og:description" content="Unmanaged vendor contracts leak money quietly: spend drifts above forecast, invoices arrive that do not match the PO, and renewal notice dates pass while.">
-  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/spend-variance/">
-<link rel="stylesheet" href="../../assets/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spend Variance &amp; Renewal Tracker — Fractional Deal Desk &amp; Contract Management</title>
+  <style>
+    :root {
+      --paper: #F8F8F5;
+      --panel: #FFFFFF;
+      --ink: #0F1E38;
+      --soft-ink: #33445E;
+      --grey: #5F6B7A;
+      --hairline: #D9DCE1;
+      --brass: #8A6D1F;
+      --brass-tint: #F7F4EB;
+      --flag-bg: #FDF6E7;
+      --flag-border: #C59B27;
+      --danger-bg: #FBF1F1;
+      --danger-ink: #7A1C1C;
+      --danger-border: #D8B2B2;
+      --ok-bg: #F2F5F3;
+      --ok-ink: #1F4E37;
+      --font-serif: Georgia, "Times New Roman", serif;
+      --font-sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* MASTHEAD */
+    .masthead {
+      background-color: var(--ink);
+      color: var(--panel);
+      border-bottom: 2px solid var(--brass);
+    }
+
+    .masthead-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: 1.05rem;
+      letter-spacing: 0.01em;
+      color: var(--panel);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      font-size: 0.9rem;
+      color: #DCE1E9;
+      padding: 6px 0;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      border-bottom: 1px solid transparent;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--panel);
+      border-bottom-color: var(--brass);
+    }
+
+    .nav-links a.nav-cta {
+      border: 1px solid var(--brass);
+      padding: 6px 14px;
+      border-radius: 2px;
+      color: var(--panel);
+      background-color: rgba(138, 109, 31, 0.22);
+      font-weight: 600;
+    }
+
+    .nav-links a.nav-cta:hover {
+      background-color: var(--brass);
+    }
+
+    /* MAIN CONTAINER */
+    .page-wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 36px 20px 64px;
+    }
+
+    /* INTRO */
+    .intro {
+      max-width: 780px;
+      margin-bottom: 32px;
+    }
+
+    .eyebrow {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--brass);
+      font-weight: 600;
+      margin: 0 0 8px 0;
+    }
+
+    .lead-heading {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: 2.25rem;
+      line-height: 1.2;
+      color: var(--ink);
+      margin: 0 0 18px 0;
+    }
+
+    .intro p {
+      margin: 0 0 14px 0;
+      color: var(--soft-ink);
+      font-size: 1rem;
+    }
+
+    .intro p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* TOOL SHELL HEADER */
+    .tool-header-card {
+      background-color: var(--panel);
+      border: 1px solid var(--hairline);
+      border-top: 3px solid var(--ink);
+      border-radius: 2px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .tool-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .tool-badge {
+      display: inline-block;
+      align-self: flex-start;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--brass);
+      background-color: var(--brass-tint);
+      border: 1px solid var(--hairline);
+      padding: 2px 8px;
+      border-radius: 2px;
+    }
+
+    .tool-title {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: 1.35rem;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .tool-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .control-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      color: var(--soft-ink);
+      font-weight: 600;
+    }
+
+    .control-field input[type="date"] {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      color: var(--ink);
+      background-color: var(--paper);
+      border: 1px solid var(--hairline);
+      border-radius: 2px;
+      padding: 6px 10px;
+      min-height: 40px;
+    }
+
+    .btn {
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--ink);
+      background-color: var(--panel);
+      border: 1px solid var(--hairline);
+      border-radius: 2px;
+      padding: 8px 14px;
+      min-height: 40px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background-color 0.12s ease, border-color 0.12s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--paper);
+      border-color: var(--soft-ink);
+    }
+
+    .btn-primary {
+      background-color: var(--ink);
+      color: var(--panel);
+      border-color: var(--ink);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--soft-ink);
+      border-color: var(--soft-ink);
+    }
+
+    .btn-brass {
+      background-color: var(--brass);
+      color: var(--panel);
+      border-color: var(--brass);
+    }
+
+    .btn-brass:hover {
+      background-color: #725918;
+      border-color: #725918;
+    }
+
+    .btn-delete {
+      font-size: 0.8rem;
+      color: var(--grey);
+      padding: 4px 10px;
+      min-height: 40px;
+      min-width: 40px;
+      background: transparent;
+      border: 1px solid var(--hairline);
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    .btn-delete:hover {
+      color: var(--danger-ink);
+      border-color: var(--danger-border);
+      background-color: var(--danger-bg);
+    }
+
+    /* STICKY KPI STRIP */
+    .kpi-strip {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background-color: var(--paper);
+      padding: 8px 0 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .kpi-card {
+      background-color: var(--panel);
+      border: 1px solid var(--hairline);
+      border-top: 2px solid var(--ink);
+      border-radius: 2px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .kpi-card.kpi-accent {
+      border-top-color: var(--brass);
+    }
+
+    .kpi-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--grey);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .kpi-value {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: 1.35rem;
+      color: var(--ink);
+      line-height: 1.2;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-sub {
+      font-size: 0.75rem;
+      color: var(--soft-ink);
+      margin-top: 4px;
+      line-height: 1.3;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* TWO-ZONE DESKTOP WORKSPACE */
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .working-zone {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0;
+    }
+
+    .output-zone {
+      position: sticky;
+      top: 118px;
+      min-width: 0;
+    }
+
+    /* CARDS & SECTIONS */
+    .panel-card {
+      background-color: var(--panel);
+      border: 1px solid var(--hairline);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--hairline);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      background-color: #FCFCFA;
+    }
+
+    .panel-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .section-tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--brass);
+    }
+
+    .panel-title {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: 1.15rem;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .panel-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* NEEDS A DECISION EXCEPTION LIST */
+    .decision-card {
+      border-top: 3px solid var(--brass);
+    }
+
+    .decision-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      divide-y: 1px solid var(--hairline);
+    }
+
+    .decision-group {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .decision-group:last-child {
+      border-bottom: none;
+    }
+
+    .decision-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .decision-group-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--soft-ink);
+      margin: 0;
+    }
+
+    .decision-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .decision-item {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 7px 10px;
+      background-color: var(--paper);
+      border: 1px solid var(--hairline);
+      border-left: 3px solid var(--brass);
+      border-radius: 2px;
+      font-size: 0.9rem;
+    }
+
+    .decision-item.is-overdue {
+      border-left-color: var(--danger-ink);
+      background-color: var(--danger-bg);
+    }
+
+    .decision-main {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .decision-meta {
+      font-size: 0.85rem;
+      color: var(--soft-ink);
+      font-variant-numeric: tabular-nums;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .empty-flag {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--grey);
+      font-style: italic;
+    }
+
+    /* TABLES */
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    table.data-table th,
+    table.data-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--hairline);
+      text-align: left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    table.data-table th {
+      background-color: #F3F4F6;
+      color: var(--soft-ink);
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    table.data-table th.num,
+    table.data-table td.num {
+      text-align: right;
+    }
+
+    table.data-table tbody tr:hover {
+      background-color: #FAF9F5;
+    }
+
+    table.data-table tfoot td {
+      background-color: #F3F4F6;
+      font-weight: 600;
+      color: var(--ink);
+      border-top: 2px solid var(--hairline);
+      border-bottom: none;
+      padding: 10px;
+    }
+
+    /* TABLE INPUTS */
+    .table-input,
+    .table-select {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      color: var(--ink);
+      background-color: var(--panel);
+      border: 1px solid var(--hairline);
+      border-radius: 2px;
+      padding: 5px 8px;
+      min-height: 40px;
+      width: 100%;
+    }
+
+    .table-input:focus,
+    .table-select:focus {
+      outline: none;
+      border-color: var(--brass);
+      box-shadow: 0 0 0 1px var(--brass);
+    }
+
+    .table-input.num-input {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      width: 115px;
+    }
+
+    .table-input.days-input {
+      text-align: right;
+      width: 72px;
+    }
+
+    .table-input.id-input {
+      width: 132px;
+      font-family: var(--font-mono);
+      font-size: 16px;
+    }
+
+    .table-input.vendor-input {
+      min-width: 165px;
+    }
+
+    .table-input.cat-input {
+      min-width: 135px;
+    }
+
+    .table-input.owner-input {
+      width: 105px;
+    }
+
+    .table-input.month-input {
+      width: 100px;
+      font-family: var(--font-mono);
+    }
+
+    .table-input.note-input {
+      min-width: 210px;
+    }
+
+    .table-select.contract-select {
+      min-width: 220px;
+    }
+
+    .table-select.status-select {
+      min-width: 130px;
+    }
+
+    /* STATUS PILLS */
+    .pill {
+      display: inline-block;
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 7px;
+      border-radius: 2px;
+      border: 1px solid transparent;
+    }
+
+    .pill-review {
+      background-color: var(--flag-bg);
+      color: var(--brass);
+      border-color: var(--flag-border);
+    }
+
+    .pill-overdue {
+      background-color: var(--danger-bg);
+      color: var(--danger-ink);
+      border-color: var(--danger-border);
+    }
+
+    .pill-ok {
+      background-color: var(--ok-bg);
+      color: var(--ok-ink);
+      border-color: #B7D1C3;
+    }
+
+    /* PORTFOLIO BRIEF PANEL */
+    .brief-card {
+      background-color: var(--panel);
+      border: 1px solid var(--hairline);
+      border-top: 3px solid var(--ink);
+      border-radius: 2px;
+    }
+
+    .brief-body {
+      padding: 16px;
+    }
+
+    .brief-pre {
+      margin: 0 0 14px 0;
+      padding: 12px;
+      background-color: var(--paper);
+      border: 1px solid var(--hairline);
+      border-radius: 2px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: var(--ink);
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .brief-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .brief-actions .btn {
+      flex: 1 1 auto;
+    }
+
+    /* BELOW-THE-TOOL SECTIONS */
+    .below-tool {
+      margin-top: 48px;
+      padding-top: 36px;
+      border-top: 1px solid var(--hairline);
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+    }
+
+    .section-heading {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: 1.5rem;
+      color: var(--ink);
+      margin: 0 0 18px 0;
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .how-card {
+      background-color: var(--panel);
+      border: 1px solid var(--hairline);
+      border-top: 2px solid var(--ink);
+      border-radius: 2px;
+      padding: 18px;
+    }
+
+    .how-num {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--brass);
+      margin-bottom: 6px;
+    }
+
+    .how-title {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--ink);
+      margin: 0 0 8px 0;
+    }
+
+    .how-card p {
+      margin: 0;
+      font-size: 0.925rem;
+      color: var(--soft-ink);
+    }
+
+    .gloss-box {
+      background-color: var(--panel);
+      border: 1px solid var(--hairline);
+      border-left: 3px solid var(--brass);
+      border-radius: 2px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .gloss-box p {
+      margin: 0;
+      font-size: 0.925rem;
+      color: var(--soft-ink);
+    }
+
+    /* CLOSING CTA BLOCK */
+    .closing-block {
+      background-color: var(--panel);
+      border: 1px solid var(--hairline);
+      border-top: 3px solid var(--brass);
+      border-radius: 2px;
+      padding: 28px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .closing-copy {
+      max-width: 680px;
+    }
+
+    .closing-copy h2 {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: 1.4rem;
+      color: var(--ink);
+      margin: 0 0 8px 0;
+    }
+
+    .closing-copy p {
+      margin: 0;
+      color: var(--soft-ink);
+      font-size: 0.98rem;
+    }
+
+    /* FOOTER */
+    .site-footer {
+      background-color: var(--ink);
+      color: #DCE1E9;
+      border-top: 2px solid var(--brass);
+      padding: 20px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .site-footer p {
+      margin: 0;
+      max-width: 1120px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* RESPONSIVE RULES */
+    @media (max-width: 1023px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+      .output-zone {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page-wrap {
+        padding: 24px 12px 48px;
+      }
+      .lead-heading {
+        font-size: 1.75rem;
+      }
+      .kpi-strip {
+        position: static;
+        padding: 4px 0 12px;
+      }
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .kpi-card:last-child {
+        grid-column: 1 / -1;
+      }
+      .kpi-label {
+        font-size: 0.72rem;
+        white-space: normal;
+      }
+      .kpi-value {
+        font-size: 1.2rem;
+      }
+      .how-grid {
+        grid-template-columns: 1fr;
+      }
+      .tool-header-card,
+      .panel-header,
+      .decision-group,
+      .closing-block {
+        padding: 14px 12px;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<header class="site-header">
-  <div class="wrap">
-    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
-    <nav>
-      <a href="../../">Home</a>
-      <a href="../../services/">Services &amp; Pricing</a>
-      <a href="../../tools/">Proof of Work</a>
-      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
-    </nav>
-  </div>
-</header>
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a href="../../" class="brand">Fractional Deal Desk &amp; Contract Management</a>
+      <nav class="nav-links" aria-label="Primary Navigation">
+        <a href="../../">Home</a>
+        <a href="../../services/">Services &amp; Pricing</a>
+        <a href="../../tools/">Proof of Work</a>
+        <a href="https://calendar.app.google/a7ET9voVYP5quHdG6" class="nav-cta">Book a Call</a>
+      </nav>
+    </div>
+  </header>
 
-<main class="wrap">
+  <main class="page-wrap">
+    <!-- INTRO -->
+    <section class="intro" aria-labelledby="page-heading">
+      <p class="eyebrow">Proof of Work &middot; Spend Variance</p>
+      <h1 id="page-heading" class="lead-heading">Spend Variance &amp; Renewal Tracker.</h1>
+      <p>
+        Unmanaged vendor contracts leak money quietly: spend drifts above forecast, invoices arrive that do not match the PO, and renewal notice dates pass while nobody is watching. This tracker is the control system for all three — combining a contract register, a monthly forecast-versus-actual tracker, an invoice audit log, and a live roll-up that flags what needs a decision.
+      </p>
+      <p>
+        The model behind this tool is the operator’s own working contract spend and renewal tracker, rebuilt as a clean web template. The operator brings 15+ years in commercial contracts, deal desk, and revenue operations, working in corporate roles since 2006, and has governed contracts up to $300M. The deals and figures loaded in the tool are fictional samples.
+      </p>
+    </section>
 
-  <section class="section">
-    <p class="kicker">Proof of Work · Spend Variance</p>
-    <h1>Spend Variance &amp; Renewal Tracker.</h1>
-    <p class="lede">Unmanaged vendor contracts leak money quietly: spend drifts above forecast, invoices arrive that do not match the PO, and renewal notice dates pass while nobody is watching. This tracker is the control system for all three. A contract register holds the portfolio; a monthly forecast-versus-actual sheet flags any contract running hot; an invoice audit log checks invoiced amounts against POs; and a live dashboard rolls it up — total annual contract value, how many contracts have a renewal notice date on or before the 90-day horizon (including any already overdue), year-to-date forecast versus actual, and how many items are flagged for review. Every vendor name and dollar in it is sample data — the file says so itself.</p>
-    <p><strong>Directions:</strong> Start on the Contract Register and add or edit a contract (annual value, start and end dates, owner, status). The renewal notice date calculates itself — end date minus 60 days. Enter monthly forecast and actual OpEx on the Actual vs Forecast sheet; any line beyond ±10% variance flags REVIEW. Log invoices on the Invoice Audit Log; invoiced amounts that do not match the PO flag REVIEW with the disparity shown. The Dashboard totals everything live.</p>
+    <!-- TOOL HEADER -->
+    <section aria-label="Tracker Controls">
+      <div class="tool-header-card">
+        <div class="tool-header-left">
+          <span class="tool-badge">Tool 4 &middot; Deal Desk</span>
+          <h2 class="tool-title">Contract Spend Variance &amp; Renewal Tracker</h2>
+        </div>
+        <div class="tool-controls">
+          <label class="control-field" for="as-of-date">
+            <span>As of date</span>
+            <input type="date" id="as-of-date" value="2026-11-11">
+          </label>
+          <button type="button" class="btn" id="btn-reset-top">Reset Sample Data</button>
+        </div>
+      </div>
+    </section>
 
-    <div class="m-summary" id="m-summary" aria-label="Dashboard totals"></div>
+    <!-- STICKY KPI STRIP -->
+    <section class="kpi-strip" aria-label="Portfolio Key Metrics">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Total Book Value</div>
+          <div class="kpi-value" id="kpi-book-value">$4,542,500</div>
+          <div class="kpi-sub" id="kpi-book-sub">10 active register contracts</div>
+        </div>
+        <div class="kpi-card kpi-accent">
+          <div class="kpi-label">Notices Due &le; 90 Days</div>
+          <div class="kpi-value" id="kpi-notices-due">6</div>
+          <div class="kpi-sub" id="kpi-notices-sub">4 overdue &middot; 2 within 90d</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">YTD Variance</div>
+          <div class="kpi-value" id="kpi-ytd-variance">$28,960 (1.3%)</div>
+          <div class="kpi-sub" id="kpi-ytd-sub">YTD forecast $2,196,996 &middot; YTD actual $2,225,956</div>
+        </div>
+        <div class="kpi-card kpi-accent">
+          <div class="kpi-label">Variance REVIEW</div>
+          <div class="kpi-value" id="kpi-variance-review">4</div>
+          <div class="kpi-sub" id="kpi-variance-sub">Lines past 10% threshold</div>
+        </div>
+        <div class="kpi-card kpi-accent">
+          <div class="kpi-label">Invoices REVIEW</div>
+          <div class="kpi-value" id="kpi-invoices-review">3</div>
+          <div class="kpi-sub" id="kpi-invoices-sub">PO vs. invoice disparities</div>
+        </div>
+      </div>
+    </section>
 
-    <div class="tool-frame">
-      <div id="wb-tool"></div>
+    <!-- WORKSPACE -->
+    <div class="workspace">
+      <div class="working-zone">
+
+        <!-- NEEDS A DECISION -->
+        <section class="panel-card decision-card" aria-labelledby="decision-heading">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <span class="section-tag">Exception Roll-Up</span>
+              <h3 id="decision-heading" class="panel-title">Needs a Decision</h3>
+            </div>
+          </div>
+          <div class="decision-grid">
+            <div class="decision-group">
+              <div class="decision-group-header">
+                <h4 class="decision-group-title">1. Renewal Notices (Overdue &amp; Due &le; 90 Days)</h4>
+              </div>
+              <div id="decision-notices-list"></div>
+            </div>
+            <div class="decision-group">
+              <div class="decision-group-header">
+                <h4 class="decision-group-title">2. Spend Variance REVIEW Lines</h4>
+              </div>
+              <div id="decision-variance-list"></div>
+            </div>
+            <div class="decision-group">
+              <div class="decision-group-header">
+                <h4 class="decision-group-title">3. Invoice Audit Mismatches</h4>
+              </div>
+              <div id="decision-invoices-list"></div>
+            </div>
+          </div>
+        </section>        <!-- SECTION 01 — CONTRACT REGISTER -->
+        <section class="panel-card" aria-labelledby="sec01-heading">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <span class="section-tag">Section 01</span>
+              <h3 id="sec01-heading" class="panel-title">Contract Register</h3>
+            </div>
+            <div class="panel-actions">
+              <button type="button" class="btn" id="btn-add-contract">+ Add Contract</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table" id="register-table">
+              <thead>
+                <tr>
+                  <th>Contract ID</th>
+                  <th>Vendor</th>
+                  <th>Category</th>
+                  <th class="num">Annual Value ($)</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th class="num">Notice Days</th>
+                  <th>Notice Date</th>
+                  <th class="num">Days to Notice</th>
+                  <th>Owner</th>
+                  <th>Status</th>
+                  <th aria-label="Remove Row"></th>
+                </tr>
+              </thead>
+              <tbody id="register-tbody"></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3">Total Annual Book Value</td>
+                  <td class="num" id="register-total-value">$4,542,500</td>
+                  <td colspan="8"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section>
+
+        <!-- SECTION 02 — ACTUAL VS FORECAST -->
+        <section class="panel-card" aria-labelledby="sec02-heading">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <span class="section-tag">Section 02</span>
+              <h3 id="sec02-heading" class="panel-title">Actual vs Forecast</h3>
+            </div>
+            <div class="panel-actions">
+              <label class="control-field" for="variance-threshold">
+                <span>Threshold (%)</span>
+                <input type="number" id="variance-threshold" class="table-input days-input" value="10" min="0" max="100" step="0.5">
+              </label>
+              <button type="button" class="btn" id="btn-add-forecast">+ Add Monthly Line</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table" id="forecast-table">
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>Contract</th>
+                  <th class="num">Forecast ($)</th>
+                  <th class="num">Actual ($)</th>
+                  <th class="num">Variance ($)</th>
+                  <th class="num">Variance (%)</th>
+                  <th>Flag</th>
+                  <th aria-label="Remove Row"></th>
+                </tr>
+              </thead>
+              <tbody id="forecast-tbody"></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2">YTD Totals</td>
+                  <td class="num" id="forecast-total-f">$2,196,996</td>
+                  <td class="num" id="forecast-total-a">$2,225,956</td>
+                  <td class="num" id="forecast-total-v">$28,960</td>
+                  <td class="num" id="forecast-total-pct">1.3%</td>
+                  <td colspan="2" id="forecast-total-flags">4 REVIEW</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section>
+
+        <!-- SECTION 03 — INVOICE AUDIT LOG -->
+        <section class="panel-card" aria-labelledby="sec03-heading">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <span class="section-tag">Section 03</span>
+              <h3 id="sec03-heading" class="panel-title">Invoice Audit Log</h3>
+            </div>
+            <div class="panel-actions">
+              <button type="button" class="btn" id="btn-add-invoice">+ Add Invoice</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table" id="invoice-table">
+              <thead>
+                <tr>
+                  <th>Invoice #</th>
+                  <th>PO #</th>
+                  <th>Contract</th>
+                  <th class="num">PO Amount ($)</th>
+                  <th class="num">Invoiced ($)</th>
+                  <th class="num">Accrued ($)</th>
+                  <th class="num">Disparity ($)</th>
+                  <th>Status</th>
+                  <th>Resolution Note</th>
+                  <th aria-label="Remove Row"></th>
+                </tr>
+              </thead>
+              <tbody id="invoice-tbody"></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3">Audit Log Totals</td>
+                  <td class="num" id="invoice-total-po">$606,624</td>
+                  <td class="num" id="invoice-total-inv">$627,841</td>
+                  <td class="num" id="invoice-total-acc">$606,624</td>
+                  <td class="num" id="invoice-total-disp">+$21,217</td>
+                  <td colspan="3" id="invoice-total-flags">3 REVIEW</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- PORTFOLIO BRIEF OUTPUT PANEL -->
+      <aside class="output-zone" aria-labelledby="brief-heading">
+        <div class="brief-card">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <span class="section-tag">Live Output</span>
+              <h3 id="brief-heading" class="panel-title">Portfolio Brief</h3>
+            </div>
+          </div>
+          <div class="brief-body">
+            <pre class="brief-pre" id="portfolio-brief-text" aria-live="polite"></pre>
+            <div class="brief-actions">
+              <button type="button" class="btn btn-primary" id="btn-copy-brief">Copy Brief</button>
+              <button type="button" class="btn" id="btn-reset-brief">Reset</button>
+            </div>
+          </div>
+        </div>
+      </aside>
     </div>
 
-    <h2>Inputs, logic, limits</h2>
-    <p>Inputs: contract register rows; monthly forecast and actual OpEx per contract; invoice PO, invoiced, and accrued amounts. Logic: variance = actual − forecast, flagged REVIEW when |variance %| exceeds 10%; invoice disparity = invoiced − PO, flagged MATCH or REVIEW; renewal notice date = end date − 60 days; the dashboard counts contracts whose notice date is on or before today plus 90 days (including any already overdue). Limits: the 60-day notice period is fixed in this tool, not a setting you can change, and there is no day-by-day countdown to a deadline — the dashboard's 90-day count is the horizon view. All data is sample data.</p>
-  </section>
+    <!-- BELOW THE TOOL -->
+    <div class="below-tool">
+      <section aria-labelledby="how-heading">
+        <h2 id="how-heading" class="section-heading">How it works</h2>
+        <div class="how-grid">
+          <div class="how-card">
+            <div class="how-num">01 &middot; Register</div>
+            <h3 class="how-title">1. The register</h3>
+            <p>Every contract, its value, its dates, its notice window.</p>
+          </div>
+          <div class="how-card">
+            <div class="how-num">02 &middot; Monthly Check</div>
+            <h3 class="how-title">2. The monthly check</h3>
+            <p>Forecast versus actual, flagged past the threshold.</p>
+          </div>
+          <div class="how-card">
+            <div class="how-num">03 &middot; Audit</div>
+            <h3 class="how-title">3. The audit</h3>
+            <p>Every invoice checked against its PO.</p>
+          </div>
+        </div>
+        <div class="gloss-box">
+          <p><strong>Renewal notice date</strong> — the last day to give notice before a contract's term runs out; computed here as the end date minus the contract's notice window (60 days unless edited).</p>
+          <p><strong>Variance</strong> — actual spend minus forecast spend for the month; a line flags REVIEW when the gap passes the threshold (10% unless edited).</p>
+        </div>
+      </section>
 
-  <section class="section">
-    <h2><span class="no">Next</span> — Put this to work on a real book of contracts.</h2>
-    <p><a class="btn" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book on my calendar</a></p>
-  </section>
+      <!-- CLOSING BLOCK -->
+      <section class="closing-block" aria-labelledby="closing-heading">
+        <div class="closing-copy">
+          <h2 id="closing-heading">Next — Put this to work on a real decision.</h2>
+          <p>
+            Need a clean read on your live vendor book or commercial terms? Commission <strong>The Deal Check — Contract &amp; Revenue Diagnostic</strong> ($6,500) to audit your active commitments, renewal exposure, and billing leakage.
+          </p>
+        </div>
+        <div>
+          <a href="https://calendar.app.google/a7ET9voVYP5quHdG6" class="btn btn-brass">Book a Call</a>
+        </div>
+      </section>
+    </div>
+  </main>
 
-</main>
-
-<footer class="site-footer">
-  <div class="wrap">
+  <!-- FOOTER -->
+  <footer class="site-footer">
     <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
-  </div>
-</footer>
+  </footer>  <script>
+    (function () {
+      'use strict';
 
-<script src="S6-P02-spend-variance-data.js"></script>
-<script src="../../assets/formula-engine.js"></script>
-<script src="../../assets/spreadsheet-tool.js"></script>
-<script>
-  window.renderWorkbook(document.getElementById("wb-tool"),
-    window.SPEND_VARIANCE_DATA);
-</script>
-<script>
-  /* Phone summary strip (this page only, same pattern as Tool 2's): the
-     Dashboard is the LAST tab, so on a phone its totals sit far from the
-     registers a visitor is typing in. The strip builds its own engine
-     instance from the same data file, feeds it every value typed into
-     the rendered workbook (matched to its sheet by panel), and shows the
-     Dashboard KPIs above the tool. It only reads; it never writes back. */
-  (function () {
-    var strip = document.getElementById("m-summary");
-    var data = window.SPEND_VARIANCE_DATA;
-    if (!strip || !data || !window.FormulaEngine) return;
-    var overrides = {}; // sheetName -> { addr: rawValue }
-    function compute() {
-      var reg = {};
-      data.sheets.forEach(function (sh) {
-        var m = {};
-        sh.rows.forEach(function (r) { r.cells.forEach(function (c) {
-          m[c.a] = c.t === "formula" ? { kind: "formula", value: c.f } : { kind: "value", value: c.v };
-        }); });
-        var ov = overrides[sh.name] || {};
-        Object.keys(ov).forEach(function (a) { m[a] = { kind: "value", value: ov[a] }; });
-        reg[sh.name] = window.FormulaEngine.createSheet(m, { resolve: function (name, addr) {
-          var t = reg[name]; return t ? t.get(addr) : "#REF!";
-        } });
+      var DEFAULT_AS_OF = '2026-11-11';
+      var DEFAULT_THRESHOLD = 10;
+
+      var SAMPLE_REGISTER = [
+        { id: 'CTR-2024-0117', vendor: 'Apex Cloud Services', category: 'SaaS', annualValue: 540000, start: '2024-03-01', end: '2027-02-28', noticeDays: 60, owner: 'J. Conte', status: 'Active' },
+        { id: 'CTR-2025-0042', vendor: 'Northwind Telecom', category: 'Telecom', annualValue: 312000, start: '2025-01-15', end: '2026-12-31', noticeDays: 60, owner: 'J. Conte', status: 'Active' },
+        { id: 'CTR-2023-0891', vendor: 'Beacon Data Systems', category: 'Infrastructure', annualValue: 780000, start: '2023-09-01', end: '2026-11-30', noticeDays: 60, owner: 'J. Conte', status: 'Expiring' },
+        { id: 'CTR-2025-0208', vendor: 'Harborview Software', category: 'SaaS', annualValue: 195000, start: '2025-06-01', end: '2028-05-31', noticeDays: 60, owner: 'J. Conte', status: 'Active' },
+        { id: 'CTR-2024-0556', vendor: 'Cascade Infrastructure', category: 'Infrastructure', annualValue: 1150000, start: '2024-07-01', end: '2027-06-30', noticeDays: 60, owner: 'J. Conte', status: 'Active' },
+        { id: 'CTR-2025-0130', vendor: 'Meridian Security', category: 'Security', annualValue: 268000, start: '2025-04-01', end: '2026-10-31', noticeDays: 60, owner: 'J. Conte', status: 'Expiring' },
+        { id: 'CTR-2026-0007', vendor: 'BluePeak Analytics', category: 'SaaS', annualValue: 142500, start: '2026-02-01', end: '2027-01-31', noticeDays: 60, owner: 'J. Conte', status: 'Active' },
+        { id: 'CTR-2024-0713', vendor: 'Summit Support Services', category: 'Professional Services', annualValue: 420000, start: '2024-10-01', end: '2027-09-30', noticeDays: 60, owner: 'J. Conte', status: 'Active' },
+        { id: 'CTR-2025-0277', vendor: 'Ironline Hardware', category: 'Hardware', annualValue: 510000, start: '2025-08-15', end: '2028-08-14', noticeDays: 60, owner: 'J. Conte', status: 'Active' },
+        { id: 'CTR-2023-0944', vendor: 'Clearpath Consulting', category: 'Professional Services', annualValue: 225000, start: '2023-12-01', end: '2026-12-15', noticeDays: 60, owner: 'J. Conte', status: 'Under Review' }
+      ];
+
+      var SAMPLE_FORECAST = [
+        { month: '2026-01', contractId: 'CTR-2024-0117', forecast: 45000, actual: 45502 },
+        { month: '2026-02', contractId: 'CTR-2024-0117', forecast: 45000, actual: 43290 },
+        { month: '2026-03', contractId: 'CTR-2024-0117', forecast: 45000, actual: 52290 },
+        { month: '2026-04', contractId: 'CTR-2024-0117', forecast: 45000, actual: 44004 },
+        { month: '2026-05', contractId: 'CTR-2024-0117', forecast: 45000, actual: 45851 },
+        { month: '2026-06', contractId: 'CTR-2024-0117', forecast: 45000, actual: 45636 },
+        { month: '2026-07', contractId: 'CTR-2024-0117', forecast: 45000, actual: 46412 },
+        { month: '2026-08', contractId: 'CTR-2024-0117', forecast: 45000, actual: 43513 },
+        { month: '2026-09', contractId: 'CTR-2024-0117', forecast: 45000, actual: 44719 },
+        { month: '2026-10', contractId: 'CTR-2024-0117', forecast: 45000, actual: 43307 },
+        { month: '2026-11', contractId: 'CTR-2024-0117', forecast: 45000, actual: 43987 },
+        { month: '2026-12', contractId: 'CTR-2024-0117', forecast: 45000, actual: 45019 },
+        { month: '2026-01', contractId: 'CTR-2025-0042', forecast: 26000, actual: 25015 },
+        { month: '2026-02', contractId: 'CTR-2025-0042', forecast: 26000, actual: 25374 },
+        { month: '2026-03', contractId: 'CTR-2025-0042', forecast: 26000, actual: 26312 },
+        { month: '2026-04', contractId: 'CTR-2025-0042', forecast: 26000, actual: 26093 },
+        { month: '2026-05', contractId: 'CTR-2025-0042', forecast: 26000, actual: 25419 },
+        { month: '2026-06', contractId: 'CTR-2025-0042', forecast: 26000, actual: 26186 },
+        { month: '2026-07', contractId: 'CTR-2025-0042', forecast: 26000, actual: 26644 },
+        { month: '2026-08', contractId: 'CTR-2025-0042', forecast: 26000, actual: 24974 },
+        { month: '2026-09', contractId: 'CTR-2025-0042', forecast: 26000, actual: 29756 },
+        { month: '2026-10', contractId: 'CTR-2025-0042', forecast: 26000, actual: 26412 },
+        { month: '2026-11', contractId: 'CTR-2025-0042', forecast: 26000, actual: 25668 },
+        { month: '2026-12', contractId: 'CTR-2025-0042', forecast: 26000, actual: 25283 },
+        { month: '2026-01', contractId: 'CTR-2024-0556', forecast: 95833, actual: 99338 },
+        { month: '2026-02', contractId: 'CTR-2024-0556', forecast: 95833, actual: 94580 },
+        { month: '2026-03', contractId: 'CTR-2024-0556', forecast: 95833, actual: 92711 },
+        { month: '2026-04', contractId: 'CTR-2024-0556', forecast: 95833, actual: 92741 },
+        { month: '2026-05', contractId: 'CTR-2024-0556', forecast: 95833, actual: 98497 },
+        { month: '2026-06', contractId: 'CTR-2024-0556', forecast: 95833, actual: 96628 },
+        { month: '2026-07', contractId: 'CTR-2024-0556', forecast: 95833, actual: 119271 },
+        { month: '2026-08', contractId: 'CTR-2024-0556', forecast: 95833, actual: 97594 },
+        { month: '2026-09', contractId: 'CTR-2024-0556', forecast: 95833, actual: 96111 },
+        { month: '2026-10', contractId: 'CTR-2024-0556', forecast: 95833, actual: 99460 },
+        { month: '2026-11', contractId: 'CTR-2024-0556', forecast: 95833, actual: 94902 },
+        { month: '2026-12', contractId: 'CTR-2024-0556', forecast: 95833, actual: 96232 },
+        { month: '2026-01', contractId: 'CTR-2025-0208', forecast: 16250, actual: 16678 },
+        { month: '2026-02', contractId: 'CTR-2025-0208', forecast: 16250, actual: 16404 },
+        { month: '2026-03', contractId: 'CTR-2025-0208', forecast: 16250, actual: 16720 },
+        { month: '2026-04', contractId: 'CTR-2025-0208', forecast: 16250, actual: 16351 },
+        { month: '2026-05', contractId: 'CTR-2025-0208', forecast: 16250, actual: 16516 },
+        { month: '2026-06', contractId: 'CTR-2025-0208', forecast: 16250, actual: 13385 },
+        { month: '2026-07', contractId: 'CTR-2025-0208', forecast: 16250, actual: 15896 },
+        { month: '2026-08', contractId: 'CTR-2025-0208', forecast: 16250, actual: 15976 },
+        { month: '2026-09', contractId: 'CTR-2025-0208', forecast: 16250, actual: 15704 },
+        { month: '2026-10', contractId: 'CTR-2025-0208', forecast: 16250, actual: 15903 },
+        { month: '2026-11', contractId: 'CTR-2025-0208', forecast: 16250, actual: 15731 },
+        { month: '2026-12', contractId: 'CTR-2025-0208', forecast: 16250, actual: 15961 }
+      ];
+
+      var SAMPLE_INVOICES = [
+        { invoiceNo: 'INV-2026-3101', poNo: 'PO-2026-1188', contractId: 'CTR-2024-0117', poAmount: 45000, invoiced: 45000, accrued: 45000, note: '' },
+        { invoiceNo: 'INV-2026-3102', poNo: 'PO-2026-1188', contractId: 'CTR-2024-0117', poAmount: 45000, invoiced: 47400, accrued: 45000, note: 'Over-billed vs PO; awaiting vendor credit memo' },
+        { invoiceNo: 'INV-2026-2874', poNo: 'PO-2026-1044', contractId: 'CTR-2025-0042', poAmount: 26000, invoiced: 26000, accrued: 26000, note: '' },
+        { invoiceNo: 'INV-2026-2875', poNo: 'PO-2026-1044', contractId: 'CTR-2025-0042', poAmount: 26000, invoiced: 26000, accrued: 26000, note: '' },
+        { invoiceNo: 'INV-2026-2955', poNo: 'PO-2026-1071', contractId: 'CTR-2024-0556', poAmount: 95833, invoiced: 95833, accrued: 95833, note: '' },
+        { invoiceNo: 'INV-2026-2956', poNo: 'PO-2026-1071', contractId: 'CTR-2024-0556', poAmount: 95833, invoiced: 116900, accrued: 95833, note: 'Usage overage not on PO; disputing with vendor' },
+        { invoiceNo: 'INV-2026-3012', poNo: 'PO-2026-1109', contractId: 'CTR-2025-0208', poAmount: 16250, invoiced: 16250, accrued: 16250, note: '' },
+        { invoiceNo: 'INV-2026-3013', poNo: 'PO-2026-1109', contractId: 'CTR-2025-0208', poAmount: 16250, invoiced: 14000, accrued: 16250, note: 'Short-billed; confirmed credit on next invoice' },
+        { invoiceNo: 'INV-2026-3188', poNo: 'PO-2026-1215', contractId: 'CTR-2023-0891', poAmount: 65000, invoiced: 65000, accrued: 65000, note: '' },
+        { invoiceNo: 'INV-2026-3201', poNo: 'PO-2026-1220', contractId: 'CTR-2025-0130', poAmount: 22333, invoiced: 22333, accrued: 22333, note: '' },
+        { invoiceNo: 'INV-2026-3220', poNo: 'PO-2026-1231', contractId: 'CTR-2024-0713', poAmount: 35000, invoiced: 35000, accrued: 35000, note: '' },
+        { invoiceNo: 'INV-2026-3244', poNo: 'PO-2026-1240', contractId: 'CTR-2025-0277', poAmount: 42500, invoiced: 42500, accrued: 42500, note: '' },
+        { invoiceNo: 'INV-2026-3255', poNo: 'PO-2026-1244', contractId: 'CTR-2023-0944', poAmount: 18750, invoiced: 18750, accrued: 18750, note: '' },
+        { invoiceNo: 'INV-2026-3260', poNo: 'PO-2026-1248', contractId: 'CTR-2026-0007', poAmount: 11875, invoiced: 11875, accrued: 11875, note: '' },
+        { invoiceNo: 'INV-2026-3266', poNo: 'PO-2026-1252', contractId: 'CTR-2024-0117', poAmount: 45000, invoiced: 45000, accrued: 45000, note: '' }
+      ];
+
+      var state = {
+        asOf: DEFAULT_AS_OF,
+        threshold: DEFAULT_THRESHOLD,
+        register: [],
+        forecast: [],
+        invoices: []
+      };
+
+      function cloneData(arr) {
+        return JSON.parse(JSON.stringify(arr));
+      }
+
+      function parseDateUTC(dateStr) {
+        if (!dateStr || typeof dateStr !== 'string') return null;
+        var parts = dateStr.split('-');
+        if (parts.length !== 3) return null;
+        var y = parseInt(parts[0], 10);
+        var m = parseInt(parts[1], 10) - 1;
+        var d = parseInt(parts[2], 10);
+        if (isNaN(y) || isNaN(m) || isNaN(d)) return null;
+        return Date.UTC(y, m, d);
+      }
+
+      function formatDateUTC(ms) {
+        if (ms === null || isNaN(ms)) return '—';
+        var dt = new Date(ms);
+        var y = dt.getUTCFullYear();
+        var m = String(dt.getUTCMonth() + 1).padStart(2, '0');
+        var d = String(dt.getUTCDate()).padStart(2, '0');
+        return y + '-' + m + '-' + d;
+      }
+
+      function addDaysUTC(dateStr, days) {
+        var ms = parseDateUTC(dateStr);
+        if (ms === null) return null;
+        var d = Number(days) || 0;
+        return ms + d * 86400000;
+      }
+
+      function diffDaysUTC(targetMs, baseMs) {
+        if (targetMs === null || baseMs === null) return null;
+        return Math.round((targetMs - baseMs) / 86400000);
+      }
+
+      function fmtCurrency(val, showPlus) {
+        var n = Math.round(Number(val) || 0);
+        var absStr = '$' + Math.abs(n).toLocaleString('en-US');
+        if (n < 0) return '-' + absStr;
+        if (showPlus && n > 0) return '+' + absStr;
+        return absStr;
+      }
+
+      function fmtPercent(ratio, showPlus) {
+        var pct = (Number(ratio) || 0) * 100;
+        var fixed = Math.abs(pct).toFixed(1) + '%';
+        if (pct < -0.0001) return '-' + fixed;
+        if (showPlus && pct > 0.0001) return '+' + fixed;
+        return fixed;
+      }
+
+      function escHtml(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function getVendorMap() {
+        var map = {};
+        for (var i = 0; i < state.register.length; i++) {
+          var r = state.register[i];
+          if (r.id) {
+            map[r.id] = r.vendor || r.id;
+          }
+        }
+        return map;
+      }
+
+      function buildContractOptionsHtml(selectedId) {
+        var html = '';
+        var found = false;
+        for (var i = 0; i < state.register.length; i++) {
+          var c = state.register[i];
+          var isSel = c.id === selectedId;
+          if (isSel) found = true;
+          html += '<option value="' + escHtml(c.id) + '"' + (isSel ? ' selected' : '') + '>' +
+            escHtml(c.id + ' — ' + (c.vendor || 'Unnamed')) + '</option>';
+        }
+        if (!found && selectedId) {
+          html = '<option value="' + escHtml(selectedId) + '" selected>' + escHtml(selectedId + ' (Unlisted)') + '</option>' + html;
+        }
+        return html;
+      }
+
+      function renderTables() {
+        renderRegisterTable();
+        renderForecastTable();
+        renderInvoiceTable();
+        recalculateAll();
+      }
+
+      function renderRegisterTable() {
+        var tbody = document.getElementById('register-tbody');
+        var html = '';
+        for (var i = 0; i < state.register.length; i++) {
+          var r = state.register[i];
+          var statuses = ['Active', 'Expiring', 'Under Review'];
+          var statusOpts = '';
+          for (var s = 0; s < statuses.length; s++) {
+            var st = statuses[s];
+            statusOpts += '<option value="' + st + '"' + (r.status === st ? ' selected' : '') + '>' + st + '</option>';
+          }
+          html += '<tr data-index="' + i + '">' +
+            '<td><input type="text" class="table-input id-input" data-table="register" data-field="id" data-index="' + i + '" value="' + escHtml(r.id) + '" aria-label="Contract ID"></td>' +
+            '<td><input type="text" class="table-input vendor-input" data-table="register" data-field="vendor" data-index="' + i + '" value="' + escHtml(r.vendor) + '" aria-label="Vendor"></td>' +
+            '<td><input type="text" class="table-input cat-input" data-table="register" data-field="category" data-index="' + i + '" value="' + escHtml(r.category) + '" aria-label="Category"></td>' +
+            '<td class="num"><input type="number" class="table-input num-input" data-table="register" data-field="annualValue" data-index="' + i + '" value="' + Number(r.annualValue || 0) + '" step="100" aria-label="Annual Value"></td>' +
+            '<td><input type="date" class="table-input" data-table="register" data-field="start" data-index="' + i + '" value="' + escHtml(r.start) + '" aria-label="Start Date"></td>' +
+            '<td><input type="date" class="table-input" data-table="register" data-field="end" data-index="' + i + '" value="' + escHtml(r.end) + '" aria-label="End Date"></td>' +
+            '<td class="num"><input type="number" class="table-input days-input" data-table="register" data-field="noticeDays" data-index="' + i + '" value="' + Number(r.noticeDays != null ? r.noticeDays : 60) + '" step="1" aria-label="Notice Days"></td>' +
+            '<td id="reg-notice-date-' + i + '"></td>' +
+            '<td class="num" id="reg-days-left-' + i + '"></td>' +
+            '<td><input type="text" class="table-input owner-input" data-table="register" data-field="owner" data-index="' + i + '" value="' + escHtml(r.owner) + '" aria-label="Owner"></td>' +
+            '<td><select class="table-select status-select" data-table="register" data-field="status" data-index="' + i + '" aria-label="Status">' + statusOpts + '</select></td>' +
+            '<td><button type="button" class="btn-delete" data-action="delete-register" data-index="' + i + '" title="Delete contract row">&times;</button></td>' +
+            '</tr>';
+        }
+        tbody.innerHTML = html;
+      }
+
+      function renderForecastTable() {
+        var tbody = document.getElementById('forecast-tbody');
+        var html = '';
+        for (var i = 0; i < state.forecast.length; i++) {
+          var f = state.forecast[i];
+          html += '<tr data-index="' + i + '">' +
+            '<td><input type="text" class="table-input month-input" data-table="forecast" data-field="month" data-index="' + i + '" value="' + escHtml(f.month) + '" aria-label="Month"></td>' +
+            '<td><select class="table-select contract-select" data-table="forecast" data-field="contractId" data-index="' + i + '" aria-label="Contract">' + buildContractOptionsHtml(f.contractId) + '</select></td>' +
+            '<td class="num"><input type="number" class="table-input num-input" data-table="forecast" data-field="forecast" data-index="' + i + '" value="' + Number(f.forecast || 0) + '" step="100" aria-label="Forecast Amount"></td>' +
+            '<td class="num"><input type="number" class="table-input num-input" data-table="forecast" data-field="actual" data-index="' + i + '" value="' + Number(f.actual || 0) + '" step="100" aria-label="Actual Amount"></td>' +
+            '<td class="num" id="fc-var-dlr-' + i + '"></td>' +
+            '<td class="num" id="fc-var-pct-' + i + '"></td>' +
+            '<td id="fc-flag-' + i + '"></td>' +
+            '<td><button type="button" class="btn-delete" data-action="delete-forecast" data-index="' + i + '" title="Delete forecast row">&times;</button></td>' +
+            '</tr>';
+        }
+        tbody.innerHTML = html;
+      }
+
+      function renderInvoiceTable() {
+        var tbody = document.getElementById('invoice-tbody');
+        var html = '';
+        for (var i = 0; i < state.invoices.length; i++) {
+          var inv = state.invoices[i];
+          html += '<tr data-index="' + i + '">' +
+            '<td><input type="text" class="table-input id-input" data-table="invoices" data-field="invoiceNo" data-index="' + i + '" value="' + escHtml(inv.invoiceNo) + '" aria-label="Invoice Number"></td>' +
+            '<td><input type="text" class="table-input id-input" data-table="invoices" data-field="poNo" data-index="' + i + '" value="' + escHtml(inv.poNo) + '" aria-label="PO Number"></td>' +
+            '<td><select class="table-select contract-select" data-table="invoices" data-field="contractId" data-index="' + i + '" aria-label="Contract">' + buildContractOptionsHtml(inv.contractId) + '</select></td>' +
+            '<td class="num"><input type="number" class="table-input num-input" data-table="invoices" data-field="poAmount" data-index="' + i + '" value="' + Number(inv.poAmount || 0) + '" step="100" aria-label="PO Amount"></td>' +
+            '<td class="num"><input type="number" class="table-input num-input" data-table="invoices" data-field="invoiced" data-index="' + i + '" value="' + Number(inv.invoiced || 0) + '" step="100" aria-label="Invoiced Amount"></td>' +
+            '<td class="num"><input type="number" class="table-input num-input" data-table="invoices" data-field="accrued" data-index="' + i + '" value="' + Number(inv.accrued || 0) + '" step="100" aria-label="Accrued Amount"></td>' +
+            '<td class="num" id="inv-disp-' + i + '"></td>' +
+            '<td id="inv-status-' + i + '"></td>' +
+            '<td><input type="text" class="table-input note-input" data-table="invoices" data-field="note" data-index="' + i + '" value="' + escHtml(inv.note) + '" placeholder="Optional note..." aria-label="Resolution Note"></td>' +
+            '<td><button type="button" class="btn-delete" data-action="delete-invoice" data-index="' + i + '" title="Delete invoice row">&times;</button></td>' +
+            '</tr>';
+        }
+        tbody.innerHTML = html;
+      }
+
+      function refreshContractSelects() {
+        var fcSelects = document.querySelectorAll('select[data-table="forecast"][data-field="contractId"]');
+        for (var i = 0; i < fcSelects.length; i++) {
+          var idx = parseInt(fcSelects[i].getAttribute('data-index'), 10);
+          if (state.forecast[idx]) {
+            fcSelects[i].innerHTML = buildContractOptionsHtml(state.forecast[idx].contractId);
+          }
+        }
+        var invSelects = document.querySelectorAll('select[data-table="invoices"][data-field="contractId"]');
+        for (var j = 0; j < invSelects.length; j++) {
+          var jdx = parseInt(invSelects[j].getAttribute('data-index'), 10);
+          if (state.invoices[jdx]) {
+            invSelects[j].innerHTML = buildContractOptionsHtml(state.invoices[jdx].contractId);
+          }
+        }
+      }
+
+      function recalculateAll() {
+        var asOfMs = parseDateUTC(state.asOf);
+        var thresholdRatio = (Number(state.threshold) || 0) / 100;
+        var vendorMap = getVendorMap();
+
+        // 1. Register Calculations
+        var totalBookValue = 0;
+        var noticesDueList = [];
+        var overdueCount = 0;
+        var upcoming90Count = 0;
+
+        for (var i = 0; i < state.register.length; i++) {
+          var r = state.register[i];
+          var val = Number(r.annualValue) || 0;
+          totalBookValue += val;
+
+          var noticeDays = Number(r.noticeDays != null ? r.noticeDays : 60);
+          var noticeMs = addDaysUTC(r.end, -noticeDays);
+          var noticeStr = formatDateUTC(noticeMs);
+          var daysToNotice = diffDaysUTC(noticeMs, asOfMs);
+
+          var ndCell = document.getElementById('reg-notice-date-' + i);
+          var dlCell = document.getElementById('reg-days-left-' + i);
+          if (ndCell) ndCell.textContent = noticeStr;
+          if (dlCell) {
+            if (daysToNotice === null) {
+              dlCell.innerHTML = '—';
+            } else if (daysToNotice < 0) {
+              dlCell.innerHTML = '<span class="pill pill-overdue">' + daysToNotice + 'd (Overdue)</span>';
+            } else if (daysToNotice <= 90) {
+              dlCell.innerHTML = '<span class="pill pill-review">' + daysToNotice + 'd</span>';
+            } else {
+              dlCell.textContent = daysToNotice + 'd';
+            }
+          }
+
+          if (daysToNotice !== null && daysToNotice <= 90) {
+            if (daysToNotice < 0) overdueCount++;
+            else upcoming90Count++;
+            noticesDueList.push({
+              id: r.id,
+              vendor: r.vendor || r.id,
+              noticeDate: noticeStr,
+              noticeMs: noticeMs,
+              daysToNotice: daysToNotice,
+              annualValue: val
+            });
+          }
+        }
+
+        noticesDueList.sort(function (a, b) {
+          return a.noticeMs - b.noticeMs;
+        });
+
+        // 2. Actual vs Forecast Calculations
+        var totalForecast = 0;
+        var totalActual = 0;
+        var flaggedForecastList = [];
+
+        for (var fIdx = 0; fIdx < state.forecast.length; fIdx++) {
+          var f = state.forecast[fIdx];
+          var fcVal = Number(f.forecast) || 0;
+          var acVal = Number(f.actual) || 0;
+          var varDlr = acVal - fcVal;
+          var varPct = fcVal === 0 ? 0 : (varDlr / fcVal);
+          var isReview = Math.abs(varPct) > thresholdRatio;
+
+          totalForecast += fcVal;
+          totalActual += acVal;
+
+          var vDlrCell = document.getElementById('fc-var-dlr-' + fIdx);
+          var vPctCell = document.getElementById('fc-var-pct-' + fIdx);
+          var vFlagCell = document.getElementById('fc-flag-' + fIdx);
+
+          if (vDlrCell) vDlrCell.textContent = fmtCurrency(varDlr, true);
+          if (vPctCell) vPctCell.textContent = fmtPercent(varPct, true);
+          if (vFlagCell) {
+            vFlagCell.innerHTML = isReview
+              ? '<span class="pill pill-review">REVIEW</span>'
+              : '<span class="pill pill-ok">OK</span>';
+          }
+
+          if (isReview) {
+            flaggedForecastList.push({
+              month: f.month,
+              contractId: f.contractId,
+              vendor: vendorMap[f.contractId] || f.contractId,
+              forecast: fcVal,
+              actual: acVal,
+              varDlr: varDlr,
+              varPct: varPct
+            });
+          }
+        }
+
+        var ytdVarianceDlr = totalActual - totalForecast;
+        var ytdVariancePct = totalForecast === 0 ? 0 : (ytdVarianceDlr / totalForecast);
+
+        // 3. Invoice Audit Calculations
+        var totalPo = 0;
+        var totalInvoiced = 0;
+        var totalAccrued = 0;
+        var flaggedInvoicesList = [];
+
+        for (var invIdx = 0; invIdx < state.invoices.length; invIdx++) {
+          var inv = state.invoices[invIdx];
+          var poVal = Number(inv.poAmount) || 0;
+          var inVal = Number(inv.invoiced) || 0;
+          var acInv = Number(inv.accrued) || 0;
+          var disp = inVal - poVal;
+          var isMismatch = Math.round(disp) !== 0;
+
+          totalPo += poVal;
+          totalInvoiced += inVal;
+          totalAccrued += acInv;
+
+          var dispCell = document.getElementById('inv-disp-' + invIdx);
+          var statCell = document.getElementById('inv-status-' + invIdx);
+
+          if (dispCell) dispCell.textContent = fmtCurrency(disp, true);
+          if (statCell) {
+            statCell.innerHTML = isMismatch
+              ? '<span class="pill pill-review">REVIEW</span>'
+              : '<span class="pill pill-ok">MATCH</span>';
+          }
+
+          if (isMismatch) {
+            flaggedInvoicesList.push({
+              invoiceNo: inv.invoiceNo,
+              poNo: inv.poNo,
+              contractId: inv.contractId,
+              vendor: vendorMap[inv.contractId] || inv.contractId,
+              disparity: disp,
+              note: inv.note
+            });
+          }
+        }
+
+        // 4. Update KPI Strip & Table Footers
+        document.getElementById('kpi-book-value').textContent = fmtCurrency(totalBookValue, false);
+        document.getElementById('kpi-book-sub').textContent = state.register.length + ' register contracts';
+
+        document.getElementById('kpi-notices-due').textContent = String(noticesDueList.length);
+        document.getElementById('kpi-notices-sub').textContent = overdueCount + ' overdue · ' + upcoming90Count + ' within 90d';
+
+        document.getElementById('kpi-ytd-variance').textContent = fmtCurrency(ytdVarianceDlr, false) + ' (' + fmtPercent(ytdVariancePct, false) + ')';
+        document.getElementById('kpi-ytd-sub').textContent = 'YTD forecast ' + fmtCurrency(totalForecast, false) + ' · YTD actual ' + fmtCurrency(totalActual, false);
+
+        document.getElementById('kpi-variance-review').textContent = String(flaggedForecastList.length);
+        document.getElementById('kpi-variance-sub').textContent = 'Lines past ' + state.threshold + '% threshold';
+
+        document.getElementById('kpi-invoices-review').textContent = String(flaggedInvoicesList.length);
+
+        document.getElementById('register-total-value').textContent = fmtCurrency(totalBookValue, false);
+        document.getElementById('forecast-total-f').textContent = fmtCurrency(totalForecast, false);
+        document.getElementById('forecast-total-a').textContent = fmtCurrency(totalActual, false);
+        document.getElementById('forecast-total-v').textContent = fmtCurrency(ytdVarianceDlr, false);
+        document.getElementById('forecast-total-pct').textContent = fmtPercent(ytdVariancePct, false);
+        document.getElementById('forecast-total-flags').textContent = flaggedForecastList.length + ' REVIEW';
+
+        var totalDisp = totalInvoiced - totalPo;
+        document.getElementById('invoice-total-po').textContent = fmtCurrency(totalPo, false);
+        document.getElementById('invoice-total-inv').textContent = fmtCurrency(totalInvoiced, false);
+        document.getElementById('invoice-total-acc').textContent = fmtCurrency(totalAccrued, false);
+        document.getElementById('invoice-total-disp').textContent = fmtCurrency(totalDisp, true);
+        document.getElementById('invoice-total-flags').textContent = flaggedInvoicesList.length + ' REVIEW';
+
+        // 5. Render Needs a Decision
+        renderDecisionLists(noticesDueList, flaggedForecastList, flaggedInvoicesList);
+
+        // 6. Render Portfolio Brief
+        renderPortfolioBrief({
+          asOf: state.asOf,
+          threshold: state.threshold,
+          totalBookValue: totalBookValue,
+          noticesDueCount: noticesDueList.length,
+          totalForecast: totalForecast,
+          totalActual: totalActual,
+          ytdVarianceDlr: ytdVarianceDlr,
+          ytdVariancePct: ytdVariancePct,
+          notices: noticesDueList,
+          variances: flaggedForecastList,
+          invoices: flaggedInvoicesList
+        });
+      }
+
+      function renderDecisionLists(notices, variances, invoices) {
+        var noticesEl = document.getElementById('decision-notices-list');
+        if (notices.length === 0) {
+          noticesEl.innerHTML = '<p class="empty-flag">Nothing flagged.</p>';
+        } else {
+          var nHtml = '<ul class="decision-list">';
+          for (var i = 0; i < notices.length; i++) {
+            var n = notices[i];
+            var isOverdue = n.daysToNotice < 0;
+            var dayLabel = isOverdue
+              ? (Math.abs(n.daysToNotice) + ' days overdue')
+              : (n.daysToNotice + ' days left');
+            nHtml += '<li class="decision-item' + (isOverdue ? ' is-overdue' : '') + '">' +
+              '<span class="decision-main">' + escHtml(n.vendor) + ' (' + escHtml(n.id) + ')</span>' +
+              '<span class="decision-meta">' +
+                '<span>Notice Date: <strong>' + escHtml(n.noticeDate) + '</strong></span>' +
+                '<span>&middot;</span>' +
+                '<span><strong>' + escHtml(dayLabel) + '</strong></span>' +
+                '<span>&middot;</span>' +
+                '<span>' + fmtCurrency(n.annualValue, false) + '/yr</span>' +
+              '</span>' +
+            '</li>';
+          }
+          nHtml += '</ul>';
+          noticesEl.innerHTML = nHtml;
+        }
+
+        var varEl = document.getElementById('decision-variance-list');
+        if (variances.length === 0) {
+          varEl.innerHTML = '<p class="empty-flag">Nothing flagged.</p>';
+        } else {
+          var vHtml = '<ul class="decision-list">';
+          for (var j = 0; j < variances.length; j++) {
+            var v = variances[j];
+            vHtml += '<li class="decision-item">' +
+              '<span class="decision-main">' + escHtml(v.vendor) + '</span>' +
+              '<span class="decision-meta">' +
+                '<span>Month: <strong>' + escHtml(v.month) + '</strong></span>' +
+                '<span>&middot;</span>' +
+                '<span>Variance: <strong>' + fmtPercent(v.varPct, true) + '</strong> (' + fmtCurrency(v.varDlr, true) + ')</span>' +
+              '</span>' +
+            '</li>';
+          }
+          vHtml += '</ul>';
+          varEl.innerHTML = vHtml;
+        }
+
+        var invEl = document.getElementById('decision-invoices-list');
+        if (invoices.length === 0) {
+          invEl.innerHTML = '<p class="empty-flag">Nothing flagged.</p>';
+        } else {
+          var iHtml = '<ul class="decision-list">';
+          for (var k = 0; k < invoices.length; k++) {
+            var inv = invoices[k];
+            iHtml += '<li class="decision-item">' +
+              '<span class="decision-main">' + escHtml(inv.invoiceNo) + ' — ' + escHtml(inv.vendor) + '</span>' +
+              '<span class="decision-meta">' +
+                '<span>Disparity: <strong>' + fmtCurrency(inv.disparity, true) + '</strong></span>' +
+                (inv.note ? '<span>&middot; ' + escHtml(inv.note) + '</span>' : '') +
+              '</span>' +
+            '</li>';
+          }
+          iHtml += '</ul>';
+          invEl.innerHTML = iHtml;
+        }
+      }
+
+      function renderPortfolioBrief(data) {
+        var lines = [];
+        lines.push('PORTFOLIO BRIEF — SPEND & RENEWAL CONTROL');
+        lines.push('As of Date: ' + data.asOf);
+        lines.push('----------------------------------------');
+        lines.push('KPI SUMMARY');
+        lines.push('• Total Book Value: ' + fmtCurrency(data.totalBookValue, false));
+        lines.push('• Notices Due <= 90 Days: ' + data.noticesDueCount);
+        lines.push('• YTD Forecast: ' + fmtCurrency(data.totalForecast, false));
+        lines.push('• YTD Actual: ' + fmtCurrency(data.totalActual, false));
+        lines.push('• YTD Variance: ' + fmtCurrency(data.ytdVarianceDlr, false) + ' (' + fmtPercent(data.ytdVariancePct, false) + ')');
+        lines.push('• Variance REVIEW Lines: ' + data.variances.length + ' (>' + data.threshold + '% threshold)');
+        lines.push('• Invoices REVIEW: ' + data.invoices.length);
+        lines.push('');
+        lines.push('1. RENEWAL NOTICES DUE <= 90 DAYS');
+        if (data.notices.length === 0) {
+          lines.push('None.');
+        } else {
+          for (var i = 0; i < data.notices.length; i++) {
+            var n = data.notices[i];
+            var statusTag = n.daysToNotice < 0
+              ? (Math.abs(n.daysToNotice) + 'd OVERDUE')
+              : (n.daysToNotice + 'd left');
+            lines.push('- ' + n.vendor + ' (' + n.id + ') | Notice: ' + n.noticeDate + ' (' + statusTag + ') | ' + fmtCurrency(n.annualValue, false));
+          }
+        }
+        lines.push('');
+        lines.push('2. SPEND VARIANCE REVIEW LINES');
+        if (data.variances.length === 0) {
+          lines.push('None.');
+        } else {
+          for (var j = 0; j < data.variances.length; j++) {
+            var v = data.variances[j];
+            lines.push('- ' + v.vendor + ' | ' + v.month + ' | ' + fmtPercent(v.varPct, true) + ' (' + fmtCurrency(v.varDlr, true) + ')');
+          }
+        }
+        lines.push('');
+        lines.push('3. INVOICE AUDIT MISMATCHES');
+        if (data.invoices.length === 0) {
+          lines.push('None.');
+        } else {
+          for (var k = 0; k < data.invoices.length; k++) {
+            var inv = data.invoices[k];
+            var notePart = inv.note ? ' [' + inv.note + ']' : '';
+            lines.push('- ' + inv.invoiceNo + ' | ' + inv.vendor + ' | Disparity: ' + fmtCurrency(inv.disparity, true) + notePart);
+          }
+        }
+
+        document.getElementById('portfolio-brief-text').textContent = lines.join('\n');
+      }
+
+      function resetToSample() {
+        state.asOf = DEFAULT_AS_OF;
+        state.threshold = DEFAULT_THRESHOLD;
+        state.register = cloneData(SAMPLE_REGISTER);
+        state.forecast = cloneData(SAMPLE_FORECAST);
+        state.invoices = cloneData(SAMPLE_INVOICES);
+
+        document.getElementById('as-of-date').value = state.asOf;
+        document.getElementById('variance-threshold').value = state.threshold;
+        renderTables();
+      }
+
+      // Event Delegation for Inputs & Buttons
+      document.addEventListener('input', function (e) {
+        var t = e.target;
+        if (t.id === 'as-of-date') {
+          state.asOf = t.value || DEFAULT_AS_OF;
+          recalculateAll();
+          return;
+        }
+        if (t.id === 'variance-threshold') {
+          state.threshold = parseFloat(t.value);
+          if (isNaN(state.threshold)) state.threshold = 0;
+          recalculateAll();
+          return;
+        }
+
+        var tbl = t.getAttribute('data-table');
+        var fld = t.getAttribute('data-field');
+        var idx = parseInt(t.getAttribute('data-index'), 10);
+        if (!tbl || !fld || isNaN(idx)) return;
+
+        var rowObj = state[tbl] && state[tbl][idx];
+        if (!rowObj) return;
+
+        if (t.type === 'number') {
+          rowObj[fld] = parseFloat(t.value) || 0;
+        } else {
+          rowObj[fld] = t.value;
+        }
+
+        if (tbl === 'register' && (fld === 'id' || fld === 'vendor')) {
+          refreshContractSelects();
+        }
+
+        recalculateAll();
       });
-      var d = reg["Dashboard"];
-      function money(v) { return (typeof v === "number" && isFinite(v)) ? "$" + Math.round(v).toLocaleString("en-US") : "—"; }
-      function num(v) { return (typeof v === "number" && isFinite(v)) ? String(Math.round(v)) : "—"; }
-      function pct(v) { return (typeof v === "number" && isFinite(v)) ? (v * 100).toFixed(1) + "%" : "—"; }
-      strip.innerHTML =
-        "<div><span>Total value</span><strong>" + money(d.get("B4")) + "</strong></div>" +
-        "<div><span>Notices due ≤90d</span><strong>" + num(d.get("B5")) + "</strong></div>" +
-        "<div><span>YTD variance</span><strong>" + money(d.get("B8")) + " (" + pct(d.get("B9")) + ")</strong></div>" +
-        "<div><span>Flagged REVIEW</span><strong>" + num(d.get("B10")) + " lines · " + num(d.get("B11")) + " invoices</strong></div>";
-    }
-    var panels = document.querySelectorAll("#wb-tool .wb-panel");
-    document.getElementById("wb-tool").addEventListener("input", function (e) {
-      var input = e.target;
-      if (!input.classList || !input.classList.contains("wb-input")) return;
-      var addr = input.getAttribute("aria-label");
-      var panel = input.closest ? input.closest(".wb-panel") : null;
-      var si = panel ? Array.prototype.indexOf.call(panels, panel) : -1;
-      if (!addr || si < 0) return;
-      var name = data.sheets[si].name;
-      var cell = null;
-      data.sheets[si].rows.forEach(function (r) { r.cells.forEach(function (c) { if (c.a === addr) cell = c; }); });
-      var raw = input.value;
-      var v;
-      if (cell && cell.fmt === "pct") { v = raw === "" ? "" : parseFloat(raw) / 100; }
-      else if (raw !== "" && !isNaN(parseFloat(raw)) && String(parseFloat(raw)) === raw.trim().replace(/,/g, "")) { v = parseFloat(raw); }
-      else if (raw !== "" && !isNaN(parseFloat(raw)) && cell && typeof cell.v === "number") { v = parseFloat(raw); }
-      else { v = raw; }
-      (overrides[name] = overrides[name] || {})[addr] = v;
-      compute();
-    });
-    compute();
-  })();
-</script>
+
+      document.addEventListener('click', function (e) {
+        var btn = e.target.closest('button');
+        if (!btn) return;
+
+        if (btn.id === 'btn-reset-top' || btn.id === 'btn-reset-brief') {
+          resetToSample();
+          return;
+        }
+
+        if (btn.id === 'btn-add-contract') {
+          var nextNum = state.register.length + 1;
+          state.register.push({
+            id: 'CTR-2026-' + String(nextNum).padStart(4, '0'),
+            vendor: 'New Vendor',
+            category: 'SaaS',
+            annualValue: 120000,
+            start: '2026-01-01',
+            end: '2027-01-31',
+            noticeDays: 60,
+            owner: 'J. Conte',
+            status: 'Active'
+          });
+          renderTables();
+          return;
+        }
+
+        if (btn.id === 'btn-add-forecast') {
+          var defaultContract = state.register[0] ? state.register[0].id : 'CTR-2024-0117';
+          state.forecast.push({
+            month: '2026-12',
+            contractId: defaultContract,
+            forecast: 25000,
+            actual: 25000
+          });
+          renderForecastTable();
+          recalculateAll();
+          return;
+        }
+
+        if (btn.id === 'btn-add-invoice') {
+          var defCid = state.register[0] ? state.register[0].id : 'CTR-2024-0117';
+          state.invoices.push({
+            invoiceNo: 'INV-2026-' + (3300 + state.invoices.length),
+            poNo: 'PO-2026-1290',
+            contractId: defCid,
+            poAmount: 25000,
+            invoiced: 25000,
+            accrued: 25000,
+            note: ''
+          });
+          renderInvoiceTable();
+          recalculateAll();
+          return;
+        }
+
+        if (btn.id === 'btn-copy-brief') {
+          var text = document.getElementById('portfolio-brief-text').textContent;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              var orig = btn.textContent;
+              btn.textContent = 'Copied';
+              setTimeout(function () { btn.textContent = orig; }, 1600);
+            });
+          } else {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            var origText = btn.textContent;
+            btn.textContent = 'Copied';
+            setTimeout(function () { btn.textContent = origText; }, 1600);
+          }
+          return;
+        }
+
+        var action = btn.getAttribute('data-action');
+        var rIdx = parseInt(btn.getAttribute('data-index'), 10);
+        if (action === 'delete-register' && !isNaN(rIdx)) {
+          state.register.splice(rIdx, 1);
+          renderTables();
+        } else if (action === 'delete-forecast' && !isNaN(rIdx)) {
+          state.forecast.splice(rIdx, 1);
+          renderForecastTable();
+          recalculateAll();
+        } else if (action === 'delete-invoice' && !isNaN(rIdx)) {
+          state.invoices.splice(rIdx, 1);
+          renderInvoiceTable();
+          recalculateAll();
+        }
+      });
+
+      // Initialize on load
+      resetToSample();
+    })();
+  </script>
 </body>
 </html>
