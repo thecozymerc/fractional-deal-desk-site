@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     LABEL — S6-P01.a — Deal Pricing Solver (tool page; address:
+     Tool / piece ID: Tool 1 — Deal Pricing Calculator
+     /tools/deal-pricing-solver/)
+     What this file is: the Deal Pricing Solver's own page. As of Nov 8,
+     2026 (Lucky's ruling, in chat: the designed calculator replaces the
+     spreadsheet embed on this page) the page holds the DEAL PRICING
+     CALCULATOR — built to Lucky's spec from his own model documents
+     (the original Deal Pricing sheet + the Enterprise Deal Pricing
+     Engine PDF): New Deal and Old vs New views; product lines with
+     dropdowns, editable names, add/delete; coupons; usage lines built
+     into both views; a usage-threshold concession. The calculator's own
+     files: S6-P01a-deal-pricing-calculator.js + .css in this folder.
+     Write-up: Draft 1.10, Section 6 (copy of record) — the two original
+     paragraphs, with only the mechanics sentence updated to describe the
+     calculator (the old text described the retired embed).
+     The retired embed (actual-workbook rendering via the shared formula
+     engine + the converted data files) is superseded ON THIS PAGE; the
+     data files stay in this folder, unused, and the engine still powers
+     S6-P01.b. The homepage (P01) still carries the embed — flagged to
+     Lucky Nov 8; his call pending.
+     Sitemap: 00-master/SITEMAP-TABLE.md, row S6-P01.a (inside S6-P01).
+     Rule: any change to this file is recorded in ../../CHANGELOG.md, and
+     the CODE-MAP entry is updated in the same change (Rule 3).
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="apple-touch-icon" href="../../favicon.svg" />
+<title>S6-P01.a — Deal Pricing Solver · Fractional Deal Desk &amp; Contract Management</title>
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/deal-pricing-solver/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="S6-P01.a — Deal Pricing Solver · Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="The Deal Pricing Calculator, live: price a new deal line by line — seats and usage together — solve list, discount, or margin, and flip to compare an old deal against a new one.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/deal-pricing-solver/">
+<meta name="description" content="The Deal Pricing Calculator, live: price a new deal line by line — seats and usage together — solve list, discount, or margin, and flip to compare an old deal against a new one.">
+<link rel="stylesheet" href="../../assets/styles.css">
+<link rel="stylesheet" href="S6-P01a-deal-pricing-calculator.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../services/">Services &amp; Pricing</a>
+      <a href="../../tools/">Proof of Work</a>
+      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">S6-P01.a — Pricing Engines</p>
+      <h1>Deal Pricing Solver</h1>
+      <div class="reading">
+        <p>Most discount fights are one triangle argued for days: list price, discount, and partner margin. Give the solver any two and it solves the third. It also includes price-per-user-per-month math and a multi-year block that shows year-by-year discounts, total contract value, retained margin after the partner’s share, and whether the deal stays inside the margin floor you set.</p>
+        <p>Below is the working calculator built from that model — broader than the sheet it came from. Price a new deal line by line: products from the dropdowns (rename any line to the customer's own products), seats and per-use or per-token usage side by side, coupons on any line, and an extra concession that kicks in when usage reaches the level you set. Then flip to the second tab and run the same deal as old versus new. The sample names and numbers are samples where they need to be, but the mechanics are real: change anything yellow, and every result on the page answers. The formulas stay under the hood.</p>
+      </div>
+      <div class="tool-frame" style="margin-top: var(--s-32);">
+        <div id="calc-root">
+<div class="calc">
+<div class="tabs" role="tablist">
+  <button class="tab active" data-view="v1" type="button">1 · New Deal</button>
+  <button class="tab" data-view="v2" type="button">2 · Old vs New Deal</button>
+</div>
+
+<!-- ============================ VIEW 1 · NEW DEAL ============================ -->
+<section id="v1">
+
+  <div class="frame">
+    <div class="block">
+      <h2>1. Global contract baselines</h2>
+      <p class="small">The anchor for the whole calculator: net contract value per seat, spread across the term. (Model §3, Hemisphere B, Step 1.)</p>
+      <div class="grid">
+        <div><label>Net ARPU — contract value per seat, per year ($)</label><input class="in" id="b-arpu" type="number" step="any" value="158.4"></div>
+        <div><label>Contract duration (months)</label><input class="in" id="b-months" type="number" step="any" value="12"></div>
+        <div><label>Calculated Net PUPM ($ per seat / month)</label><div class="out"><b id="b-pupm">—</b></div></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>2. Pricing variable solver — flat matrix</h2>
+      <p class="small">The analyst layout (Model §3, Hemisphere A): each row solves one variable from the other two, off the baselines above. Net PUPM = List × (1 − Discount) × (1 − Partner Margin).</p>
+      <div class="scroll"><table>
+        <tr><th>Solve for</th><th>Partner Margin %</th><th>Discount %</th><th>List Price ($)</th><th>Result</th></tr>
+        <tr>
+          <td><b>List Price</b></td>
+          <td><input class="in" id="m1-pm" type="number" step="any" value="20"></td>
+          <td><input class="in" id="m1-disc" type="number" step="any" value="45"></td>
+          <td class="num">—</td>
+          <td class="num"><span class="out" style="display:inline-block"><b id="m1-out">—</b></span></td>
+        </tr>
+        <tr>
+          <td><b>Discount</b></td>
+          <td><input class="in" id="m2-pm" type="number" step="any" value="20"></td>
+          <td class="num">—</td>
+          <td><input class="in" id="m2-list" type="number" step="any" value="30"></td>
+          <td class="num"><span class="out" style="display:inline-block"><b id="m2-out">—</b></span></td>
+        </tr>
+        <tr>
+          <td><b>Partner Margin</b></td>
+          <td class="num">—</td>
+          <td><input class="in" id="m3-disc" type="number" step="any" value="45"></td>
+          <td><input class="in" id="m3-list" type="number" step="any" value="30"></td>
+          <td class="num"><span class="out" style="display:inline-block"><b id="m3-out">—</b></span></td>
+        </tr>
+      </table></div>
+    </div>
+
+    <div class="block">
+      <h2>3. Smart calculator form</h2>
+      <p class="small">The field layout (Model §3, Hemisphere B, Step 2): pick what to solve for from the dropdown; the form asks only for the other two.</p>
+      <div class="grid">
+        <div><label>What do you want to calculate?</label>
+          <select class="in" id="s-target">
+            <option value="list" selected>Solve for List Price</option>
+            <option value="disc">Solve for Discount</option>
+            <option value="pm">Solve for Partner Margin</option>
+          </select></div>
+        <div id="s-f1-wrap"><label id="s-f1-label">Enter Partner Margin (PM) %</label><input class="in" id="s-f1" type="number" step="any" value="20"></div>
+        <div id="s-f2-wrap"><label id="s-f2-label">Enter Discount %</label><input class="in" id="s-f2" type="number" step="any" value="45"></div>
+        <div><label>Calculated result</label><div class="out"><b class="big" id="s-out">—</b></div></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>4. Get the list price from the TCV</h2>
+      <p class="small">Start from a signed total instead (Model §3, Interactive TCV form): total contract value, term, and seats give the annual value and the per-seat prices.</p>
+      <div class="grid">
+        <div><label>Total Contract Value — TCV ($)</label><input class="in" id="t-tcv" type="number" step="any" value="114048"></div>
+        <div><label>Contract duration (years)</label><input class="in" id="t-years" type="number" step="any" value="4"></div>
+        <div><label>Number of seats / users</label><input class="in" id="t-seats" type="number" step="any" value="180"></div>
+        <div><label>Annual Contract Value — ACV ($)</label><div class="out"><b id="t-acv">—</b></div></div>
+        <div><label>Duration (months)</label><div class="out"><b id="t-months">—</b></div></div>
+        <div><label>Net ARPU ($ per seat / year)</label><div class="out"><b id="t-arpu">—</b></div></div>
+        <div><label>Net PUPM ($ per seat / month)</label><div class="out"><b id="t-pupm">—</b></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <h2>5. New deal — product lines</h2>
+    <p class="small">Up to four lines (the model's architecture). Pick a product from the dropdown — its list price fills in and stays editable. Unit price is per seat per month; ACV and TCV build from the net per-seat price.</p>
+    <div class="scroll"><table id="nd-table">
+      <tr><th>SKU name (editable)</th><th>Preset</th><th>List price ($/seat/mo)</th><th>Seats</th><th>Discount %</th><th>Partner Margin %</th><th>Term (months)</th><th>Net PUPM</th><th>Net ARPU (yr)</th><th>ACV ($)</th><th>TCV ($)</th><th>Coupon ($)</th><th>ACV after coupon</th><th>TCV after coupon</th><th></th></tr>
+    </table></div>
+    <p style="margin:12px 0 0"><button class="tab" type="button" id="add-nd">+ Add a product line</button></p>
+    <div class="grid" style="margin-top:14px">
+      <div><label>Total seats</label><div class="out"><b id="nd-seats">—</b></div></div>
+      <div><label>Seat ACV, after coupons ($)</label><div class="out"><b id="nd-acv">—</b></div></div>
+      <div><label>Seat TCV, after coupons ($)</label><div class="out"><b id="nd-tcv">—</b></div></div>
+      <div><label>Blended Net PUPM ($)</label><div class="out"><b id="nd-pupm">—</b></div></div>
+      <div><label>Usage net / year, after concession ($)</label><div class="out"><b id="nd-usageyr">—</b></div></div>
+      <div><label>Full deal TCV — seats + usage ($)</label><div class="out"><b id="nd-fulltcv">—</b></div></div>
+    </div>
+    <p class="small">Payment terms per line are Net 60 in the model's samples; they ride along as a label, they don't change the math.</p>
+  </div>
+
+  <div class="frame">
+    <h2>6. Usage lines — per use / per token, inside this deal</h2>
+    <p class="small">Consumption pricing rides in the same deal as the seats. Pick the unit, set expected monthly volume and the rate; the committed minimum bills even when use runs below it. These lines feed the deal totals above and the concession below.</p>
+    <div class="scroll"><table id="ndu-table">
+      <tr><th>Usage line name (editable)</th><th>Unit type</th><th>Usage / month</th><th>Price per unit ($)</th><th>Discount %</th><th>Committed min (units)</th><th>Net ($/mo)</th><th>Effective per unit ($)</th><th>Per token ($)</th><th></th></tr>
+    </table></div>
+    <p style="margin:12px 0 0"><button class="tab" type="button" id="add-ndu">+ Add a usage line</button></p>
+  </div>
+
+  <div class="frame">
+    <h2>7. Deal levers — coupons &amp; the usage concession</h2>
+    <p class="small">Coupons: every product line above has a Coupon ($) field — a flat amount off that line's contract value, spread across its years (the model's voucher idea, as a simple option on every line). Concession: when billed usage on the chosen meter reaches the threshold, an extra discount comes off those usage lines.</p>
+    <div class="grid">
+      <div><label>Concession meter (unit type)</label>
+        <select class="in" id="g1-meter">
+          <option value="token1m" selected>Tokens — per 1M tokens</option>
+          <option value="token1k">Tokens — per 1K tokens</option>
+          <option value="use">Per use / per call</option>
+          <option value="api">Per API request</option>
+        </select></div>
+      <div><label>Usage threshold (billed units / month)</label><input class="in" id="g1-threshold" type="number" step="any" value="50"></div>
+      <div><label>Extra discount when reached %</label><input class="in" id="g1-extra" type="number" step="any" value="5"></div>
+      <div><label>Billed units on the meter</label><div class="out"><b id="g1-units">—</b></div></div>
+      <div><label>Concession status</label><div class="out"><span class="flag" id="g1-status">—</span></div></div>
+      <div><label>Metered usage net / month, after concession ($)</label><div class="out"><b id="g1-after">—</b></div></div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <h2>8. ARPU expansion &amp; contraction utility</h2>
+    <p class="small">A standalone sandbox (Model §4): take one current price and see the uplift and the concession at the same time, without touching the deal above.</p>
+    <div class="grid">
+      <div><label>Current deal paying price ($)</label><input class="in" id="e-price" type="number" step="any" value="20.10"></div>
+      <div><label>Price increase needed %</label><input class="in" id="e-up" type="number" step="any" value="10"></div>
+      <div><label>Price decrease needed %</label><input class="in" id="e-down" type="number" step="any" value="10"></div>
+      <div><label>Increase result ($)</label><div class="out"><b id="e-up-out">—</b></div></div>
+      <div><label>Decrease result ($)</label><div class="out"><b id="e-down-out">—</b></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ VIEW 2 · OLD VS NEW ============================ -->
+<section id="v2" style="display:none">
+  <div class="frame">
+    <h2>Current / old deal footprint</h2>
+    <p class="small">The baseline ledger (Model §5): what the customer has today, line by line. Dropdowns pick the product; list price fills in and stays editable.</p>
+    <div class="scroll"><table id="old-table">
+      <tr><th>SKU name (editable)</th><th>Preset</th><th>List price ($/seat/mo)</th><th>Seats</th><th>Discount %</th><th>Partner Margin %</th><th>Term (months)</th><th>Net PUPM</th><th>Net ARPU (yr)</th><th>ACV ($)</th><th>TCV ($)</th><th>Coupon ($)</th><th>ACV after coupon</th><th>TCV after coupon</th><th></th></tr>
+    </table></div>
+    <p style="margin:12px 0 0"><button class="tab" type="button" id="add-old">+ Add a product line</button></p>
+  </div>
+
+  <div class="frame">
+    <h2>Old deal — usage lines</h2>
+    <p class="small">What the old deal consumes today, priced the same way as the new side so the comparison is honest.</p>
+    <div class="scroll"><table id="oldu-table">
+      <tr><th>Usage line name (editable)</th><th>Unit type</th><th>Usage / month</th><th>Price per unit ($)</th><th>Discount %</th><th>Committed min (units)</th><th>Net ($/mo)</th><th>Effective per unit ($)</th><th>Per token ($)</th><th></th></tr>
+    </table></div>
+    <p style="margin:12px 0 0"><button class="tab" type="button" id="add-oldu">+ Add a usage line</button></p>
+  </div>
+
+  <div class="frame">
+    <h2>Proposed deal — discount / concession method</h2>
+    <p class="small">The new deal (Model §7), same shape. The comparison below reads line 1 against line 1, line 2 against line 2, line 3 against line 3 — so keep the same slot for the same product family.</p>
+    <div class="scroll"><table id="new-table">
+      <tr><th>SKU name (editable)</th><th>Preset</th><th>List price ($/seat/mo)</th><th>Seats</th><th>Discount %</th><th>Partner Margin %</th><th>Term (months)</th><th>Net PUPM</th><th>Net ARPU (yr)</th><th>ACV ($)</th><th>TCV ($)</th><th>Coupon ($)</th><th>ACV after coupon</th><th>TCV after coupon</th><th></th></tr>
+    </table></div>
+    <p style="margin:12px 0 0"><button class="tab" type="button" id="add-new">+ Add a product line</button></p>
+  </div>
+
+  <div class="frame">
+    <h2>Proposed deal — usage lines &amp; concession</h2>
+    <p class="small">The new deal's consumption, with the same usage-threshold concession as the New Deal view: reach the threshold on the meter and the extra discount comes off the metered lines.</p>
+    <div class="scroll"><table id="newu-table">
+      <tr><th>Usage line name (editable)</th><th>Unit type</th><th>Usage / month</th><th>Price per unit ($)</th><th>Discount %</th><th>Committed min (units)</th><th>Net ($/mo)</th><th>Effective per unit ($)</th><th>Per token ($)</th><th></th></tr>
+    </table></div>
+    <p style="margin:12px 0 0"><button class="tab" type="button" id="add-newu">+ Add a usage line</button></p>
+    <div class="grid" style="margin-top:14px">
+      <div><label>Concession meter (unit type)</label>
+        <select class="in" id="g2-meter">
+          <option value="token1m" selected>Tokens — per 1M tokens</option>
+          <option value="token1k">Tokens — per 1K tokens</option>
+          <option value="use">Per use / per call</option>
+          <option value="api">Per API request</option>
+        </select></div>
+      <div><label>Usage threshold (billed units / month)</label><input class="in" id="g2-threshold" type="number" step="any" value="50"></div>
+      <div><label>Extra discount when reached %</label><input class="in" id="g2-extra" type="number" step="any" value="5"></div>
+      <div><label>Billed units on the meter</label><div class="out"><b id="g2-units">—</b></div></div>
+      <div><label>Concession status</label><div class="out"><span class="flag" id="g2-status">—</span></div></div>
+      <div><label>Metered usage net / month, after concession ($)</label><div class="out"><b id="g2-after">—</b></div></div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <h2>The comparison — what changed</h2>
+    <p class="small">The model's variance indicators: Seat +/-, ARPU +/-, ARPA +/-, ACV +/-, TCV +/-. ARPA is the account's monthly value (ACV ÷ 12).</p>
+    <div class="scroll"><table id="cmp-table">
+      <tr><th>Line</th><th>Seat +/-</th><th>ARPU +/-</th><th>ARPA +/-</th><th>ACV +/-</th><th>TCV +/-</th></tr>
+    </table></div>
+    <div class="grid" style="margin-top:14px">
+      <div><label>Old — ACV / TCV ($)</label><div class="out"><b id="cmp-old">—</b></div></div>
+      <div><label>New — ACV / TCV ($)</label><div class="out"><b id="cmp-new">—</b></div></div>
+      <div><label>Total ACV change (after coupons)</label><div class="out"><b id="cmp-acv">—</b></div></div>
+      <div><label>Total TCV change (after coupons)</label><div class="out"><b id="cmp-tcv">—</b></div></div>
+      <div><label>Usage — old net / month ($)</label><div class="out"><b id="cmp-uold">—</b></div></div>
+      <div><label>Usage — new net / month, after concession ($)</label><div class="out"><b id="cmp-unew">—</b></div></div>
+      <div><label>Usage change</label><div class="out"><b id="cmp-udelta">—</b></div></div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <h2>SKU-mix adjudication — the model's sample rules</h2>
+    <p class="small">From the model's PDL hub (§6), its own example rules — an organization may have different rules; these are the ones documented in the model.</p>
+    <div class="rule"><span class="flag" id="pdl-1-flag">—</span> <b>Top-tier seat floor:</b> <span id="pdl-1-text">—</span></div>
+    <div class="rule"><span class="flag" id="pdl-2-flag">—</span> <b>Mid-tier seat cap:</b> <span id="pdl-2-text">—</span></div>
+  </div>
+</section>
+</div>
+        </div>
+      </div>
+      <div class="reading" style="margin-top: var(--s-32);">
+        <div class="calc-mobile-bar" id="calc-mobile-bar"><span class="lbl">Deal totals</span><span id="cmb-main">—</span><span id="cmb-sub"></span></div>
+        <p><a href="../../tools/pricing-engines/">Back to Pricing Engines</a> · <a href="../../tools/">All tools</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
+  </div>
+</footer>
+
+<script src="S6-P01a-deal-pricing-calculator.js"></script>
+<script>
+  /* Mobile totals bar (Nov 10, 2026): phone widths only (CSS hides it on
+     desktop). This script only READS the calculator's own rendered
+     outputs and mirrors the active view's totals into the sticky bar —
+     it computes nothing. */
+  (function () {
+    var root = document.getElementById("calc-root");
+    var main = document.getElementById("cmb-main"), sub = document.getElementById("cmb-sub");
+    if (!root || !main) return;
+    function txt(id) { var el = document.getElementById(id); return el ? el.textContent.trim() : ""; }
+    function sync() {
+      var active = root.querySelector(".tab.active");
+      var view = active ? active.getAttribute("data-view") : "v1";
+      if (view === "v2") {
+        main.innerHTML = "New deal: <b>" + txt("cmp-new") + "</b>";
+        sub.innerHTML = "TCV change: <b>" + txt("cmp-tcv") + "</b>";
+      } else {
+        main.innerHTML = "Seat TCV after coupons: <b>$" + txt("nd-tcv") + "</b>";
+        sub.innerHTML = "Full deal TCV: <b>$" + txt("nd-fulltcv") + "</b>";
+      }
+    }
+    var t = null;
+    root.addEventListener("input", function () { clearTimeout(t); t = setTimeout(sync, 60); });
+    root.addEventListener("click", function () { clearTimeout(t); t = setTimeout(sync, 60); });
+    sync();
+  })();
+</script>
+</body>
+</html>
