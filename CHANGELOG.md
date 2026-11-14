@@ -1,5 +1,81 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-13 — S6-P05 partition rename COMPLETE (Deal Desk Controls)
+
+- The partition page at /tools/stories-and-sandboxes/ is
+  rebuilt by Argon to the Tool 7/8 bank frame and renamed
+  DEAL DESK CONTROLS in its title, breadcrumb, eyebrow,
+  cards, and structured data. The address and all four tool
+  targets (Tools 5–8) are unchanged. The old story framing
+  and the Book-a-Call block are retired with the old page.
+- The tools hub (S6-proof-of-work) is updated naming-only:
+  the lede and the third partition card now say Deal Desk
+  Controls; every other byte is the supplied file's.
+- Verification (Muse): hub diff = the manifest plus the
+  three naming lines only; partition law scans clean (no
+  story framing, no pitch, no employer names; senior anchors
+  present); JSON-LD parses; width ladder zero overflow at
+  280–1280 on both pages; screenshots in both modes; live
+  on Cloudflare at the exact promoted bytes.
+
+## 2026-11-13 — Tool 8 (S6-P05.4) ARGON FULL REBUILD live
+
+- The Bundling Sandbox page is rebuilt by Argon (TOOL 8.1):
+  a working sandbox — two bundle options built line by line
+  against a buyer budget ceiling and a margin floor, each
+  gated live. Gate strip up top carries both verdicts;
+  Deal Settings; the two option tables; a copyable Bundle
+  Brief; Reset. Story 4 retired with the old embed build.
+- Math is the workbook's, with three alterations Argon
+  declared in its in-file manifest: (1) the zero-revenue
+  margin guard extended to every line and total (never NaN);
+  (2) gate messages now follow the CURRENT floor and read
+  the same for both options (at the sample 75% floor they
+  read exactly as the workbook's strings); (3) revenue/COGS
+  labels follow the current term. Argon also caught an
+  error in the prompt's own boundary note: at Term 1,
+  Option B COGS is $22,600 and margin 73.4% per the workbook
+  formulas (the prompt's prose said $23,800 / 72.0%) —
+  Argon's figures verified independently and shipped.
+- Verification (Muse): independent battery vs the workbook
+  oracle — sample anchors exact, all four boundary cases,
+  all-zero state, reset — 40/40 on displayed values; width
+  ladder clean 280–1280; screenshots in both modes; law
+  scans clean. Own additions by Argon: budget/margin
+  headroom notes on the gate cards and a Quick Test
+  Scenarios bar.
+- The superseded workbook-embed build is archived:
+  tool8-build/original-live-copy-2026-11-13/, GitHub branch
+  tool-8-iterations, Drive mirror folder (data.js record).
+
+## 2026-11-13 — THE QA PASS, CONSOLIDATED — what the pass before Tool 8 accomplished
+
+- Tools 3 and 4 got their missing meta descriptions and
+  canonical links — every page now describes itself to Google.
+- robots.txt added: crawlers welcomed, pointed at the sitemap.
+- sitemap.xml added: all 27 pages listed for Google in one file.
+- Favicon live: the brass-and-navy D in every browser tab;
+  link tags installed on all 52 page files.
+- Custom 404 page live: a bad address returns a real HTTP 404
+  on a real page, not a void.
+- Security headers shipped in _headers (HSTS, nosniff,
+  referrer policy, frame + permissions locks). Cloudflare
+  applies 2 of 5 on the free pages.dev host; HSTS waits on a
+  custom domain. No CSP — it would break the calculators'
+  inline code; Argon's report-only CSP step awaits a ruling.
+- Contrast fixed sitewide: the light grey failing at 2.46:1
+  replaced with the passing slate at 5.10:1 (Argon's call).
+- Photos set per the peer-reviewed research: the casual,
+  smiling photo leads Homepage and About; the suit photo is
+  a small secondary image on About only.
+- Nothing shipped unverified: byte-diffs, the 240-check
+  battery (Tool 3), anchor probes (Tool 4), the 10-width
+  ladder on every page, live fetches on both hosts.
+- Cloudflare, GitHub, and the Drive mirror carry the same
+  bytes. Scoreboard: 8 findings — 7 closed, 1 partial
+  (F7, platform limit). Detail in the wave entries below
+  and Plans log 64–68.
+
 ## 2026-11-13 — QA job CLOSED: photo treatment live (Deliverables 8–9)
 
 - Homepage (P01) + About (P03): the research-backed photo
