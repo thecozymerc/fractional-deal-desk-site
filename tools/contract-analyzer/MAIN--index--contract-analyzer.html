@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<!--
+ARGON MANIFEST: TOOL 13 FULL REBUILD — Contract Analyzer (S6-P03.4)
+====================================================================
+
+1. SELF-CHECK AGAINST GROUND-TRUTH ANCHORS (INLINED ENGINE: S6-P03d-analyzer.js / analyzer-engine.txt)
+   - Engine Fidelity / Math-Class Alterations:
+     * None. Zero alterations. S6-P03d-analyzer.js (supplied as analyzer-engine.txt, 191 lines, 13,791 bytes) is carried over BYTE-FOR-BYTE into its own <script> block with its LABEL header comment, Layer 1 regexes, 33-entry CHECKS table, excerptAround logic, and window.ContractAnalyzer interface intact.
+
+   - Fixture 1 — Sample Contract (verbatim 6-line SERVICE AGREEMENT):
+     * Layer 2 found count: 8 of 33
+     * Found IDs (8): parties, effective-date, term, renewal, termination-convenience, fees, payment-terms, governing-law
+     * Not found count: 25 of 33
+     * Layer 1 (six original scans):
+       - dates: ["2024-01-15"]
+       - money: ["USD $12,500"]
+       - parties: [["ACME, Inc.", "Roadrunner LLC.\nPayment"]] (1 pair — faithful port quirk)
+       - law: [["Governing Law", "California"]]
+       - term_length: [""] (1 entry, empty string — faithful port quirk, rendered as "(empty match)")
+       - renewal_period: [] (none)
+
+   - Fixture 2 — Plain Prose ("The quick brown fox... Nobody talked about work at all."):
+     * Layer 2 found count: 0 of 33 (zero false positives)
+     * Layer 1 (six original scans): empty array [] on all six scans (dates, money, parties, law, term_length, renewal_period)
+
+   - Fixture 3 — Full-Coverage Synthetic Contract (fixture-full.txt, verified externally, NOT embedded on page):
+     * Layer 2 found count: 33 of 33 (all 33 checks matched across Basics, Money, Risk, Data & IP, Operations, Legal)
+     * Layer 1 (six original scans — every scan returns >= 1 match):
+       - dates: ["January 1, 2026", "January 15, 2026"] (2 matches)
+       - money: ["USD $48,000"] (1 match)
+       - parties: [["Brightpath Technologies, Inc.", "Northwind Retail Group, LLC, effective date January 1, 2026 "]] (1 match)
+       - law: [["governing law", "Delaware"], ["jurisdiction", "lie in Delaware courts"], ["Governing Law", "Delaware"]] (3 matches)
+       - term_length: [""] (1 match)
+       - renewal_period: [["renew", ""], ["auto-renews", ""]] (2 matches)
+
+   - Input, File Extraction, Empty Input & AI Failure Modes:
+     * Paste flow, sample-load flow, and file upload flow (.txt direct UTF-8 read, .docx via JSZip word/document.xml, .pdf via PDF.js page-by-page text items) all populate #ca-text and produce full result renders.
+     * Scanned image PDFs (0 extracted text characters) are explicitly caught and reported with a clear prompt to paste text instead.
+     * Empty input on Run reports a plain notice asking for a contract with zero crashes and zero NaN.
+     * AI Read POSTs JSON {"text": ...} (first 60,000 chars) to /api/analyze and degrades gracefully across all three failure states (501 / not_configured, API/HTTP error, and unreachable host) while keeping the browser scan intact.
+
+2. IMPROVEMENTS MADE (WITHIN ENGINE & NON-SELLING BOUNDS):
+   - Live Check Filter & Group Jump Strip: Added an interactive filter bar (All 33 / Found / Not found) and section jump links across the six check groups (Basics, Money, Risk, Data & IP, Operations, Legal), re-rendering from in-memory results without display:none.
+   - Copyable Plain-Text Analysis Brief: Added a structured, clipboard-copyable plain-text summary (overall score, Layer 1 six scans, found clauses with excerpts, and missing items to verify by hand) with textarea fallback.
+   - Plain-Text (.txt) Upload Support & Scanned-PDF Guard: Added native .txt reading alongside .docx (JSZip) and .pdf (PDF.js), plus an explicit check rejecting empty-text PDFs as scanned image files.
+   - Live Document Counter & Clear Control: Added real-time character/word count feedback on the textarea and a Clear button to reset the workspace cleanly.
+
+3. GOAL-VS-SPEC CONFLICTS & RULINGS:
+   - Deal Check Section Ruling: Dropped the standalone "Next — From a scan to a worked deal" section and booking link from the superseded page; Deal Check (../deal-check/) now appears solely as a plain descriptive link inside Related Links and the footer, enforcing the standing no-selling rule.
+   - Results Visibility vs. Part E: Removed the superseded page's hidden attribute (display:none) on #ca-results; the results section renders an explicit ready state before analysis runs and populates on run with zero display:none content blocks.
+   - Sibling Tool Links Note: Tool 9 (Contract Migration Triage) and Tool 10 (Case Operations & Capacity) use ../contract-migration-triage/ and ../case-operations/ following the site's /tools/<kebab-case>/ directory convention (verify against site/CODE-MAP.md on deploy).
+
+4. RESPONSIVE MODES & FLUID-FIRST SWEEP (280px - 1280px):
+   - Desktop Mode (> 720px): Working surface first in full reading measure; 4-card KPI summary strip; 2-column grid for the six original scans; grouped 33-point checklist with side-by-side status badges and wrapped evidence excerpts; 2-column layout for AI Read + How It Works / Provenance.
+   - Phone Mode (<= 720px): File and sample/clear controls stack first, textarea stays >= 11rem tall at 16px font size (no iOS auto-zoom), Run button expands to 100% width with >= 44px touch height; six scans and check cards stack in 1 column with 4px semantic left borders (green/red) for instant scanability; fixed bottom sticky summary strip displays Found/Gaps counts and jumps to AI Read.
+   - Fluid-First Sweep (280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS px): Built with relative units, minmax(0, 1fr), min-width: 0, overflow-wrap: anywhere, and 1-column fallback <= 380px so long contract excerpts and filenames wrap with zero horizontal page scroll at every width.
+
+5. PART E — SEO INTEGRITY COMPLIANCE:
+   - 100% compliant. Zero display:none content blocks, zero hidden text or links, zero white-on-white, zero off-screen positioning, zero zero-size text, zero keyword stuffing, zero cloaking or doorway pages.
+-->
+<!--
+     LABEL — S6-P03.4 — Contract Analyzer (tool page;
+     Tool / piece ID: Tool 13 — Contract Analyzer, version
+     TOOL 13.1, address: /tools/contract-analyzer/)
+     What this page holds: the Argon full rebuild (Nov 13,
+     2026) of Tool 13 — a working first-pass contract
+     analyzer that runs entirely in the visitor's browser:
+     paste text or upload a TXT / DOCX / PDF (text extracted
+     locally with the site's shared JSZip and PDF.js
+     libraries), then Run the analysis for the six Layer 1
+     scans, the 33 Layer 2 coverage checks grouped with
+     found excerpts or not-found lines, a copyable Analysis
+     Brief, and an optional AI read (POST /api/analyze; the
+     only step that sends text anywhere). One mechanical fix
+     was applied at promotion (disclosed in the CHANGELOG):
+     Argon's two Tool 10 links pointed at
+     ../case-operations/ (the partition address); they now
+     point at ../case-operations-capacity/.
+     THE ENGINE: the analyzer's JavaScript (Layer 1 — the
+     original six regex scans ported exactly from Lucky's
+     contract-analyzer repo, quirks included; Layer 2 — the
+     33 coverage checks in six groups) is inlined in this
+     page BYTE-FOR-BYTE from S6-P03d-analyzer.js, its LABEL
+     header comment intact, verified two ways by Muse
+     (source diff identical; output equivalence deep-compared
+     on three fixtures: the sample contract finds exactly 8
+     of 33, plain prose finds 0 of 33, a synthetic
+     full-coverage contract finds 33 of 33). The standalone
+     engine file is retired from this folder — archived in
+     tool13-build/original-live-copy-2026-11-13/ and on the
+     GitHub branch tool-13-iterations. Heuristic pattern
+     matching only: it locates language, it does not judge
+     it, and it is not legal advice (stated on the page).
+     ARGON'S DEAL CHECK RULING (its call, inside the
+     no-selling rule, declared in its manifest): the old
+     closing "Next — From a scan to a worked deal" section
+     is dropped; the Deal Check rides as a plain descriptive
+     link among the related links.
+     Map: site/CODE-MAP.md ("tools/contract-analyzer/").
+     Rule: any change here is recorded in site/CHANGELOG.md
+     with the CODE-MAP and this folder's LABEL.md updated in
+     the same change (Code Labeling System, Rule 3).
+     -->
+<!--
+     LABEL — S6-P03.4 — Contract Analyzer (tool page;
+     Tool / piece ID: Tool 13 — Contract Analyzer,
+     address: /tools/contract-analyzer/)
+     What this page holds: Argon full rebuild of Tool 13 — browser-based
+     first-pass contract analyzer carrying S6-P03d-analyzer.js byte-for-byte
+     (Layer 1 six original heuristic scans + Layer 2 33-point coverage
+     checklist across six groups), in-browser TXT/DOCX/PDF text extraction,
+     copyable analysis brief, and optional /api/analyze AI read.
+     Map: site/CODE-MAP.md ("tools/contract-analyzer/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+  <link rel="apple-touch-icon" href="../../favicon.svg" />
+  <title>Contract Analyzer — Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="Paste or upload a TXT, DOCX, or PDF contract in your browser to pull key facts with six pattern scans, run a 33-point clause coverage checklist with evidence, and get an optional plain-English AI read.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/contract-analyzer/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Contract Analyzer — Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="Paste or upload a TXT, DOCX, or PDF contract in your browser to pull key facts with six pattern scans, run a 33-point clause coverage checklist with evidence, and get an optional plain-English AI read.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/contract-analyzer/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/contract-analyzer/#webapp",
+        "name": "Contract Analyzer",
+        "url": "https://fractional-deal-desk-site.pages.dev/tools/contract-analyzer/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "All",
+        "description": "Browser-based first-pass contract analyzer extracting key facts with six heuristic scans, running a 33-point clause coverage check with matched excerpts, and providing an optional plain-English AI read.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Fractional Deal Desk & Contract Management",
+          "url": "https://fractional-deal-desk-site.pages.dev/"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/contract-analyzer/#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fractional-deal-desk-site.pages.dev/" },
+          { "@type": "ListItem", "position": 2, "name": "Proof of Work", "item": "https://fractional-deal-desk-site.pages.dev/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Contract Operations", "item": "https://fractional-deal-desk-site.pages.dev/tools/contract-operations/" },
+          { "@type": "ListItem", "position": 4, "name": "Contract Analyzer", "item": "https://fractional-deal-desk-site.pages.dev/tools/contract-analyzer/" }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --navy-900: #0F1E38;
+      --navy-800: #16294A;
+      --navy-700: #1F3760;
+      --brass-600: #8A661B;
+      --brass-500: #B5892E;
+      --brass-400: #D4AF5A;
+      --brass-100: #F7F1E1;
+      --paper-bg: #F8F7F4;
+      --paper-card: #FFFFFF;
+      --paper-alt: #F1EFEA;
+      --ink-900: #0F1E38;
+      --ink-700: #28364E;
+      --ink-600: #42526B;
+      --rule-color: #D5D0C5;
+      --rule-strong: #0F1E38;
+      --fail-bg: #FEF2F2;
+      --fail-ink: #7F1D1D;
+      --fail-border: #991B1B;
+      --pass-bg: #F0FDF4;
+      --pass-ink: #14532D;
+      --pass-border: #166534;
+      --font-serif: Georgia, "Times New Roman", Times, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { margin: 0; padding: 0; background-color: var(--paper-bg); color: var(--ink-900); font-family: var(--font-sans); line-height: 1.55; overflow-x: hidden; }
+    a { color: var(--navy-900); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover, a:focus-visible { color: var(--brass-600); }
+    button, input, textarea { font-family: inherit; border-radius: 0; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--brass-500); outline-offset: 2px; }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 clamp(0.65rem, 3vw, 2rem); }
+
+    /* HEADER & BREADCRUMB */
+    .site-header { background-color: var(--navy-900); color: #FFFFFF; border-bottom: 3px solid var(--brass-500); }
+    .header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; padding: 0.85rem 0; }
+    .brand-link { color: #FFFFFF; text-decoration: none; font-family: var(--font-serif); font-size: clamp(1rem, 2.2vw, 1.2rem); font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .brand-link:hover, .brand-link:focus-visible { color: var(--brass-400); }
+    .site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.85rem; }
+    .site-nav a { color: #E2E8F0; text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0.4rem; min-height: 44px; display: inline-flex; align-items: center; border-bottom: 2px solid transparent; }
+    .site-nav a:hover, .site-nav a:focus-visible, .site-nav a[aria-current="page"] { color: #FFFFFF; border-bottom-color: var(--brass-400); }
+
+    .breadcrumb-bar { background-color: var(--paper-alt); border-bottom: 1px solid var(--rule-color); font-size: 0.8125rem; }
+    .breadcrumb-list { list-style: none; margin: 0; padding: 0.5rem 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; color: var(--ink-700); }
+    .breadcrumb-list li { display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; overflow-wrap: anywhere; }
+    .breadcrumb-list li + li::before { content: "/"; color: var(--ink-600); }
+    .breadcrumb-list a { color: var(--ink-700); padding: 0.35rem 0.15rem; min-height: 36px; display: inline-flex; align-items: center; }
+    .breadcrumb-list [aria-current="page"] { color: var(--ink-900); font-weight: 600; }
+
+    /* HERO */
+    .hero-banner { background-color: var(--navy-900); color: #FFFFFF; padding: clamp(1.5rem, 4vw, 2.75rem) 0; border-bottom: 1px solid var(--rule-strong); }
+    .hero-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.85rem; }
+    .eyebrow-tag { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-400); font-weight: 600; }
+    .tool-badge { display: inline-block; background-color: var(--navy-800); border: 1px solid var(--brass-500); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; letter-spacing: 0.04em; }
+    .hero-title { font-family: var(--font-serif); font-size: clamp(1.55rem, 3.6vw, 2.35rem); line-height: 1.2; font-weight: 700; margin: 0 0 0.9rem 0; color: #FFFFFF; overflow-wrap: anywhere; }
+    .hero-lede { font-size: clamp(0.95rem, 1.6vw, 1.06rem); line-height: 1.62; color: #E2E8F0; max-width: 82ch; margin: 0 0 1.15rem 0; }
+    .provenance-strip { background-color: var(--navy-800); border-left: 3px solid var(--brass-500); padding: 0.85rem 1rem; font-size: 0.86rem; color: #E2E8F0; line-height: 1.55; max-width: 86ch; }
+    .provenance-strip strong { color: #FFFFFF; }
+
+    /* SECTIONS */
+    main { padding-bottom: 3rem; }
+    .section-block { padding: clamp(1.35rem, 3vw, 2.25rem) 0; border-bottom: 1px solid var(--rule-color); }
+    .section-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--navy-900); }
+    .section-title { font-family: var(--font-serif); font-size: clamp(1.2rem, 2.4vw, 1.5rem); font-weight: 700; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; }
+    .section-subtitle { font-size: 0.85rem; color: var(--ink-600); font-family: var(--font-mono); margin: 0; overflow-wrap: anywhere; }
+
+    /* ANALYZER WORKING SURFACE */
+    .analyzer-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--brass-500); padding: clamp(0.95rem, 2.5vw, 1.4rem); }
+    .input-row-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.85rem 1.25rem; align-items: end; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--rule-color); }
+    .field-block { min-width: 0; }
+    .field-label { display: block; font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-900); margin-bottom: 0.4rem; }
+    .file-input-control { width: 100%; max-width: 100%; min-height: 44px; padding: 0.5rem 0.6rem; border: 1px solid #B6B0A3; background-color: var(--paper-alt); color: var(--ink-900); font-size: 0.92rem; }
+    .file-input-control:focus { background-color: #FFFFFF; border-color: var(--navy-900); }
+    .file-status-line { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-700); margin: 0.4rem 0 0 0; min-height: 1.2em; overflow-wrap: anywhere; word-break: break-word; }
+
+    .top-quick-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+
+    .textarea-header-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.35rem 1rem; margin-bottom: 0.4rem; }
+    .text-stats { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-600); }
+    .contract-textarea { width: 100%; min-height: 12.5rem; border: 1px solid #B6B0A3; background-color: var(--brass-100); color: var(--ink-900); font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.55; padding: 0.75rem; resize: vertical; }
+    .contract-textarea:focus { background-color: #FFFFFF; border-color: var(--navy-900); }
+
+    .analyzer-action-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1rem; margin-top: 0.9rem; }
+    .analyzer-note { font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-700); margin: 0; overflow-wrap: anywhere; flex: 1 1 240px; }
+    .analyzer-note.is-error { color: var(--fail-ink); font-weight: 700; }
+
+    .btn-primary { background-color: var(--navy-900); color: #FFFFFF; border: 1px solid var(--navy-900); padding: 0.55rem 1.15rem; font-size: 0.9rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-primary:hover, .btn-primary:focus-visible { background-color: var(--brass-600); border-color: var(--brass-600); }
+    .btn-primary:disabled { opacity: 0.65; cursor: wait; }
+    .btn-secondary { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.5rem 0.95rem; font-size: 0.86rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-secondary:hover, .btn-secondary:focus-visible { background-color: var(--navy-900); color: #FFFFFF; }
+
+    /* KPI STRIP */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem; margin-bottom: 1.4rem; }
+    .kpi-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 4px solid var(--navy-900); padding: clamp(0.85rem, 2vw, 1.1rem); display: flex; flex-direction: column; justify-content: space-between; gap: 0.35rem; min-width: 0; }
+    .kpi-card.is-brass { border-top-color: var(--brass-500); }
+    .kpi-card.is-pass { border-top-color: var(--pass-border); background-color: var(--pass-bg); }
+    .kpi-card.is-warn { border-top-color: var(--fail-border); background-color: var(--fail-bg); }
+    .kpi-label { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-700); font-weight: 700; overflow-wrap: anywhere; }
+    .kpi-value { font-family: var(--font-serif); font-size: clamp(1.45rem, 2.8vw, 1.9rem); font-weight: 700; line-height: 1.15; color: var(--ink-900); font-variant-numeric: tabular-nums; }
+    .kpi-card.is-pass .kpi-value { color: var(--pass-ink); }
+    .kpi-card.is-warn .kpi-value { color: var(--fail-ink); }
+    .kpi-note { font-family: var(--font-mono); font-size: 0.73rem; color: var(--ink-600); margin: 0; overflow-wrap: anywhere; }
+
+    /* IDLE STATE BOX */
+    .idle-notice-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: 1rem 1.1rem; font-size: 0.92rem; color: var(--ink-700); }
+
+    /* LAYER 1: SIX SCANS */
+    .sub-block { margin-top: 1.5rem; }
+    .sub-block-title { font-family: var(--font-serif); font-size: 1.18rem; font-weight: 700; margin: 0 0 0.25rem 0; color: var(--ink-900); }
+    .sub-block-desc { font-size: 0.87rem; color: var(--ink-600); margin: 0 0 0.85rem 0; }
+    .scans-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+    .scan-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 3px solid var(--navy-900); padding: 0.8rem 0.9rem; min-width: 0; }
+    .scan-key { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--navy-900); margin-bottom: 0.3rem; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem; }
+    .scan-key-slug { color: var(--ink-600); font-weight: 600; text-transform: none; }
+    .scan-values { font-family: var(--font-mono); font-size: 0.82rem; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; word-break: break-word; }
+    .scan-empty { color: var(--ink-600); font-style: italic; }
+
+    /* LAYER 2: 33 COVERAGE CHECKS */
+    .check-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.7rem 0.8rem; margin-bottom: 1rem; }
+    .filter-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
+    .filter-btn { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
+    .filter-btn:hover, .filter-btn:focus-visible, .filter-btn.is-active { background-color: var(--navy-900); color: #FFFFFF; }
+    .group-jump-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.65rem; font-family: var(--font-mono); font-size: 0.76rem; }
+    .group-jump-nav a { padding: 0.35rem 0.2rem; min-height: 36px; display: inline-flex; align-items: center; }
+
+    .check-group-block { margin-bottom: 1.35rem; }
+    .check-group-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.4rem 1rem; padding: 0.45rem 0.7rem; background-color: var(--navy-900); color: #FFFFFF; margin-bottom: 0.65rem; }
+    .check-group-name { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 700; margin: 0; }
+    .check-group-count { font-family: var(--font-mono); font-size: 0.76rem; color: var(--brass-400); font-weight: 700; }
+
+    .check-list { display: grid; grid-template-columns: 1fr; gap: 0.6rem; }
+    .check-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--rule-strong); padding: 0.8rem 0.9rem; min-width: 0; }
+    .check-card.is-found { border-left-color: var(--pass-border); }
+    .check-card.is-missing { border-left-color: var(--fail-border); background-color: #FFFDFD; }
+    .check-top-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.4rem 0.75rem; margin-bottom: 0.35rem; }
+    .check-name { font-weight: 700; font-size: 0.95rem; color: var(--ink-900); overflow-wrap: anywhere; }
+    .check-badge { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.5rem; border: 1px solid transparent; white-space: nowrap; }
+    .check-badge.is-found { background-color: var(--pass-bg); color: var(--pass-ink); border-color: var(--pass-border); }
+    .check-badge.is-missing { background-color: var(--fail-bg); color: var(--fail-ink); border-color: var(--fail-border); }
+    .check-why { font-size: 0.87rem; color: var(--ink-700); margin: 0 0 0.4rem 0; overflow-wrap: anywhere; }
+    .check-excerpt { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.5rem 0.65rem; font-family: var(--font-mono); font-size: 0.79rem; line-height: 1.5; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; word-break: break-word; }
+    .check-missing-note { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fail-ink); font-weight: 600; margin: 0; }
+
+    /* COPYABLE BRIEF */
+    .brief-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); padding: clamp(0.9rem, 2vw, 1.2rem); margin-top: 1.4rem; }
+    .brief-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.7rem; }
+    .copy-status { font-family: var(--font-mono); font-size: 0.8rem; color: var(--pass-ink); font-weight: 700; }
+    .brief-pre { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.85rem; margin: 0; font-family: var(--font-mono); font-size: 0.79rem; line-height: 1.55; color: var(--ink-900); white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; max-height: 22rem; overflow-y: auto; }
+
+    /* AI READ + HOW IT WORKS */
+    .two-col-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
+    .card-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 3px solid var(--navy-900); padding: clamp(0.95rem, 2.2vw, 1.3rem); min-width: 0; }
+    .card-box.is-brass-top { border-top-color: var(--brass-500); }
+    .card-box h3 { font-family: var(--font-serif); font-size: 1.08rem; margin: 0 0 0.55rem 0; color: var(--ink-900); }
+    .card-box p { margin: 0 0 0.75rem 0; font-size: 0.92rem; line-height: 1.6; color: var(--ink-700); overflow-wrap: anywhere; }
+    .card-box p:last-child { margin-bottom: 0; }
+
+    .ai-output-box { margin-top: 0.9rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.9rem; font-size: 0.91rem; color: var(--ink-900); min-width: 0; }
+    .ai-output-box h4 { font-family: var(--font-mono); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--navy-900); margin: 0.85rem 0 0.35rem 0; }
+    .ai-output-box h4:first-child { margin-top: 0; }
+    .ai-output-box ul { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.3rem; }
+    .ai-output-box li { overflow-wrap: anywhere; word-break: break-word; }
+
+    .privacy-callout { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-left: 4px solid var(--brass-500); padding: 0.85rem 1rem; font-size: 0.88rem; color: var(--ink-900); line-height: 1.55; margin-top: 0.85rem; }
+
+    /* RELATED LINKS & STICKY SUMMARY & FOOTER */
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem; }
+    .related-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.9rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.4rem; min-width: 0; }
+    .related-card-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; color: var(--brass-600); font-weight: 700; }
+    .related-card a { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--ink-900); min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .related-card p { font-size: 0.83rem; color: var(--ink-700); margin: 0; }
+
+    .live-summary-bar { background-color: var(--navy-900); color: #FFFFFF; border-top: 2px solid var(--brass-500); padding: 0.55rem 0; z-index: 40; }
+    .summary-bar-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.45rem 1rem; font-family: var(--font-mono); font-size: 0.78rem; }
+    .summary-metrics { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.9rem; }
+    .summary-jump-link { color: #FFFFFF; font-size: 0.78rem; font-weight: 600; padding: 0.35rem 0.65rem; border: 1px solid var(--brass-400); text-decoration: none; min-height: 36px; display: inline-flex; align-items: center; }
+
+    .site-footer { background-color: var(--navy-900); color: #E2E8F0; border-top: 3px solid var(--brass-500); padding: 2rem 0 4.5rem 0; font-size: 0.85rem; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+    .footer-heading { font-family: var(--font-serif); font-size: 0.95rem; color: #FFFFFF; margin: 0 0 0.6rem 0; }
+    .footer-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+    .footer-links a { color: #E2E8F0; min-height: 38px; display: inline-flex; align-items: center; }
+    .footer-links a:hover, .footer-links a:focus-visible { color: var(--brass-400); }
+    .footer-bottom { border-top: 1px solid var(--navy-700); padding-top: 1rem; font-size: 0.78rem; color: #CBD5E1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+
+    /* PHONE MODE (<= 720px) */
+    @media (max-width: 720px) {
+      .input-row-top,
+      .scans-grid,
+      .two-col-grid { grid-template-columns: 1fr; }
+
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .contract-textarea { font-size: 1rem; min-height: 11.5rem; }
+      .file-input-control { font-size: 0.95rem; }
+
+      .top-quick-actions,
+      .top-quick-actions button,
+      .analyzer-action-bar .btn-primary,
+      #ca-ai { width: 100%; }
+
+      .live-summary-bar { position: fixed; bottom: 0; left: 0; right: 0; box-shadow: 0 -2px 10px rgba(15, 30, 56, 0.25); }
+    }
+
+    @media (max-width: 380px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../../" class="brand-link">Fractional Deal Desk &amp; Contract Management</a>
+      <nav class="site-nav" aria-label="Primary Navigation">
+        <a href="../../">Home</a>
+        <a href="../../tools/" aria-current="page">Proof of Work</a>
+        <a href="../../tools/contract-operations/">Contract Operations</a>
+        <a href="../../services/">Practice &amp; Mandate Scope</a>
+        <a href="../../about/">Operator Record</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumb-bar" aria-label="Breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb-list">
+        <li><a href="../../">Home</a></li>
+        <li><a href="../../tools/">Proof of Work</a></li>
+        <li><a href="../../tools/contract-operations/">Contract Operations</a></li>
+        <li aria-current="page">Contract Analyzer</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="hero-banner">
+    <div class="container">
+      <div class="hero-meta-row">
+        <span class="eyebrow-tag">Proof of Work · Contract Operations</span>
+        <span class="tool-badge">Tool 13 · Contract Operations</span>
+      </div>
+      <h1 class="hero-title">Contract Analyzer</h1>
+      <p class="hero-lede">
+        Drop in a contract and see what is actually in it: the key facts pulled out, every standard item checked for, and a plain-English read of what to watch.
+      </p>
+      <div class="provenance-strip">
+        <strong>Provenance &amp; Operating Record:</strong> Built from 15+ years in commercial contracts, deal desk, and revenue operations across contracts up to $300M and 3,000+ SKUs under management. The browser scan runs locally on your device and never stores your document; the built-in sample is fictional sample data.
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- 1. THE ANALYZER (WORKING SURFACE FIRST) -->
+    <section class="section-block" aria-labelledby="heading-analyzer">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-analyzer">The Analyzer — Upload or Paste a Contract</h2>
+        <p class="section-subtitle">Accepts .txt, .docx, and .pdf in your browser, or paste text directly</p>
+      </div>
+
+      <div class="analyzer-panel">
+        <div class="input-row-top">
+          <div class="field-block">
+            <label class="field-label" for="ca-file">Upload a contract (TXT, DOCX, or PDF)</label>
+            <input type="file" id="ca-file" class="file-input-control" accept=".txt,.docx,.pdf">
+            <p class="file-status-line" id="ca-file-status" aria-live="polite">No file uploaded yet — files are read locally in your browser.</p>
+          </div>
+          <div class="top-quick-actions">
+            <button type="button" class="btn-secondary" id="ca-sample">Load the sample contract</button>
+            <button type="button" class="btn-secondary" id="ca-clear">Clear</button>
+          </div>
+        </div>
+
+        <div class="field-block">
+          <div class="textarea-header-row">
+            <label class="field-label" for="ca-text">Or paste the contract text</label>
+            <span class="text-stats" id="ca-text-stats">0 characters · 0 words</span>
+          </div>
+          <textarea id="ca-text" class="contract-textarea" rows="10" placeholder="Paste the contract text here, upload a TXT/DOCX/PDF above, or load the sample contract to see how it reads."></textarea>
+        </div>
+
+        <div class="analyzer-action-bar">
+          <p class="analyzer-note" id="ca-note" role="status" aria-live="polite"></p>
+          <button type="button" class="btn-primary" id="ca-run">Run the analysis</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. THE RESULTS -->
+    <section class="section-block" aria-labelledby="heading-results" id="section-results">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-results">Analysis Output — Scans &amp; 33-Point Coverage Check</h2>
+        <p class="section-subtitle">Evidence-backed pattern detection across 6 clause groups</p>
+      </div>
+
+      <div id="ca-results">
+        <div class="idle-notice-box" id="ca-idle-state">
+          Ready to analyze. Upload a contract, paste text, or load the fictional sample contract above, then click <strong>Run the analysis</strong> to populate the six original scans and all 33 coverage checks.
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. THE AI READ -->
+    <section class="section-block" aria-labelledby="heading-ai" id="section-ai-read">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-ai">The AI Read</h2>
+        <p class="section-subtitle">Optional second step via /api/analyze (first 60,000 characters)</p>
+      </div>
+
+      <div class="card-box is-brass-top">
+        <h3>Plain-English Contract Read</h3>
+        <p>Optional. Running it sends the contract text to the site's AI endpoint, which returns a plain-English summary, the key terms, watch-outs, and missing items. Nothing is stored.</p>
+        <p><button type="button" class="btn-primary" id="ca-ai">Write the AI read</button></p>
+        <div class="ai-output-box" id="ca-ai-out" aria-live="polite">
+          Run the browser scan above first, then select <strong>Write the AI read</strong> if you want an AI-written summary alongside the heuristic evidence.
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. HOW IT WORKS & PROVENANCE -->
+    <section class="section-block" aria-labelledby="heading-how">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-how">How — It works</h2>
+        <p class="section-subtitle">Three steps, browser-first execution, and clear limits</p>
+      </div>
+
+      <div class="two-col-grid">
+        <article class="card-box">
+          <h3>Three-step review workflow</h3>
+          <p><strong>1.</strong> Add the contract — upload a PDF or DOCX, or paste the text. <strong>2.</strong> Run the analysis: the key facts come out and each of the 33 checks reports <em>found</em> (with the line it came from) or <em>not found</em>, so the gaps are as visible as the catches. <strong>3.</strong> Run the AI read for the summary a person would write: what this contract is, the terms that matter, what looks one-sided, and what is missing.</p>
+          <div class="privacy-callout">
+            Privacy: the scan runs entirely in your browser — your document never leaves your device, and nothing is stored. The AI read is the one exception: if you run it, the text is sent to the AI endpoint to write the summary. Scanned image PDFs will not read — the file has to carry real text, the same limit the original tool has.
+          </div>
+        </article>
+
+        <article class="card-box">
+          <h3>Where this tool comes from</h3>
+          <p>This began as my own working MVP in October 2025 — upload a contract, extract the text, scan for the clauses that matter. This page is that tool rebuilt for the site and finished: the original scans, a full 33-point coverage checklist, and the AI read wired in. It is a first-pass instrument, the way I start a review — it finds the language and flags what is missing. It is not legal advice, and it does not replace reading the document.</p>
+          <p>Heuristics locate language; they do not judge whether a clause is balanced or enforceable. Every found item displays the surrounding excerpt from your document so a reviewer can verify context directly.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 5. RELATED LINKS -->
+    <section class="section-block" aria-labelledby="heading-related">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-related">Related Contract Operations &amp; Proof of Work</h2>
+        <p class="section-subtitle">Neighboring tools and governance references across the practice record</p>
+      </div>
+
+      <div class="related-grid">
+        <div class="related-card">
+          <span class="related-card-eyebrow">Hub</span>
+          <a href="../../tools/">Proof of Work Hub</a>
+          <p>All live commercial models, pricing engines, contract trackers, and decision tools.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Partition</span>
+          <a href="../../tools/contract-operations/">Contract Operations Partition</a>
+          <p>Tools built for contract review, migration triage, and operational case capacity.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 9 · Contract Operations</span>
+          <a href="../contract-migration-triage/">Tool 9: Contract Migration Triage</a>
+          <p>Classify and sequence legacy agreements during system migrations and post-close integrations.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 10 · Contract Operations</span>
+          <a href="../case-operations-capacity/">Tool 10: Case Operations &amp; Capacity</a>
+          <p>Track intake volume, backlog aging, and team capacity across commercial support queues.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Diagnostic Review</span>
+          <a href="../deal-check/">Deal Check</a>
+          <p>Six-step live deal diagnostic covering buyer posture, blockers, and the internal checklist.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- STICKY SUMMARY STRIP -->
+  <div class="live-summary-bar" role="region" aria-label="Contract Analyzer Status Strip">
+    <div class="container summary-bar-inner">
+      <div class="summary-metrics">
+        <span>Found: <strong id="sticky-found">—/33</strong></span>
+        <span>Not found: <strong id="sticky-missing">—</strong></span>
+        <span>Scan: <strong>Browser-only</strong></span>
+      </div>
+      <a href="#section-ai-read" class="summary-jump-link">AI Read</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h2 class="footer-heading">Fractional Deal Desk &amp; Contract Management</h2>
+          <p style="margin: 0; color: #CBD5E1; line-height: 1.5;">
+            Commercial contracts, deal desk architecture, and revenue operations controls. 15+ years of operating experience across contracts up to $300M and 3,000+ SKUs under management.
+          </p>
+        </div>
+        <div>
+          <h2 class="footer-heading">Proof of Work &amp; Tools</h2>
+          <ul class="footer-links">
+            <li><a href="../../tools/">Proof of Work Hub</a></li>
+            <li><a href="../../tools/contract-operations/">Contract Operations Partition</a></li>
+            <li><a href="../contract-migration-triage/">Tool 9: Contract Migration Triage</a></li>
+            <li><a href="../case-operations-capacity/">Tool 10: Case Operations &amp; Capacity</a></li>
+            <li><a href="../deal-check/">Deal Check</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="footer-heading">Practice Information</h2>
+          <ul class="footer-links">
+            <li><a href="../../">Home</a></li>
+            <li><a href="../../services/">Practice &amp; Mandate Scope</a></li>
+            <li><a href="../../about/">Operator Record</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>Tool 13 · Contract Analyzer (S6-P03.4)</span>
+        <span>Browser-first clause scan. Not legal advice.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/jszip-3.10.1.min.js"></script>
+  <script src="../../assets/pdf-3.11.174.min.js"></script>
+
+  <!-- INLINED ENGINE — BYTE-FOR-BYTE FROM S6-P03d-analyzer.js (analyzer-engine.txt) -->
+  <script>
+/* ==========================================================================
+   LABEL — S6-P03.d · Tool 13 — Contract Analyzer — analysis engine.
+   What this file is: the analyzer's brain, in two layers.
+   LAYER 1 — the original scans: an exact JavaScript port of the heuristic
+   parser from Lucky's contract-analyzer repo (analyzer/parsers/clauses.py,
+   Streamlit MVP, Oct 2025) — the same six patterns with the same semantics,
+   quirks included, verified output-for-output against the Python original
+   on the repo's sample contract (see the build record).
+   LAYER 2 — the coverage checks: the full "what needs checking in a
+   contract" checklist (basics, money, risk, data & IP, operations, legal),
+   each check a set of phrase patterns; a check reports FOUND with the
+   matched excerpt, or NOT FOUND so a human checks by hand. Heuristic
+   pattern matching only — it locates language, it does not judge it, and
+   it is not legal advice.
+   Rule: any change to this file is recorded in CHANGELOG.md, and the
+   CODE-MAP entry is updated in the same change (Code Labeling, Rule 3).
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  /* ---------------- Layer 1 — the original six scans (faithful port) ---- */
+  var DATE_RE = /\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)[\s,]+\d{1,2},\s*\d{4}\b|\b\d{4}-\d{2}-\d{2}\b/gi;
+  var MONEY_RE = /\b(?:USD\s*)?\$\s?\d[\d,]*(?:\.\d{2})?\b/gi;
+  var PARTY_RE = /\bbetween\s+([A-Z][\w\s,&.\-]+?)\s+and\s+([A-Z][\w\s,&.\-]+)/gi;
+  var LAW_RE = /\b(governing law|jurisdiction)\b[:\s-]+([A-Za-z\s]+)/gi;
+  var TERM_LENGTH_RE = /\b(initial\s+)?term\b.*?(?:is|for|of)?\s*(?:\w+\s*\(\s*\d+\s*\)\s*|\d+)\s*(?:month|year|day|week)s?/gi;
+  var RENEWAL_PERIOD_RE = /\b(renews?|auto[-\s]?renew(al)?)\b.*?(?:for\s*)?(?:\w+\s*\(\s*\d+\s*\)\s*|\d+)\s*(?:month|year|day|week)s?/gi;
+
+  function allMatches(text, re) {
+    var out = [], m;
+    re.lastIndex = 0;
+    while ((m = re.exec(text)) !== null) {
+      if (m.length > 1) {
+        var groups = [];
+        for (var i = 1; i < m.length; i++) groups.push(m[i] === undefined ? "" : m[i]);
+        out.push(groups.length === 1 ? groups[0] : groups);
+      } else {
+        out.push(m[0]);
+      }
+      if (m[0] === "") re.lastIndex++;
+    }
+    return out;
+  }
+
+  function parseKeyClauses(text) {
+    return {
+      dates: allMatches(text, DATE_RE),
+      money: allMatches(text, MONEY_RE),
+      parties: allMatches(text, PARTY_RE),
+      law: allMatches(text, LAW_RE),
+      term_length: allMatches(text, TERM_LENGTH_RE),
+      renewal_period: allMatches(text, RENEWAL_PERIOD_RE)
+    };
+  }
+
+  /* ---------------- Layer 2 — the coverage checks ----------------------- */
+  function P(s) { return new RegExp(s, "i"); }
+  var CHECKS = [
+    /* Basics */
+    { id: "parties", group: "Basics", name: "Parties named",
+      why: "Who is bound — the legal names of both sides.",
+      patterns: [P("\\bbetween\\s+[A-Z][\\w\\s,&.\\-]+?\\s+and\\s+[A-Z]"), P("\\b(this agreement|this contract)\\s+is\\s+(made|entered into)\\b")] },
+    { id: "effective-date", group: "Basics", name: "Effective / start date",
+      why: "When the obligations start running.",
+      patterns: [P("\\beffective date\\b"), P("\\bcommencement date\\b"), P("\\bmade on\\s+\\d{4}-\\d{2}-\\d{2}\\b")] },
+    { id: "term", group: "Basics", name: "Term length",
+      why: "How long the contract runs before it ends or renews.",
+      patterns: [P("\\b(initial\\s+)?term\\b[^.\\n]{0,60}?(\\d+|twelve|twenty-four|thirty-six)(\\s*\\(\\s*\\d+\\s*\\))?\\s*(month|year|day|week)"), P("\\bterm of\\s+(this agreement|\\d)")] },
+    { id: "renewal", group: "Basics", name: "Renewal / auto-renewal",
+      why: "Whether it rolls over on its own, and for how long each time.",
+      patterns: [P("\\bauto[-\\s]?renew"), P("\\bshall renew\\b"), P("\\brenew(s|al)?\\s+for\\b"), P("\\bsuccessive (terms|periods|renewal)\\b")] },
+    { id: "renewal-notice", group: "Basics", name: "Non-renewal notice deadline",
+      why: "The last day to stop a renewal — the date that gets missed.",
+      patterns: [P("notice of non[-\\s]?renewal"), P("\\bnot\\s+(renew|extend)\\b[^.\\n]{0,40}notice"), P("(prior to|before)\\s+(the\\s+)?(renewal|expiration)[^.\\n]{0,60}notice"), P("notice[^.\\n]{0,50}(prior to|before)[^.\\n]{0,30}renew")] },
+    { id: "termination-convenience", group: "Basics", name: "Termination for convenience + notice",
+      why: "Whether either side can walk away without cause, and how much notice.",
+      patterns: [P("terminate[^.\\n]{0,60}for convenience"), P("terminate[^.\\n]{0,40}without cause"), P("may terminate[^.\\n]{0,80}\\b\\d+\\s*days?['\\u2019]?\\s*(prior\\s+)?(written\\s+)?notice")] },
+    { id: "termination-cause", group: "Basics", name: "Termination for cause",
+      why: "The exit when the other side breaches — and any cure period.",
+      patterns: [P("terminate[^.\\n]{0,60}for cause"), P("material breach"), P("cure (period|such breach|within)")] },
+    /* Money */
+    { id: "fees", group: "Money", name: "Fees / contract value",
+      why: "What is actually being paid — amounts, per what, how often.",
+      patterns: [P("(USD\\s*)?\\$\\s?\\d[\\d,]*(\\.\\d{2})?"), P("\\bfees? of\\s"), P("\\bper (month|year|annum|user|seat)\\b")] },
+    { id: "payment-terms", group: "Money", name: "Payment terms (when invoices are due)",
+      why: "Net days and the trigger (invoice date, receipt, acceptance).",
+      patterns: [P("\\bnet\\s*\\d+\\b"), P("payable within\\s*\\d+\\s*days"), P("due within\\s*\\d+\\s*days"), P("within\\s*\\d+\\s*days of (invoice|receipt)")] },
+    { id: "late-fees", group: "Money", name: "Late fees / interest on late payment",
+      why: "What a late payment costs, and whether it is capped.",
+      patterns: [P("late (fee|charge|payment)[^.\\n]{0,50}(%|interest|per)"), P("interest[^.\\n]{0,40}(late|overdue|per (month|annum))"), P("overdue[^.\\n]{0,40}interest")] },
+    { id: "price-increase", group: "Money", name: "Price increases / escalators",
+      why: "Whether prices can rise at renewal, by how much, tied to what index.",
+      patterns: [P("price increase"), P("increase[^.\\n]{0,40}(fees|prices|charges)[^.\\n]{0,40}(%|CPI|index)"), P("\\bCPI\\b"), P("escalat(or|ion)"), P("uplift")] },
+    { id: "taxes", group: "Money", name: "Taxes",
+      why: "Which taxes sit on top of the fees and who carries them.",
+      patterns: [P("\\b(exclusive of|plus|excluding)\\s+(all\\s+)?taxes\\b"), P("\\b(sales tax|VAT|GST|withholding tax)\\b"), P("responsible for[^.\\n]{0,30}taxes")] },
+    /* Risk */
+    { id: "liability-cap", group: "Risk", name: "Liability cap",
+      why: "The ceiling on what either side can be made to pay — the number that matters most in a dispute.",
+      patterns: [P("liability[^.\\n]{0,60}(shall not exceed|cap(ped)?|limited to)"), P("aggregate liability"), P("(cap|limitation) on liability"), P("in no event[^.\\n]{0,60}liable[^.\\n]{0,40}exceed")] },
+    { id: "consequential", group: "Risk", name: "Consequential / indirect damages exclusion",
+      why: "Whether lost profits and similar damages are excluded — for both sides or one.",
+      patterns: [P("consequential damages"), P("indirect[^.\\n]{0,20}damages"), P("lost profits")] },
+    { id: "indemnity", group: "Risk", name: "Indemnification",
+      why: "Who pays when a third party comes after either side, and for what.",
+      patterns: [P("\\bindemnif\\w+"), P("hold harmless"), P("defend[^.\\n]{0,40}against[^.\\n]{0,30}(claim|action)")] },
+    { id: "warranties", group: "Risk", name: "Warranties",
+      why: "What is promised about the service — and what is disclaimed.",
+      patterns: [P("\\bwarrant(s|ies|y)\\b"), P("as[-\\s]is"), P("disclaim\\w*[^.\\n]{0,30}warrant")] },
+    { id: "insurance", group: "Risk", name: "Insurance requirements",
+      why: "Coverage the other side must carry, and at what limits.",
+      patterns: [P("\\binsurance\\b[^.\\n]{0,50}(maintain|carry|coverage|policy)"), P("certificate of insurance"), P("(commercial general liability|cyber liability|professional liability) insurance")] },
+    /* Data & IP */
+    { id: "ip-ownership", group: "Data & IP", name: "IP ownership / work product",
+      why: "Who owns what gets made under the contract.",
+      patterns: [P("intellectual property"), P("work product"), P("(own|ownership)[^.\\n]{0,40}(deliverables|materials developed)"), P("all rights, title")] },
+    { id: "license", group: "Data & IP", name: "License grant",
+      why: "What each side is allowed to use, and where the grant stops.",
+      patterns: [P("grant(s|ed)?[^.\\n]{0,40}licen[cs]e"), P("licen[cs]e to use"), P("non-exclusive[^.\\n]{0,30}licen[cs]e")] },
+    { id: "confidentiality", group: "Data & IP", name: "Confidentiality",
+      why: "What counts as confidential, how long the duty lasts, who can see it.",
+      patterns: [P("confidential information"), P("\\bnon-disclosure\\b"), P("shall keep[^.\\n]{0,30}confidential")] },
+    { id: "data-protection", group: "Data & IP", name: "Data protection / privacy (DPA)",
+      why: "How personal data is handled, and whether a data processing addendum applies.",
+      patterns: [P("data protection"), P("personal data"), P("\\bDPA\\b|data processing (addendum|agreement)"), P("(GDPR|CCPA|CPRA)"), P("data breach|security incident")] },
+    { id: "security", group: "Data & IP", name: "Security requirements",
+      why: "Named security standards, audits, and breach notice duties.",
+      patterns: [P("(SOC\\s?2|ISO\\s?27001)"), P("security (measures|program|standards)"), P("notify[^.\\n]{0,50}(breach|incident)[^.\\n]{0,30}(hour|day)")] },
+    /* Operations */
+    { id: "sla", group: "Operations", name: "Service levels / SLA + credits",
+      why: "Uptime and support commitments — and what happens when they are missed.",
+      patterns: [P("service levels?"), P("\\bSLA\\b"), P("uptime"), P("service credits?"), P("availability of\\s*\\d")] },
+    { id: "audit-rights", group: "Operations", name: "Audit rights",
+      why: "Who can inspect books, usage, or compliance — and how often.",
+      patterns: [P("audit rights?"), P("right to audit"), P("(inspect|examine)[^.\\n]{0,40}(books|records)"), P("upon[^.\\n]{0,30}notice[^.\\n]{0,30}audit")] },
+    { id: "assignment", group: "Operations", name: "Assignment / change of control",
+      why: "Whether the contract can be handed to another company without consent.",
+      patterns: [P("\\bassign(ment|s|ed)?\\b[^.\\n]{0,50}(consent|successor)"), P("change of control"), P("may not assign")] },
+    { id: "subcontracting", group: "Operations", name: "Subcontractors / subprocessors",
+      why: "Who else touches the work or the data, and whether consent is needed.",
+      patterns: [P("subcontract"), P("sub-?processor"), P("third-party (providers|services)[^.\\n]{0,30}(list|notif)")] },
+    { id: "exclusivity-nonsolicit", group: "Operations", name: "Exclusivity / non-solicitation",
+      why: "Lock-ins: exclusive dealing, non-competes, and staff poaching bans.",
+      patterns: [P("\\bexclusiv(e|ity)\\b"), P("non-?solicit"), P("shall not solicit"), P("non-?compete")] },
+    /* Legal */
+    { id: "governing-law", group: "Legal", name: "Governing law",
+      why: "Which state's or country's law interprets the contract.",
+      patterns: [P("governing law"), P("governed by[^.\\n]{0,30}laws of")] },
+    { id: "venue-disputes", group: "Legal", name: "Venue / dispute resolution / arbitration",
+      why: "Where a fight happens and how — courts, arbitration, mediation first.",
+      patterns: [P("\\bjurisdiction\\b"), P("\\bvenue\\b"), P("arbitrat\\w+"), P("mediation"), P("dispute resolution")] },
+    { id: "force-majeure", group: "Legal", name: "Force majeure",
+      why: "What happens when events outside both sides' control stop performance.",
+      patterns: [P("force majeure"), P("act of God"), P("events beyond[^.\\n]{0,30}(reasonable )?control")] },
+    { id: "notices", group: "Legal", name: "Notices (how formal notice is given)",
+      why: "Where termination and other notices must be sent to count.",
+      patterns: [P("notices? (shall|must) be (given|sent|in writing)"), P("notice to[^.\\n]{0,10}:"), P("all notices")] },
+    { id: "entire-agreement", group: "Legal", name: "Entire agreement / amendments / precedence",
+      why: "Whether side promises count, how changes are made, and which document wins a conflict.",
+      patterns: [P("entire agreement"), P("order of precedence"), P("amend(ed|ment)[^.\\n]{0,40}in writing"), P("in the event of a conflict")] },
+    { id: "signatures", group: "Legal", name: "Signatures / execution",
+      why: "Whether the copy is actually signed — and by whom.",
+      patterns: [P("IN WITNESS WHEREOF"), P("\\bsignature\\b"), P("/s/"), P("\\bexecuted\\b[^.\\n]{0,30}(by|as of)")] }
+  ];
+
+  function excerptAround(text, idx, len) {
+    var start = Math.max(0, idx - 70);
+    var end = Math.min(text.length, idx + len + 90);
+    var s = text.slice(start, end).replace(/\s+/g, " ").trim();
+    if (start > 0) s = "…" + s;
+    if (end < text.length) s = s + "…";
+    return s;
+  }
+
+  function runChecks(text) {
+    return CHECKS.map(function (c) {
+      var hit = null;
+      for (var i = 0; i < c.patterns.length && !hit; i++) {
+        var m = c.patterns[i].exec(text);
+        if (m) hit = { match: m[0], excerpt: excerptAround(text, m.index, m[0].length) };
+      }
+      return { id: c.id, group: c.group, name: c.name, why: c.why, found: !!hit, excerpt: hit ? hit.excerpt : null };
+    });
+  }
+
+  window.ContractAnalyzer = {
+    parseKeyClauses: parseKeyClauses,
+    runChecks: runChecks,
+    CHECKS: CHECKS
+  };
+})();
+  </script>
+
+  <!-- PAGE CONTROLLER & SELF-CHECK BATTERY -->
+  <script>
+    (function () {
+      "use strict";
+
+      var SAMPLE = "SERVICE AGREEMENT\nThis Agreement is made on 2024-01-15 between ACME, Inc. and Roadrunner LLC.\nPayment: USD $12,500 per month, payable within 30 days of invoice.\nTerm: The initial term is twelve (12) months and auto-renews for additional 12-month terms.\nTermination: Either party may terminate with 30 days' notice.\nGoverning Law: California.";
+
+      var SCAN_META = [
+        { key: "dates", label: "Dates" },
+        { key: "money", label: "Money" },
+        { key: "parties", label: "Parties" },
+        { key: "law", label: "Governing law / jurisdiction" },
+        { key: "term_length", label: "Term length" },
+        { key: "renewal_period", label: "Renewal period" }
+      ];
+
+      var fileEl = document.getElementById("ca-file");
+      var fileStatusEl = document.getElementById("ca-file-status");
+      var textEl = document.getElementById("ca-text");
+      var textStatsEl = document.getElementById("ca-text-stats");
+      var noteEl = document.getElementById("ca-note");
+      var resultsEl = document.getElementById("ca-results");
+      var aiBtn = document.getElementById("ca-ai");
+      var aiOutEl = document.getElementById("ca-ai-out");
+      var stickyFoundEl = document.getElementById("sticky-found");
+      var stickyMissingEl = document.getElementById("sticky-missing");
+
+      var lastText = "";
+      var lastChecks = null;
+      var lastScans = null;
+      var activeFilter = "all";
+
+      if (window.pdfjsLib) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = "../../assets/pdf.worker-3.11.174.min.js";
+      }
+
+      function esc(s) {
+        return String(s == null ? "" : s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function slugifyGroup(g) {
+        return "group-" + g.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      }
+
+      function setNote(msg, isError) {
+        noteEl.textContent = msg || "";
+        noteEl.className = "analyzer-note" + (isError ? " is-error" : "");
+      }
+
+      function updateTextStats() {
+        var val = textEl.value;
+        var chars = val.length;
+        var trimmed = val.trim();
+        var words = trimmed ? trimmed.split(/\s+/).length : 0;
+        textStatsEl.textContent = chars.toLocaleString() + " characters · " + words.toLocaleString() + " words";
+      }
+
+      function resetResultsToIdle() {
+        lastText = "";
+        lastChecks = null;
+        lastScans = null;
+        activeFilter = "all";
+        stickyFoundEl.textContent = "—/33";
+        stickyMissingEl.textContent = "—";
+        resultsEl.innerHTML =
+          '<div class="idle-notice-box" id="ca-idle-state">' +
+            'Ready to analyze. Upload a contract, paste text, or load the fictional sample contract above, then click <strong>Run the analysis</strong> to populate the six original scans and all 33 coverage checks.' +
+          '</div>';
+        aiOutEl.innerHTML = "Run the browser scan above first, then select <strong>Write the AI read</strong> if you want an AI-written summary alongside the heuristic evidence.";
+      }
+
+      textEl.addEventListener("input", updateTextStats);
+
+      document.getElementById("ca-sample").addEventListener("click", function () {
+        textEl.value = SAMPLE;
+        fileStatusEl.textContent = "Sample contract loaded (fictional service agreement — 6 lines).";
+        updateTextStats();
+        setNote("Sample loaded — the fictional service agreement from the original tool. Run the analysis.", false);
+      });
+
+      document.getElementById("ca-clear").addEventListener("click", function () {
+        textEl.value = "";
+        fileEl.value = "";
+        fileStatusEl.textContent = "No file uploaded yet — files are read locally in your browser.";
+        updateTextStats();
+        setNote("", false);
+        resetResultsToIdle();
+      });
+
+      fileEl.addEventListener("change", function (ev) {
+        var f = ev.target.files && ev.target.files[0];
+        if (!f) return;
+        var lower = f.name.toLowerCase();
+        fileStatusEl.textContent = "Reading " + f.name + "…";
+        setNote("", false);
+
+        var done = function (text) {
+          textEl.value = text;
+          updateTextStats();
+          fileStatusEl.textContent = f.name + " — " + text.length.toLocaleString() + " characters extracted in your browser.";
+          setNote("File loaded. Select Run the analysis to scan it.", false);
+        };
+
+        var fail = function (err) {
+          fileStatusEl.textContent = "Could not extract text from " + f.name + ".";
+          setNote("That file did not read: " + (err && err.message ? err.message : err) + " — a scanned image PDF carries no text to extract. Paste the text instead.", true);
+        };
+
+        if (lower.endsWith(".txt")) {
+          var readTxt = typeof f.text === "function"
+            ? f.text()
+            : new Promise(function (resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function () { resolve(String(reader.result || "")); };
+                reader.onerror = function () { reject(new Error("could not read text file")); };
+                reader.readAsText(f);
+              });
+          readTxt.then(function (txt) {
+            var cleaned = txt.trim();
+            if (!cleaned) throw new Error("the text file is empty");
+            done(cleaned);
+          }).catch(fail);
+        } else if (lower.endsWith(".docx")) {
+          if (!window.JSZip) {
+            fail(new Error("DOCX library not loaded"));
+            return;
+          }
+          f.arrayBuffer()
+            .then(function (buf) { return window.JSZip.loadAsync(buf); })
+            .then(function (zip) {
+              var docFile = zip.file("word/document.xml");
+              if (!docFile) throw new Error("no word/document.xml found inside the DOCX");
+              return docFile.async("string");
+            })
+            .then(function (xml) {
+              var doc = new DOMParser().parseFromString(xml, "text/xml");
+              var paras = doc.getElementsByTagName("w:p");
+              var lines = [];
+              for (var i = 0; i < paras.length; i++) {
+                var ts = paras[i].getElementsByTagName("w:t");
+                var line = "";
+                for (var j = 0; j < ts.length; j++) line += ts[j].textContent;
+                lines.push(line);
+              }
+              var out = lines.join("\n").trim();
+              if (!out) throw new Error("no readable text paragraphs found in the DOCX");
+              done(out);
+            })
+            .catch(fail);
+        } else if (lower.endsWith(".pdf")) {
+          if (!window.pdfjsLib) {
+            fail(new Error("PDF library not loaded"));
+            return;
+          }
+          f.arrayBuffer()
+            .then(function (buf) { return window.pdfjsLib.getDocument({ data: buf }).promise; })
+            .then(function (pdf) {
+              var pages = [];
+              var chain = Promise.resolve();
+              var collect = function (n) {
+                chain = chain
+                  .then(function () { return pdf.getPage(n); })
+                  .then(function (pg) { return pg.getTextContent(); })
+                  .then(function (tc) {
+                    var lines = [];
+                    var lastY = null;
+                    tc.items.forEach(function (it) {
+                      var y = it.transform[5];
+                      if (lastY !== null && Math.abs(y - lastY) > 2) lines.push("\n");
+                      else if (lines.length) lines.push(" ");
+                      lines.push(it.str);
+                      lastY = y;
+                    });
+                    pages.push(lines.join(""));
+                  });
+              };
+              for (var n = 1; n <= pdf.numPages; n++) collect(n);
+              return chain.then(function () {
+                var extracted = pages.join("\n").trim();
+                if (!extracted) {
+                  throw new Error("no text layer found in PDF (likely a scanned image PDF)");
+                }
+                done(extracted);
+              });
+            })
+            .catch(fail);
+        } else {
+          fileStatusEl.textContent = "Unsupported file type: " + f.name;
+          setNote("That file type is not supported — use a TXT, DOCX, or PDF file, or paste the text.", true);
+        }
+      });
+
+      function formatScanValues(vals) {
+        if (!vals || !vals.length) return [];
+        return vals.map(function (v) {
+          return Array.isArray(v) ? v.join(" / ") : (v === "" ? "(empty match)" : v);
+        });
+      }
+
+      function buildPlainBrief(checks, scans) {
+        var foundList = checks.filter(function (c) { return c.found; });
+        var missingList = checks.filter(function (c) { return !c.found; });
+        var lines = [];
+        lines.push("CONTRACT ANALYZER — BROWSER SCAN BRIEF");
+        lines.push("======================================");
+        lines.push("Coverage: " + foundList.length + " of " + checks.length + " checks found | " + missingList.length + " not found");
+        lines.push("");
+        lines.push("ORIGINAL SIX SCANS");
+        SCAN_META.forEach(function (meta) {
+          var flat = formatScanValues(scans[meta.key]);
+          lines.push("- " + meta.key + " (" + meta.label + "): " + (flat.length ? flat.join(" | ") : "nothing found"));
+        });
+        lines.push("");
+        lines.push("FOUND CLAUSES (" + foundList.length + ")");
+        if (!foundList.length) {
+          lines.push("None");
+        } else {
+          foundList.forEach(function (c) {
+            lines.push("- [" + c.group + "] " + c.name + " — \"" + c.excerpt + "\"");
+          });
+        }
+        lines.push("");
+        lines.push("NOT FOUND — CHECK BY HAND (" + missingList.length + ")");
+        if (!missingList.length) {
+          lines.push("None — all 33 checks matched.");
+        } else {
+          missingList.forEach(function (c) {
+            lines.push("- [" + c.group + "] " + c.name + " — " + c.why);
+          });
+        }
+        return lines.join("\n");
+      }
+
+      function renderChecksSection(checks) {
+        var foundCount = checks.filter(function (c) { return c.found; }).length;
+        var missingCount = checks.length - foundCount;
+
+        var groups = [];
+        var byGroup = {};
+        checks.forEach(function (c) {
+          if (!byGroup[c.group]) {
+            byGroup[c.group] = [];
+            groups.push(c.group);
+          }
+          byGroup[c.group].push(c);
+        });
+
+        var html = '<div class="sub-block" id="ca-checks-block">';
+        html += '<h3 class="sub-block-title">The 33-point coverage checklist</h3>';
+        html += '<p class="sub-block-desc">Every standard item checked across six groups — found items show the matched line; missing items are listed so a human checks by hand.</p>';
+
+        html += '<div class="check-toolbar">';
+        html += '<div class="filter-group" role="group" aria-label="Filter coverage checks">';
+        html += '<button type="button" class="filter-btn' + (activeFilter === "all" ? " is-active" : "") + '" data-filter="all">All (' + checks.length + ')</button>';
+        html += '<button type="button" class="filter-btn' + (activeFilter === "found" ? " is-active" : "") + '" data-filter="found">Found (' + foundCount + ')</button>';
+        html += '<button type="button" class="filter-btn' + (activeFilter === "missing" ? " is-active" : "") + '" data-filter="missing">Not found (' + missingCount + ')</button>';
+        html += '</div>';
+        html += '<nav class="group-jump-nav" aria-label="Jump to check group">';
+        groups.forEach(function (g) {
+          html += '<a href="#' + esc(slugifyGroup(g)) + '">' + esc(g) + '</a>';
+        });
+        html += '</nav>';
+        html += '</div>';
+
+        groups.forEach(function (g) {
+          var items = byGroup[g];
+          var groupFound = items.filter(function (c) { return c.found; }).length;
+          var visibleItems = items.filter(function (c) {
+            if (activeFilter === "found") return c.found;
+            if (activeFilter === "missing") return !c.found;
+            return true;
+          });
+
+          html += '<div class="check-group-block" id="' + esc(slugifyGroup(g)) + '">';
+          html += '<div class="check-group-header">';
+          html += '<h4 class="check-group-name">' + esc(g) + '</h4>';
+          html += '<span class="check-group-count">' + groupFound + ' of ' + items.length + ' found</span>';
+          html += '</div>';
+
+          if (!visibleItems.length) {
+            html += '<div class="idle-notice-box">No items in <strong>' + esc(g) + '</strong> match the current filter.</div>';
+          } else {
+            html += '<div class="check-list">';
+            visibleItems.forEach(function (c) {
+              var stateClass = c.found ? "is-found" : "is-missing";
+              var badgeText = c.found ? "✓ FOUND" : "✗ NOT FOUND";
+              html += '<article class="check-card ' + stateClass + '" data-check-id="' + esc(c.id) + '">';
+              html += '<div class="check-top-row">';
+              html += '<span class="check-name">' + esc(c.name) + '</span>';
+              html += '<span class="check-badge ' + stateClass + '">' + badgeText + '</span>';
+              html += '</div>';
+              html += '<p class="check-why">' + esc(c.why) + '</p>';
+              if (c.found) {
+                html += '<p class="check-excerpt">“' + esc(c.excerpt) + '”</p>';
+              } else {
+                html += '<p class="check-missing-note">Not found in document. Check by hand.</p>';
+              }
+              html += '</article>';
+            });
+            html += '</div>';
+          }
+          html += '</div>';
+        });
+
+        html += '</div>';
+        return html;
+      }
+
+      function renderFullResults(checks, scans) {
+        var found = checks.filter(function (c) { return c.found; }).length;
+        var missing = checks.length - found;
+
+        stickyFoundEl.textContent = found + "/" + checks.length;
+        stickyMissingEl.textContent = String(missing);
+
+        var html = "";
+
+        // (a) Summary KPI Strip
+        html += '<div class="kpi-grid" role="region" aria-label="Contract Scan Summary">';
+        html += '<article class="kpi-card ' + (found > 0 ? "is-pass" : "is-brass") + '"><span class="kpi-label">Coverage checks found</span><span class="kpi-value">' + found + ' of ' + checks.length + '</span><p class="kpi-note">Matched with evidence excerpt below</p></article>';
+        html += '<article class="kpi-card ' + (missing > 0 ? "is-warn" : "is-pass") + '"><span class="kpi-label">Not found — check by hand</span><span class="kpi-value">' + missing + '</span><p class="kpi-note">Gaps flagged for manual verification</p></article>';
+        html += '<article class="kpi-card is-brass"><span class="kpi-label">Dollar figures pulled</span><span class="kpi-value">' + scans.money.length + '</span><p class="kpi-note">Pulled by the original Layer 1 scan</p></article>';
+        html += '<article class="kpi-card"><span class="kpi-label">Dates pulled</span><span class="kpi-value">' + scans.dates.length + '</span><p class="kpi-note">Pulled by the original Layer 1 scan</p></article>';
+        html += '</div>';
+
+        // (b) The Six Original Scans
+        html += '<div class="sub-block" id="ca-scans">';
+        html += '<h3 class="sub-block-title">The original scans</h3>';
+        html += '<p class="sub-block-desc">The six scans from the original tool, exactly as it ran them.</p>';
+        html += '<div class="scans-grid">';
+        SCAN_META.forEach(function (meta) {
+          var flat = formatScanValues(scans[meta.key]);
+          html += '<div class="scan-card" data-scan-key="' + esc(meta.key) + '">';
+          html += '<div class="scan-key"><span>' + esc(meta.label) + '</span><span class="scan-key-slug">' + esc(meta.key) + '</span></div>';
+          if (flat.length) {
+            html += '<p class="scan-values">' + esc(flat.join(" · ")) + '</p>';
+          } else {
+            html += '<p class="scan-values scan-empty">nothing found</p>';
+          }
+          html += '</div>';
+        });
+        html += '</div>';
+        html += '</div>';
+
+        // (c) The 33 Coverage Checks
+        html += '<div id="ca-checks-container">' + renderChecksSection(checks) + '</div>';
+
+        // (d) Copyable Plain-Text Brief
+        var briefText = buildPlainBrief(checks, scans);
+        html += '<div class="brief-panel" id="ca-brief-panel">';
+        html += '<div class="brief-toolbar">';
+        html += '<button type="button" class="btn-secondary" id="ca-copy-brief">Copy Analysis Brief</button>';
+        html += '<span class="copy-status" id="ca-copy-status" aria-live="polite"></span>';
+        html += '</div>';
+        html += '<pre class="brief-pre" id="ca-brief-pre" tabindex="0" aria-label="Copyable Contract Analysis Brief">' + esc(briefText) + '</pre>';
+        html += '</div>';
+
+        resultsEl.innerHTML = html;
+      }
+
+      resultsEl.addEventListener("click", function (e) {
+        var filterBtn = e.target.closest ? e.target.closest("[data-filter]") : null;
+        if (filterBtn && lastChecks) {
+          activeFilter = filterBtn.getAttribute("data-filter");
+          var checksContainer = document.getElementById("ca-checks-container");
+          if (checksContainer) {
+            checksContainer.innerHTML = renderChecksSection(lastChecks);
+          }
+          return;
+        }
+
+        var copyBtn = e.target.closest ? e.target.closest("#ca-copy-brief") : null;
+        if (copyBtn) {
+          var pre = document.getElementById("ca-brief-pre");
+          var status = document.getElementById("ca-copy-status");
+          if (!pre) return;
+          var txt = pre.textContent;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(txt).then(
+              function () { if (status) status.textContent = "Copied Analysis Brief to clipboard."; },
+              function () { fallbackCopy(txt, status); }
+            );
+          } else {
+            fallbackCopy(txt, status);
+          }
+        }
+      });
+
+      function fallbackCopy(text, statusEl) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "0";
+        ta.style.left = "0";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+          if (statusEl) statusEl.textContent = "Copied Analysis Brief to clipboard.";
+        } catch (err) {
+          if (statusEl) statusEl.textContent = "Select the brief below and press Ctrl+C / Cmd+C.";
+        }
+        document.body.removeChild(ta);
+      }
+
+      document.getElementById("ca-run").addEventListener("click", function () {
+        var text = textEl.value.trim();
+        if (!text) {
+          setNote("Add a contract first — upload a TXT, DOCX, or PDF file, paste the text, or load the sample.", true);
+          resetResultsToIdle();
+          return;
+        }
+        setNote("", false);
+        lastText = text;
+        activeFilter = "all";
+        var A = window.ContractAnalyzer;
+        lastChecks = A.runChecks(text);
+        lastScans = A.parseKeyClauses(text);
+        renderFullResults(lastChecks, lastScans);
+        aiOutEl.innerHTML = "Browser scan complete. Select <strong>Write the AI read</strong> if you want an AI-written summary.";
+      });
+
+      aiBtn.addEventListener("click", function () {
+        var sourceText = lastText || textEl.value.trim();
+        if (!sourceText) {
+          aiOutEl.innerHTML = "<p>Run the analysis first — add a contract above, then select <strong>Run the analysis</strong>.</p>";
+          return;
+        }
+
+        aiBtn.disabled = true;
+        aiBtn.textContent = "Writing the AI read…";
+        aiOutEl.innerHTML = "<p>Sending the first 60,000 characters to /api/analyze and waiting for the plain-English read…</p>";
+
+        fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: sourceText.slice(0, 60000) })
+        })
+          .then(function (r) {
+            return r.json()
+              .catch(function () { return { error: "invalid JSON response" }; })
+              .then(function (data) { return { ok: r.ok, status: r.status, data: data }; });
+          })
+          .then(function (res) {
+            var d = res.data;
+            if (res.status === 501 || (d && d.error === "not_configured")) {
+              aiOutEl.innerHTML = "<p>The AI read is not switched on yet — the browser scan above is complete without it.</p>";
+              return;
+            }
+            if (!res.ok || !d || d.error) {
+              var errMsg = (d && d.error) ? d.error : ("HTTP " + res.status);
+              aiOutEl.innerHTML = "<p>The AI read did not come back (" + esc(errMsg) + "). The browser scan above stands on its own.</p>";
+              return;
+            }
+
+            var html = "";
+            if (d.summary) {
+              html += "<h4>Plain-English Summary</h4><p>" + esc(d.summary) + "</p>";
+            }
+            [
+              ["Key terms", d.key_terms],
+              ["Watch out", d.watch_out],
+              ["Missing", d.missing]
+            ].forEach(function (pair) {
+              if (pair[1] && pair[1].length) {
+                html += "<h4>" + pair[0] + "</h4><ul>" + pair[1].map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>";
+              }
+            });
+            aiOutEl.innerHTML = html || "<p>The AI read came back empty. The browser scan above stands on its own.</p>";
+          })
+          .catch(function () {
+            aiOutEl.innerHTML = "<p>The AI read is not reachable from here — it runs on the site\u2019s main host. The browser scan above stands on its own.</p>";
+          })
+          .finally(function () {
+            aiBtn.disabled = false;
+            aiBtn.textContent = "Write the AI read";
+          });
+      });
+
+      function runSelfCheckBattery() {
+        var A = window.ContractAnalyzer;
+        console.assert(A && typeof A.parseKeyClauses === "function" && typeof A.runChecks === "function" && Array.isArray(A.CHECKS) && A.CHECKS.length === 33, "Engine interface / 33 checks integrity fail");
+
+        // 1. Sample Contract
+        var sChecks = A.runChecks(SAMPLE);
+        var sFound = sChecks.filter(function (c) { return c.found; }).map(function (c) { return c.id; });
+        var expectedSampleIds = ["parties", "effective-date", "term", "renewal", "termination-convenience", "fees", "payment-terms", "governing-law"];
+        console.assert(sFound.length === 8 && JSON.stringify(sFound) === JSON.stringify(expectedSampleIds), "Sample Layer 2 found IDs mismatch: " + JSON.stringify(sFound));
+
+        var sScans = A.parseKeyClauses(SAMPLE);
+        console.assert(JSON.stringify(sScans.dates) === JSON.stringify(["2024-01-15"]), "Sample Layer 1 dates fail");
+        console.assert(JSON.stringify(sScans.money) === JSON.stringify(["USD $12,500"]), "Sample Layer 1 money fail");
+        console.assert(sScans.parties.length === 1 && Array.isArray(sScans.parties[0]) && sScans.parties[0][0] === "ACME, Inc.", "Sample Layer 1 parties fail");
+        console.assert(JSON.stringify(sScans.law) === JSON.stringify([["Governing Law", "California"]]), "Sample Layer 1 law fail");
+        console.assert(sScans.term_length.length === 1 && sScans.term_length[0] === "", "Sample Layer 1 term_length quirk fail");
+        console.assert(sScans.renewal_period.length === 0, "Sample Layer 1 renewal_period fail");
+
+        // 2. Plain Prose
+        var PROSE = "The quick brown fox jumps over the lazy dog. We went to the market on Saturday and bought apples, bread, and cheese. The weather was fine and the train home was only a little late. Nobody talked about work at all.";
+        var pChecks = A.runChecks(PROSE);
+        var pFound = pChecks.filter(function (c) { return c.found; });
+        var pScans = A.parseKeyClauses(PROSE);
+        console.assert(pFound.length === 0, "Plain prose Layer 2 false positive fail");
+        console.assert(
+          pScans.dates.length === 0 && pScans.money.length === 0 && pScans.parties.length === 0 &&
+          pScans.law.length === 0 && pScans.term_length.length === 0 && pScans.renewal_period.length === 0,
+          "Plain prose Layer 1 false positive fail"
+        );
+
+        // 3. Empty string safety
+        var eChecks = A.runChecks("");
+        var eScans = A.parseKeyClauses("");
+        console.assert(eChecks.length === 33 && eChecks.filter(function (c) { return c.found; }).length === 0, "Empty input Layer 2 fail");
+        console.assert(eScans.dates.length === 0 && eScans.money.length === 0 && eScans.parties.length === 0 && eScans.law.length === 0 && eScans.term_length.length === 0 && eScans.renewal_period.length === 0, "Empty input Layer 1 fail");
+      }
+
+      updateTextStats();
+      runSelfCheckBattery();
+    })();
+  </script>
+</body>
+</html>
