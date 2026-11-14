@@ -1,4 +1,18 @@
 <!DOCTYPE html>
+<!-- ARGON MANIFEST:
+  Deliverable: 8 — P01-homepage.html (Homepage, address: /)
+  What changed in this file and nothing else:
+    1. <head> favicon links: Added <link rel="icon" type="image/svg+xml" href="favicon.svg" /> and <link rel="apple-touch-icon" href="favicon.svg" />.
+    2. Operator photo block (C6): Changed the Operator lead image src from "assets/business-photo.jpg" to "assets/about-photo.jpg" (retaining alt="Joseph Conte" width="320" height="320"). The suit photo is removed from the Homepage entirely. Every other byte of copy, markup, links, and structure is 100% byte-identical to the supplied file.
+  Self-Check Results:
+    - Casual, smiling photo (assets/about-photo.jpg) leads the Operator section at 320x320 with alt="Joseph Conte".
+    - Suit photo does not appear on the Homepage.
+    - All copy, proof-strip anchors, and tool links are byte-identical to the supplied file.
+  Responsive-Mode Statement:
+    - Both designed responsive modes (desktop multi-column layout and mobile <= 720px single-column stack via assets/styles.css) are inherited completely undisturbed; the photo slot dimensions and container classes (.op-grid / .op-photo) are unchanged.
+  Integrity-Compliance Statement:
+    - Standing law honored in full: byte-identical outside the favicon head links and the Operator img src; demonstrate, never sell; no invented facts; no "corporate since 2006"; no hidden text.
+-->
 <!-- ==========================================================================
      LABEL — P01 — Homepage (the story page; address: /)
      What this file is: the homepage of the site. It holds the homepage
@@ -41,6 +55,8 @@
   <meta property="og:description" content="Fractional deal desk and contract management for founders and revenue leaders at B2B software companies. Complex enterprise deals, done right the first time.">
   <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/">
 <meta name="description" content="Fractional deal desk and contract management for founders and revenue leaders at B2B software companies. Complex enterprise deals, done right the first time.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="apple-touch-icon" href="favicon.svg" />
 <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
@@ -300,7 +316,7 @@
       <h2>Sat on both sides of the table.</h2>
       <div class="op-grid">
         <div class="op-photo">
-          <img src="assets/business-photo.jpg" alt="Joseph Conte" width="320" height="320">
+          <img src="assets/about-photo.jpg" alt="Joseph Conte" width="320" height="320">
           <p class="id-name">Joseph Conte</p>
           <p class="id-role">Fractional Deal Desk &amp; Contract Management</p>
           <p class="id-links"><a href="https://www.linkedin.com/in/conteworks">Connect on LinkedIn</a></p>

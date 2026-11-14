@@ -1,5 +1,28 @@
 # CHANGE LOG — every change to the site code, in plain words
 
+## 2026-11-13 — QA job CLOSED: photo treatment live (Deliverables 8–9)
+
+- Homepage (P01) + About (P03): the research-backed photo
+  treatment is live on both hosts. The casual, smiling photo
+  (assets/about-photo.jpg) now leads the Homepage Operator
+  section (320) and the About page (240); the suit photo is
+  off the Homepage entirely and sits on About only, smaller
+  (180) and lower, alt "Joseph Conte in formal business
+  attire". Argon's returns verified byte-identical outside
+  the photo blocks (executor restored the in-file LABEL
+  comments Argon had replaced with its manifest — both
+  records now ride in the files); ladders clean; modes
+  inherited undisturbed.
+- With this, the Website QA Checklist fix program is COMPLETE:
+  F1–F6 and F8 closed; F7 partially closed (platform limit,
+  see wave 2 entry). Argon's closing inventory also delivered
+  its CSP recommendation: (1) add a report-only CSP baseline
+  permitting inline execution while locking external origins,
+  object-src, base-uri, frame-ancestors, form-action;
+  (2) a full enforced CSP only as a separate refactor that
+  externalizes the tools' inline scripts/styles. Step 1 is
+  awaiting Lucky's ruling; nothing was added to _headers.
+
 ## 2026-11-13 — QA fixes wave 2 (Argon master QA prompt, Deliverables 2–7)
 
 - S6-P02 / Tool 4 (Spend Variance): meta description + canonical
