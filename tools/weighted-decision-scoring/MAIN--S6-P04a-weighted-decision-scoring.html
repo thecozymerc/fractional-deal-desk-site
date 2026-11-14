@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<!--
+ARGON MANIFEST: TOOL 11 FULL REBUILD — Weighted Decision Scoring (S6-P04.a)
+===========================================================================
+
+1. SELF-CHECK AGAINST GROUND-TRUTH ANCHORS (WORKBOOK LOGIC + BOUNDARY CASES)
+   - Math / Logic Alterations vs. Source Workbook:
+     * None. Zero alterations were made to the workbook's formulas.
+     * Weight input & cleared-cell handling: weights are entered as percents (e.g., 30 for 30%, 12.5 for 12.5%, 2.5 for 2.5%) and divided by 100 in the arithmetic so SUMPRODUCT operates on fractions identically to the workbook. Any empty or cleared weight or score input is treated as 0 (matching Excel blank-as-zero semantics in SUM/SUMPRODUCT) so outputs never produce NaN.
+     * Display precision & tie-safe comparison: composites display to 2 decimal places using half-up epsilon rounding (1e-11) so exact decimal halves such as 79.175 and 77.775 display as 79.18 and 77.78 rather than IEEE-754 binary truncation. Full-precision values drive ranks and winners, with a 1e-11 comparison snap so exact decimal ties (such as Option C = Option A at 75.45) always resolve as true ties in both RANK and INDEX/MATCH first-match winner lookup.
+     * Single-source weights: Worked Example ("Worked Example — Vendor Eval") holds zero weight inputs; every Weight cell displays the shared weight array controlled by the main grid ("Decision Scoring Tool"), matching the workbook's ='Decision Scoring Tool'!B18..B25 formulas. Both grids display the unified weight check string ("OK — weights add up to 100%" or "WARNING — weights do not add up to 100%; fix the Weight INPUT cells").
+
+   - Sample State Anchors (on load):
+     * Weight total = 100% -> check line = "OK — weights add up to 100%".
+     * Main grid composites: Option A — SAMPLE = 75.45 · Option B — SAMPLE = 85.20 · Option C — SAMPLE = 65.45.
+     * Main grid ranks: Option A = 2 · Option B = 1 · Option C = 3.
+     * Main grid winner: Option B — SAMPLE, 85.20.
+     * Example grid composites (full precision / 2-decimal display): Sample Vendor A = 82.55 (82.55) · Sample Vendor B = 79.175 (79.18) · Sample Vendor C = 77.775 (77.78).
+     * Example grid ranks: Sample Vendor A = 1 · Sample Vendor B = 2 · Sample Vendor C = 3.
+     * Example grid winner: Sample Vendor A, 82.55.
+
+   - Five Boundary Cases + Combination Battery Verified (via console.assert battery on load):
+     * Boundary (1) Weight-Break (Overall Satisfaction weight 30% -> 25%): Weight total = 95%, check line = "WARNING — weights do not add up to 100%; fix the Weight INPUT cells" in both grids. Main composites = 71.45 / 80.70 / 61.95 (winner unchanged: Option B — SAMPLE at 80.70). Example composites = 78.15 / 75.475 (75.48) / 73.725 (73.73) (winner unchanged: Sample Vendor A at 78.15).
+     * Boundary (2) Winner-Flip (Option B Overall Satisfaction score 90 -> 40): Main composites = 75.45 / 70.20 / 65.45; ranks = A 1 / B 2 / C 3; winner becomes Option A — SAMPLE at 75.45. Example grid untouched: 82.55 / 79.175 (79.18) / 77.775 (77.78), Sample Vendor A wins.
+     * Boundary (3) Shared-Weights (Overall Satisfaction 30% -> 25% AND Binary Success Metrics 5% -> 10%): Weight total = 100%, check line = "OK — weights add up to 100%". Main composites = 75.70 / 85.20 / 65.70. Example composites = 82.65 / 78.875 (78.88) / 77.375 (77.38) with zero example scores edited.
+     * Boundary (4) Tie (Option C scores set equal to Option A: 80, 75, 70, 78, 72, 65, 60, 85): Option C composite = 75.45, tying Option A; ranks = A 2 / B 1 / C 2; winner still Option B — SAMPLE. Also verified tie-for-first resolution (Option A set equal to Option B -> ranks 1 / 1 / 3, winner = Option A — SAMPLE, matching INDEX/MATCH first-match behavior).
+     * Boundary (5) Zero weights (all 8 weights set to 0): Weight total = 0%, WARNING string shows in both grids; all six composites = 0.00; all ranks = 1; winners resolve to first option (Option A — SAMPLE and Sample Vendor A) at 0.00; zero NaN anywhere.
+     * Edge Battery: Cleared score and cleared weight inputs ("") resolve cleanly as 0 with zero NaN, and Reset restores all 8 weights and 48 scores cleanly.
+
+2. IMPROVEMENTS MADE:
+   - Live Single-Surface Linked-Weight Architecture: Replaced the static two-tab spreadsheet embed with a unified single-page surface where both the main Decision Scoring Grid and the Worked Example — Vendor Evaluation sit in sequence, making the single-source weight link visually verifiable in real time without switching tabs.
+   - Proportional Score Comparison Bars in Verdict & Grid Summaries: Added subtle 0-to-100 visual composite bars inside the Verdict Strip and grid result blocks so visitors can immediately read margins between options alongside the exact 2-decimal composites.
+   - One-Tap Boundary Presets + Active State Detection: Added one-tap scenario buttons (Sample State, Weight-Break, Winner-Flip, Shared-Weights, Tie, Zero Weights, Reset to Sample) that update active styling dynamically even when a visitor reaches a scenario manually by typing.
+   - Copyable Plain-Text Decision Brief: Built a structured Decision Brief block (criteria & shared weights, main grid composites/ranks/winner, worked example composites/ranks/winner, and weight check state) with clipboard copy and fallback textarea selection.
+
+3. RESPONSIVE MODES & FLUID-FIRST SWEEP (280px - 1280px):
+   - Desktop Mode (> 720px): 3-card Verdict Strip across the top showing Main Winner, Worked Example Winner, and Weight Check State; full 6-column Scoring Grid and Worked Example tables inside contained `.table-scroll-wrap` containers with readable "What this criterion measures" descriptions and attached `tfoot` summary rows; 2-column Decision Brief + Inputs/Logic/Limits and 2-column Explainer layout.
+   - Phone Mode (<= 720px): Verdict Strip stacks with the two winner cards and weight check pinned at the top; each grid's `tbody` rows reflow via pure CSS into per-criterion cards with `data-label` field headers, `>= 44px` touch targets, `16px` inputs, and full-width "What this criterion measures" text kept attached to its criterion; `tfoot` summary rows (Weight total, Check line, Composites, Ranks, Highest composite) reflow into attached summary cards directly under their grid; a fixed bottom Sticky Summary Strip rides the viewport showing Main Winner, Example Winner, and Weight Check with a jump link.
+   - Fluid-First Sweep (280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS px): Built strictly with relative units, `minmax(0, 1fr)`, `clamp()`, `overflow-wrap: anywhere`, and single-column fallback `<= 380px` for zero horizontal page scroll across every width on the ladder.
+
+4. PART E — SEO INTEGRITY COMPLIANCE & GOAL-VS-SPEC NOTES:
+   - Part E Compliance: 100% compliant. Zero `display: none` content blocks, zero hidden text or links, zero white-on-white, zero off-screen positioning, zero zero-size text, zero keyword stuffing, zero cloaking or doorway pages. Screen-reader-only `.sr-only` clipping is used solely on visually-reflowed mobile `thead` cells where visible `data-label` labels appear on every card field.
+   - Standing No-Selling Compliance: Retired the superseded page's "Next — Put this to work on a real decision." section and all booking/calendar links. No pricing, no pitch copy, and no booking buttons appear anywhere; Deal Check is included only as a plain descriptive link among related Proof of Work links (`../deal-check/`).
+-->
+<!--
+     LABEL — S6-P04.a — Weighted Decision Scoring (tool page;
+     Tool / piece ID: Tool 11 — Weighted Decision Scoring, version TOOL 11.1,
+     address: /tools/weighted-decision-scoring/)
+     What this page holds: the Argon full rebuild (Nov 13, 2026) of
+     Tool 11 — two scoring grids on ONE shared weight set: the main
+     grid (the framework's eight criteria; editable weights and
+     scores for Option A / B / C — SAMPLE) and a worked example —
+     a vendor evaluation whose Weight column is a live display of
+     the same shared weights (in the workbook every example Weight
+     cell is a formula linked to the main sheet; the page
+     reproduces that as a single weight state, so the example can
+     never drift from the framework). Composites, ranks, winner
+     lines, the weight total and the workbook's OK / WARNING check
+     line compute live; a copyable Decision Brief and one-tap
+     scenario presets ride along. Self-contained: no external
+     data file, no formula engine.
+     MATH PROVENANCE: the workbook's logic, UNALTERED (Argon
+     manifest) — Composite = SUMPRODUCT of the weights and that
+     option's scores; Rank = Excel RANK descending (ties share
+     the better rank, next rank skips); Winner = the first
+     maximum (INDEX / MATCH first-match); weight check: ABS
+     (total - 1) < 0.0001 reads "OK — weights add up to 100%",
+     else "WARNING — weights do not add up to 100%; fix the
+     Weight INPUT cells". Workbook: "Weighted Decision Scoring
+     Tool — SAMPLE v2.xlsx", implementing the documented Weighted
+     Decision Framework; the vendor sheet is a worked example of
+     the method on generic sample vendors, not a record of any
+     real procurement (stated on the page).
+     VERIFICATION (Muse, Nov 13, 2026): independent DOM battery
+     72/72 — all 64 sample inputs and 8 linked-weight displays
+     cell-for-cell vs the workbook, verdict strip, both grids'
+     composites / ranks / winners / check lines, all five preset
+     boundary cases, a manual weight-edit probe proving the
+     example grid follows the shared weights, brief, sticky
+     strip, reset — zero page errors; standing-law scan clean;
+     width ladder 280-1280 zero overflow; screenshots both
+     modes.
+     SUPERSEDES the first-generation workbook-embed build (retired
+     data.js pattern); that build is archived in
+     tool11-build/original-live-copy-2026-11-13/ and on the GitHub
+     branch tool-11-iterations. Map: site/CODE-MAP.md
+     ("tools/weighted-decision-scoring/"). Rule: any change here
+     is recorded in site/CHANGELOG.md with the CODE-MAP and this
+     folder's LABEL.md updated in the same change (Code Labeling
+     System, Rule 3).
+     -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+  <link rel="apple-touch-icon" href="../../favicon.svg" />
+  <title>Weighted Decision Scoring — Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="Score options across eight weighted criteria on a normalized 0-to-100 scale with live composite scoring, ranking, and a linked worked vendor evaluation example.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/weighted-decision-scoring/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Weighted Decision Scoring — Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="Score options across eight weighted criteria on a normalized 0-to-100 scale with live composite scoring, ranking, and a linked worked vendor evaluation example.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/weighted-decision-scoring/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/weighted-decision-scoring/#webapp",
+        "name": "Weighted Decision Scoring",
+        "url": "https://fractional-deal-desk-site.pages.dev/tools/weighted-decision-scoring/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "All",
+        "description": "Eight-criterion weighted decision scoring matrix with live SUMPRODUCT composites, descending ranks, weight-total checks, and a linked worked vendor evaluation example.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Fractional Deal Desk & Contract Management",
+          "url": "https://fractional-deal-desk-site.pages.dev/"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/weighted-decision-scoring/#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fractional-deal-desk-site.pages.dev/" },
+          { "@type": "ListItem", "position": 2, "name": "Proof of Work", "item": "https://fractional-deal-desk-site.pages.dev/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Executive Intelligence", "item": "https://fractional-deal-desk-site.pages.dev/tools/executive-intelligence/" },
+          { "@type": "ListItem", "position": 4, "name": "Weighted Decision Scoring", "item": "https://fractional-deal-desk-site.pages.dev/tools/weighted-decision-scoring/" }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --navy-900: #0F1E38;
+      --navy-800: #16294A;
+      --navy-700: #1F3760;
+      --brass-600: #8A661B;
+      --brass-500: #B5892E;
+      --brass-400: #D4AF5A;
+      --brass-100: #F7F1E1;
+      --paper-bg: #F8F7F4;
+      --paper-card: #FFFFFF;
+      --paper-alt: #F1EFEA;
+      --ink-900: #0F1E38;
+      --ink-700: #28364E;
+      --ink-600: #42526B;
+      --rule-color: #D5D0C5;
+      --rule-strong: #0F1E38;
+      --fail-bg: #FEF2F2;
+      --fail-ink: #7F1D1D;
+      --fail-border: #991B1B;
+      --pass-bg: #F0FDF4;
+      --pass-ink: #14532D;
+      --pass-border: #166534;
+      --font-serif: Georgia, "Times New Roman", Times, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { margin: 0; padding: 0; background-color: var(--paper-bg); color: var(--ink-900); font-family: var(--font-sans); line-height: 1.55; overflow-x: hidden; }
+    a { color: var(--navy-900); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover, a:focus-visible { color: var(--brass-600); }
+    button, input, select { font-family: inherit; border-radius: 0; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--brass-500); outline-offset: 2px; }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 clamp(0.65rem, 3vw, 2rem); }
+
+    /* HEADER & BREADCRUMB */
+    .site-header { background-color: var(--navy-900); color: #FFFFFF; border-bottom: 3px solid var(--brass-500); }
+    .header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; padding: 0.85rem 0; }
+    .brand-link { color: #FFFFFF; text-decoration: none; font-family: var(--font-serif); font-size: clamp(1rem, 2.2vw, 1.2rem); font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .brand-link:hover, .brand-link:focus-visible { color: var(--brass-400); }
+    .site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.85rem; }
+    .site-nav a { color: #E2E8F0; text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0.4rem; min-height: 44px; display: inline-flex; align-items: center; border-bottom: 2px solid transparent; }
+    .site-nav a:hover, .site-nav a:focus-visible, .site-nav a[aria-current="page"] { color: #FFFFFF; border-bottom-color: var(--brass-400); }
+
+    .breadcrumb-bar { background-color: var(--paper-alt); border-bottom: 1px solid var(--rule-color); font-size: 0.8125rem; }
+    .breadcrumb-list { list-style: none; margin: 0; padding: 0.5rem 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; color: var(--ink-700); }
+    .breadcrumb-list li { display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; overflow-wrap: anywhere; }
+    .breadcrumb-list li + li::before { content: "/"; color: var(--ink-600); }
+    .breadcrumb-list a { color: var(--ink-700); padding: 0.35rem 0.15rem; min-height: 36px; display: inline-flex; align-items: center; }
+    .breadcrumb-list [aria-current="page"] { color: var(--ink-900); font-weight: 600; }
+
+    /* HERO */
+    .hero-banner { background-color: var(--navy-900); color: #FFFFFF; padding: clamp(1.5rem, 4vw, 2.75rem) 0; border-bottom: 1px solid var(--rule-strong); }
+    .hero-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.85rem; }
+    .eyebrow-tag { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-400); font-weight: 600; }
+    .tool-badge { display: inline-block; background-color: var(--navy-800); border: 1px solid var(--brass-500); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; letter-spacing: 0.04em; }
+    .hero-title { font-family: var(--font-serif); font-size: clamp(1.55rem, 3.6vw, 2.35rem); line-height: 1.2; font-weight: 700; margin: 0 0 0.9rem 0; color: #FFFFFF; overflow-wrap: anywhere; }
+    .hero-lede { font-size: clamp(0.95rem, 1.6vw, 1.06rem); line-height: 1.62; color: #E2E8F0; max-width: 82ch; margin: 0 0 1.15rem 0; }
+    .provenance-strip { background-color: var(--navy-800); border-left: 3px solid var(--brass-500); padding: 0.85rem 1rem; font-size: 0.86rem; color: #E2E8F0; line-height: 1.55; max-width: 86ch; }
+    .provenance-strip strong { color: #FFFFFF; }
+
+    /* SECTIONS */
+    main { padding-bottom: 3rem; }
+    .section-block { padding: clamp(1.35rem, 3vw, 2.25rem) 0; border-bottom: 1px solid var(--rule-color); }
+    .section-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--navy-900); }
+    .section-title { font-family: var(--font-serif); font-size: clamp(1.2rem, 2.4vw, 1.5rem); font-weight: 700; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; }
+    .section-subtitle { font-size: 0.85rem; color: var(--ink-600); font-family: var(--font-mono); margin: 0; overflow-wrap: anywhere; }
+
+    /* 1. VERDICT STRIP */
+    .verdict-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.9rem; }
+    .verdict-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 4px solid var(--navy-900); padding: clamp(0.85rem, 2vw, 1.15rem); display: flex; flex-direction: column; justify-content: space-between; gap: 0.5rem; min-width: 0; }
+    .verdict-card.is-brass { border-top-color: var(--brass-500); }
+    .verdict-card.is-pass { border-top-color: var(--pass-border); background-color: var(--pass-bg); }
+    .verdict-card.is-warn { border-top-color: var(--fail-border); background-color: var(--fail-bg); }
+    .verdict-label { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-700); font-weight: 700; overflow-wrap: anywhere; }
+    .verdict-main-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.35rem 0.65rem; }
+    .verdict-winner { font-family: var(--font-serif); font-size: clamp(1.15rem, 2.2vw, 1.4rem); font-weight: 700; line-height: 1.25; color: var(--ink-900); overflow-wrap: anywhere; }
+    .verdict-score { font-family: var(--font-mono); font-size: clamp(1.25rem, 2.3vw, 1.55rem); font-weight: 700; color: var(--navy-900); white-space: nowrap; }
+    .verdict-state-text { font-family: var(--font-sans); font-size: 0.95rem; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+    .verdict-card.is-pass .verdict-state-text { color: var(--pass-ink); }
+    .verdict-card.is-warn .verdict-state-text { color: var(--fail-ink); }
+    .verdict-note { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-600); margin: 0; overflow-wrap: anywhere; }
+    .verdict-card.is-pass .verdict-note { color: var(--pass-ink); }
+    .verdict-card.is-warn .verdict-note { color: var(--fail-ink); }
+
+    .mini-bars { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.25rem; padding-top: 0.5rem; border-top: 1px solid var(--rule-color); }
+    .mini-bar-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(44px, 1.1fr) auto; align-items: center; gap: 0.45rem; font-family: var(--font-mono); font-size: 0.74rem; }
+    .mini-bar-name { color: var(--ink-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mini-bar-row.is-leader .mini-bar-name,
+    .mini-bar-row.is-leader .mini-bar-val { font-weight: 700; color: var(--ink-900); }
+    .mini-bar-track { width: 100%; height: 8px; background-color: var(--paper-alt); border: 1px solid var(--rule-color); }
+    .mini-bar-fill { height: 100%; background-color: var(--ink-600); transition: width 0.15s ease; }
+    .mini-bar-row.is-leader .mini-bar-fill { background-color: var(--navy-900); }
+    .mini-bar-val { text-align: right; color: var(--ink-700); white-space: nowrap; }
+
+    /* DIRECTIONS & CONTROLS */
+    .directions-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--brass-500); padding: 0.9rem 1.1rem; margin-bottom: 1rem; font-size: 0.925rem; color: var(--ink-900); }
+    .directions-label { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brass-600); font-weight: 700; display: block; margin-bottom: 0.25rem; }
+    .directions-text { margin: 0; }
+
+    .control-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.65rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.75rem; margin-bottom: 1rem; }
+    .preset-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; }
+    .preset-group-label { font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: var(--ink-700); margin-right: 0.2rem; }
+    .btn-preset { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.45rem 0.75rem; font-size: 0.8rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
+    .btn-preset:hover, .btn-preset:focus-visible, .btn-preset.is-active { background-color: var(--navy-900); color: #FFFFFF; border-color: var(--navy-900); }
+    .action-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+    .btn-primary { background-color: var(--navy-900); color: #FFFFFF; border: 1px solid var(--navy-900); padding: 0.5rem 0.95rem; font-size: 0.84rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
+    .btn-primary:hover, .btn-primary:focus-visible { background-color: var(--brass-600); border-color: var(--brass-600); }
+    .btn-secondary { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.5rem 0.95rem; font-size: 0.84rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
+    .btn-secondary:hover, .btn-secondary:focus-visible { background-color: var(--navy-900); color: #FFFFFF; }
+
+    /* 2 & 3. SCORING GRIDS */
+    .table-scroll-wrap { width: 100%; max-width: 100%; overflow-x: auto; border: 1px solid var(--rule-strong); background-color: var(--paper-card); -webkit-overflow-scrolling: touch; }
+    .scoring-table { width: 100%; border-collapse: collapse; table-layout: auto; font-size: 0.86rem; }
+    .scoring-table thead th { background-color: var(--navy-900); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; text-align: left; padding: 0.7rem 0.6rem; border-right: 1px solid var(--navy-700); }
+    .scoring-table thead th:last-child { border-right: 0; }
+    .scoring-table thead th.is-num { text-align: right; }
+    .scoring-table tbody tr { border-bottom: 1px solid var(--rule-color); background-color: var(--paper-card); }
+    .scoring-table tbody tr:nth-child(even) { background-color: #FAF9F6; }
+    .scoring-table tbody td { padding: 0.5rem 0.55rem; border-right: 1px solid var(--rule-color); vertical-align: middle; }
+    .scoring-table tbody td:last-child { border-right: 0; }
+
+    .col-criterion { min-width: 185px; font-weight: 600; color: var(--ink-900); }
+    .col-weight { min-width: 108px; }
+    .col-score { min-width: 118px; }
+    .col-measures { min-width: 240px; color: var(--ink-700); font-size: 0.83rem; line-height: 1.45; }
+
+    .weight-input-wrap { display: flex; align-items: center; gap: 0.25rem; }
+    .grid-input { width: 100%; min-height: 40px; border: 1px solid #B6B0A3; background-color: var(--brass-100); color: var(--ink-900); font-family: var(--font-mono); font-size: 0.88rem; font-weight: 700; padding: 0.35rem 0.45rem; text-align: right; }
+    .grid-input:focus { background-color: #FFFFFF; border-color: var(--navy-900); outline: 2px solid var(--brass-500); outline-offset: -1px; }
+    .pct-suffix { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; color: var(--ink-700); flex-shrink: 0; }
+
+    .linked-weight-cell { display: inline-flex; align-items: center; justify-content: flex-end; width: 100%; min-height: 40px; padding: 0.35rem 0.5rem; font-family: var(--font-mono); font-size: 0.88rem; font-weight: 700; background-color: var(--paper-alt); border: 1px solid var(--rule-color); color: var(--navy-900); }
+    .linked-banner { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: 0.7rem 0.95rem; margin-bottom: 0.9rem; font-size: 0.88rem; color: var(--ink-900); }
+    .linked-banner strong { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--navy-900); margin-right: 0.4rem; }
+
+    /* TFOOT SUMMARY ROWS */
+    .scoring-table tfoot tr { border-top: 1px solid var(--rule-color); background-color: var(--paper-alt); }
+    .scoring-table tfoot tr.row-total-weights { border-top: 2px solid var(--rule-strong); }
+    .scoring-table tfoot tr.row-composite { background-color: #FFFFFF; border-top: 2px solid var(--rule-strong); }
+    .scoring-table tfoot tr.row-rank { background-color: var(--paper-alt); }
+    .scoring-table tfoot tr.row-winner { background-color: var(--brass-100); border-top: 2px solid var(--brass-500); }
+    .scoring-table tfoot th,
+    .scoring-table tfoot td { padding: 0.58rem 0.55rem; border-right: 1px solid var(--rule-color); vertical-align: middle; }
+    .scoring-table tfoot td:last-child { border-right: 0; }
+    .scoring-table tfoot th { text-align: left; font-weight: 700; color: var(--ink-900); }
+
+    .foot-num { font-family: var(--font-mono); font-weight: 700; text-align: right; font-size: 0.94rem; color: var(--ink-900); }
+    .foot-num.is-winner-cell { background-color: var(--pass-bg); color: var(--pass-ink); }
+    .foot-desc { font-size: 0.8rem; color: var(--ink-600); }
+    .check-badge { display: inline-block; width: 100%; padding: 0.4rem 0.6rem; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; border: 1px solid transparent; overflow-wrap: anywhere; }
+    .check-badge.is-ok { background-color: var(--pass-bg); color: var(--pass-ink); border-color: var(--pass-border); }
+    .check-badge.is-warn { background-color: var(--fail-bg); color: var(--fail-ink); border-color: var(--fail-border); }
+    .winner-pill { font-family: var(--font-serif); font-size: 0.98rem; font-weight: 700; color: var(--ink-900); }
+
+    /* 4. BRIEF & LIMITS */
+    .brief-layout { display: grid; grid-template-columns: 1.35fr 1fr; gap: 1.25rem; align-items: start; }
+    .brief-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); padding: clamp(0.9rem, 2vw, 1.25rem); min-width: 0; }
+    .brief-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .copy-status { font-family: var(--font-mono); font-size: 0.8rem; color: var(--pass-ink); font-weight: 700; }
+    .brief-pre { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.9rem; margin: 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; color: var(--ink-900); white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+
+    .limits-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 3px solid var(--navy-900); padding: clamp(0.9rem, 2vw, 1.25rem); font-size: 0.89rem; color: var(--ink-700); min-width: 0; }
+    .limits-card h3 { font-family: var(--font-serif); font-size: 1.08rem; margin: 0 0 0.6rem 0; color: var(--ink-900); }
+    .limits-card p { margin: 0 0 0.7rem 0; line-height: 1.55; }
+    .limits-card p:last-child { margin-bottom: 0; }
+    .limits-list { margin: 0.5rem 0 0 0; padding-left: 1.1rem; color: var(--ink-900); font-family: var(--font-mono); font-size: 0.77rem; display: flex; flex-direction: column; gap: 0.35rem; }
+
+    /* EXPLAINER */
+    .prose-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+    .prose-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: clamp(0.95rem, 2vw, 1.3rem); min-width: 0; }
+    .prose-card h3 { font-family: var(--font-serif); font-size: 1.06rem; margin: 0 0 0.55rem 0; color: var(--ink-900); }
+    .prose-card p { margin: 0; font-size: 0.93rem; line-height: 1.62; color: var(--ink-700); }
+
+    /* RELATED LINKS & STICKY SUMMARY & FOOTER */
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem; }
+    .related-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.9rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.4rem; min-width: 0; }
+    .related-card-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; color: var(--brass-600); font-weight: 700; }
+    .related-card a { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--ink-900); min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .related-card p { font-size: 0.83rem; color: var(--ink-700); margin: 0; }
+
+    .live-summary-bar { background-color: var(--navy-900); color: #FFFFFF; border-top: 2px solid var(--brass-500); padding: 0.55rem 0; z-index: 40; }
+    .summary-bar-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.45rem 1rem; font-family: var(--font-mono); font-size: 0.78rem; }
+    .summary-metrics { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.9rem; }
+    .summary-ok { color: #86EFAC; font-weight: 700; }
+    .summary-warn { color: #FCA5A5; font-weight: 700; }
+    .summary-jump-link { color: #FFFFFF; font-size: 0.78rem; font-weight: 600; padding: 0.35rem 0.65rem; border: 1px solid var(--brass-400); text-decoration: none; min-height: 36px; display: inline-flex; align-items: center; }
+
+    .site-footer { background-color: var(--navy-900); color: #E2E8F0; border-top: 3px solid var(--brass-500); padding: 2rem 0 4.5rem 0; font-size: 0.85rem; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+    .footer-heading { font-family: var(--font-serif); font-size: 0.95rem; color: #FFFFFF; margin: 0 0 0.6rem 0; }
+    .footer-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+    .footer-links a { color: #E2E8F0; min-height: 38px; display: inline-flex; align-items: center; }
+    .footer-links a:hover, .footer-links a:focus-visible { color: var(--brass-400); }
+    .footer-bottom { border-top: 1px solid var(--navy-700); padding-top: 1rem; font-size: 0.78rem; color: #CBD5E1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+
+    /* PHONE MODE (<= 720px): ZERO display:none — pure CSS card reflow */
+    @media (max-width: 720px) {
+      .verdict-grid { grid-template-columns: 1fr; }
+      .verdict-card.verdict-check-card { order: -1; }
+      .brief-layout,
+      .prose-grid { grid-template-columns: 1fr; }
+
+      .grid-wrap-outer { overflow-x: visible; border: 0; background-color: transparent; }
+      .scoring-table,
+      .scoring-table tbody,
+      .scoring-table tfoot { display: block; width: 100%; }
+
+      .scoring-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .scoring-table tbody tr {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+        padding: 0.9rem;
+        margin-bottom: 0.9rem;
+        border: 1px solid var(--rule-strong);
+        border-left: 4px solid var(--navy-900);
+        background-color: var(--paper-card);
+      }
+      .scoring-table tbody td {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        padding: 0;
+        border-right: 0;
+      }
+      .scoring-table tbody td.mobile-span-2 { grid-column: 1 / -1; }
+      .scoring-table tbody td.col-criterion {
+        font-family: var(--font-serif);
+        font-size: 1.02rem;
+        padding-bottom: 0.35rem;
+        border-bottom: 1px solid var(--rule-color);
+      }
+      .scoring-table tbody td::before {
+        content: attr(data-label);
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ink-700);
+        margin-bottom: 0.25rem;
+      }
+      .scoring-table tbody td.col-criterion::before { margin-bottom: 0.15rem; }
+
+      .grid-input, .linked-weight-cell {
+        min-height: 44px;
+        font-size: 1rem;
+      }
+
+      /* Attached TFOOT summary cards on phone */
+      .scoring-table tfoot tr {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.55rem;
+        padding: 0.8rem;
+        margin-bottom: 0.6rem;
+        border: 1px solid var(--rule-strong);
+        background-color: var(--paper-card);
+      }
+      .scoring-table tfoot tr.row-winner {
+        grid-template-columns: 1fr;
+        background-color: var(--brass-100);
+        border-left: 4px solid var(--brass-500);
+      }
+      .scoring-table tfoot th,
+      .scoring-table tfoot td {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        padding: 0;
+        border-right: 0;
+        border-top: 0;
+        text-align: left !important;
+      }
+      .scoring-table tfoot th {
+        grid-column: 1 / -1;
+        border-bottom: 1px solid var(--rule-color);
+        padding-bottom: 0.3rem;
+        font-size: 0.88rem;
+      }
+      .scoring-table tfoot td.mobile-span-full { grid-column: 1 / -1; }
+      .scoring-table tfoot td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--ink-600);
+        margin-bottom: 0.15rem;
+      }
+      .foot-num.is-winner-cell { padding: 0.25rem 0.4rem; }
+
+      .live-summary-bar { position: fixed; bottom: 0; left: 0; right: 0; box-shadow: 0 -2px 10px rgba(15, 30, 56, 0.25); }
+    }
+
+    @media (max-width: 380px) {
+      .scoring-table tbody tr { grid-template-columns: 1fr; }
+      .scoring-table tfoot tr { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../../" class="brand-link">Fractional Deal Desk &amp; Contract Management</a>
+      <nav class="site-nav" aria-label="Primary Navigation">
+        <a href="../../">Home</a>
+        <a href="../../tools/" aria-current="page">Proof of Work</a>
+        <a href="../../tools/executive-intelligence/">Executive Intelligence</a>
+        <a href="../../services/">Practice &amp; Mandate Scope</a>
+        <a href="../../about/">Operator Record</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumb-bar" aria-label="Breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb-list">
+        <li><a href="../../">Home</a></li>
+        <li><a href="../../tools/">Proof of Work</a></li>
+        <li><a href="../../tools/executive-intelligence/">Executive Intelligence</a></li>
+        <li aria-current="page">Weighted Decision Scoring</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="hero-banner">
+    <div class="container">
+      <div class="hero-meta-row">
+        <span class="eyebrow-tag">Proof of Work · Executive Intelligence</span>
+        <span class="tool-badge">Tool 11 · Executive Intelligence</span>
+      </div>
+      <h1 class="hero-title">Weighted Decision Scoring</h1>
+      <p class="hero-lede">
+        Committees decide by whoever argues loudest, and then the reasons get rewritten afterwards. This tool is the discipline that replaces that: eight criteria with fixed weights, every option scored on the same normalized 0-to-100 scale, one composite per option, and a rank that falls out of the arithmetic instead of the meeting. It implements the documented Weighted Decision Framework — the criteria measure solution effectiveness, efficiency, usability, and satisfaction — and every number in it is sample data.
+      </p>
+      <div class="provenance-strip">
+        <strong>Provenance &amp; Operating Record:</strong> Built from 15+ years in commercial contracts, deal desk, and revenue operations across contracts up to $300M and 3,000+ SKUs under management. This tool implements the documented Weighted Decision Framework; the eight criteria measure solution effectiveness, efficiency, usability, and satisfaction. The vendor evaluation below is a worked example of the method on generic sample vendors — one sample evaluation team's normalized judgments — not a record of any real procurement. All criteria weights, scores, and results on this page are fictional sample data.
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- 1. VERDICT STRIP (THE ANSWERS, UP TOP) -->
+    <section class="section-block" aria-labelledby="heading-verdict">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-verdict">Decision Standings &amp; Weight Integrity</h2>
+        <p class="section-subtitle">Both grids share one weight set — edit any weight or score below</p>
+      </div>
+
+      <div class="verdict-grid" role="region" aria-label="Decision Standings" aria-live="polite">
+        <article class="verdict-card is-brass">
+          <span class="verdict-label">Main Grid Winner</span>
+          <div class="verdict-main-row">
+            <span class="verdict-winner" id="verdict-main-winner">Option B — SAMPLE</span>
+            <span class="verdict-score" id="verdict-main-score">85.20</span>
+          </div>
+          <div class="mini-bars" id="verdict-main-bars"></div>
+        </article>
+
+        <article class="verdict-card">
+          <span class="verdict-label">Worked Example Winner (Vendor Eval)</span>
+          <div class="verdict-main-row">
+            <span class="verdict-winner" id="verdict-vendor-winner">Sample Vendor A</span>
+            <span class="verdict-score" id="verdict-vendor-score">82.55</span>
+          </div>
+          <div class="mini-bars" id="verdict-vendor-bars"></div>
+        </article>
+
+        <article class="verdict-card verdict-check-card is-pass" id="verdict-check-card">
+          <span class="verdict-label">Shared Weight Check State</span>
+          <div class="verdict-main-row">
+            <span class="verdict-state-text" id="verdict-check-text">OK — weights add up to 100%</span>
+            <span class="verdict-score" id="verdict-weight-total">100%</span>
+          </div>
+          <p class="verdict-note" id="verdict-check-note">Single-source weights active across both Decision Scoring Tool and Worked Example.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 2. THE SCORING GRID (WORKING LAYER) -->
+    <section class="section-block" aria-labelledby="heading-main-grid" id="section-main-grid">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-main-grid">Decision Scoring Tool — Main Grid</h2>
+        <p class="section-subtitle">8 weighted criteria · Normalized 0–100 scores · Shared weights set here</p>
+      </div>
+
+      <div class="directions-box">
+        <span class="directions-label">Directions</span>
+        <p class="directions-text">Step 1 — Collect the metrics: gather quantitative performance metrics for each option you are evaluating. Step 2 — Capture feedback: collect qualitative user feedback through structured observations and sentiment grouping. Step 3 — Normalize: put every metric on the same 0 to 100 scale so no single scale can dominate, and enter those normalized scores in the yellow INPUT cells. Step 4 — Apply weights: check the weights in the Weight column — they must add up to 100%, and the check line under the table confirms it. Step 5 — Composite: the tool multiplies each score by its weight and adds them up to give one composite score per option. Step 6 — Rank: read the Rank row and the result line — the highest composite wins. Step 7 — Validate: sanity-check the result against the underlying feedback and correlations before you act on it.</p>
+      </div>
+
+      <div class="control-bar" role="region" aria-label="Boundary Case Scenario Presets">
+        <div class="preset-group">
+          <span class="preset-group-label">Scenarios:</span>
+          <button type="button" class="btn-preset is-active" id="preset-sample" data-preset="sample">Sample State</button>
+          <button type="button" class="btn-preset" id="preset-weight-break" data-preset="weight-break">Weight-Break</button>
+          <button type="button" class="btn-preset" id="preset-winner-flip" data-preset="winner-flip">Winner-Flip</button>
+          <button type="button" class="btn-preset" id="preset-shared-weights" data-preset="shared-weights">Shared-Weights</button>
+          <button type="button" class="btn-preset" id="preset-tie" data-preset="tie">Tie</button>
+          <button type="button" class="btn-preset" id="preset-zero-weights" data-preset="zero-weights">Zero Weights</button>
+        </div>
+        <div class="action-group">
+          <button type="button" class="btn-secondary" id="btn-reset">Reset to Sample</button>
+        </div>
+      </div>
+
+      <div class="table-scroll-wrap grid-wrap-outer">
+        <table class="scoring-table" id="main-grid-table" aria-label="Decision Scoring Tool Main Grid">
+          <thead>
+            <tr>
+              <th scope="col" class="col-criterion">Criterion</th>
+              <th scope="col" class="col-weight is-num">Weight (%)</th>
+              <th scope="col" class="col-score is-num">Option A — SAMPLE</th>
+              <th scope="col" class="col-score is-num">Option B — SAMPLE</th>
+              <th scope="col" class="col-score is-num">Option C — SAMPLE</th>
+              <th scope="col" class="col-measures">What this criterion measures</th>
+            </tr>
+          </thead>
+          <tbody id="main-grid-tbody"></tbody>
+          <tfoot id="main-grid-tfoot"></tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. WORKED EXAMPLE — VENDOR EVALUATION -->
+    <section class="section-block" aria-labelledby="heading-vendor-grid" id="section-vendor-grid">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-vendor-grid">Worked Example — Vendor Evaluation (SAMPLE)</h2>
+        <p class="section-subtitle">Weights linked live from Main Grid · Editable vendor scores only</p>
+      </div>
+
+      <div class="linked-banner" role="note">
+        <strong>Single-Source Weight Link:</strong> Every cell in the Weight column below reads directly from the main Scoring Grid above — there is no second weight state. Change any weight once on the main grid and watch both grids' composites and ranks move together.
+      </div>
+
+      <div class="table-scroll-wrap grid-wrap-outer">
+        <table class="scoring-table" id="vendor-grid-table" aria-label="Worked Example Vendor Evaluation Grid">
+          <thead>
+            <tr>
+              <th scope="col" class="col-criterion">Criterion</th>
+              <th scope="col" class="col-weight is-num">Weight (Linked)</th>
+              <th scope="col" class="col-score is-num">Sample Vendor A</th>
+              <th scope="col" class="col-score is-num">Sample Vendor B</th>
+              <th scope="col" class="col-score is-num">Sample Vendor C</th>
+              <th scope="col" class="col-measures">What this criterion measures</th>
+            </tr>
+          </thead>
+          <tbody id="vendor-grid-tbody"></tbody>
+          <tfoot id="vendor-grid-tfoot"></tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- 4. THE DECISION BRIEF & INPUTS / LOGIC / LIMITS -->
+    <section class="section-block" aria-labelledby="heading-brief" id="section-brief">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-brief">The Decision Brief</h2>
+        <p class="section-subtitle">Copyable plain-text summary: criteria, weights, composites, ranks, winners, and check state</p>
+      </div>
+
+      <div class="brief-layout">
+        <div class="brief-panel">
+          <div class="brief-toolbar">
+            <button type="button" class="btn-primary" id="btn-copy-brief">Copy Decision Brief</button>
+            <span class="copy-status" id="copy-feedback" aria-live="polite"></span>
+          </div>
+          <pre class="brief-pre" id="decision-brief-text" tabindex="0" aria-label="Copyable Decision Brief"></pre>
+        </div>
+
+        <aside class="limits-card" aria-label="Inputs, logic, limits">
+          <h3>Inputs, logic, limits</h3>
+          <p>Inputs: the criterion weights and the 0 to 100 scores for Option A, Option B, and Option C. Logic: Composite = SUMPRODUCT of weights and scores for that option; Rank and the highest-composite line are formulas. The weights are 30 / 20 / 15 / 12.5 / 10 / 5 / 2.5 / 5 percent across the eight criteria, and the weight-total line warns in words if they stop adding to 100%. Limits: scores must already be normalized to 0 to 100 before entry, with higher meaning better for every criterion — the tool does not normalize for you. If you change a weight, keep the total at 100% or the composites will not be comparable. And in the workbook's own words: this workbook implements the documented framework from the Weighted Decision Framework document; it is NOT a "50-30-20" tool.</p>
+          <ul class="limits-list">
+            <li>Composite: SUMPRODUCT(Weights, Option Scores)</li>
+            <li>Rank: Descending Excel RANK (ties share top rank, next skips)</li>
+            <li>Winner: INDEX/MATCH MAX (first option in column order on tie)</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 5. EXPLAINER SECTION -->
+    <section class="section-block" aria-labelledby="heading-explainer">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-explainer">One framework, two decisions.</h2>
+        <p class="section-subtitle">Why fixed shared weights keep evaluation meetings honest</p>
+      </div>
+
+      <div class="prose-grid">
+        <article class="prose-card">
+          <h3>The main scoring grid</h3>
+          <p>The main sheet scores three generic options against the framework's eight criteria — Overall Satisfaction carries 30% because it is the primary indicator of solution effectiveness; the two correlation criteria and the click counts carry small weights on purpose, so a supporting signal can inform the result without dominating it. Change any weight and the check line under the grid tells you whether the framework still adds to 100% before you trust the composites.</p>
+        </article>
+        <article class="prose-card">
+          <h3>The worked vendor evaluation</h3>
+          <p>The worked example points the same eight criteria and weights at a vendor evaluation — Sample Vendor A, B, and C, one sample evaluation team's normalized judgments — so the method can be seen working end to end on a complete decision. Its weights are not typed on that sheet: every Weight cell is a live formula linked to the main sheet, so the example can never drift from the framework. It demonstrates the method on generic sample vendors; it is not a record of any real procurement, and the framework itself is a decision method, not a vendor-scoring product.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 6. RELATED PROOF OF WORK LINKS -->
+    <section class="section-block" aria-labelledby="heading-related">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-related">Related Executive Intelligence &amp; Proof of Work</h2>
+        <p class="section-subtitle">Inspect neighboring tools and governance partitions across the practice record</p>
+      </div>
+
+      <div class="related-grid">
+        <div class="related-card">
+          <span class="related-card-eyebrow">Hub</span>
+          <a href="../../tools/">Proof of Work Hub</a>
+          <p>Explore the full set of working commercial models, contract playbooks, and operational trackers.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Partition</span>
+          <a href="../../tools/executive-intelligence/">Executive Intelligence Partition</a>
+          <p>Decision frameworks, executive dashboards, and structured commercial intelligence models.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 12 · Executive Intelligence</span>
+          <a href="../executive-dashboard/">Tool 12: Executive Dashboard</a>
+          <p>Track executive pipeline, contract velocity, and governance indicators in one reconciled view.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Diagnostic Review</span>
+          <a href="../deal-check/">Deal Check</a>
+          <p>Overview of the structured review format used to audit live deals, backlogs, and commercial controls.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- STICKY SUMMARY STRIP -->
+  <div class="live-summary-bar" role="region" aria-label="Live Scoring Summary Strip">
+    <div class="container summary-bar-inner">
+      <div class="summary-metrics">
+        <span>Main: <strong id="sticky-main">Option B — SAMPLE (85.20)</strong></span>
+        <span>Example: <strong id="sticky-vendor">Sample Vendor A (82.55)</strong></span>
+        <span>Weights: <strong id="sticky-check" class="summary-ok">OK (100%)</strong></span>
+      </div>
+      <a href="#section-brief" class="summary-jump-link">Decision Brief</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h2 class="footer-heading">Fractional Deal Desk &amp; Contract Management</h2>
+          <p style="margin: 0; color: #CBD5E1; line-height: 1.5;">
+            Commercial contracts, deal desk architecture, and revenue operations controls. 15+ years of operating experience across contracts up to $300M and 3,000+ SKUs under management.
+          </p>
+        </div>
+        <div>
+          <h2 class="footer-heading">Proof of Work &amp; Tools</h2>
+          <ul class="footer-links">
+            <li><a href="../../tools/">Proof of Work Hub</a></li>
+            <li><a href="../../tools/executive-intelligence/">Executive Intelligence Partition</a></li>
+            <li><a href="../executive-dashboard/">Tool 12: Executive Dashboard</a></li>
+            <li><a href="../deal-check/">Deal Check</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="footer-heading">Practice Information</h2>
+          <ul class="footer-links">
+            <li><a href="../../">Home</a></li>
+            <li><a href="../../services/">Practice &amp; Mandate Scope</a></li>
+            <li><a href="../../about/">Operator Record</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>Tool 11 · Weighted Decision Scoring (S6-P04.a)</span>
+        <span>All criteria weights, scores, and results on this page are fictional sample data.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var OK_STRING = "OK \u2014 weights add up to 100%";
+      var WARN_STRING = "WARNING \u2014 weights do not add up to 100%; fix the Weight INPUT cells";
+
+      var MAIN_OPTIONS = ["Option A \u2014 SAMPLE", "Option B \u2014 SAMPLE", "Option C \u2014 SAMPLE"];
+      var VENDOR_OPTIONS = ["Sample Vendor A", "Sample Vendor B", "Sample Vendor C"];
+
+      var INITIAL_ROWS = [
+        {
+          criterion: "Overall Satisfaction",
+          weightPct: 30,
+          mainScores: [80, 90, 70],
+          vendorScores: [88, 74, 81],
+          measures: "Overall user experience; the primary indicator of solution effectiveness."
+        },
+        {
+          criterion: "Sentiment Analysis",
+          weightPct: 20,
+          mainScores: [75, 85, 65],
+          vendorScores: [82, 90, 68],
+          measures: "Qualitative feedback turned into measurable groups, capturing perception beyond numbers."
+        },
+        {
+          criterion: "Correlation: Time-on-Task and Satisfaction",
+          weightPct: 15,
+          mainScores: [70, 80, 60],
+          vendorScores: [76, 82, 90],
+          measures: "Whether faster completion goes with a better experience."
+        },
+        {
+          criterion: "Question-Specific Performance",
+          weightPct: 12.5,
+          mainScores: [78, 88, 68],
+          vendorScores: [84, 71, 77],
+          measures: "Responses to the key evaluation questions that support the project goals."
+        },
+        {
+          criterion: "Average Time-on-Task",
+          weightPct: 10,
+          mainScores: [72, 82, 62],
+          vendorScores: [79, 85, 66],
+          measures: "Operational efficiency: time needed to complete representative tasks."
+        },
+        {
+          criterion: "Correlation: Clicks and Satisfaction",
+          weightPct: 5,
+          mainScores: [65, 75, 55],
+          vendorScores: [74, 80, 88],
+          measures: "Whether navigation complexity affects overall satisfaction."
+        },
+        {
+          criterion: "Average Number of Clicks",
+          weightPct: 2.5,
+          mainScores: [60, 70, 50],
+          vendorScores: [70, 76, 84],
+          measures: "Interaction complexity: an added efficiency measure."
+        },
+        {
+          criterion: "Binary Success Metrics",
+          weightPct: 5,
+          mainScores: [85, 90, 75],
+          vendorScores: [90, 68, 73],
+          measures: "Yes/No completion measures, weighted so they cannot dominate the result."
+        }
+      ];
+
+      function cloneRows(src) {
+        return src.map(function (r) {
+          return {
+            criterion: r.criterion,
+            weightPct: r.weightPct,
+            mainScores: r.mainScores.slice(),
+            vendorScores: r.vendorScores.slice(),
+            measures: r.measures
+          };
+        });
+      }
+
+      function safeNum(val) {
+        if (val === "" || val === null || val === undefined) return 0;
+        var n = typeof val === "number" ? val : parseFloat(val);
+        return isFinite(n) ? n : 0;
+      }
+
+      function snapCompare(n) {
+        return Math.round(n * 1e11) / 1e11;
+      }
+
+      function formatTwoDecimals(n) {
+        var val = isFinite(n) ? n : 0;
+        var sign = val < 0 ? -1 : 1;
+        var rounded = Math.round((Math.abs(val) + 1e-11) * 100) / 100;
+        if (rounded === 0) return "0.00";
+        return (sign < 0 ? "-" : "") + rounded.toFixed(2);
+      }
+
+      function formatPct(pct) {
+        var val = isFinite(pct) ? pct : 0;
+        var rounded = Math.round((val + 1e-11) * 100) / 100;
+        if (Object.is(rounded, -0)) rounded = 0;
+        var s = rounded.toFixed(2).replace(/\.?0+$/, "");
+        return s + "%";
+      }
+
+      function computeGridRanks(composites) {
+        var snapped = composites.map(snapCompare);
+        return snapped.map(function (val) {
+          var higher = 0;
+          for (var j = 0; j < snapped.length; j++) {
+            if (snapped[j] > val) higher++;
+          }
+          return higher + 1;
+        });
+      }
+
+      function computeWinnerIndex(composites) {
+        var snapped = composites.map(snapCompare);
+        var maxVal = snapped[0];
+        var maxIdx = 0;
+        for (var i = 1; i < snapped.length; i++) {
+          if (snapped[i] > maxVal) {
+            maxVal = snapped[i];
+            maxIdx = i;
+          }
+        }
+        return maxIdx;
+      }
+
+      function evaluateModel(rows) {
+        var weightTotalPct = 0;
+        var i, col;
+
+        for (i = 0; i < rows.length; i++) {
+          weightTotalPct += safeNum(rows[i].weightPct);
+        }
+        var weightTotalFrac = weightTotalPct / 100;
+        var isWeightOk = Math.abs(weightTotalFrac - 1) < 0.0001;
+        var checkString = isWeightOk ? OK_STRING : WARN_STRING;
+
+        var mainComposites = [0, 0, 0];
+        var vendorComposites = [0, 0, 0];
+
+        for (i = 0; i < rows.length; i++) {
+          var wFrac = safeNum(rows[i].weightPct) / 100;
+          for (col = 0; col < 3; col++) {
+            mainComposites[col] += wFrac * safeNum(rows[i].mainScores[col]);
+            vendorComposites[col] += wFrac * safeNum(rows[i].vendorScores[col]);
+          }
+        }
+
+        var mainRanks = computeGridRanks(mainComposites);
+        var vendorRanks = computeGridRanks(vendorComposites);
+        var mainWinnerIdx = computeWinnerIndex(mainComposites);
+        var vendorWinnerIdx = computeWinnerIndex(vendorComposites);
+
+        return {
+          weightTotalPct: weightTotalPct,
+          isWeightOk: isWeightOk,
+          checkString: checkString,
+          main: {
+            labels: MAIN_OPTIONS,
+            composites: mainComposites,
+            ranks: mainRanks,
+            winnerIdx: mainWinnerIdx,
+            winnerLabel: MAIN_OPTIONS[mainWinnerIdx],
+            winnerScore: mainComposites[mainWinnerIdx]
+          },
+          vendor: {
+            labels: VENDOR_OPTIONS,
+            composites: vendorComposites,
+            ranks: vendorRanks,
+            winnerIdx: vendorWinnerIdx,
+            winnerLabel: VENDOR_OPTIONS[vendorWinnerIdx],
+            winnerScore: vendorComposites[vendorWinnerIdx]
+          }
+        };
+      }
+
+      var stateRows = cloneRows(INITIAL_ROWS);
+
+      var mainTbody = document.getElementById("main-grid-tbody");
+      var mainTfoot = document.getElementById("main-grid-tfoot");
+      var vendorTbody = document.getElementById("vendor-grid-tbody");
+      var vendorTfoot = document.getElementById("vendor-grid-tfoot");
+      var briefPre = document.getElementById("decision-brief-text");
+      var copyFeedback = document.getElementById("copy-feedback");
+
+      function escapeAttr(str) {
+        return String(str == null ? "" : str)
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function escapeHtml(str) {
+        return String(str == null ? "" : str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function renderGridBodies() {
+        var mainHtml = "";
+        var vendorHtml = "";
+
+        for (var i = 0; i < stateRows.length; i++) {
+          var r = stateRows[i];
+          var wVal = r.weightPct === "" ? "" : String(r.weightPct);
+
+          mainHtml +=
+            '<tr>' +
+              '<td class="col-criterion mobile-span-2" data-label="Criterion">' + escapeHtml(r.criterion) + '</td>' +
+              '<td class="col-weight" data-label="Weight (%)">' +
+                '<div class="weight-input-wrap">' +
+                  '<input type="number" step="0.5" min="0" class="grid-input" data-grid="main" data-row="' + i + '" data-field="weight" value="' + escapeAttr(wVal) + '" aria-label="' + escapeAttr(r.criterion + ' Weight Percent') + '">' +
+                  '<span class="pct-suffix" aria-hidden="true">%</span>' +
+                '</div>' +
+              '</td>' +
+              '<td class="col-score" data-label="Option A — SAMPLE"><input type="number" step="1" class="grid-input" data-grid="main" data-row="' + i + '" data-col="0" value="' + escapeAttr(r.mainScores[0]) + '" aria-label="' + escapeAttr(r.criterion + ' Option A Score') + '"></td>' +
+              '<td class="col-score" data-label="Option B — SAMPLE"><input type="number" step="1" class="grid-input" data-grid="main" data-row="' + i + '" data-col="1" value="' + escapeAttr(r.mainScores[1]) + '" aria-label="' + escapeAttr(r.criterion + ' Option B Score') + '"></td>' +
+              '<td class="col-score" data-label="Option C — SAMPLE"><input type="number" step="1" class="grid-input" data-grid="main" data-row="' + i + '" data-col="2" value="' + escapeAttr(r.mainScores[2]) + '" aria-label="' + escapeAttr(r.criterion + ' Option C Score') + '"></td>' +
+              '<td class="col-measures mobile-span-2" data-label="What this criterion measures">' + escapeHtml(r.measures) + '</td>' +
+            '</tr>';
+
+          vendorHtml +=
+            '<tr>' +
+              '<td class="col-criterion mobile-span-2" data-label="Criterion">' + escapeHtml(r.criterion) + '</td>' +
+              '<td class="col-weight" data-label="Weight (Linked)"><span class="linked-weight-cell" id="linked-weight-' + i + '">' + escapeHtml(formatPct(safeNum(r.weightPct))) + '</span></td>' +
+              '<td class="col-score" data-label="Sample Vendor A"><input type="number" step="1" class="grid-input" data-grid="vendor" data-row="' + i + '" data-col="0" value="' + escapeAttr(r.vendorScores[0]) + '" aria-label="' + escapeAttr(r.criterion + ' Sample Vendor A Score') + '"></td>' +
+              '<td class="col-score" data-label="Sample Vendor B"><input type="number" step="1" class="grid-input" data-grid="vendor" data-row="' + i + '" data-col="1" value="' + escapeAttr(r.vendorScores[1]) + '" aria-label="' + escapeAttr(r.criterion + ' Sample Vendor B Score') + '"></td>' +
+              '<td class="col-score" data-label="Sample Vendor C"><input type="number" step="1" class="grid-input" data-grid="vendor" data-row="' + i + '" data-col="2" value="' + escapeAttr(r.vendorScores[2]) + '" aria-label="' + escapeAttr(r.criterion + ' Sample Vendor C Score') + '"></td>' +
+              '<td class="col-measures mobile-span-2" data-label="What this criterion measures">' + escapeHtml(r.measures) + '</td>' +
+            '</tr>';
+        }
+
+        mainTbody.innerHTML = mainHtml;
+        vendorTbody.innerHTML = vendorHtml;
+      }
+
+      function renderGridFooter(tfootEl, gridData, weightTotalPct, isWeightOk, checkString, winnerHeadingLabel, checkRowDesc) {
+        var checkClass = isWeightOk ? "is-ok" : "is-warn";
+        var html =
+          '<tr class="row-total-weights">' +
+            '<th scope="row">Weight total — must be 100%</th>' +
+            '<td class="foot-num mobile-span-full" data-label="Weight total">' + escapeHtml(formatPct(weightTotalPct)) + '</td>' +
+            '<td colspan="4" class="mobile-span-full" data-label="Weight check">' +
+              '<span class="check-badge ' + checkClass + '">' + escapeHtml(checkString) + '</span>' +
+            '</td>' +
+          '</tr>' +
+          '<tr class="row-composite">' +
+            '<th scope="row">Weighted Composite Score (0–100)</th>' +
+            '<td class="foot-desc mobile-span-full">' + escapeHtml(checkRowDesc) + '</td>' +
+            '<td class="foot-num ' + (gridData.winnerIdx === 0 ? "is-winner-cell" : "") + '" data-label="' + escapeAttr(gridData.labels[0]) + '">' + formatTwoDecimals(gridData.composites[0]) + '</td>' +
+            '<td class="foot-num ' + (gridData.winnerIdx === 1 ? "is-winner-cell" : "") + '" data-label="' + escapeAttr(gridData.labels[1]) + '">' + formatTwoDecimals(gridData.composites[1]) + '</td>' +
+            '<td class="foot-num ' + (gridData.winnerIdx === 2 ? "is-winner-cell" : "") + '" data-label="' + escapeAttr(gridData.labels[2]) + '">' + formatTwoDecimals(gridData.composites[2]) + '</td>' +
+            '<td class="foot-desc mobile-span-full">Composite = SUMPRODUCT of weights and scores.</td>' +
+          '</tr>' +
+          '<tr class="row-rank">' +
+            '<th scope="row">Rank</th>' +
+            '<td class="foot-desc mobile-span-full">Descending</td>' +
+            '<td class="foot-num ' + (gridData.ranks[0] === 1 ? "is-winner-cell" : "") + '" data-label="' + escapeAttr(gridData.labels[0] + " Rank") + '">' + gridData.ranks[0] + '</td>' +
+            '<td class="foot-num ' + (gridData.ranks[1] === 1 ? "is-winner-cell" : "") + '" data-label="' + escapeAttr(gridData.labels[1] + " Rank") + '">' + gridData.ranks[1] + '</td>' +
+            '<td class="foot-num ' + (gridData.ranks[2] === 1 ? "is-winner-cell" : "") + '" data-label="' + escapeAttr(gridData.labels[2] + " Rank") + '">' + gridData.ranks[2] + '</td>' +
+            '<td class="foot-desc mobile-span-full">1 = highest composite score (ties share top rank).</td>' +
+          '</tr>' +
+          '<tr class="row-winner">' +
+            '<th scope="row">' + escapeHtml(winnerHeadingLabel) + '</th>' +
+            '<td colspan="3" class="winner-pill mobile-span-full" data-label="Winning option">' + escapeHtml(gridData.winnerLabel) + '</td>' +
+            '<td class="foot-num mobile-span-full" data-label="Winning score">' + formatTwoDecimals(gridData.winnerScore) + '</td>' +
+            '<td class="foot-desc mobile-span-full">Highest composite wins (first in column order on tie).</td>' +
+          '</tr>';
+
+        tfootEl.innerHTML = html;
+      }
+
+      function renderMiniBars(containerId, gridData) {
+        var el = document.getElementById(containerId);
+        var maxScore = Math.max(100, gridData.composites[0], gridData.composites[1], gridData.composites[2]);
+        var html = "";
+        for (var i = 0; i < 3; i++) {
+          var score = gridData.composites[i];
+          var pct = Math.max(0, Math.min(100, (score / maxScore) * 100));
+          var isLeader = gridData.ranks[i] === 1;
+          html +=
+            '<div class="mini-bar-row' + (isLeader ? " is-leader" : "") + '">' +
+              '<span class="mini-bar-name">' + escapeHtml(gridData.labels[i]) + ' (#' + gridData.ranks[i] + ')</span>' +
+              '<div class="mini-bar-track" aria-hidden="true"><div class="mini-bar-fill" style="width: ' + pct.toFixed(1) + '%;"></div></div>' +
+              '<span class="mini-bar-val">' + formatTwoDecimals(score) + '</span>' +
+            '</div>';
+        }
+        el.innerHTML = html;
+      }
+
+      function syncPresetButtons() {
+        function weightsMatch(arr) {
+          return stateRows.every(function (r, idx) { return Math.abs(safeNum(r.weightPct) - arr[idx]) < 1e-9; });
+        }
+        function mainMatches(fn) {
+          return stateRows.every(fn);
+        }
+        function vendorMatchesBase() {
+          return stateRows.every(function (r, idx) {
+            return r.vendorScores.every(function (v, c) { return safeNum(v) === INITIAL_ROWS[idx].vendorScores[c]; });
+          });
+        }
+        var baseWeights = INITIAL_ROWS.map(function (r) { return r.weightPct; });
+        var mainAllBase = mainMatches(function (r, idx) {
+          return r.mainScores.every(function (v, c) { return safeNum(v) === INITIAL_ROWS[idx].mainScores[c]; });
+        });
+
+        var isSample = weightsMatch(baseWeights) && mainAllBase && vendorMatchesBase();
+        var isWeightBreak = weightsMatch([25, 20, 15, 12.5, 10, 5, 2.5, 5]) && mainAllBase && vendorMatchesBase();
+        var isWinnerFlip = weightsMatch(baseWeights) && vendorMatchesBase() && mainMatches(function (r, idx) {
+          return r.mainScores.every(function (v, c) {
+            if (idx === 0 && c === 1) return safeNum(v) === 40;
+            return safeNum(v) === INITIAL_ROWS[idx].mainScores[c];
+          });
+        });
+        var isSharedWeights = weightsMatch([25, 20, 15, 12.5, 10, 5, 2.5, 10]) && mainAllBase && vendorMatchesBase();
+        var isTie = weightsMatch(baseWeights) && vendorMatchesBase() && mainMatches(function (r, idx) {
+          return safeNum(r.mainScores[0]) === INITIAL_ROWS[idx].mainScores[0] &&
+            safeNum(r.mainScores[1]) === INITIAL_ROWS[idx].mainScores[1] &&
+            safeNum(r.mainScores[2]) === INITIAL_ROWS[idx].mainScores[0];
+        });
+        var isZeroWeights = weightsMatch([0, 0, 0, 0, 0, 0, 0, 0]) && mainAllBase && vendorMatchesBase();
+
+        document.getElementById("preset-sample").classList.toggle("is-active", isSample);
+        document.getElementById("preset-weight-break").classList.toggle("is-active", isWeightBreak);
+        document.getElementById("preset-winner-flip").classList.toggle("is-active", isWinnerFlip);
+        document.getElementById("preset-shared-weights").classList.toggle("is-active", isSharedWeights);
+        document.getElementById("preset-tie").classList.toggle("is-active", isTie);
+        document.getElementById("preset-zero-weights").classList.toggle("is-active", isZeroWeights);
+      }
+
+      function renderOutputs(ev) {
+        // Update linked weights in Worked Example body
+        for (var i = 0; i < stateRows.length; i++) {
+          var lw = document.getElementById("linked-weight-" + i);
+          if (lw) lw.textContent = formatPct(safeNum(stateRows[i].weightPct));
+        }
+
+        // Top Verdict Strip
+        document.getElementById("verdict-main-winner").textContent = ev.main.winnerLabel;
+        document.getElementById("verdict-main-score").textContent = formatTwoDecimals(ev.main.winnerScore);
+        renderMiniBars("verdict-main-bars", ev.main);
+
+        document.getElementById("verdict-vendor-winner").textContent = ev.vendor.winnerLabel;
+        document.getElementById("verdict-vendor-score").textContent = formatTwoDecimals(ev.vendor.winnerScore);
+        renderMiniBars("verdict-vendor-bars", ev.vendor);
+
+        var checkCard = document.getElementById("verdict-check-card");
+        checkCard.className = "verdict-card verdict-check-card " + (ev.isWeightOk ? "is-pass" : "is-warn");
+        document.getElementById("verdict-check-text").textContent = ev.checkString;
+        document.getElementById("verdict-weight-total").textContent = formatPct(ev.weightTotalPct);
+        document.getElementById("verdict-check-note").textContent = ev.isWeightOk
+          ? "Single-source weights total 100% across both Decision Scoring Tool and Worked Example."
+          : "Composites are not comparable until shared weights add up to 100%.";
+
+        // Sticky Summary Strip
+        document.getElementById("sticky-main").textContent = ev.main.winnerLabel + " (" + formatTwoDecimals(ev.main.winnerScore) + ")";
+        document.getElementById("sticky-vendor").textContent = ev.vendor.winnerLabel + " (" + formatTwoDecimals(ev.vendor.winnerScore) + ")";
+        var stickyCheck = document.getElementById("sticky-check");
+        stickyCheck.textContent = (ev.isWeightOk ? "OK" : "WARNING") + " (" + formatPct(ev.weightTotalPct) + ")";
+        stickyCheck.className = ev.isWeightOk ? "summary-ok" : "summary-warn";
+
+        // Table Footers
+        renderGridFooter(
+          mainTfoot,
+          ev.main,
+          ev.weightTotalPct,
+          ev.isWeightOk,
+          ev.checkString,
+          "Highest composite — main option",
+          "Shared Weights"
+        );
+        renderGridFooter(
+          vendorTfoot,
+          ev.vendor,
+          ev.weightTotalPct,
+          ev.isWeightOk,
+          ev.checkString,
+          "Highest composite — vendor",
+          "Linked Weights"
+        );
+
+        // Decision Brief (criteria & weights first -> main grid -> worked example -> weight check state last; zero sales line)
+        var lines = [];
+        lines.push("WEIGHTED DECISION SCORING — DECISION BRIEF");
+        lines.push("==========================================");
+        lines.push("");
+        lines.push("CRITERIA & SHARED WEIGHTS");
+        for (var k = 0; k < stateRows.length; k++) {
+          lines.push("- " + stateRows[k].criterion + ": " + formatPct(safeNum(stateRows[k].weightPct)));
+        }
+        lines.push("Weight Total: " + formatPct(ev.weightTotalPct));
+        lines.push("");
+        lines.push("MAIN SCORING GRID (OPTIONS A / B / C)");
+        for (var m = 0; m < 3; m++) {
+          lines.push("- " + ev.main.labels[m] + ": Composite " + formatTwoDecimals(ev.main.composites[m]) + " | Rank " + ev.main.ranks[m]);
+        }
+        lines.push("Main Winner: " + ev.main.winnerLabel + " (" + formatTwoDecimals(ev.main.winnerScore) + ")");
+        lines.push("");
+        lines.push("WORKED EXAMPLE — VENDOR EVALUATION (SHARED WEIGHTS)");
+        for (var v = 0; v < 3; v++) {
+          lines.push("- " + ev.vendor.labels[v] + ": Composite " + formatTwoDecimals(ev.vendor.composites[v]) + " | Rank " + ev.vendor.ranks[v]);
+        }
+        lines.push("Vendor Winner: " + ev.vendor.winnerLabel + " (" + formatTwoDecimals(ev.vendor.winnerScore) + ")");
+        lines.push("");
+        lines.push("WEIGHT CHECK STATE");
+        lines.push(ev.checkString);
+
+        briefPre.textContent = lines.join("\n");
+        syncPresetButtons();
+      }
+
+      function fullRender() {
+        renderGridBodies();
+        renderOutputs(evaluateModel(stateRows));
+      }
+
+      function softRender() {
+        renderOutputs(evaluateModel(stateRows));
+      }
+
+      function applyPreset(name) {
+        stateRows = cloneRows(INITIAL_ROWS);
+        if (name === "weight-break") {
+          stateRows[0].weightPct = 25;
+        } else if (name === "winner-flip") {
+          stateRows[0].mainScores[1] = 40;
+        } else if (name === "shared-weights") {
+          stateRows[0].weightPct = 25;
+          stateRows[7].weightPct = 10;
+        } else if (name === "tie") {
+          for (var i = 0; i < stateRows.length; i++) {
+            stateRows[i].mainScores[2] = stateRows[i].mainScores[0];
+          }
+        } else if (name === "zero-weights") {
+          for (var z = 0; z < stateRows.length; z++) {
+            stateRows[z].weightPct = 0;
+          }
+        }
+        copyFeedback.textContent = "";
+        fullRender();
+      }
+
+      function handleGridInput(e) {
+        var el = e.target;
+        var grid = el.getAttribute("data-grid");
+        var rowAttr = el.getAttribute("data-row");
+        if (!grid || rowAttr === null) return;
+        var rowIdx = parseInt(rowAttr, 10);
+        if (!stateRows[rowIdx]) return;
+
+        var rawVal = el.value === "" ? "" : safeNum(el.value);
+        if (grid === "main") {
+          if (el.getAttribute("data-field") === "weight") {
+            stateRows[rowIdx].weightPct = rawVal;
+          } else {
+            var colIdx = parseInt(el.getAttribute("data-col"), 10);
+            stateRows[rowIdx].mainScores[colIdx] = rawVal;
+          }
+        } else if (grid === "vendor") {
+          var vColIdx = parseInt(el.getAttribute("data-col"), 10);
+          stateRows[rowIdx].vendorScores[vColIdx] = rawVal;
+        }
+        copyFeedback.textContent = "";
+        softRender();
+      }
+
+      mainTbody.addEventListener("input", handleGridInput);
+      mainTbody.addEventListener("change", handleGridInput);
+      vendorTbody.addEventListener("input", handleGridInput);
+      vendorTbody.addEventListener("change", handleGridInput);
+
+      var presetButtons = document.querySelectorAll("[data-preset]");
+      for (var p = 0; p < presetButtons.length; p++) {
+        presetButtons[p].addEventListener("click", function (e) {
+          applyPreset(e.currentTarget.getAttribute("data-preset"));
+        });
+      }
+
+      document.getElementById("btn-reset").addEventListener("click", function () {
+        applyPreset("sample");
+        copyFeedback.textContent = "Weights and scores reset to sample state.";
+      });
+
+      document.getElementById("btn-copy-brief").addEventListener("click", function () {
+        var textToCopy = briefPre.textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(textToCopy).then(
+            function () { copyFeedback.textContent = "Copied Decision Brief to clipboard."; },
+            function () { fallbackCopy(textToCopy); }
+          );
+        } else {
+          fallbackCopy(textToCopy);
+        }
+      });
+
+      function fallbackCopy(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "0";
+        ta.style.left = "0";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+          copyFeedback.textContent = "Copied Decision Brief to clipboard.";
+        } catch (err) {
+          copyFeedback.textContent = "Select the brief text below and press Ctrl+C / Cmd+C.";
+        }
+        document.body.removeChild(ta);
+      }
+
+      function runVerificationBattery() {
+        // 0. Sample state
+        var s0 = evaluateModel(cloneRows(INITIAL_ROWS));
+        console.assert(s0.weightTotalPct === 100 && s0.checkString === OK_STRING, "Sample weight check fail");
+        console.assert(formatTwoDecimals(s0.main.composites[0]) === "75.45" && formatTwoDecimals(s0.main.composites[1]) === "85.20" && formatTwoDecimals(s0.main.composites[2]) === "65.45", "Sample main composites fail");
+        console.assert(s0.main.ranks[0] === 2 && s0.main.ranks[1] === 1 && s0.main.ranks[2] === 3 && s0.main.winnerLabel === "Option B \u2014 SAMPLE", "Sample main ranks/winner fail");
+        console.assert(formatTwoDecimals(s0.vendor.composites[0]) === "82.55" && Math.abs(s0.vendor.composites[1] - 79.175) < 1e-9 && Math.abs(s0.vendor.composites[2] - 77.775) < 1e-9, "Sample vendor precision fail");
+        console.assert(formatTwoDecimals(s0.vendor.composites[1]) === "79.18" && formatTwoDecimals(s0.vendor.composites[2]) === "77.78", "Sample vendor 2-dec display fail");
+        console.assert(s0.vendor.ranks[0] === 1 && s0.vendor.ranks[1] === 2 && s0.vendor.ranks[2] === 3 && s0.vendor.winnerLabel === "Sample Vendor A", "Sample vendor ranks/winner fail");
+
+        // 1. Boundary (1): Weight-Break (Overall Satisfaction 30% -> 25%)
+        var b1Rows = cloneRows(INITIAL_ROWS);
+        b1Rows[0].weightPct = 25;
+        var b1 = evaluateModel(b1Rows);
+        console.assert(b1.weightTotalPct === 95 && b1.checkString === WARN_STRING, "B1 weight check fail");
+        console.assert(formatTwoDecimals(b1.main.composites[0]) === "71.45" && formatTwoDecimals(b1.main.composites[1]) === "80.70" && formatTwoDecimals(b1.main.composites[2]) === "61.95" && b1.main.winnerLabel === "Option B \u2014 SAMPLE", "B1 main fail");
+        console.assert(formatTwoDecimals(b1.vendor.composites[0]) === "78.15" && Math.abs(b1.vendor.composites[1] - 75.475) < 1e-9 && Math.abs(b1.vendor.composites[2] - 73.725) < 1e-9 && b1.vendor.winnerLabel === "Sample Vendor A", "B1 vendor fail");
+
+        // 2. Boundary (2): Winner-Flip (Option B Overall Satisfaction 90 -> 40)
+        var b2Rows = cloneRows(INITIAL_ROWS);
+        b2Rows[0].mainScores[1] = 40;
+        var b2 = evaluateModel(b2Rows);
+        console.assert(formatTwoDecimals(b2.main.composites[1]) === "70.20" && b2.main.winnerLabel === "Option A \u2014 SAMPLE" && formatTwoDecimals(b2.main.winnerScore) === "75.45", "B2 main flip fail");
+        console.assert(b2.main.ranks[0] === 1 && b2.main.ranks[1] === 2 && b2.main.ranks[2] === 3, "B2 ranks fail");
+        console.assert(formatTwoDecimals(b2.vendor.composites[0]) === "82.55" && b2.vendor.winnerLabel === "Sample Vendor A", "B2 vendor untouched fail");
+
+        // 3. Boundary (3): Shared-Weights (Overall Satisfaction 30% -> 25% AND Binary Success Metrics 5% -> 10%)
+        var b3Rows = cloneRows(INITIAL_ROWS);
+        b3Rows[0].weightPct = 25;
+        b3Rows[7].weightPct = 10;
+        var b3 = evaluateModel(b3Rows);
+        console.assert(b3.weightTotalPct === 100 && b3.checkString === OK_STRING, "B3 check fail");
+        console.assert(formatTwoDecimals(b3.main.composites[0]) === "75.70" && formatTwoDecimals(b3.main.composites[1]) === "85.20" && formatTwoDecimals(b3.main.composites[2]) === "65.70", "B3 main fail");
+        console.assert(formatTwoDecimals(b3.vendor.composites[0]) === "82.65" && Math.abs(b3.vendor.composites[1] - 78.875) < 1e-9 && Math.abs(b3.vendor.composites[2] - 77.375) < 1e-9, "B3 vendor fail");
+
+        // 4. Boundary (4): Tie (Option C set equal to Option A)
+        var b4Rows = cloneRows(INITIAL_ROWS);
+        for (var i = 0; i < b4Rows.length; i++) b4Rows[i].mainScores[2] = b4Rows[i].mainScores[0];
+        var b4 = evaluateModel(b4Rows);
+        console.assert(formatTwoDecimals(b4.main.composites[2]) === "75.45" && b4.main.ranks[0] === 2 && b4.main.ranks[1] === 1 && b4.main.ranks[2] === 2 && b4.main.winnerLabel === "Option B \u2014 SAMPLE", "B4 tie fail");
+
+        // Tie for first check (Option A set equal to Option B -> first column wins)
+        var t1Rows = cloneRows(INITIAL_ROWS);
+        for (var j = 0; j < t1Rows.length; j++) t1Rows[j].mainScores[0] = t1Rows[j].mainScores[1];
+        var t1 = evaluateModel(t1Rows);
+        console.assert(t1.main.ranks[0] === 1 && t1.main.ranks[1] === 1 && t1.main.ranks[2] === 3 && t1.main.winnerLabel === "Option A \u2014 SAMPLE", "First-match tie fail");
+
+        // 5. Boundary (5): Zero weights (all 8 weights = 0)
+        var b5Rows = cloneRows(INITIAL_ROWS);
+        for (var z = 0; z < b5Rows.length; z++) b5Rows[z].weightPct = 0;
+        var b5 = evaluateModel(b5Rows);
+        console.assert(b5.weightTotalPct === 0 && b5.checkString === WARN_STRING, "B5 weight check fail");
+        console.assert(
+          b5.main.composites.every(function (v) { return v === 0 && !isNaN(v); }) &&
+          b5.vendor.composites.every(function (v) { return v === 0 && !isNaN(v); }) &&
+          b5.main.ranks.every(function (r) { return r === 1; }) &&
+          b5.vendor.ranks.every(function (r) { return r === 1; }) &&
+          b5.main.winnerLabel === "Option A \u2014 SAMPLE" &&
+          b5.vendor.winnerLabel === "Sample Vendor A",
+          "B5 zero weights fail"
+        );
+
+        // 6. Cleared / blank input check (no NaN)
+        var clRows = cloneRows(INITIAL_ROWS);
+        clRows[0].weightPct = "";
+        clRows[1].mainScores[0] = "";
+        var cl = evaluateModel(clRows);
+        console.assert(!isNaN(cl.weightTotalPct) && !isNaN(cl.main.composites[0]) && !isNaN(cl.vendor.composites[0]), "Cleared input NaN fail");
+      }
+
+      fullRender();
+      runVerificationBattery();
+    })();
+  </script>
+</body>
+</html>
