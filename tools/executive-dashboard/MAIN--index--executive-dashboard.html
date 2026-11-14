@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<!--
+ARGON MANIFEST: TOOL 12 FULL REBUILD — Executive Dashboard (S6-P04.b)
+====================================================================
+
+1. SELF-CHECK AGAINST GROUND-TRUTH ANCHORS (WORKBOOK LOGIC + BOUNDARY CASES)
+   - Math / Logic Alterations vs. Source Workbook:
+     * None. Zero alterations were made to the workbook's formulas or definitions.
+     * Both backlog definitions from the workbook are preserved verbatim and labeled side by side without silent reconciliation:
+       - Headline KPI card ("Open + In Progress (backlog)"): counts Status = "Open" + Status = "In Progress" (excludes Escalated).
+       - Regional Performance table ("Backlog"): counts Status <> "Closed" per region (includes Escalated).
+     * Missing / invalid input handling (per Part C input rules):
+       - A Closed-status row with no valid Closed date (or no valid Opened date) reads Age = 0 until valid dates are entered (never NaN).
+       - An open/in-progress/escalated row with no valid Opened date reads Age = 0 (never NaN).
+       - A cleared or invalid SLA Target reads as 0 (never NaN).
+       - Empty register (0 rows): Total = 0, Escalation rate = 0.0%, Avg resolution / age = 0.0, all regional counts = 0, regional Avg Days = 0.0.
+     * Calendar-day calculation: uses exact UTC calendar-day integer math (Date.UTC(y, m - 1, d) / 86400000) from the visitor's local YYYY-MM-DD date so DST transitions never introduce fractional or off-by-one day drift.
+
+   - Self-Check Reference Date for Date-Pinned Anchors: 2026-11-11
+     (Live page uses the visitor's current local date dynamically, carrying an "as of YYYY-MM-DD" marker on the two age-driven KPI cards.)
+
+   - Fixed Anchors (true on any date):
+     * Total case volume = 36
+     * Open = 9 · In Progress = 12 · Open + In Progress (backlog) = 21
+     * Escalated = 3 · Closed = 12 · Escalation rate = 8.3%
+     * Regional fixed anchors (Total / Backlog [not-Closed] / Escalated / Closed):
+       - AMER West: 6 / 2 / 0 / 4
+       - AMER East: 7 / 5 / 0 / 2
+       - AMER Central: 8 / 7 / 1 / 1
+       - EMEA: 4 / 4 / 2 / 0
+       - APAC: 11 / 6 / 0 / 5
+
+   - Date-Pinned Anchors (verified at reference date 2026-11-11):
+     * SLA breaches = 28 · Avg resolution / age (days) = 35.1
+     * Regional Breaches: AMER West 3 · AMER East 6 · AMER Central 8 · EMEA 4 · APAC 7 (sum = 28)
+     * Regional Avg Days: AMER West 24.7 · AMER East 35.9 · AMER Central 41.9 · EMEA 55.8 · APAC 27.8
+
+   - Boundary Cases (verified at reference date 2026-11-11 AND verified dynamically at visitor's current date):
+     * (1) Close CASE-1004 (Status = "Closed", Closed = reference date 2026-11-11):
+       - Headline Open + In Progress (backlog) = 20 · Closed = 13
+       - AMER East Regional Backlog = 4 · Closed = 3 · Avg Days = 35.9 (unchanged at reference date)
+     * (2) Escalate CASE-1002 (Status "In Progress" -> "Escalated"):
+       - Escalated = 4 · Escalation rate = 11.1% · Headline Open + In Progress (backlog) = 20
+       - APAC Regional Backlog stays 6 (not-Closed count includes Escalated) · APAC Escalated = 1
+     * (3) Widen CASE-1033 SLA Target (2 -> 40):
+       - CASE-1033 age at 2026-11-11 = 27 <= 40 -> SLA Flag flips to "Within SLA"
+       - Headline SLA breaches = 27 · AMER East Regional Breaches = 5
+
+   - Reconciliation Invariants & Edge Battery (verified via console.assert battery on load):
+     * Sum of 5 Regional Totals === Headline Total case volume (36)
+     * Sum of 5 Regional Closed === Headline Closed (12)
+     * Sum of 5 Regional Breaches === Headline SLA breaches (28 at 2026-11-11)
+     * Add-case, delete-case, status/region/target edits, missing Closed date on Closed row, cleared SLA Target, empty register (0 rows), and Reset to Sample all produce finite numbers with zero NaN and preserved invariants.
+
+2. IMPROVEMENTS MADE:
+   - Explicit Reconciliation Audit Strip on Regional Performance: Added a live footer row and audit strip beneath the Regional Performance table showing the summed Total, Closed, and Breaches across all five regions alongside an explicit status breakdown (Open: 9 · In Progress: 12 · Escalated: 3 · Closed: 12) so visitors can verify every cross-table invariant in one glance without mentally adding columns.
+   - Definition-Divergence Callout: Placed a clear, plain-language callout directly inside the Regional Performance section highlighting why Regional Backlog (not-Closed, 24) differs from Headline Backlog (Open + In Progress, 21) so executives and operators never mistake two intentional workbook formulas for a discrepancy.
+   - Live Breach Visual Flagging & One-Tap Presets: Flagged breaching rows cleanly with semantic left borders and contrast-safe BREACH / Within SLA badges, paired with active-state detection on the one-tap scenario presets (Close CASE-1004, Escalate CASE-1002, Widen CASE-1033 Target, Reset to Sample).
+   - Copyable Dashboard Brief: Built a structured, plain-text Dashboard Brief (7 headline KPIs, 5 regional performance lines, and all currently breaching Case IDs) with clipboard copy and fallback textarea selection.
+
+3. RESPONSIVE MODES & FLUID-FIRST SWEEP (280px - 1280px):
+   - Desktop Mode (> 720px): 7 live KPI cards laid out cleanly across the top strip with "as of" date badges on the two age-driven cards; full 7-column Regional Performance table with reconciliation footer; wide 12-column Case Register table (11 workbook columns + Delete control) inside a contained `.table-scroll-wrap` container so the page itself never overflows horizontally; 2-column Dashboard Brief + Inputs/Logic/Limits and 2-column Explainer layout.
+   - Phone Mode (<= 720px): KPI cards stack vertically with CSS `order` promoting Open + In Progress (backlog) and SLA breaches to the top of the stack; Regional Performance table reflows via pure CSS into per-region labeled cards; Case Register reflows via pure CSS into per-case labeled cards with >= 44px touch targets and 16px inputs/selects; visually hidden accessible `.sr-only` pattern on `thead` (zero `display:none` content); fixed bottom Sticky Summary Strip showing Backlog · Breaches · Escalation rate and a jump link to `#section-brief`.
+   - Fluid-First Sweep (280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS px): Built strictly with relative units, `minmax(0, 1fr)`, `clamp()`, `min-width: 0`, `overflow-wrap: anywhere`, and single-column fallback `<= 380px` for zero horizontal page scroll across every width on the ladder.
+
+4. PART E — SEO INTEGRITY COMPLIANCE & GOAL-VS-SPEC NOTES:
+   - Part E Compliance: 100% compliant. Zero `display: none` content blocks, zero hidden text or links, zero white-on-white, zero off-screen positioning, zero zero-size text, zero keyword stuffing, zero cloaking or doorway pages. Screen-reader-only clipping is used solely on visually-reflowed mobile `thead` cells where visible `data-label` labels appear on every card field.
+   - Standing No-Selling Compliance: The superseded page's "Next — Put this to work on a real operation." booking section and all calendar/pricing links are retired and absent. Deal Check is linked solely as a plain descriptive link among related Proof of Work links (`../deal-check/`).
+   - Goal-vs-Spec Conflicts: None. Both backlog definitions are preserved as specified by the workbook and Part C.
+-->
+<!--
+     LABEL — S6-P04.b — Executive Dashboard (tool page;
+     Tool / piece ID: Tool 12 — Executive Dashboard, version TOOL 12.1,
+     address: /tools/executive-dashboard/)
+     What this page holds: the Argon full rebuild (Nov 13, 2026)
+     of Tool 12 — an executive dashboard over a live case
+     register: seven headline KPIs computed from the register
+     (total case volume; Open + In Progress backlog; escalated;
+     closed; escalation rate; average resolution / age; SLA
+     breaches), a Regional Performance table rolling the same
+     register up by region, the full 36-case register as the
+     editable working layer (status / region / queue / type /
+     priority selects, dates, SLA targets; age and SLA flag
+     computed), a copyable Dashboard Brief, and one-tap
+     scenario presets. Self-contained: no external data file,
+     no formula engine.
+     MATH PROVENANCE: the workbook's logic, UNALTERED (Argon
+     manifest) — Age = Closed minus Opened when Closed, else
+     TODAY() minus Opened (whole days, visitor's local date);
+     Flag = BREACH when Age is strictly greater than target.
+     Headline backlog = Open + In Progress ONLY (the
+     dashboard sheet's formula); the regional Backlog column
+     counts every not-Closed case (the Regional Performance
+     sheet's COUNTIFS) — the workbook carries both definitions
+     and the page names the difference instead of reconciling
+     it. Escalation rate = ROUND(Escalated / Total x 100, 1)
+     with a zero-total guard; averages rounded to one decimal.
+     Workbook: "Executive Dashboard — SAMPLE.xlsx", an
+     EQUIVALENT SAMPLE built Oct 2026 to pair with the
+     Executive Dashboard portfolio PDF (the original dashboard
+     was built in a CRM system; no workbook version existed;
+     the CRM's raw export is not in the workbook and is never
+     displayed — provenance stated on the page).
+     VERIFICATION (Muse, Nov 13, 2026): independent DOM
+     battery 74/74 with the clock frozen at the workbook
+     reference date 2026-11-11 — all 36 register rows
+     cell-for-cell vs the workbook (fields, computed ages and
+     flags), all seven KPIs, all 30 regional figures, the
+     reconciliation sums, brief, sticky strip, the three
+     preset boundary cases, a manual region-edit probe, and
+     reset — zero page errors; standing-law scan clean; width
+     ladder 280-1280 zero overflow; screenshots both modes.
+     SUPERSEDES the first-generation workbook-embed build
+     (retired data.js pattern); that build is archived in
+     tool12-build/original-live-copy-2026-11-13/ and on the
+     GitHub branch tool-12-iterations. Map: site/CODE-MAP.md
+     ("tools/executive-dashboard/"). Rule: any change here is
+     recorded in site/CHANGELOG.md with the CODE-MAP and this
+     folder's LABEL.md updated in the same change (Code
+     Labeling System, Rule 3).
+     -->
+<!--
+     LABEL — S6-P04.b — Executive Dashboard (tool page;
+     Tool / piece ID: Tool 12 — Executive Dashboard,
+     address: /tools/executive-dashboard/)
+     -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+  <link rel="apple-touch-icon" href="../../favicon.svg" />
+  <title>Executive Dashboard — Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="Track seven live executive KPIs, a regional performance table, and an editable 36-case register with real-time SLA aging and breach flags.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/executive-dashboard/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Executive Dashboard — Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="Track seven live executive KPIs, a regional performance table, and an editable 36-case register with real-time SLA aging and breach flags.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/executive-dashboard/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/executive-dashboard/#webapp",
+        "name": "Executive Dashboard",
+        "url": "https://fractional-deal-desk-site.pages.dev/tools/executive-dashboard/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "All",
+        "description": "Live executive case operations dashboard computing seven headline KPIs, regional performance rollups, case aging, and SLA breach flags over an editable 36-case sample register.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Fractional Deal Desk & Contract Management",
+          "url": "https://fractional-deal-desk-site.pages.dev/"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/executive-dashboard/#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fractional-deal-desk-site.pages.dev/" },
+          { "@type": "ListItem", "position": 2, "name": "Proof of Work", "item": "https://fractional-deal-desk-site.pages.dev/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Executive Intelligence", "item": "https://fractional-deal-desk-site.pages.dev/tools/executive-intelligence/" },
+          { "@type": "ListItem", "position": 4, "name": "Executive Dashboard", "item": "https://fractional-deal-desk-site.pages.dev/tools/executive-dashboard/" }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --navy-900: #0F1E38;
+      --navy-800: #16294A;
+      --navy-700: #1F3760;
+      --brass-600: #8A661B;
+      --brass-500: #B5892E;
+      --brass-400: #D4AF5A;
+      --brass-100: #F7F1E1;
+      --paper-bg: #F8F7F4;
+      --paper-card: #FFFFFF;
+      --paper-alt: #F1EFEA;
+      --ink-900: #0F1E38;
+      --ink-700: #28364E;
+      --ink-600: #42526B;
+      --rule-color: #D5D0C5;
+      --rule-strong: #0F1E38;
+      --fail-bg: #FEF2F2;
+      --fail-ink: #7F1D1D;
+      --fail-border: #991B1B;
+      --pass-bg: #F0FDF4;
+      --pass-ink: #14532D;
+      --pass-border: #166534;
+      --font-serif: Georgia, "Times New Roman", Times, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { margin: 0; padding: 0; background-color: var(--paper-bg); color: var(--ink-900); font-family: var(--font-sans); line-height: 1.55; overflow-x: hidden; }
+    a { color: var(--navy-900); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover, a:focus-visible { color: var(--brass-600); }
+    button, input, select { font-family: inherit; border-radius: 0; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--brass-500); outline-offset: 2px; }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 clamp(0.65rem, 3vw, 2rem); }
+
+    /* HEADER & BREADCRUMB */
+    .site-header { background-color: var(--navy-900); color: #FFFFFF; border-bottom: 3px solid var(--brass-500); }
+    .header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; padding: 0.85rem 0; }
+    .brand-link { color: #FFFFFF; text-decoration: none; font-family: var(--font-serif); font-size: clamp(1rem, 2.2vw, 1.2rem); font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .brand-link:hover, .brand-link:focus-visible { color: var(--brass-400); }
+    .site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.85rem; }
+    .site-nav a { color: #E2E8F0; text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0.4rem; min-height: 44px; display: inline-flex; align-items: center; border-bottom: 2px solid transparent; }
+    .site-nav a:hover, .site-nav a:focus-visible, .site-nav a[aria-current="page"] { color: #FFFFFF; border-bottom-color: var(--brass-400); }
+
+    .breadcrumb-bar { background-color: var(--paper-alt); border-bottom: 1px solid var(--rule-color); font-size: 0.8125rem; }
+    .breadcrumb-list { list-style: none; margin: 0; padding: 0.5rem 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; color: var(--ink-700); }
+    .breadcrumb-list li { display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; overflow-wrap: anywhere; }
+    .breadcrumb-list li + li::before { content: "/"; color: var(--ink-600); }
+    .breadcrumb-list a { color: var(--ink-700); padding: 0.35rem 0.15rem; min-height: 36px; display: inline-flex; align-items: center; }
+    .breadcrumb-list [aria-current="page"] { color: var(--ink-900); font-weight: 600; }
+
+    /* HERO */
+    .hero-banner { background-color: var(--navy-900); color: #FFFFFF; padding: clamp(1.5rem, 4vw, 2.75rem) 0; border-bottom: 1px solid var(--rule-strong); }
+    .hero-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.85rem; }
+    .eyebrow-tag { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-400); font-weight: 600; }
+    .tool-badge { display: inline-block; background-color: var(--navy-800); border: 1px solid var(--brass-500); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; letter-spacing: 0.04em; }
+    .hero-title { font-family: var(--font-serif); font-size: clamp(1.55rem, 3.6vw, 2.35rem); line-height: 1.2; font-weight: 700; margin: 0 0 0.9rem 0; color: #FFFFFF; overflow-wrap: anywhere; }
+    .hero-lede { font-size: clamp(0.95rem, 1.6vw, 1.06rem); line-height: 1.62; color: #E2E8F0; max-width: 82ch; margin: 0 0 1.15rem 0; }
+    .provenance-strip { background-color: var(--navy-800); border-left: 3px solid var(--brass-500); padding: 0.85rem 1rem; font-size: 0.86rem; color: #E2E8F0; line-height: 1.55; max-width: 86ch; }
+    .provenance-strip strong { color: #FFFFFF; }
+
+    /* SECTIONS */
+    main { padding-bottom: 3rem; }
+    .section-block { padding: clamp(1.35rem, 3vw, 2.25rem) 0; border-bottom: 1px solid var(--rule-color); }
+    .section-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--navy-900); }
+    .section-title { font-family: var(--font-serif); font-size: clamp(1.2rem, 2.4vw, 1.5rem); font-weight: 700; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; }
+    .section-subtitle { font-size: 0.85rem; color: var(--ink-600); font-family: var(--font-mono); margin: 0; overflow-wrap: anywhere; }
+
+    /* 1. KPI STRIP */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem; }
+    .kpi-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 4px solid var(--navy-900); padding: clamp(0.85rem, 2vw, 1.1rem); display: flex; flex-direction: column; justify-content: space-between; gap: 0.45rem; min-width: 0; }
+    .kpi-card.is-brass { border-top-color: var(--brass-500); }
+    .kpi-card.is-warn { border-top-color: var(--fail-border); background-color: var(--fail-bg); }
+    .kpi-card.is-ok { border-top-color: var(--pass-border); background-color: var(--pass-bg); }
+    .kpi-label { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-700); font-weight: 700; overflow-wrap: anywhere; }
+    .kpi-value-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.35rem 0.65rem; }
+    .kpi-value { font-family: var(--font-serif); font-size: clamp(1.5rem, 2.8vw, 1.95rem); font-weight: 700; line-height: 1.15; color: var(--ink-900); font-variant-numeric: tabular-nums; }
+    .kpi-card.is-warn .kpi-value { color: var(--fail-ink); }
+    .kpi-card.is-ok .kpi-value { color: var(--pass-ink); }
+    .kpi-as-of { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.4rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); color: var(--ink-700); white-space: nowrap; }
+    .kpi-note { font-family: var(--font-mono); font-size: 0.73rem; color: var(--ink-600); margin: 0; overflow-wrap: anywhere; }
+    .kpi-card.is-warn .kpi-note { color: var(--fail-ink); }
+    .kpi-card.is-ok .kpi-note { color: var(--pass-ink); }
+
+    /* 2. REGIONAL PERFORMANCE */
+    .definition-note { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.88rem; color: var(--ink-900); }
+    .definition-note strong { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--navy-900); margin-right: 0.35rem; }
+
+    .table-scroll-wrap { width: 100%; max-width: 100%; overflow-x: auto; border: 1px solid var(--rule-strong); background-color: var(--paper-card); -webkit-overflow-scrolling: touch; }
+    .data-table { width: 100%; border-collapse: collapse; table-layout: auto; font-size: 0.86rem; }
+    .data-table thead th { background-color: var(--navy-900); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; text-align: left; padding: 0.7rem 0.6rem; border-right: 1px solid var(--navy-700); white-space: nowrap; }
+    .data-table thead th:last-child { border-right: 0; }
+    .data-table thead th.is-num { text-align: right; }
+    .data-table tbody tr { border-bottom: 1px solid var(--rule-color); background-color: var(--paper-card); }
+    .data-table tbody tr:nth-child(even) { background-color: #FAF9F6; }
+    .data-table tbody td { padding: 0.55rem 0.6rem; border-right: 1px solid var(--rule-color); vertical-align: middle; }
+    .data-table tbody td:last-child { border-right: 0; }
+    .data-table tbody td.is-num { text-align: right; font-family: var(--font-mono); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .data-table tbody td.col-region { font-weight: 700; color: var(--ink-900); white-space: nowrap; }
+    .data-table tbody td.has-breach { color: var(--fail-ink); background-color: var(--fail-bg); }
+
+    .data-table tfoot tr { border-top: 2px solid var(--rule-strong); background-color: var(--brass-100); }
+    .data-table tfoot th,
+    .data-table tfoot td { padding: 0.6rem; border-right: 1px solid var(--rule-color); font-weight: 700; color: var(--ink-900); }
+    .data-table tfoot td:last-child { border-right: 0; }
+    .data-table tfoot th { text-align: left; font-family: var(--font-serif); }
+    .data-table tfoot td.is-num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+    .audit-strip { margin-top: 0.75rem; background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.65rem 0.9rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; font-family: var(--font-mono); font-size: 0.76rem; color: var(--ink-700); }
+    .audit-pill { font-weight: 700; padding: 0.2rem 0.5rem; border: 1px solid var(--pass-border); background-color: var(--pass-bg); color: var(--pass-ink); }
+
+    /* DIRECTIONS & CONTROLS */
+    .directions-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--brass-500); padding: 0.9rem 1.1rem; margin-bottom: 1rem; font-size: 0.925rem; color: var(--ink-900); }
+    .directions-label { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brass-600); font-weight: 700; display: block; margin-bottom: 0.25rem; }
+    .directions-text { margin: 0; }
+
+    .control-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.65rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.75rem; margin-bottom: 0.85rem; }
+    .preset-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; }
+    .preset-group-label { font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: var(--ink-700); margin-right: 0.2rem; }
+    .btn-preset { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.45rem 0.75rem; font-size: 0.8rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
+    .btn-preset:hover, .btn-preset:focus-visible, .btn-preset.is-active { background-color: var(--navy-900); color: #FFFFFF; border-color: var(--navy-900); }
+    .action-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+    .btn-primary { background-color: var(--navy-900); color: #FFFFFF; border: 1px solid var(--navy-900); padding: 0.5rem 0.95rem; font-size: 0.84rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
+    .btn-primary:hover, .btn-primary:focus-visible { background-color: var(--brass-600); border-color: var(--brass-600); }
+    .btn-secondary { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.5rem 0.95rem; font-size: 0.84rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
+    .btn-secondary:hover, .btn-secondary:focus-visible { background-color: var(--navy-900); color: #FFFFFF; }
+
+    .status-breakdown-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.45rem 1rem; padding: 0.55rem 0.8rem; margin-bottom: 0.85rem; background-color: var(--paper-card); border: 1px solid var(--rule-color); font-family: var(--font-mono); font-size: 0.77rem; color: var(--ink-700); }
+    .status-breakdown-items { display: flex; flex-wrap: wrap; gap: 0.45rem 1rem; }
+
+    /* 3. CASE REGISTER */
+    .register-table { width: 100%; border-collapse: collapse; table-layout: auto; font-size: 0.82rem; }
+    .register-table thead th { background-color: var(--navy-900); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.69rem; text-transform: uppercase; letter-spacing: 0.04em; text-align: left; padding: 0.65rem 0.45rem; border-right: 1px solid var(--navy-700); white-space: nowrap; }
+    .register-table thead th:last-child { border-right: 0; }
+    .register-table thead th.is-num { text-align: right; }
+    .register-table tbody tr { border-bottom: 1px solid var(--rule-color); background-color: var(--paper-card); }
+    .register-table tbody tr:nth-child(even) { background-color: #FAF9F6; }
+    .register-table tbody tr.is-breach-row { border-left: 4px solid var(--fail-border); background-color: #FFFDFD; }
+    .register-table tbody tr.is-within-row { border-left: 4px solid var(--pass-border); }
+    .register-table tbody td { padding: 0.42rem 0.4rem; border-right: 1px solid var(--rule-color); vertical-align: middle; }
+    .register-table tbody td:last-child { border-right: 0; }
+
+    .reg-input,
+    .reg-select { width: 100%; min-height: 40px; border: 1px solid #B6B0A3; background-color: var(--brass-100); color: var(--ink-900); font-size: 0.81rem; font-weight: 600; padding: 0.3rem 0.4rem; }
+    .reg-input:focus,
+    .reg-select:focus { background-color: #FFFFFF; border-color: var(--navy-900); outline: 2px solid var(--brass-500); outline-offset: -1px; }
+    .reg-input.is-id { font-family: var(--font-mono); min-width: 96px; font-weight: 700; }
+    .reg-select.is-region { min-width: 118px; }
+    .reg-select.is-queue { min-width: 118px; }
+    .reg-select.is-type { min-width: 148px; }
+    .reg-select.is-priority { min-width: 108px; }
+    .reg-select.is-status { min-width: 110px; }
+    .reg-input.is-date { font-family: var(--font-mono); min-width: 126px; }
+    .reg-input.is-num { font-family: var(--font-mono); text-align: right; min-width: 66px; }
+
+    .computed-age { font-family: var(--font-mono); font-weight: 700; text-align: right; white-space: nowrap; font-size: 0.84rem; color: var(--ink-900); padding: 0 0.35rem; }
+    .sla-badge { display: inline-block; padding: 0.25rem 0.45rem; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; white-space: nowrap; border: 1px solid transparent; }
+    .sla-badge.is-breach { background-color: var(--fail-bg); color: var(--fail-ink); border-color: var(--fail-border); }
+    .sla-badge.is-within { background-color: var(--pass-bg); color: var(--pass-ink); border-color: var(--pass-border); }
+
+    .btn-delete-row { background-color: var(--paper-card); color: var(--fail-ink); border: 1px solid var(--fail-border); padding: 0.35rem 0.55rem; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; min-height: 40px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-delete-row:hover, .btn-delete-row:focus-visible { background-color: var(--fail-ink); color: #FFFFFF; }
+
+    .empty-register-note { padding: 1.25rem; text-align: center; font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-700); background-color: var(--paper-alt); }
+
+    /* 4. BRIEF & LIMITS */
+    .brief-layout { display: grid; grid-template-columns: 1.35fr 1fr; gap: 1.25rem; align-items: start; }
+    .brief-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); padding: clamp(0.9rem, 2vw, 1.25rem); min-width: 0; }
+    .brief-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .copy-status { font-family: var(--font-mono); font-size: 0.8rem; color: var(--pass-ink); font-weight: 700; }
+    .brief-pre { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.9rem; margin: 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; color: var(--ink-900); white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+
+    .limits-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 3px solid var(--navy-900); padding: clamp(0.9rem, 2vw, 1.25rem); font-size: 0.89rem; color: var(--ink-700); min-width: 0; }
+    .limits-card h3 { font-family: var(--font-serif); font-size: 1.08rem; margin: 0 0 0.6rem 0; color: var(--ink-900); }
+    .limits-card p { margin: 0 0 0.7rem 0; line-height: 1.55; }
+    .limits-card p:last-child { margin-bottom: 0; }
+    .limits-list { margin: 0.5rem 0 0 0; padding-left: 1.1rem; color: var(--ink-900); font-family: var(--font-mono); font-size: 0.77rem; display: flex; flex-direction: column; gap: 0.35rem; }
+
+    /* EXPLAINER */
+    .prose-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+    .prose-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: clamp(0.95rem, 2vw, 1.3rem); min-width: 0; }
+    .prose-card h3 { font-family: var(--font-serif); font-size: 1.06rem; margin: 0 0 0.55rem 0; color: var(--ink-900); }
+    .prose-card p { margin: 0; font-size: 0.93rem; line-height: 1.62; color: var(--ink-700); }
+
+    /* RELATED LINKS & STICKY SUMMARY & FOOTER */
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem; }
+    .related-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.9rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.4rem; min-width: 0; }
+    .related-card-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; color: var(--brass-600); font-weight: 700; }
+    .related-card a { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--ink-900); min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .related-card p { font-size: 0.83rem; color: var(--ink-700); margin: 0; }
+
+    .live-summary-bar { background-color: var(--navy-900); color: #FFFFFF; border-top: 2px solid var(--brass-500); padding: 0.55rem 0; z-index: 40; }
+    .summary-bar-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.45rem 1rem; font-family: var(--font-mono); font-size: 0.78rem; }
+    .summary-metrics { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.9rem; }
+    .summary-breach { color: #FCA5A5; font-weight: 700; }
+    .summary-ok { color: #86EFAC; font-weight: 700; }
+    .summary-jump-link { color: #FFFFFF; font-size: 0.78rem; font-weight: 600; padding: 0.35rem 0.65rem; border: 1px solid var(--brass-400); text-decoration: none; min-height: 36px; display: inline-flex; align-items: center; }
+
+    .site-footer { background-color: var(--navy-900); color: #E2E8F0; border-top: 3px solid var(--brass-500); padding: 2rem 0 4.5rem 0; font-size: 0.85rem; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+    .footer-heading { font-family: var(--font-serif); font-size: 0.95rem; color: #FFFFFF; margin: 0 0 0.6rem 0; }
+    .footer-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+    .footer-links a { color: #E2E8F0; min-height: 38px; display: inline-flex; align-items: center; }
+    .footer-links a:hover, .footer-links a:focus-visible { color: var(--brass-400); }
+    .footer-bottom { border-top: 1px solid var(--navy-700); padding-top: 1rem; font-size: 0.78rem; color: #CBD5E1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+
+    /* PHONE MODE (<= 720px): ZERO display:none — pure CSS card reflow */
+    @media (max-width: 720px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+      .kpi-card.kpi-priority-backlog { order: -2; }
+      .kpi-card.kpi-priority-breaches { order: -1; }
+
+      .brief-layout,
+      .prose-grid { grid-template-columns: 1fr; }
+
+      .grid-wrap-outer { overflow-x: visible; border: 0; background-color: transparent; }
+
+      .data-table,
+      .data-table tbody,
+      .data-table tfoot,
+      .register-table,
+      .register-table tbody { display: block; width: 100%; }
+
+      .data-table thead,
+      .register-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      /* Regional Performance Cards */
+      .data-table tbody tr {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.6rem;
+        padding: 0.85rem;
+        margin-bottom: 0.8rem;
+        border: 1px solid var(--rule-strong);
+        border-left: 4px solid var(--navy-900);
+        background-color: var(--paper-card);
+      }
+      .data-table tbody td {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        padding: 0;
+        border-right: 0;
+        text-align: left !important;
+      }
+      .data-table tbody td.col-region {
+        grid-column: 1 / -1;
+        font-family: var(--font-serif);
+        font-size: 1.05rem;
+        padding-bottom: 0.35rem;
+        border-bottom: 1px solid var(--rule-color);
+      }
+      .data-table tbody td.has-breach { padding: 0.2rem 0.35rem; }
+      .data-table tbody td::before {
+        content: attr(data-label);
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--ink-600);
+        margin-bottom: 0.15rem;
+      }
+
+      .data-table tfoot tr {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.55rem;
+        padding: 0.85rem;
+        border: 1px solid var(--rule-strong);
+        background-color: var(--brass-100);
+      }
+      .data-table tfoot th,
+      .data-table tfoot td {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        padding: 0;
+        border-right: 0;
+        text-align: left !important;
+      }
+      .data-table tfoot th {
+        grid-column: 1 / -1;
+        border-bottom: 1px solid var(--brass-500);
+        padding-bottom: 0.3rem;
+        font-size: 0.95rem;
+      }
+      .data-table tfoot td::before {
+        content: attr(data-label);
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--ink-700);
+        margin-bottom: 0.15rem;
+      }
+
+      /* Case Register Cards */
+      .register-table tbody tr {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+        padding: 0.9rem;
+        margin-bottom: 0.9rem;
+        border: 1px solid var(--rule-strong);
+        border-left: 4px solid var(--navy-900);
+        background-color: var(--paper-card);
+      }
+      .register-table tbody tr.is-breach-row { border-left: 4px solid var(--fail-border); }
+      .register-table tbody tr.is-within-row { border-left: 4px solid var(--pass-border); }
+      .register-table tbody td {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        padding: 0;
+        border-right: 0;
+      }
+      .register-table tbody td.mobile-span-2 { grid-column: 1 / -1; }
+      .register-table tbody td::before {
+        content: attr(data-label);
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ink-700);
+        margin-bottom: 0.25rem;
+      }
+
+      .reg-input,
+      .reg-select,
+      .btn-delete-row {
+        min-height: 44px;
+        font-size: 1rem;
+        min-width: 0 !important;
+      }
+      .computed-age { text-align: left; padding: 0.2rem 0; font-size: 1rem; }
+      .btn-delete-row { width: 100%; }
+
+      .live-summary-bar { position: fixed; bottom: 0; left: 0; right: 0; box-shadow: 0 -2px 10px rgba(15, 30, 56, 0.25); }
+    }
+
+    @media (max-width: 380px) {
+      .data-table tbody tr,
+      .data-table tfoot tr,
+      .register-table tbody tr { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../../" class="brand-link">Fractional Deal Desk &amp; Contract Management</a>
+      <nav class="site-nav" aria-label="Primary Navigation">
+        <a href="../../">Home</a>
+        <a href="../../tools/" aria-current="page">Proof of Work</a>
+        <a href="../../tools/executive-intelligence/">Executive Intelligence</a>
+        <a href="../../services/">Practice &amp; Mandate Scope</a>
+        <a href="../../about/">Operator Record</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumb-bar" aria-label="Breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb-list">
+        <li><a href="../../">Home</a></li>
+        <li><a href="../../tools/">Proof of Work</a></li>
+        <li><a href="../../tools/executive-intelligence/">Executive Intelligence</a></li>
+        <li aria-current="page">Executive Dashboard</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="hero-banner">
+    <div class="container">
+      <div class="hero-meta-row">
+        <span class="eyebrow-tag">Proof of Work · Executive Intelligence</span>
+        <span class="tool-badge">Tool 12 · Executive Intelligence</span>
+      </div>
+      <h1 class="hero-title">Executive Dashboard</h1>
+      <p class="hero-lede">
+        An executive does not need another chart; they need seven numbers they can trust in a thirty-second read — total case volume, the backlog, escalations, what has closed, the escalation rate, average age, and how many cases are breaching SLA — each one calculated live from the case register underneath, and a regional table that breaks the same register down the same way. This dashboard is that read, over a 36-case sample register. Every case, date and figure in it is sample data.
+      </p>
+      <div class="provenance-strip">
+        <strong>Provenance &amp; Operating Record:</strong> Built from 15+ years in commercial contracts, deal desk, and revenue operations across contracts up to $300M and 3,000+ SKUs under management. This workbook is an equivalent sample built in October 2026 to pair with the Executive Dashboard portfolio PDF; the original dashboard was built in a CRM system and no workbook version existed. The CRM's raw case export is not in this workbook and is never displayed — every case, date, and figure on this page is fictional sample data.
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- 1. KPI STRIP (THE ANSWERS, UP TOP) -->
+    <section class="section-block" aria-labelledby="heading-kpis">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-kpis">Executive Dashboard — Headline KPIs</h2>
+        <p class="section-subtitle">Seven live metrics recalculated from the Case Register below</p>
+      </div>
+
+      <div class="kpi-grid" role="region" aria-label="Headline Dashboard KPIs" aria-live="polite">
+        <article class="kpi-card is-brass">
+          <span class="kpi-label">Total case volume</span>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="kpi-total">36</span>
+          </div>
+          <p class="kpi-note">Total rows in Case Data register</p>
+        </article>
+
+        <article class="kpi-card kpi-priority-backlog">
+          <span class="kpi-label">Open + In Progress (backlog)</span>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="kpi-backlog">21</span>
+          </div>
+          <p class="kpi-note" id="kpi-backlog-note">Open + In Progress only (excludes Escalated)</p>
+        </article>
+
+        <article class="kpi-card">
+          <span class="kpi-label">Escalated</span>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="kpi-escalated">3</span>
+          </div>
+          <p class="kpi-note">Cases with Status = Escalated</p>
+        </article>
+
+        <article class="kpi-card">
+          <span class="kpi-label">Closed</span>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="kpi-closed">12</span>
+          </div>
+          <p class="kpi-note">Cases with Status = Closed</p>
+        </article>
+
+        <article class="kpi-card">
+          <span class="kpi-label">Escalation rate</span>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="kpi-esc-rate">8.3%</span>
+          </div>
+          <p class="kpi-note">ROUND(Escalated / Total × 100, 1)</p>
+        </article>
+
+        <article class="kpi-card">
+          <span class="kpi-label">Avg resolution / age (days)</span>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="kpi-avg-age">37.1</span>
+            <span class="kpi-as-of" id="as-of-age">as of 2026-11-14</span>
+          </div>
+          <p class="kpi-note">Open cases age against current local date</p>
+        </article>
+
+        <article class="kpi-card kpi-priority-breaches is-warn" id="kpi-breaches-card">
+          <span class="kpi-label">SLA breaches</span>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="kpi-breaches">28</span>
+            <span class="kpi-as-of" id="as-of-breaches">as of 2026-11-14</span>
+          </div>
+          <p class="kpi-note">Cases where Age &gt; SLA Target (strictly greater)</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 2. REGIONAL PERFORMANCE -->
+    <section class="section-block" aria-labelledby="heading-regional">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-regional">Regional Performance (live)</h2>
+        <p class="section-subtitle">COUNTIF / COUNTIFS / AVERAGEIF rollups across the five operating regions</p>
+      </div>
+
+      <div class="definition-note" role="note">
+        <strong>Backlog Definition Note:</strong> This table's <em>Backlog</em> column follows the workbook's Regional Performance formula and counts every case where Status is not Closed (escalations included). The headline <em>Open + In Progress (backlog)</em> card above follows the workbook's dashboard formula and excludes Escalated cases. Both definitions are the workbook's own and remain distinct by design.
+      </div>
+
+      <div class="table-scroll-wrap grid-wrap-outer">
+        <table class="data-table" id="regional-table" aria-label="Regional Performance Table">
+          <thead>
+            <tr>
+              <th scope="col">Region</th>
+              <th scope="col" class="is-num">Total</th>
+              <th scope="col" class="is-num">Backlog</th>
+              <th scope="col" class="is-num">Escalated</th>
+              <th scope="col" class="is-num">Closed</th>
+              <th scope="col" class="is-num">Avg Days</th>
+              <th scope="col" class="is-num">Breaches</th>
+            </tr>
+          </thead>
+          <tbody id="regional-tbody"></tbody>
+          <tfoot id="regional-tfoot"></tfoot>
+        </table>
+      </div>
+
+      <div class="audit-strip" aria-live="polite">
+        <span id="reconcile-text">Reconciliation: 5 regional Totals = 36 · 5 regional Closed = 12 · 5 regional Breaches = 28</span>
+        <span class="audit-pill" id="reconcile-badge">RECONCILED</span>
+      </div>
+    </section>
+
+    <!-- 3. THE CASE REGISTER (WORKING LAYER) -->
+    <section class="section-block" aria-labelledby="heading-register" id="section-register">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-register">Case Data — Live Case Register</h2>
+        <p class="section-subtitle">11 workbook columns · Edit any cell, add or delete rows, or run a scenario</p>
+      </div>
+
+      <div class="directions-box">
+        <span class="directions-label">Directions</span>
+        <p class="directions-text">Directions: The Case Data tab is the register — edit statuses, regions, dates, and SLA targets there. The Executive Dashboard tab recounts it into the seven headline KPIs, and the Regional Performance tab rolls the same register up by region: totals, backlog, escalated, closed, average days, and breaches per region. Nothing on the two rollup tabs is typed — change a register row and both tabs move. Open cases age against today's date, the way the workbook's formulas do it, so the age-driven numbers move with the calendar.</p>
+      </div>
+
+      <div class="control-bar" role="region" aria-label="Scenario Presets and Register Controls">
+        <div class="preset-group">
+          <span class="preset-group-label">Scenarios:</span>
+          <button type="button" class="btn-preset is-active" id="preset-sample" data-preset="sample">Sample State</button>
+          <button type="button" class="btn-preset" id="preset-close-1004" data-preset="close-1004">Close CASE-1004</button>
+          <button type="button" class="btn-preset" id="preset-escalate-1002" data-preset="escalate-1002">Escalate CASE-1002</button>
+          <button type="button" class="btn-preset" id="preset-widen-1033" data-preset="widen-1033">Widen CASE-1033 Target</button>
+        </div>
+        <div class="action-group">
+          <button type="button" class="btn-primary" id="btn-add-case">+ Add Case</button>
+          <button type="button" class="btn-secondary" id="btn-reset">Reset to Sample</button>
+        </div>
+      </div>
+
+      <div class="status-breakdown-bar" aria-live="polite">
+        <div class="status-breakdown-items" id="status-breakdown">
+          <span>Open: <strong>9</strong></span>
+          <span>In Progress: <strong>12</strong></span>
+          <span>Escalated: <strong>3</strong></span>
+          <span>Closed: <strong>12</strong></span>
+        </div>
+        <span id="register-count-note">Showing 36 live cases</span>
+      </div>
+
+      <div class="table-scroll-wrap grid-wrap-outer">
+        <table class="register-table" id="register-table" aria-label="Case Data Register">
+          <thead>
+            <tr>
+              <th scope="col">Case ID</th>
+              <th scope="col">Region</th>
+              <th scope="col">Queue</th>
+              <th scope="col">Case Type</th>
+              <th scope="col">Priority</th>
+              <th scope="col">Status</th>
+              <th scope="col">Opened</th>
+              <th scope="col">Closed</th>
+              <th scope="col" class="is-num">SLA Target (days)</th>
+              <th scope="col" class="is-num">Age / Resolution (days)</th>
+              <th scope="col">SLA Flag</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody id="register-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 4. THE DASHBOARD BRIEF & INPUTS / LOGIC / LIMITS -->
+    <section class="section-block" aria-labelledby="heading-brief" id="section-brief">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-brief">The Dashboard Brief</h2>
+        <p class="section-subtitle">Copyable plain-text readout: seven KPIs, five regional lines, and breaching Case IDs</p>
+      </div>
+
+      <div class="brief-layout">
+        <div class="brief-panel">
+          <div class="brief-toolbar">
+            <button type="button" class="btn-primary" id="btn-copy-brief">Copy Dashboard Brief</button>
+            <span class="copy-status" id="copy-feedback" aria-live="polite"></span>
+          </div>
+          <pre class="brief-pre" id="dashboard-brief-text" tabindex="0" aria-label="Copyable Dashboard Brief"></pre>
+        </div>
+
+        <aside class="limits-card" aria-label="Inputs, logic, limits">
+          <h3>Inputs, logic, limits</h3>
+          <p>In the dashboard's own words — Inputs: the Case Data register rows (36 sample cases: Case ID, Region, Queue, Case Type, Priority, Status, Opened, Closed, SLA Target in days). Logic: live KPI formulas over the register — counts by status, SLA flags, and regional rollups on the Regional Performance sheet; figures recalculate from the register. Limits: sample data only (36 cases); no charts in the original; figures move only when register rows change. Two definitions worth naming plainly: this dashboard's backlog line counts Open + In Progress, and says so in its own label — a narrower, self-described definition than the not-Closed count used in the Case Operations tool (S6-P03.3), and each workbook keeps its own words rather than borrowing the other's. The escalation rate is escalations as a percentage of total volume, rounded to one decimal by the workbook's own formula.</p>
+          <ul class="limits-list">
+            <li>Age / Resolution: IF Status = "Closed" → Closed − Opened; ELSE → TODAY() − Opened</li>
+            <li>SLA Flag: IF Age &gt; SLA Target → "BREACH"; ELSE → "Within SLA"</li>
+            <li>Regional Backlog: COUNTIFS(Region, Status &lt;&gt; "Closed")</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 5. EXPLAINER SECTION -->
+    <section class="section-block" aria-labelledby="heading-explainer">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-explainer">Where this dashboard comes from.</h2>
+        <p class="section-subtitle">An equivalent sample built to let the arithmetic be touched and verified</p>
+      </div>
+
+      <div class="prose-grid">
+        <article class="prose-card">
+          <h3>Built as an equivalent sample</h3>
+          <p>The original dashboard behind the portfolio PDF was built inside a CRM system — the metrics an executive team actually watched: open and closed case volumes, backlog and queue monitoring, case aging and escalation tracking, regional performance, workload distribution. No workbook version of it existed, so this workbook is an equivalent sample, built in October 2026 to pair with that PDF: it mirrors the same metrics as live formulas over a sample register, so the structure and the controls can be inspected and exercised. The CRM's raw case export is not in this workbook and is never displayed — the 36 cases on the Case Data tab are the sample's own illustrative data, labeled as such in the file itself.</p>
+        </article>
+        <article class="prose-card">
+          <h3>Why live reconciliation matters</h3>
+          <p>That distinction is the point of showing it this way. A screenshot of a CRM dashboard proves a dashboard existed once; a live workbook proves the numbers reconcile — the regional table's totals sum to the dashboard's volume, the breach count equals a hand count of BREACH flags in the register, and editing one register row moves every dependent figure in the open. The executive read is only worth thirty seconds if the arithmetic under it survives being touched.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 6. RELATED PROOF OF WORK LINKS -->
+    <section class="section-block" aria-labelledby="heading-related">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-related">Related Executive Intelligence &amp; Proof of Work</h2>
+        <p class="section-subtitle">Inspect neighboring tools and governance partitions across the practice record</p>
+      </div>
+
+      <div class="related-grid">
+        <div class="related-card">
+          <span class="related-card-eyebrow">Hub</span>
+          <a href="../../tools/">Proof of Work Hub</a>
+          <p>Explore the full set of working commercial models, contract playbooks, and operational trackers.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Partition</span>
+          <a href="../../tools/executive-intelligence/">Executive Intelligence Partition</a>
+          <p>Decision frameworks, executive dashboards, and structured commercial intelligence models.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 11 · Executive Intelligence</span>
+          <a href="../weighted-decision-scoring/">Tool 11: Weighted Decision Scoring</a>
+          <p>Score options across eight weighted criteria on a 0-to-100 scale with a linked worked vendor example.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Diagnostic Review</span>
+          <a href="../deal-check/">Deal Check</a>
+          <p>Overview of the structured review format used to audit live deals, backlogs, and commercial controls.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- STICKY SUMMARY STRIP -->
+  <div class="live-summary-bar" role="region" aria-label="Live Dashboard Summary Strip">
+    <div class="container summary-bar-inner">
+      <div class="summary-metrics">
+        <span>Backlog: <strong id="sticky-backlog">21</strong></span>
+        <span>Breaches: <strong id="sticky-breaches" class="summary-breach">28</strong></span>
+        <span>Escalation rate: <strong id="sticky-esc-rate">8.3%</strong></span>
+      </div>
+      <a href="#section-brief" class="summary-jump-link">Dashboard Brief</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h2 class="footer-heading">Fractional Deal Desk &amp; Contract Management</h2>
+          <p style="margin: 0; color: #CBD5E1; line-height: 1.5;">
+            Commercial contracts, deal desk architecture, and revenue operations controls. 15+ years of operating experience across contracts up to $300M and 3,000+ SKUs under management.
+          </p>
+        </div>
+        <div>
+          <h2 class="footer-heading">Proof of Work &amp; Tools</h2>
+          <ul class="footer-links">
+            <li><a href="../../tools/">Proof of Work Hub</a></li>
+            <li><a href="../../tools/executive-intelligence/">Executive Intelligence Partition</a></li>
+            <li><a href="../weighted-decision-scoring/">Tool 11: Weighted Decision Scoring</a></li>
+            <li><a href="../deal-check/">Deal Check</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="footer-heading">Practice Information</h2>
+          <ul class="footer-links">
+            <li><a href="../../">Home</a></li>
+            <li><a href="../../services/">Practice &amp; Mandate Scope</a></li>
+            <li><a href="../../about/">Operator Record</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>Tool 12 · Executive Dashboard (S6-P04.b)</span>
+        <span>Every case, date, and figure on this page is sample data.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var REGIONS = ["AMER West", "AMER East", "AMER Central", "EMEA", "APAC"];
+      var QUEUES = ["Deal Support", "Contract Ops", "Renewals", "Billing", "Technical"];
+      var CASE_TYPES = ["Renewal", "Deal Review", "Contract Amendment", "Billing Dispute", "Pricing Exception", "Onboarding"];
+      var PRIORITIES = ["P1 - Critical", "P2 - High", "P3 - Normal", "P4 - Low"];
+      var STATUSES = ["Open", "In Progress", "Escalated", "Closed"];
+
+      var INITIAL_CASES = [
+        { id: "CASE-1001", region: "AMER West", queue: "Deal Support", type: "Renewal", priority: "P4 - Low", status: "Closed", opened: "2026-09-21", closed: "2026-10-02", target: 15 },
+        { id: "CASE-1002", region: "APAC", queue: "Contract Ops", type: "Deal Review", priority: "P1 - Critical", status: "In Progress", opened: "2026-09-07", closed: "", target: 2 },
+        { id: "CASE-1003", region: "AMER East", queue: "Deal Support", type: "Renewal", priority: "P1 - Critical", status: "In Progress", opened: "2026-09-06", closed: "", target: 2 },
+        { id: "CASE-1004", region: "AMER East", queue: "Renewals", type: "Deal Review", priority: "P1 - Critical", status: "Open", opened: "2026-09-28", closed: "", target: 2 },
+        { id: "CASE-1005", region: "AMER West", queue: "Renewals", type: "Contract Amendment", priority: "P1 - Critical", status: "Closed", opened: "2026-10-07", closed: "2026-10-11", target: 2 },
+        { id: "CASE-1006", region: "APAC", queue: "Billing", type: "Renewal", priority: "P1 - Critical", status: "In Progress", opened: "2026-09-19", closed: "", target: 2 },
+        { id: "CASE-1007", region: "AMER Central", queue: "Deal Support", type: "Renewal", priority: "P2 - High", status: "Open", opened: "2026-10-14", closed: "", target: 5 },
+        { id: "CASE-1008", region: "EMEA", queue: "Renewals", type: "Billing Dispute", priority: "P2 - High", status: "Escalated", opened: "2026-09-05", closed: "", target: 5 },
+        { id: "CASE-1009", region: "AMER Central", queue: "Billing", type: "Contract Amendment", priority: "P4 - Low", status: "In Progress", opened: "2026-09-21", closed: "", target: 15 },
+        { id: "CASE-1010", region: "APAC", queue: "Billing", type: "Renewal", priority: "P2 - High", status: "Closed", opened: "2026-09-12", closed: "2026-09-14", target: 5 },
+        { id: "CASE-1011", region: "APAC", queue: "Deal Support", type: "Deal Review", priority: "P4 - Low", status: "Closed", opened: "2026-10-02", closed: "2026-10-07", target: 15 },
+        { id: "CASE-1012", region: "AMER East", queue: "Technical", type: "Billing Dispute", priority: "P3 - Normal", status: "In Progress", opened: "2026-10-03", closed: "", target: 10 },
+        { id: "CASE-1013", region: "APAC", queue: "Billing", type: "Pricing Exception", priority: "P1 - Critical", status: "Closed", opened: "2026-09-03", closed: "2026-09-12", target: 2 },
+        { id: "CASE-1014", region: "APAC", queue: "Technical", type: "Deal Review", priority: "P4 - Low", status: "In Progress", opened: "2026-10-15", closed: "", target: 15 },
+        { id: "CASE-1015", region: "AMER West", queue: "Deal Support", type: "Onboarding", priority: "P4 - Low", status: "Closed", opened: "2026-09-06", closed: "2026-09-18", target: 15 },
+        { id: "CASE-1016", region: "AMER Central", queue: "Technical", type: "Onboarding", priority: "P4 - Low", status: "In Progress", opened: "2026-10-15", closed: "", target: 15 },
+        { id: "CASE-1017", region: "AMER Central", queue: "Contract Ops", type: "Renewal", priority: "P4 - Low", status: "Open", opened: "2026-09-23", closed: "", target: 15 },
+        { id: "CASE-1018", region: "AMER Central", queue: "Contract Ops", type: "Onboarding", priority: "P2 - High", status: "In Progress", opened: "2026-09-08", closed: "", target: 5 },
+        { id: "CASE-1019", region: "AMER West", queue: "Contract Ops", type: "Billing Dispute", priority: "P4 - Low", status: "In Progress", opened: "2026-09-16", closed: "", target: 15 },
+        { id: "CASE-1020", region: "EMEA", queue: "Renewals", type: "Pricing Exception", priority: "P2 - High", status: "Escalated", opened: "2026-09-26", closed: "", target: 5 },
+        { id: "CASE-1021", region: "AMER East", queue: "Deal Support", type: "Contract Amendment", priority: "P4 - Low", status: "Closed", opened: "2026-09-27", closed: "2026-10-01", target: 15 },
+        { id: "CASE-1022", region: "AMER West", queue: "Technical", type: "Renewal", priority: "P2 - High", status: "Open", opened: "2026-09-10", closed: "", target: 5 },
+        { id: "CASE-1023", region: "AMER East", queue: "Technical", type: "Renewal", priority: "P1 - Critical", status: "In Progress", opened: "2026-09-12", closed: "", target: 2 },
+        { id: "CASE-1024", region: "APAC", queue: "Renewals", type: "Onboarding", priority: "P3 - Normal", status: "Closed", opened: "2026-09-24", closed: "2026-09-27", target: 10 },
+        { id: "CASE-1025", region: "APAC", queue: "Technical", type: "Billing Dispute", priority: "P4 - Low", status: "Closed", opened: "2026-10-14", closed: "2026-10-25", target: 15 },
+        { id: "CASE-1026", region: "EMEA", queue: "Deal Support", type: "Contract Amendment", priority: "P4 - Low", status: "In Progress", opened: "2026-09-26", closed: "", target: 15 },
+        { id: "CASE-1027", region: "AMER West", queue: "Billing", type: "Renewal", priority: "P4 - Low", status: "Closed", opened: "2026-09-05", closed: "2026-09-08", target: 15 },
+        { id: "CASE-1028", region: "APAC", queue: "Deal Support", type: "Pricing Exception", priority: "P2 - High", status: "Open", opened: "2026-09-04", closed: "", target: 5 },
+        { id: "CASE-1029", region: "APAC", queue: "Technical", type: "Contract Amendment", priority: "P2 - High", status: "Open", opened: "2026-10-10", closed: "", target: 5 },
+        { id: "CASE-1030", region: "APAC", queue: "Billing", type: "Billing Dispute", priority: "P3 - Normal", status: "In Progress", opened: "2026-10-11", closed: "", target: 10 },
+        { id: "CASE-1031", region: "EMEA", queue: "Technical", type: "Billing Dispute", priority: "P4 - Low", status: "Open", opened: "2026-09-08", closed: "", target: 15 },
+        { id: "CASE-1032", region: "AMER Central", queue: "Billing", type: "Billing Dispute", priority: "P1 - Critical", status: "Open", opened: "2026-09-20", closed: "", target: 2 },
+        { id: "CASE-1033", region: "AMER East", queue: "Renewals", type: "Pricing Exception", priority: "P1 - Critical", status: "Open", opened: "2026-10-15", closed: "", target: 2 },
+        { id: "CASE-1034", region: "AMER Central", queue: "Deal Support", type: "Onboarding", priority: "P1 - Critical", status: "Closed", opened: "2026-09-10", closed: "2026-09-19", target: 2 },
+        { id: "CASE-1035", region: "AMER Central", queue: "Contract Ops", type: "Renewal", priority: "P2 - High", status: "Escalated", opened: "2026-09-17", closed: "", target: 5 },
+        { id: "CASE-1036", region: "AMER East", queue: "Renewals", type: "Contract Amendment", priority: "P3 - Normal", status: "Closed", opened: "2026-10-05", closed: "2026-10-16", target: 10 }
+      ];
+
+      function cloneCases(src) {
+        return src.map(function (c) {
+          return {
+            id: c.id,
+            region: c.region,
+            queue: c.queue,
+            type: c.type,
+            priority: c.priority,
+            status: c.status,
+            opened: c.opened,
+            closed: c.closed,
+            target: c.target
+          };
+        });
+      }
+
+      function getTodayISO() {
+        var now = new Date();
+        var y = now.getFullYear();
+        var m = String(now.getMonth() + 1).padStart(2, "0");
+        var d = String(now.getDate()).padStart(2, "0");
+        return y + "-" + m + "-" + d;
+      }
+
+      function parseISODateDays(iso) {
+        if (typeof iso !== "string") return null;
+        var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim());
+        if (!m) return null;
+        var y = parseInt(m[1], 10);
+        var mo = parseInt(m[2], 10);
+        var d = parseInt(m[3], 10);
+        var dt = new Date(Date.UTC(y, mo - 1, d));
+        if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) {
+          return null;
+        }
+        return Math.floor(dt.getTime() / 86400000);
+      }
+
+      function safeTarget(val) {
+        if (val === "" || val === null || val === undefined) return 0;
+        var n = typeof val === "number" ? val : parseFloat(val);
+        return isFinite(n) ? n : 0;
+      }
+
+      function roundOneDecimal(val) {
+        if (!isFinite(val)) return 0;
+        var sign = val < 0 ? -1 : 1;
+        var r = Math.round((Math.abs(val) + 1e-11) * 10) / 10;
+        var out = sign * r;
+        return Object.is(out, -0) ? 0 : out;
+      }
+
+      function evaluateDashboard(cases, refDateISO) {
+        var refDays = parseISODateDays(refDateISO);
+        var total = cases.length;
+        var openCount = 0;
+        var inProgressCount = 0;
+        var escalatedCount = 0;
+        var closedCount = 0;
+        var breachCount = 0;
+        var ageSum = 0;
+        var breachingIds = [];
+
+        var regionalMap = {};
+        for (var r = 0; r < REGIONS.length; r++) {
+          regionalMap[REGIONS[r]] = {
+            region: REGIONS[r],
+            total: 0,
+            backlog: 0,
+            escalated: 0,
+            closed: 0,
+            ageSum: 0,
+            avgDays: 0,
+            breaches: 0
+          };
+        }
+
+        var rowResults = cases.map(function (c) {
+          var openedDays = parseISODateDays(c.opened);
+          var age = 0;
+          if (c.status === "Closed") {
+            var closedDays = parseISODateDays(c.closed);
+            if (openedDays !== null && closedDays !== null) {
+              age = closedDays - openedDays;
+            } else {
+              age = 0;
+            }
+          } else {
+            if (openedDays !== null && refDays !== null) {
+              age = refDays - openedDays;
+            } else {
+              age = 0;
+            }
+          }
+
+          var targetVal = safeTarget(c.target);
+          var flag = age > targetVal ? "BREACH" : "Within SLA";
+
+          if (c.status === "Open") openCount++;
+          else if (c.status === "In Progress") inProgressCount++;
+          else if (c.status === "Escalated") escalatedCount++;
+          else if (c.status === "Closed") closedCount++;
+
+          if (flag === "BREACH") {
+            breachCount++;
+            breachingIds.push(c.id || "(Unnamed)");
+          }
+          ageSum += age;
+
+          var regObj = regionalMap[c.region];
+          if (regObj) {
+            regObj.total++;
+            if (c.status !== "Closed") regObj.backlog++;
+            if (c.status === "Escalated") regObj.escalated++;
+            if (c.status === "Closed") regObj.closed++;
+            regObj.ageSum += age;
+            if (flag === "BREACH") regObj.breaches++;
+          }
+
+          return {
+            age: age,
+            flag: flag
+          };
+        });
+
+        var headlineBacklog = openCount + inProgressCount;
+        var escalationRate = total === 0 ? 0 : roundOneDecimal((escalatedCount / total) * 100);
+        var avgAge = total === 0 ? 0 : roundOneDecimal(ageSum / total);
+
+        var regionalRows = [];
+        var regSumTotal = 0;
+        var regSumBacklog = 0;
+        var regSumEscalated = 0;
+        var regSumClosed = 0;
+        var regSumBreaches = 0;
+
+        for (var i = 0; i < REGIONS.length; i++) {
+          var ro = regionalMap[REGIONS[i]];
+          ro.avgDays = ro.total === 0 ? 0 : roundOneDecimal(ro.ageSum / ro.total);
+          regionalRows.push(ro);
+          regSumTotal += ro.total;
+          regSumBacklog += ro.backlog;
+          regSumEscalated += ro.escalated;
+          regSumClosed += ro.closed;
+          regSumBreaches += ro.breaches;
+        }
+
+        return {
+          refDateISO: refDateISO,
+          total: total,
+          openCount: openCount,
+          inProgressCount: inProgressCount,
+          headlineBacklog: headlineBacklog,
+          escalatedCount: escalatedCount,
+          closedCount: closedCount,
+          escalationRate: escalationRate,
+          avgAge: avgAge,
+          breachCount: breachCount,
+          breachingIds: breachingIds,
+          rowResults: rowResults,
+          regionalRows: regionalRows,
+          reconcile: {
+            regSumTotal: regSumTotal,
+            regSumBacklog: regSumBacklog,
+            regSumEscalated: regSumEscalated,
+            regSumClosed: regSumClosed,
+            regSumBreaches: regSumBreaches,
+            matches: (regSumTotal === total && regSumClosed === closedCount && regSumBreaches === breachCount)
+          }
+        };
+      }
+
+      var stateCases = cloneCases(INITIAL_CASES);
+      var nextGeneratedNum = 1037;
+
+      var regionalTbody = document.getElementById("regional-tbody");
+      var regionalTfoot = document.getElementById("regional-tfoot");
+      var registerTbody = document.getElementById("register-tbody");
+      var briefPre = document.getElementById("dashboard-brief-text");
+      var copyFeedback = document.getElementById("copy-feedback");
+
+      function escapeHtml(str) {
+        return String(str == null ? "" : str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function escapeAttr(str) {
+        return escapeHtml(str).replace(/"/g, "&quot;");
+      }
+
+      function buildOptions(list, selectedVal) {
+        var html = "";
+        for (var i = 0; i < list.length; i++) {
+          var sel = list[i] === selectedVal ? " selected" : "";
+          html += '<option value="' + escapeAttr(list[i]) + '"' + sel + '>' + escapeHtml(list[i]) + '</option>';
+        }
+        return html;
+      }
+
+      function renderRegisterRows(rowResults) {
+        if (stateCases.length === 0) {
+          registerTbody.innerHTML = '<tr><td colspan="12" class="empty-register-note">No cases in the register. Click "+ Add Case" or "Reset to Sample" to repopulate.</td></tr>';
+          return;
+        }
+
+        var html = "";
+        for (var i = 0; i < stateCases.length; i++) {
+          var c = stateCases[i];
+          var res = rowResults[i];
+          var isBreach = res.flag === "BREACH";
+          var rowClass = isBreach ? "is-breach-row" : "is-within-row";
+          var flagClass = isBreach ? "is-breach" : "is-within";
+
+          html +=
+            '<tr class="' + rowClass + '" data-row-index="' + i + '">' +
+              '<td data-label="Case ID"><input type="text" class="reg-input is-id" data-row="' + i + '" data-field="id" value="' + escapeAttr(c.id) + '" aria-label="Case ID for row ' + (i + 1) + '"></td>' +
+              '<td data-label="Region"><select class="reg-select is-region" data-row="' + i + '" data-field="region" aria-label="Region for ' + escapeAttr(c.id || ('row ' + (i + 1))) + '">' + buildOptions(REGIONS, c.region) + '</select></td>' +
+              '<td data-label="Queue"><select class="reg-select is-queue" data-row="' + i + '" data-field="queue" aria-label="Queue for ' + escapeAttr(c.id || ('row ' + (i + 1))) + '">' + buildOptions(QUEUES, c.queue) + '</select></td>' +
+              '<td data-label="Case Type"><select class="reg-select is-type" data-row="' + i + '" data-field="type" aria-label="Case Type for ' + escapeAttr(c.id || ('row ' + (i + 1))) + '">' + buildOptions(CASE_TYPES, c.type) + '</select></td>' +
+              '<td data-label="Priority"><select class="reg-select is-priority" data-row="' + i + '" data-field="priority" aria-label="Priority for ' + escapeAttr(c.id || ('row ' + (i + 1))) + '">' + buildOptions(PRIORITIES, c.priority) + '</select></td>' +
+              '<td data-label="Status"><select class="reg-select is-status" data-row="' + i + '" data-field="status" aria-label="Status for ' + escapeAttr(c.id || ('row ' + (i + 1))) + '">' + buildOptions(STATUSES, c.status) + '</select></td>' +
+              '<td data-label="Opened"><input type="date" class="reg-input is-date" data-row="' + i + '" data-field="opened" value="' + escapeAttr(c.opened) + '" aria-label="Opened date for ' + escapeAttr(c.id || ('row ' + (i + 1))) + '"></td>' +
+              '<td data-label="Closed"><input type="date" class="reg-input is-date" data-row="' + i + '" data-field="closed" value="' + escapeAttr(c.closed) + '" aria-label="Closed date for ' + escapeAttr(c.id || ('row ' + (i + 1))) + '"></td>' +
+              '<td data-label="SLA Target (days)"><input type="number" step="1" min="0" class="reg-input is-num" data-row="' + i + '" data-field="target" value="' + escapeAttr(c.target) + '" aria-label="SLA Target days for ' + escapeAttr(c.id || ('row ' + (i + 1))) + '"></td>' +
+              '<td data-label="Age / Resolution (days)"><div class="computed-age" id="cell-age-' + i + '">' + res.age + '</div></td>' +
+              '<td data-label="SLA Flag"><span class="sla-badge ' + flagClass + '" id="cell-flag-' + i + '">' + escapeHtml(res.flag) + '</span></td>' +
+              '<td data-label="Action" class="mobile-span-2"><button type="button" class="btn-delete-row" data-delete-row="' + i + '" aria-label="Delete ' + escapeAttr(c.id || ('row ' + (i + 1))) + '">Delete</button></td>' +
+            '</tr>';
+        }
+        registerTbody.innerHTML = html;
+      }
+
+      function syncPresetButtons(refDateISO) {
+        function casesEqual(a, b) {
+          return a.id === b.id && a.region === b.region && a.queue === b.queue &&
+            a.type === b.type && a.priority === b.priority && a.status === b.status &&
+            a.opened === b.opened && a.closed === b.closed && safeTarget(a.target) === safeTarget(b.target);
+        }
+        var sameLen = stateCases.length === INITIAL_CASES.length;
+        var isSample = sameLen && stateCases.every(function (c, i) { return casesEqual(c, INITIAL_CASES[i]); });
+        var isClose1004 = sameLen && stateCases.every(function (c, i) {
+          if (i === 3) {
+            return c.id === "CASE-1004" && c.status === "Closed" && c.closed === refDateISO &&
+              c.region === INITIAL_CASES[3].region && c.opened === INITIAL_CASES[3].opened && safeTarget(c.target) === INITIAL_CASES[3].target;
+          }
+          return casesEqual(c, INITIAL_CASES[i]);
+        });
+        var isEscalate1002 = sameLen && stateCases.every(function (c, i) {
+          if (i === 1) {
+            return c.id === "CASE-1002" && c.status === "Escalated" && c.closed === "" &&
+              c.region === INITIAL_CASES[1].region && c.opened === INITIAL_CASES[1].opened && safeTarget(c.target) === INITIAL_CASES[1].target;
+          }
+          return casesEqual(c, INITIAL_CASES[i]);
+        });
+        var isWiden1033 = sameLen && stateCases.every(function (c, i) {
+          if (i === 32) {
+            return c.id === "CASE-1033" && safeTarget(c.target) === 40 && c.status === INITIAL_CASES[32].status &&
+              c.region === INITIAL_CASES[32].region && c.opened === INITIAL_CASES[32].opened;
+          }
+          return casesEqual(c, INITIAL_CASES[i]);
+        });
+
+        document.getElementById("preset-sample").classList.toggle("is-active", isSample);
+        document.getElementById("preset-close-1004").classList.toggle("is-active", isClose1004);
+        document.getElementById("preset-escalate-1002").classList.toggle("is-active", isEscalate1002);
+        document.getElementById("preset-widen-1033").classList.toggle("is-active", isWiden1033);
+      }
+
+      function renderOutputs(ev) {
+        // 1. Headline KPIs
+        document.getElementById("kpi-total").textContent = ev.total;
+        document.getElementById("kpi-backlog").textContent = ev.headlineBacklog;
+        document.getElementById("kpi-escalated").textContent = ev.escalatedCount;
+        document.getElementById("kpi-closed").textContent = ev.closedCount;
+        document.getElementById("kpi-esc-rate").textContent = ev.escalationRate.toFixed(1) + "%";
+        document.getElementById("kpi-avg-age").textContent = ev.avgAge.toFixed(1);
+        document.getElementById("kpi-breaches").textContent = ev.breachCount;
+
+        document.getElementById("as-of-age").textContent = "as of " + ev.refDateISO;
+        document.getElementById("as-of-breaches").textContent = "as of " + ev.refDateISO;
+
+        var breachesCard = document.getElementById("kpi-breaches-card");
+        breachesCard.className = "kpi-card kpi-priority-breaches " + (ev.breachCount > 0 ? "is-warn" : "is-ok");
+
+        // 2. Regional Performance
+        var regHtml = "";
+        for (var i = 0; i < ev.regionalRows.length; i++) {
+          var r = ev.regionalRows[i];
+          regHtml +=
+            '<tr>' +
+              '<td class="col-region" data-label="Region">' + escapeHtml(r.region) + '</td>' +
+              '<td class="is-num" data-label="Total">' + r.total + '</td>' +
+              '<td class="is-num" data-label="Backlog (not Closed)">' + r.backlog + '</td>' +
+              '<td class="is-num" data-label="Escalated">' + r.escalated + '</td>' +
+              '<td class="is-num" data-label="Closed">' + r.closed + '</td>' +
+              '<td class="is-num" data-label="Avg Days">' + r.avgDays.toFixed(1) + '</td>' +
+              '<td class="is-num ' + (r.breaches > 0 ? "has-breach" : "") + '" data-label="Breaches">' + r.breaches + '</td>' +
+            '</tr>';
+        }
+        regionalTbody.innerHTML = regHtml;
+
+        regionalTfoot.innerHTML =
+          '<tr>' +
+            '<th scope="row">All Regions (Reconciled Sum)</th>' +
+            '<td class="is-num" data-label="Total">' + ev.reconcile.regSumTotal + '</td>' +
+            '<td class="is-num" data-label="Backlog (not Closed)">' + ev.reconcile.regSumBacklog + '</td>' +
+            '<td class="is-num" data-label="Escalated">' + ev.reconcile.regSumEscalated + '</td>' +
+            '<td class="is-num" data-label="Closed">' + ev.reconcile.regSumClosed + '</td>' +
+            '<td class="is-num" data-label="Overall Avg Days">' + ev.avgAge.toFixed(1) + '</td>' +
+            '<td class="is-num" data-label="Breaches">' + ev.reconcile.regSumBreaches + '</td>' +
+          '</tr>';
+
+        document.getElementById("reconcile-text").textContent =
+          "Reconciliation: Regional Totals = " + ev.reconcile.regSumTotal + " (Headline " + ev.total + ") · " +
+          "Regional Closed = " + ev.reconcile.regSumClosed + " (Headline " + ev.closedCount + ") · " +
+          "Regional Breaches = " + ev.reconcile.regSumBreaches + " (Headline " + ev.breachCount + ")";
+        var recBadge = document.getElementById("reconcile-badge");
+        recBadge.textContent = ev.reconcile.matches ? "RECONCILED" : "CHECK";
+
+        // 3. Status Breakdown & Inline Computed Register Cells
+        document.getElementById("status-breakdown").innerHTML =
+          '<span>Open: <strong>' + ev.openCount + '</strong></span>' +
+          '<span>In Progress: <strong>' + ev.inProgressCount + '</strong></span>' +
+          '<span>Escalated: <strong>' + ev.escalatedCount + '</strong></span>' +
+          '<span>Closed: <strong>' + ev.closedCount + '</strong></span>';
+        document.getElementById("register-count-note").textContent =
+          "Showing " + ev.total + " live " + (ev.total === 1 ? "case" : "cases");
+
+        for (var k = 0; k < ev.rowResults.length; k++) {
+          var rr = ev.rowResults[k];
+          var ageEl = document.getElementById("cell-age-" + k);
+          var flagEl = document.getElementById("cell-flag-" + k);
+          var trEl = registerTbody.querySelector('tr[data-row-index="' + k + '"]');
+          if (ageEl) ageEl.textContent = rr.age;
+          if (flagEl) {
+            flagEl.textContent = rr.flag;
+            flagEl.className = "sla-badge " + (rr.flag === "BREACH" ? "is-breach" : "is-within");
+          }
+          if (trEl) {
+            trEl.className = rr.flag === "BREACH" ? "is-breach-row" : "is-within-row";
+          }
+        }
+
+        // 4. Sticky Summary Strip
+        document.getElementById("sticky-backlog").textContent = ev.headlineBacklog;
+        var stickyBreaches = document.getElementById("sticky-breaches");
+        stickyBreaches.textContent = ev.breachCount;
+        stickyBreaches.className = ev.breachCount > 0 ? "summary-breach" : "summary-ok";
+        document.getElementById("sticky-esc-rate").textContent = ev.escalationRate.toFixed(1) + "%";
+
+        // 5. Dashboard Brief (7 KPIs -> 5 regional lines -> breaching Case IDs; zero sales line)
+        var lines = [];
+        lines.push("EXECUTIVE DASHBOARD — BRIEF (AS OF " + ev.refDateISO + ")");
+        lines.push("====================================================");
+        lines.push("");
+        lines.push("HEADLINE KPIs");
+        lines.push("- Total case volume: " + ev.total);
+        lines.push("- Open + In Progress (backlog): " + ev.headlineBacklog);
+        lines.push("- Escalated: " + ev.escalatedCount);
+        lines.push("- Closed: " + ev.closedCount);
+        lines.push("- Escalation rate: " + ev.escalationRate.toFixed(1) + "%");
+        lines.push("- Avg resolution / age (days) [as of " + ev.refDateISO + "]: " + ev.avgAge.toFixed(1));
+        lines.push("- SLA breaches [as of " + ev.refDateISO + "]: " + ev.breachCount);
+        lines.push("");
+        lines.push("REGIONAL PERFORMANCE (Backlog = Status <> Closed)");
+        for (var j = 0; j < ev.regionalRows.length; j++) {
+          var reg = ev.regionalRows[j];
+          lines.push(
+            "- " + reg.region + ": Total " + reg.total +
+            " | Backlog " + reg.backlog +
+            " | Escalated " + reg.escalated +
+            " | Closed " + reg.closed +
+            " | Avg Days " + reg.avgDays.toFixed(1) +
+            " | Breaches " + reg.breaches
+          );
+        }
+        lines.push("");
+        lines.push("CASES IN BREACH (" + ev.breachingIds.length + ")");
+        if (ev.breachingIds.length === 0) {
+          lines.push("None");
+        } else {
+          lines.push(ev.breachingIds.join(", "));
+        }
+
+        briefPre.textContent = lines.join("\n");
+        syncPresetButtons(ev.refDateISO);
+      }
+
+      function fullRender() {
+        var today = getTodayISO();
+        var ev = evaluateDashboard(stateCases, today);
+        renderRegisterRows(ev.rowResults);
+        renderOutputs(ev);
+      }
+
+      function softRender() {
+        var today = getTodayISO();
+        var ev = evaluateDashboard(stateCases, today);
+        renderOutputs(ev);
+      }
+
+      function applyPreset(name) {
+        stateCases = cloneCases(INITIAL_CASES);
+        var today = getTodayISO();
+        if (name === "close-1004") {
+          stateCases[3].status = "Closed";
+          stateCases[3].closed = today;
+        } else if (name === "escalate-1002") {
+          stateCases[1].status = "Escalated";
+        } else if (name === "widen-1033") {
+          stateCases[32].target = 40;
+        }
+        copyFeedback.textContent = "";
+        fullRender();
+      }
+
+      function handleRegisterEdit(e) {
+        var el = e.target;
+        var rowAttr = el.getAttribute("data-row");
+        var field = el.getAttribute("data-field");
+        if (rowAttr === null || !field) return;
+        var idx = parseInt(rowAttr, 10);
+        if (!stateCases[idx]) return;
+
+        if (field === "target") {
+          stateCases[idx].target = el.value === "" ? "" : safeTarget(el.value);
+        } else {
+          stateCases[idx][field] = el.value;
+        }
+        copyFeedback.textContent = "";
+        softRender();
+      }
+
+      registerTbody.addEventListener("input", handleRegisterEdit);
+      registerTbody.addEventListener("change", handleRegisterEdit);
+
+      registerTbody.addEventListener("click", function (e) {
+        var delBtn = e.target.closest ? e.target.closest("[data-delete-row]") : null;
+        if (!delBtn) return;
+        var idx = parseInt(delBtn.getAttribute("data-delete-row"), 10);
+        if (!isNaN(idx) && stateCases[idx]) {
+          stateCases.splice(idx, 1);
+          copyFeedback.textContent = "";
+          fullRender();
+        }
+      });
+
+      var presetButtons = document.querySelectorAll("[data-preset]");
+      for (var p = 0; p < presetButtons.length; p++) {
+        presetButtons[p].addEventListener("click", function (e) {
+          applyPreset(e.currentTarget.getAttribute("data-preset"));
+        });
+      }
+
+      document.getElementById("btn-add-case").addEventListener("click", function () {
+        var today = getTodayISO();
+        var newId = "CASE-" + nextGeneratedNum++;
+        stateCases.push({
+          id: newId,
+          region: "AMER West",
+          queue: "Deal Support",
+          type: "Renewal",
+          priority: "P3 - Normal",
+          status: "Open",
+          opened: today,
+          closed: "",
+          target: 5
+        });
+        copyFeedback.textContent = "";
+        fullRender();
+        var newInput = registerTbody.querySelector('input[data-row="' + (stateCases.length - 1) + '"][data-field="id"]');
+        if (newInput) newInput.focus();
+      });
+
+      document.getElementById("btn-reset").addEventListener("click", function () {
+        nextGeneratedNum = 1037;
+        applyPreset("sample");
+        copyFeedback.textContent = "Register reset to the 36 sample cases.";
+      });
+
+      document.getElementById("btn-copy-brief").addEventListener("click", function () {
+        var textToCopy = briefPre.textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(textToCopy).then(
+            function () { copyFeedback.textContent = "Copied Dashboard Brief to clipboard."; },
+            function () { fallbackCopy(textToCopy); }
+          );
+        } else {
+          fallbackCopy(textToCopy);
+        }
+      });
+
+      function fallbackCopy(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "0";
+        ta.style.left = "0";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+          copyFeedback.textContent = "Copied Dashboard Brief to clipboard.";
+        } catch (err) {
+          copyFeedback.textContent = "Select the brief text below and press Ctrl+C / Cmd+C.";
+        }
+        document.body.removeChild(ta);
+      }
+
+      function runVerificationBattery() {
+        var REF_DATE = "2026-11-11";
+
+        // 0. Sample state at reference date 2026-11-11
+        var s0 = evaluateDashboard(cloneCases(INITIAL_CASES), REF_DATE);
+        console.assert(s0.total === 36, "Fixed total fail");
+        console.assert(s0.openCount === 9 && s0.inProgressCount === 12 && s0.headlineBacklog === 21, "Fixed open/inProgress/backlog fail");
+        console.assert(s0.escalatedCount === 3 && s0.closedCount === 12 && s0.escalationRate === 8.3, "Fixed escalated/closed/rate fail");
+        console.assert(s0.breachCount === 28 && s0.avgAge === 35.1, "Date-pinned breaches/avgAge fail at 2026-11-11");
+        console.assert(s0.reconcile.matches === true, "Sample reconciliation invariant fail");
+
+        var regMap0 = {};
+        s0.regionalRows.forEach(function (r) { regMap0[r.region] = r; });
+        console.assert(regMap0["AMER West"].total === 6 && regMap0["AMER West"].backlog === 2 && regMap0["AMER West"].escalated === 0 && regMap0["AMER West"].closed === 4 && regMap0["AMER West"].avgDays === 24.7 && regMap0["AMER West"].breaches === 3, "AMER West anchor fail");
+        console.assert(regMap0["AMER East"].total === 7 && regMap0["AMER East"].backlog === 5 && regMap0["AMER East"].escalated === 0 && regMap0["AMER East"].closed === 2 && regMap0["AMER East"].avgDays === 35.9 && regMap0["AMER East"].breaches === 6, "AMER East anchor fail");
+        console.assert(regMap0["AMER Central"].total === 8 && regMap0["AMER Central"].backlog === 7 && regMap0["AMER Central"].escalated === 1 && regMap0["AMER Central"].closed === 1 && regMap0["AMER Central"].avgDays === 41.9 && regMap0["AMER Central"].breaches === 8, "AMER Central anchor fail");
+        console.assert(regMap0["EMEA"].total === 4 && regMap0["EMEA"].backlog === 4 && regMap0["EMEA"].escalated === 2 && regMap0["EMEA"].closed === 0 && regMap0["EMEA"].avgDays === 55.8 && regMap0["EMEA"].breaches === 4, "EMEA anchor fail");
+        console.assert(regMap0["APAC"].total === 11 && regMap0["APAC"].backlog === 6 && regMap0["APAC"].escalated === 0 && regMap0["APAC"].closed === 5 && regMap0["APAC"].avgDays === 27.8 && regMap0["APAC"].breaches === 7, "APAC anchor fail");
+
+        // 1. Boundary (1): Close CASE-1004 at REF_DATE
+        var b1Cases = cloneCases(INITIAL_CASES);
+        b1Cases[3].status = "Closed";
+        b1Cases[3].closed = REF_DATE;
+        var b1 = evaluateDashboard(b1Cases, REF_DATE);
+        var b1East = b1.regionalRows.filter(function (r) { return r.region === "AMER East"; })[0];
+        console.assert(b1.headlineBacklog === 20 && b1.closedCount === 13 && b1.reconcile.matches, "B1 headline fail");
+        console.assert(b1East.backlog === 4 && b1East.closed === 3 && b1East.avgDays === 35.9, "B1 AMER East fail");
+
+        // 2. Boundary (2): Escalate CASE-1002
+        var b2Cases = cloneCases(INITIAL_CASES);
+        b2Cases[1].status = "Escalated";
+        var b2 = evaluateDashboard(b2Cases, REF_DATE);
+        var b2Apac = b2.regionalRows.filter(function (r) { return r.region === "APAC"; })[0];
+        console.assert(b2.escalatedCount === 4 && b2.escalationRate === 11.1 && b2.headlineBacklog === 20 && b2.reconcile.matches, "B2 headline fail");
+        console.assert(b2Apac.backlog === 6 && b2Apac.escalated === 1, "B2 APAC backlog invariance fail");
+
+        // 3. Boundary (3): Widen CASE-1033 SLA Target 2 -> 40
+        var b3Cases = cloneCases(INITIAL_CASES);
+        b3Cases[32].target = 40;
+        var b3 = evaluateDashboard(b3Cases, REF_DATE);
+        var b3East = b3.regionalRows.filter(function (r) { return r.region === "AMER East"; })[0];
+        console.assert(b3.rowResults[32].flag === "Within SLA" && b3.breachCount === 27 && b3East.breaches === 5 && b3.reconcile.matches, "B3 CASE-1033 fail");
+
+        // 4. Strictly-greater SLA boundary (Age === Target => Within SLA)
+        var eqCases = [{ id: "T-EQ", region: "EMEA", queue: "Billing", type: "Renewal", priority: "P2 - High", status: "Closed", opened: "2026-10-01", closed: "2026-10-06", target: 5 }];
+        var eqEv = evaluateDashboard(eqCases, REF_DATE);
+        console.assert(eqEv.rowResults[0].age === 5 && eqEv.rowResults[0].flag === "Within SLA" && eqEv.breachCount === 0, "Strict greater SLA check fail");
+
+        // 5. Missing Closed date on Closed row + cleared SLA Target + empty register (zero NaN)
+        var edgeCases = [
+          { id: "E-1", region: "APAC", queue: "Billing", type: "Renewal", priority: "P1 - Critical", status: "Closed", opened: "2026-10-01", closed: "", target: "" }
+        ];
+        var edgeEv = evaluateDashboard(edgeCases, REF_DATE);
+        console.assert(edgeEv.rowResults[0].age === 0 && edgeEv.rowResults[0].flag === "Within SLA" && !isNaN(edgeEv.avgAge) && edgeEv.reconcile.matches, "Missing closed/target edge fail");
+
+        var emptyEv = evaluateDashboard([], REF_DATE);
+        console.assert(emptyEv.total === 0 && emptyEv.escalationRate === 0 && emptyEv.avgAge === 0 && emptyEv.breachCount === 0 && emptyEv.reconcile.matches, "Empty register edge fail");
+      }
+
+      fullRender();
+      runVerificationBattery();
+    })();
+  </script>
+</body>
+</html>
