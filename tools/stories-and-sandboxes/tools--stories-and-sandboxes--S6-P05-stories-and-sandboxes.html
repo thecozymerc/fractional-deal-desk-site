@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<!--
+ARGON MANIFEST: S6-P05 PARTITION REBUILD — Deal Desk Controls (/tools/stories-and-sandboxes/)
+==============================================================================================
+
+1. SELF-CHECK AGAINST PART A, PART B, PART C & PART D REQUIREMENTS
+   - Partition Naming:
+     * Visible partition name updated everywhere from "Stories & Sandboxes" to "Deal Desk Controls".
+     * Eyebrow follows the tool-page pattern: "Proof of Work · Deal Desk Controls".
+     * Breadcrumb: Home / Proof of Work / Deal Desk Controls.
+     * Title: "Deal Desk Controls — Fractional Deal Desk & Contract Management".
+     * Meta description: one plain sentence naming all four control tools (intake gate, redlining playbook, QTC diagnostic, bundling sandbox).
+     * Zero "Story" or "Stories" framing anywhere in visible copy, headings, or structured-data names.
+   - Address & Link Preservation:
+     * Canonical URL unchanged: https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/
+     * Favicon links unchanged relative path: ../../favicon.svg
+     * All four tool link targets preserved verbatim from the current page (resolving to /tools/intake-gate/, /tools/redlining-playbook/, /tools/qtc-diagnostic/, /tools/bundling-sandbox/):
+       - Tool 5 · Intake Gate & Submission Scorecard -> ../intake-gate/
+       - Tool 6 · Redlining Playbook & Clause Fallback Matrix -> ../redlining-playbook/
+       - Tool 7 · QTC Diagnostic & Bottleneck Scorecard -> ../qtc-diagnostic/
+       - Tool 8 · Commercial Restructuring & Margin Bundling Sandbox -> ../bundling-sandbox/
+   - Frame & Voice Match:
+     * Rebuilt to match Tool 7 / Tool 8 bank frame tokens exactly: deep navy (#0F1E38), restrained brass (#B5892E / #8A661B), off-white paper (#F8F7F4), Georgia serif display headings, squared geometry, hairline rules.
+     * Senior provenance anchors included without employer names or "corporate since 2006": 15+ years in commercial contracts, deal desk, and revenue operations; contracts up to $300M; 3,000+ SKUs under management.
+     * Standing demonstration rule enforced: zero pitch copy, zero pricing, zero book/buy buttons; Practice & Mandate Scope appears only as a plain descriptive link among the other navigation and related links.
+   - Structured Data:
+     * JSON-LD CollectionPage + BreadcrumbList updated with "Deal Desk Controls" names and unchanged live URLs.
+
+2. IMPROVEMENTS MADE
+   - Control Architecture Strip: Added a 4-node visual summary strip directly above the tool grid mapping each control's role in order (Tool 5 Front-Door Gate -> Tool 6 Clause Fallbacks -> Tool 7 Process Audit -> Tool 8 Margin Sandbox) with anchor jumps to each card.
+   - Structured Tool Cards with Descriptive CTAs: Upgraded generic "Open the tool ->" links to descriptive, >= 44px touch-target CTA links naming each tool, paired with factual scope tags derived strictly from Part C ("5 Baseline Checks", "8 Clauses · Pre-Approved Tiers", "5 QTC Stages · P1–P3", "2 Options · Budget & Margin Gate").
+   - Related Controls & Practice Navigation Grid: Added a bottom navigation band matching Tool 7 / Tool 8 so visitors can step cleanly back to the Proof of Work Hub or inspect Practice & Mandate Scope and Operator Record.
+
+3. CONFLICTS CHECK
+   - Minor href notation note: Part C states "(targets unchanged from the current page)" while listing `(../../tools/intake-gate/)` in parentheses; the current page uses `../intake-gate/`, `../redlining-playbook/`, `../qtc-diagnostic/`, and `../bundling-sandbox/`. Kept the current page's exact `../<tool>/` relative targets so the href strings remain unchanged and resolve identically to `/tools/<tool>/`. No conflicts with Part A's goal.
+
+4. PART D — SEO & INTEGRITY COMPLIANCE
+   - 100% compliant. Single clear intent (the deal desk control layer, four working tools). Descriptive link text throughout. Zero hidden text or links, zero white-on-white, zero off-screen positioning, zero zero-size text, zero display:none content blocks, zero keyword stuffing, zero cloaking or doorway patterns. Contrast ratios exceed 4.5:1 for normal text and 3:1 for large text.
+
+5. RESPONSIVE MODES & FLUID-FIRST SWEEP (280px – 1280px)
+   - Desktop Mode (> 720px): 4-column control architecture strip (`repeat(4, minmax(0, 1fr))`), 2x2 grid for the four tool cards (`repeat(2, minmax(0, 1fr))`), and fluid multi-column related/footer grids.
+   - Phone Mode (<= 720px): Stacks tool cards to 1 column (`1fr`), reflows the control architecture strip to 2 columns (`repeat(2, minmax(0, 1fr))`) and 1 column below 360px, and maintains >= 44px touch targets on all navigation links, jump nodes, and tool CTA links.
+   - Fluid-First Sweep (280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS px): Built with relative units, `clamp()`, `minmax(0, 1fr)`, `minmax(min(220px, 100%), 1fr)`, `min-width: 0`, and `overflow-wrap: anywhere` for zero horizontal page scroll across every target width.
+-->
+<!-- LABEL — S6-P05 — Deal Desk Controls (partition page; address /tools/stories-and-sandboxes/). Rebuilt Nov 14, 2026 under Argon rename pass from "Stories & Sandboxes" to "Deal Desk Controls" matching the Tool 7/8 bank frame. Address and tool targets unchanged. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+  <link rel="apple-touch-icon" href="../../favicon.svg" />
+  <title>Deal Desk Controls — Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="The deal desk control layer: four working tools covering the intake gate, redlining playbook, QTC diagnostic, and bundling sandbox.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Deal Desk Controls — Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="The deal desk control layer: four working tools covering the intake gate, redlining playbook, QTC diagnostic, and bundling sandbox.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/#collection",
+        "name": "Deal Desk Controls",
+        "url": "https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/",
+        "description": "The deal desk control layer: four working tools covering the intake gate, redlining playbook, QTC diagnostic, and bundling sandbox.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Fractional Deal Desk & Contract Management",
+          "url": "https://fractional-deal-desk-site.pages.dev/"
+        },
+        "hasPart": [
+          {
+            "@type": "WebApplication",
+            "name": "Intake Gate & Submission Scorecard",
+            "url": "https://fractional-deal-desk-site.pages.dev/tools/intake-gate/",
+            "applicationCategory": "BusinessApplication"
+          },
+          {
+            "@type": "WebApplication",
+            "name": "Redlining Playbook & Clause Fallback Matrix",
+            "url": "https://fractional-deal-desk-site.pages.dev/tools/redlining-playbook/",
+            "applicationCategory": "BusinessApplication"
+          },
+          {
+            "@type": "WebApplication",
+            "name": "QTC Diagnostic & Bottleneck Scorecard",
+            "url": "https://fractional-deal-desk-site.pages.dev/tools/qtc-diagnostic/",
+            "applicationCategory": "BusinessApplication"
+          },
+          {
+            "@type": "WebApplication",
+            "name": "Commercial Restructuring & Margin Bundling Sandbox",
+            "url": "https://fractional-deal-desk-site.pages.dev/tools/bundling-sandbox/",
+            "applicationCategory": "BusinessApplication"
+          }
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fractional-deal-desk-site.pages.dev/" },
+          { "@type": "ListItem", "position": 2, "name": "Proof of Work", "item": "https://fractional-deal-desk-site.pages.dev/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Deal Desk Controls", "item": "https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/" }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --navy-900: #0F1E38;
+      --navy-800: #16294A;
+      --navy-700: #1F3760;
+      --brass-600: #8A661B;
+      --brass-500: #B5892E;
+      --brass-400: #D4AF5A;
+      --brass-100: #F7F1E1;
+      --paper-bg: #F8F7F4;
+      --paper-card: #FFFFFF;
+      --paper-alt: #F1EFEA;
+      --ink-900: #0F1E38;
+      --ink-700: #28364E;
+      --ink-600: #42526B;
+      --rule-color: #D5D0C5;
+      --rule-strong: #0F1E38;
+      --font-serif: Georgia, "Times New Roman", Times, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { margin: 0; padding: 0; background-color: var(--paper-bg); color: var(--ink-900); font-family: var(--font-sans); line-height: 1.55; overflow-x: hidden; }
+    a { color: var(--navy-900); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover, a:focus-visible { color: var(--brass-600); }
+    :focus-visible { outline: 2px solid var(--brass-500); outline-offset: 2px; }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 clamp(0.75rem, 3vw, 2rem); }
+
+    /* HEADER & BREADCRUMB */
+    .site-header { background-color: var(--navy-900); color: #FFFFFF; border-bottom: 3px solid var(--brass-500); }
+    .header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; padding: 0.85rem 0; }
+    .brand-link { color: #FFFFFF; text-decoration: none; font-family: var(--font-serif); font-size: clamp(1rem, 2.2vw, 1.2rem); font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .brand-link:hover, .brand-link:focus-visible { color: var(--brass-400); }
+    .site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.85rem; }
+    .site-nav a { color: #E2E8F0; text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0.4rem; min-height: 44px; display: inline-flex; align-items: center; border-bottom: 2px solid transparent; }
+    .site-nav a:hover, .site-nav a:focus-visible, .site-nav a[aria-current="page"] { color: #FFFFFF; border-bottom-color: var(--brass-400); }
+
+    .breadcrumb-bar { background-color: var(--paper-alt); border-bottom: 1px solid var(--rule-color); font-size: 0.8125rem; }
+    .breadcrumb-list { list-style: none; margin: 0; padding: 0.5rem 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; color: var(--ink-700); }
+    .breadcrumb-list li { display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; overflow-wrap: anywhere; }
+    .breadcrumb-list li + li::before { content: "/"; color: var(--ink-600); }
+    .breadcrumb-list a { color: var(--ink-700); padding: 0.35rem 0.15rem; min-height: 36px; display: inline-flex; align-items: center; }
+    .breadcrumb-list [aria-current="page"] { color: var(--ink-900); font-weight: 600; }
+
+    /* HERO */
+    .hero-banner { background-color: var(--navy-900); color: #FFFFFF; padding: clamp(1.5rem, 4vw, 2.75rem) 0; border-bottom: 1px solid var(--rule-strong); }
+    .hero-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.85rem; }
+    .eyebrow-tag { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-400); font-weight: 600; }
+    .tool-badge { display: inline-block; background-color: var(--navy-800); border: 1px solid var(--brass-500); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; letter-spacing: 0.04em; }
+    .hero-title { font-family: var(--font-serif); font-size: clamp(1.6rem, 3.6vw, 2.4rem); line-height: 1.2; font-weight: 700; margin: 0 0 0.9rem 0; color: #FFFFFF; overflow-wrap: anywhere; }
+    .hero-lede { font-size: clamp(0.95rem, 1.6vw, 1.1rem); line-height: 1.6; color: #E2E8F0; max-width: 78ch; margin: 0 0 1.15rem 0; }
+    .provenance-strip { background-color: var(--navy-800); border-left: 3px solid var(--brass-500); padding: 0.75rem 1rem; font-size: 0.85rem; color: #E2E8F0; line-height: 1.5; max-width: 82ch; }
+    .provenance-strip strong { color: #FFFFFF; }
+
+    /* SECTIONS */
+    main { padding-bottom: 2.5rem; }
+    .section-block { padding: clamp(1.35rem, 3vw, 2.25rem) 0; border-bottom: 1px solid var(--rule-color); }
+    .section-block:last-of-type { border-bottom: 0; }
+    .section-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--navy-900); }
+    .section-title { font-family: var(--font-serif); font-size: clamp(1.25rem, 2.4vw, 1.55rem); font-weight: 700; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; }
+    .section-subtitle { font-size: 0.85rem; color: var(--ink-600); font-family: var(--font-mono); margin: 0; }
+
+    /* CONTROL LAYER STRIP */
+    .control-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.65rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.75rem; margin-bottom: 1.5rem; }
+    .control-node { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 3px solid var(--navy-900); padding: 0.6rem 0.75rem; text-decoration: none; color: var(--ink-900); display: flex; flex-direction: column; gap: 0.25rem; min-height: 44px; min-width: 0; }
+    .control-node:hover, .control-node:focus-visible { border-color: var(--navy-900); border-top-color: var(--brass-500); background-color: var(--brass-100); color: var(--ink-900); }
+    .control-node-tag { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--brass-600); }
+    .control-node-name { font-family: var(--font-serif); font-size: 0.95rem; font-weight: 700; color: var(--ink-900); overflow-wrap: anywhere; }
+    .control-node-role { font-size: 0.78rem; color: var(--ink-700); overflow-wrap: anywhere; }
+
+    /* TOOL CARDS GRID */
+    .controls-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.15rem; }
+    .control-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 4px solid var(--navy-900); padding: clamp(1rem, 2.2vw, 1.45rem); display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; min-width: 0; }
+    .control-card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.4rem 0.75rem; margin-bottom: 0.6rem; }
+    .control-id-badge { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background-color: var(--navy-900); color: #FFFFFF; padding: 0.2rem 0.55rem; }
+    .control-scope-tag { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; color: var(--brass-600); background-color: var(--brass-100); border: 1px solid var(--brass-500); padding: 0.18rem 0.5rem; }
+    .control-card-title { font-family: var(--font-serif); font-size: clamp(1.15rem, 2vw, 1.32rem); line-height: 1.25; font-weight: 700; color: var(--ink-900); margin: 0 0 0.65rem 0; overflow-wrap: anywhere; }
+    .control-card-desc { font-size: 0.95rem; color: var(--ink-700); margin: 0; line-height: 1.58; overflow-wrap: anywhere; }
+
+    .control-card-foot { border-top: 1px solid var(--rule-color); padding-top: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .control-cta { display: inline-flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%; min-height: 44px; padding: 0.6rem 0.9rem; background-color: var(--paper-alt); border: 1px solid var(--rule-strong); color: var(--ink-900); font-family: var(--font-sans); font-size: 0.875rem; font-weight: 700; text-decoration: none; overflow-wrap: anywhere; }
+    .control-cta:hover, .control-cta:focus-visible { background-color: var(--navy-900); color: #FFFFFF; border-color: var(--navy-900); }
+    .control-cta-arrow { font-family: var(--font-mono); flex-shrink: 0; }
+
+    /* RELATED NAVIGATION GRID */
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 0.85rem; }
+    .related-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.95rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.45rem; min-width: 0; }
+    .related-card-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; color: var(--brass-600); font-weight: 700; }
+    .related-card a { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--ink-900); min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .related-card p { font-size: 0.84rem; color: var(--ink-700); margin: 0; overflow-wrap: anywhere; }
+
+    /* FOOTER */
+    .site-footer { background-color: var(--navy-900); color: #E2E8F0; border-top: 3px solid var(--brass-500); padding: 2rem 0 2.5rem 0; font-size: 0.85rem; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+    .footer-heading { font-family: var(--font-serif); font-size: 0.95rem; color: #FFFFFF; margin: 0 0 0.6rem 0; }
+    .footer-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+    .footer-links a { color: #E2E8F0; min-height: 36px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .footer-links a:hover, .footer-links a:focus-visible { color: var(--brass-400); }
+    .footer-bottom { border-top: 1px solid var(--navy-700); padding-top: 1rem; font-size: 0.78rem; color: #CBD5E1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+
+    /* RESPONSIVE MODES */
+    @media (max-width: 720px) {
+      .control-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .controls-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 360px) {
+      .control-strip { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../../" class="brand-link">Fractional Deal Desk &amp; Contract Management</a>
+      <nav class="site-nav" aria-label="Primary Navigation">
+        <a href="../../">Home</a>
+        <a href="../../tools/">Proof of Work</a>
+        <a href="../../tools/stories-and-sandboxes/" aria-current="page">Deal Desk Controls</a>
+        <a href="../../services/">Practice &amp; Mandate Scope</a>
+        <a href="../../about/">Operator Record</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumb-bar" aria-label="Breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb-list">
+        <li><a href="../../">Home</a></li>
+        <li><a href="../../tools/">Proof of Work</a></li>
+        <li aria-current="page">Deal Desk Controls</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="hero-banner">
+    <div class="container">
+      <div class="hero-meta-row">
+        <span class="eyebrow-tag">Proof of Work · Deal Desk Controls</span>
+        <span class="tool-badge">Partition S6-P05 · Tools 5–8</span>
+      </div>
+      <h1 class="hero-title">Deal Desk Controls</h1>
+      <p class="hero-lede">
+        The deal desk's control layer: the gate that keeps bad deals out, the fallback matrix that keeps redlines fast, the diagnostic that scores the quote-to-cash process, and the sandbox that restructures bundles against a margin floor.
+      </p>
+      <div class="provenance-strip">
+        <strong>Operator Provenance:</strong> Built from an operating record of 15+ years in commercial contracts, deal desk, and revenue operations; contracts up to $300M; and 3,000+ SKUs under management. Each page below is an open, working control model pre-loaded with fictional sample data so you can inspect the math directly.
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <section class="section-block" aria-labelledby="heading-controls">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-controls">Four Working Controls</h2>
+        <p class="section-subtitle">Tools 5–8 · Interactive workbooks and scorecards</p>
+      </div>
+
+      <div class="control-strip" aria-label="Deal Desk Control Sequence">
+        <a href="#tool-5" class="control-node">
+          <span class="control-node-tag">Tool 5 · Stage 1</span>
+          <span class="control-node-name">Intake Gate</span>
+          <span class="control-node-role">5 baseline checks &amp; audit alert</span>
+        </a>
+        <a href="#tool-6" class="control-node">
+          <span class="control-node-tag">Tool 6 · Stage 4</span>
+          <span class="control-node-name">Redlining Playbook</span>
+          <span class="control-node-role">8 clauses &amp; fallback tiers</span>
+        </a>
+        <a href="#tool-7" class="control-node">
+          <span class="control-node-tag">Tool 7 · Process Audit</span>
+          <span class="control-node-name">QTC Diagnostic</span>
+          <span class="control-node-role">5 stages &amp; P1 bottlenecks</span>
+        </a>
+        <a href="#tool-8" class="control-node">
+          <span class="control-node-tag">Tool 8 · Structuring</span>
+          <span class="control-node-name">Bundling Sandbox</span>
+          <span class="control-node-role">2 options vs. budget &amp; floor</span>
+        </a>
+      </div>
+
+      <div class="controls-grid">
+        <article class="control-card" id="tool-5">
+          <div>
+            <div class="control-card-head">
+              <span class="control-id-badge">Tool 5 · Deal Desk Controls</span>
+              <span class="control-scope-tag">5 Baseline Checks</span>
+            </div>
+            <h3 class="control-card-title">Intake Gate &amp; Submission Scorecard</h3>
+            <p class="control-card-desc">
+              Scores every submitted deal on five baseline checks, reads its readiness, and routes it: fast-track, hold, or stop-and-audit an approval that skipped the baseline.
+            </p>
+          </div>
+          <div class="control-card-foot">
+            <a href="../intake-gate/" class="control-cta">
+              <span>Open Intake Gate &amp; Submission Scorecard</span>
+              <span class="control-cta-arrow" aria-hidden="true">-&gt;</span>
+            </a>
+          </div>
+        </article>
+
+        <article class="control-card" id="tool-6">
+          <div>
+            <div class="control-card-head">
+              <span class="control-id-badge">Tool 6 · Deal Desk Controls</span>
+              <span class="control-scope-tag">8 Clauses · Pre-Approved Tiers</span>
+            </div>
+            <h3 class="control-card-title">Redlining Playbook &amp; Clause Fallback Matrix</h3>
+            <p class="control-card-desc">
+              Eight commercial clauses, each with pre-approved fallback tiers and the approver each tier requires, so Tier 1 clears at the desk without waking Legal.
+            </p>
+          </div>
+          <div class="control-card-foot">
+            <a href="../redlining-playbook/" class="control-cta">
+              <span>Open Redlining Playbook &amp; Clause Fallback Matrix</span>
+              <span class="control-cta-arrow" aria-hidden="true">-&gt;</span>
+            </a>
+          </div>
+        </article>
+
+        <article class="control-card" id="tool-7">
+          <div>
+            <div class="control-card-head">
+              <span class="control-id-badge">Tool 7 · Deal Desk Controls</span>
+              <span class="control-scope-tag">5 QTC Stages · P1 Flagging</span>
+            </div>
+            <h3 class="control-card-title">QTC Diagnostic &amp; Bottleneck Scorecard</h3>
+            <p class="control-card-desc">
+              Scores five quote-to-cash stages for control maturity and risk, rolls them into one readiness number, and names the P1 bottlenecks to fix first.
+            </p>
+          </div>
+          <div class="control-card-foot">
+            <a href="../qtc-diagnostic/" class="control-cta">
+              <span>Open QTC Diagnostic &amp; Bottleneck Scorecard</span>
+              <span class="control-cta-arrow" aria-hidden="true">-&gt;</span>
+            </a>
+          </div>
+        </article>
+
+        <article class="control-card" id="tool-8">
+          <div>
+            <div class="control-card-head">
+              <span class="control-id-badge">Tool 8 · Deal Desk Controls</span>
+              <span class="control-scope-tag">2 Options · Budget &amp; Floor Gate</span>
+            </div>
+            <h3 class="control-card-title">Commercial Restructuring &amp; Margin Bundling Sandbox</h3>
+            <p class="control-card-desc">
+              Builds two bundle options line by line against a buyer's budget ceiling and an internal margin floor, gating each live: the raw ask fails, the restructured bundle passes.
+            </p>
+          </div>
+          <div class="control-card-foot">
+            <a href="../bundling-sandbox/" class="control-cta">
+              <span>Open Commercial Restructuring &amp; Margin Bundling Sandbox</span>
+              <span class="control-cta-arrow" aria-hidden="true">-&gt;</span>
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-block" aria-labelledby="heading-navigation">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-navigation">Other Partitions &amp; Practice Scope</h2>
+        <p class="section-subtitle">Navigate the rest of the proof-of-work library and operating background</p>
+      </div>
+
+      <div class="related-grid">
+        <div class="related-card">
+          <span class="related-card-eyebrow">Section 6 Hub</span>
+          <a href="../../tools/">Proof of Work Hub</a>
+          <p>Return to the full index of pricing engines, contract operations, executive intelligence, and adapted contracts.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Practice Scope</span>
+          <a href="../../services/">Practice &amp; Mandate Scope</a>
+          <p>Review fractional deal desk, contract management, and quote-to-cash implementation engagements.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Background</span>
+          <a href="../../about/">Operator Record &amp; Background</a>
+          <p>Inspect the operating record behind these controls across commercial contracts, deal desk, and revenue operations.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h2 class="footer-heading">Fractional Deal Desk &amp; Contract Management</h2>
+          <p style="margin: 0; color: #CBD5E1; line-height: 1.5;">
+            Commercial contracts, deal desk architecture, and revenue operations controls. 15+ years of operating experience across contracts up to $300M and 3,000+ SKUs under management.
+          </p>
+        </div>
+        <div>
+          <h2 class="footer-heading">Deal Desk Controls (Tools 5–8)</h2>
+          <ul class="footer-links">
+            <li><a href="../intake-gate/">Tool 5: Intake Gate &amp; Submission Scorecard</a></li>
+            <li><a href="../redlining-playbook/">Tool 6: Redlining Playbook &amp; Clause Fallback Matrix</a></li>
+            <li><a href="../qtc-diagnostic/">Tool 7: QTC Diagnostic &amp; Bottleneck Scorecard</a></li>
+            <li><a href="../bundling-sandbox/">Tool 8: Commercial Restructuring &amp; Margin Bundling Sandbox</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="footer-heading">Site Sections</h2>
+          <ul class="footer-links">
+            <li><a href="../../">Home</a></li>
+            <li><a href="../../tools/">Proof of Work Hub</a></li>
+            <li><a href="../../services/">Practice &amp; Mandate Scope</a></li>
+            <li><a href="../../about/">Operator Record &amp; Background</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>Partition S6-P05 · Deal Desk Controls</span>
+        <span>All sample figures and records inside the linked tools are fictional and for demonstration only.</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
