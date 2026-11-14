@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<!--
+ARGON MANIFEST: TOOL 1 FULL REBUILD — Deal Pricing Solver / Deal Pricing Calculator (S6-P01.a)
+================================================================================================
+
+1. SELF-CHECK AGAINST GROUND-TRUTH ANCHORS & ALL EIGHT INTERACTION CASES (PART C)
+   Engine Parity:
+   - The CALC block and its header comment from calculator-engine.txt are inlined BYTE-FOR-BYTE
+     at the top of the page script (12 pure methods: pupmFromArpu, pupmLayer, solveList, solveDisc,
+     solvePM, line, pctChange, expand, contract, usage, applyCoupon, threshold).
+   - Every numerical assertion below is executed live on page load by runSelfCheckBattery()
+     against the inlined CALC object and live DOM outputs.
+
+   Seed-State Anchors (verified against inlined CALC):
+   - Baselines: ARPU $158.40 / 12 months => Net PUPM $13.20.
+   - Solver identity & flat matrix:
+     * 30 * (1 - 45%) * (1 - 20%) = $13.20
+     * Solve List (PM 20%, Disc 45%) => $30.00
+     * Solve Discount (PM 20%, List $30) => 45.00%
+     * Solve Partner Margin (Disc 45%, List $30) => 20.00%
+     * Smart form (solve list / disc / pm) => $30.00 / 45.00% / 20.00%
+   - TCV form: TCV $114,048 / 4 yrs => ACV $28,512.00; 48 months; / 180 seats => ARPU $158.40; Net PUPM $13.20.
+   - New Deal lines:
+     * L1 Core Standard (list $23, 86 seats, disc 45%, pm 12%, 36m, coupon $1,500):
+       PUPM $11.13 (11.132), PUPY $133.58, ACV $11,488.22, TCV $34,464.67,
+       ACV after coupon $10,988.22, TCV after coupon $32,964.67.
+     * L2 Biz Plus (list $22, 230 seats, disc 45%, pm 12%, 36m, coupon $0):
+       PUPM $10.65 (10.648), PUPY $127.78, ACV $29,388.48, TCV $88,165.44.
+     * L3 Frontline Lite (list $4, 255 seats, disc 45%, pm 12%, 36m, coupon $0):
+       PUPM $1.94 (1.936), PUPY $23.23, ACV $5,924.16, TCV $17,772.48.
+     * L4 None: all $0.00.
+     * Deal totals: 571 seats; raw ACV $46,800.86; raw TCV $140,402.59;
+       after coupons ACV $46,300.86 / TCV $138,902.59; Blended Net PUPM $6.83.
+   - Usage (New Deal):
+     * Token line (per 1M tokens, 60 units, $3.00, disc 10%, min 25):
+       billed 60, gross $180.00, net $162.00/mo ($1,944.00/yr),
+       effective per unit $2.7000, per-token price $0.00000270 (8dp).
+     * Concession (meter token1m, threshold 50, extra 5%):
+       CONCESSION ACTIVE (TRIGGERED) — metered net $162.00, off $8.10, after $153.90/mo.
+       Deal usage net/year after concession = $1,846.80.
+       Full deal TCV (36 months, seat TCV after coupons + usage after concession):
+       $138,902.592 + $1,846.80 * 3 = $144,442.99.
+       [Arithmetic note on Part C prompt figure: Part C listed $145,942.99, which equals
+        raw pre-coupon seat TCV $140,402.59 + $5,540.40 usage; the shipped calculator-full.txt
+        formula (totTcv + ndUsageMo * 12 * dealYears, where totTcv sums after-coupon r.ftcv)
+        computes $144,442.99, which is preserved faithfully without altering the formula.]
+   - Old vs New:
+     * Old totals: 50 seats, ACV $7,920.00, TCV $23,760.00.
+     * Proposed totals: 571 seats, ACV $46,300.86, TCV $138,902.59 (after coupons).
+     * Comparison deltas: ACV delta +484.61% (+$38,380.86), TCV delta +484.61% (+$115,142.59).
+     * Old usage net: $108.00/mo; Proposed usage net: $148.50/mo, concession TRIGGERED
+       (off $7.43, after $141.08/mo), usage delta +30.63%.
+   - SKU-mix at seed state:
+     * Floor = max(15% * 571, 100) = 100. Enterprise seats = 86 => Rule 1 FAILS
+       ("Proposed: 86 top-tier seats of 571 total — floor is 100.").
+     * Business seats = 230 <= 300 => Rule 2 PASSES.
+   - Expansion utility: $20.10 => up 10% = $22.11, down 10% = $18.09.
+
+   All 8 Interaction Cases (verified on load against inlined CALC + DOM reset):
+   1. Solver round-trips: matrix rows & smart form (list/disc/pm) solve exact seed values.
+   2. Coupon spread: $1,500 on 36-month L1 reduces ACV by $500.00/yr and TCV by $1,500.00.
+   3. Minimum binds: usage 10 with min 25 ($3.00, 10% disc) => billed 25, net $67.50/mo.
+   4. Threshold edge: threshold 50 w/ 60 billed => TRIGGERED; raised to 100 => NOT REACHED, off $0.00, after = $162.00.
+   5. PDL flip: raising Proposed L1 Core Standard seats 86 -> 120 => 120 enterprise seats of 605 total, floor 100 => Rule 1 PASSES.
+   6. Zero-divisor guards: 100% discount in solveList, months = 0 in baselines, and 0 old-deal ACV in comparison all render "—" cleanly with zero "$—", NaN, or Infinity.
+   7. Per-token at 1K: switching New Deal token line to token1k yields effective per-token price $0.00270000 (8dp).
+   8. Reset restores the entire seed state in both views (baselines, solver, TCV, product & usage lines, concessions, expansion, and labels).
+
+2. IMPROVEMENTS MADE (10X RULE — DEEP FLAGSHIP IMPROVEMENT SET):
+   1. Live Deal Command Strip (Top 4-Card Band on Desktop / Sticky Compact Bottom Bar on Phone):
+      Surfaces the active view's critical per-unit and deal-level numbers without scrolling through forms:
+      New Deal shows Baseline PUPM, TCV-derived PUPM, Total Seats, Blended Net PUPM & PUPY, Seat ACV/TCV
+      after coupons, Usage Net/yr + Concession status, and Full Deal TCV; Old vs New shows Old ACV/TCV,
+      Proposed ACV/TCV, ACV/TCV % & $ variance, Usage delta, and SKU-mix Rule 1 & Rule 2 status.
+   2. Zero-Divisor Clean Formatting Helper (moneyDollar / pctFmt):
+      Eliminates the "$—" artifact from the prior script when solveList or TCV outputs return NaN/Infinity;
+      non-finite values render strictly as "—".
+   3. Semantic Tables on Desktop + Stacked Line Cards Leading with SKU Name on Mobile (<= 720px):
+      Product and usage tables render as full multi-column tables on desktop and transform cleanly into
+      stacked line cards on mobile with the editable SKU / Usage line name leading every card, >= 44px
+      touch targets, 1rem inputs, and zero page-level horizontal overflow from 280px to 1280px.
+   4. Explicit Net-60 Payment Terms Tag + Per-Line Readout Enrichment:
+      Each product line shows its Net-60 terms badge inline (per model spec) alongside live Net PUPM,
+      Net PUPY (ARPU), ACV, TCV, ACV after coupon, and TCV after coupon.
+   5. Usage Minimum-vs-Volume Driver Pill & Pre/Post-Concession Breakdown:
+      Each usage line automatically flags whether the "Committed min binds" or "Metered volume binds",
+      and both concession blocks show Metered Net Before, Discount Off ($/mo), Billed Units, Status
+      (CONCESSION ACTIVE / NOT REACHED), and Metered Net After ($/mo).
+   6. One-Tap Scenario Presets + Full Seed Reset + "Copy New Deal -> Proposed Deal" Sync:
+      Allows instant one-tap verification of key scenarios (Minimum Binds, Threshold Missed, PDL Rule 1 Pass,
+      Per-1K Token Pricing, Zero-Divisor Guard) plus full reset to the exact seed state and one-click
+      sync from View 1 New Deal lines & usage into View 2 Proposed Deal.
+   7. Dual Variance Table (% + Absolute Dollar/Seat Deltas) + Executive Verdict Banner:
+      The Old vs New comparison table renders both percent deltas (from CALC.pctChange) and absolute
+      dollar/seat changes, so newly added product slots where Old = $0 remain transparent and defensible.
+   8. Visual SKU-Mix Threshold Gauges & Proportional Deal Shape Bars:
+      Surfaces Rule 1 (Enterprise >= max(15%, 100 seats)) and Rule 2 (Business <= 300 seats) with
+      proportional progress bars showing exact seat headroom or deficit, plus Old vs Proposed ACV/Seat bars.
+   9. TCV-to-Baseline Sync Convenience Button:
+      Lets users push the TCV-solved Net ARPU directly into Section 1's Global Baseline ARPU and months
+      to chain Section 4 -> Sections 2 & 3 without manual retyping.
+   10. Live Copyable Deal Brief (Both Views + Per-Unit Metrics + Comparison + SKU-Mix):
+       Generates a complete plain-text Deal Desk brief with one-click clipboard copy and textarea fallback.
+
+3. GOAL-VS-SPEC CONFLICTS & RULINGS:
+   - Part C prompt text listed Full Deal TCV (36m, after concession) as "$145,942.99", while
+     calculator-full.txt computes totTcv ($138,902.592 after the $1,500 coupon) + ndUsageMo * 12 * 3
+     ($5,540.40) = "$144,442.99". Per the Engine & Ground-Truth rules, the shipped calculation
+     ($144,442.99 after coupons) is preserved and both figures are documented in the self-check.
+   - Phone Mode sticky bar vs Part E (No display:none content):
+     Instead of hiding secondary metrics with display:none on mobile, CSS rearranges the 4-card
+     Command Strip into a compact 2x2 fixed bottom bar and adds bottom footer padding so all text
+     remains accessible and Part E compliance is 100%.
+   - Table headers on mobile stacked cards vs Part E:
+     Instead of display:none on product/usage table headers on <= 720px, an accessible .sr-only
+     clipping rule is applied while visible data-label headings label every card cell.
+
+4. RESPONSIVE MODES (MOBILE & DESKTOP):
+   - Desktop Mode (> 720px): Top 4-card Live Command Strip pinned at the top of the workspace; full
+     multi-column solver matrix, TCV form, product & usage line tables, concession panels, side-by-side
+     Old vs New comparison table, SKU-mix threshold gauges, Deal Brief, and two-column reference guide.
+   - Phone Mode (<= 720px): Sticky fixed-bottom 2x2 Command Strip tracking the active view (View 1:
+     Baseline/Blended PUPM, Seats, Seat ACV/TCV after coupons, Full Deal TCV; View 2: Old ACV/TCV,
+     Proposed ACV/TCV, ACV/TCV deltas, SKU-Mix PASS/FAIL); product and usage lines stack into cards
+     led by the editable SKU/line name; wide matrix and comparison tables scroll horizontally inside
+     their own .table-scroll wrappers with zero page-level horizontal scroll across 280px–1280px.
+
+5. PART E — SEO INTEGRITY COMPLIANCE:
+   - 100% compliant. Zero white-on-white text, zero off-screen positioning, zero zero-size text,
+     zero keyword stuffing, zero cloaking or doorway pages.
+   - Both tab panels (#v1 New Deal and #v2 Old vs New) are fully present in the DOM as
+     visitor-controlled application state switched by accessible tab controls (role="tablist" /
+     role="tab" / role="tabpanel"), explicitly permitted as a legitimate app-state exception.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+  <link rel="apple-touch-icon" href="../../favicon.svg" />
+  <title>Deal Pricing Solver — Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="Solve list price, discount, and partner margin from net PUPM, price multi-line seats and per-use or per-token usage with coupons and a usage-threshold concession, and compare Old vs New deals side by side.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/deal-pricing-solver/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Deal Pricing Solver — Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="Solve list price, discount, and partner margin from net PUPM, price multi-line seats and per-use or per-token usage with coupons and a usage-threshold concession, and compare Old vs New deals side by side.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/deal-pricing-solver/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/deal-pricing-solver/#webapp",
+        "name": "Deal Pricing Solver",
+        "url": "https://fractional-deal-desk-site.pages.dev/tools/deal-pricing-solver/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "All",
+        "description": "Interactive deal pricing calculator solving list price, discount, and partner margin from net PUPM, modeling seat-based product lines with coupons alongside per-use and per-token usage lines with threshold concessions, comparing Old vs New deals, and checking SKU-mix rules.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Fractional Deal Desk & Contract Management",
+          "url": "https://fractional-deal-desk-site.pages.dev/"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/deal-pricing-solver/#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fractional-deal-desk-site.pages.dev/" },
+          { "@type": "ListItem", "position": 2, "name": "Proof of Work", "item": "https://fractional-deal-desk-site.pages.dev/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Pricing Engines", "item": "https://fractional-deal-desk-site.pages.dev/tools/pricing-engines/" },
+          { "@type": "ListItem", "position": 4, "name": "Deal Pricing Solver", "item": "https://fractional-deal-desk-site.pages.dev/tools/deal-pricing-solver/" }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --navy-900: #0F1E38;
+      --navy-800: #16294A;
+      --navy-700: #1F3760;
+      --brass-600: #7D5B14;
+      --brass-500: #B5892E;
+      --brass-400: #D4AF5A;
+      --brass-100: #F7F1E1;
+      --paper-bg: #F8F7F4;
+      --paper-card: #FFFFFF;
+      --paper-alt: #F1EFEA;
+      --ink-900: #0F1E38;
+      --ink-700: #28364E;
+      --ink-600: #42526B;
+      --rule-color: #D5D0C5;
+      --rule-strong: #0F1E38;
+      --fail-bg: #FEF2F2;
+      --fail-ink: #7F1D1D;
+      --fail-border: #991B1B;
+      --pass-bg: #F0FDF4;
+      --pass-ink: #14532D;
+      --pass-border: #166534;
+      --warn-bg: #FFFBEB;
+      --warn-ink: #78350F;
+      --warn-border: #B45309;
+      --font-serif: Georgia, "Times New Roman", Times, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { margin: 0; padding: 0; background-color: var(--paper-bg); color: var(--ink-900); font-family: var(--font-sans); line-height: 1.55; overflow-x: hidden; }
+    a { color: var(--navy-900); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover, a:focus-visible { color: var(--brass-600); }
+    button, input, select, textarea { font-family: inherit; border-radius: 0; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--brass-500); outline-offset: 2px; }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 clamp(0.65rem, 3vw, 2rem); }
+
+    /* HEADER & BREADCRUMB */
+    .site-header { background-color: var(--navy-900); color: #FFFFFF; border-bottom: 3px solid var(--brass-500); }
+    .header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; padding: 0.85rem 0; }
+    .brand-link { color: #FFFFFF; text-decoration: none; font-family: var(--font-serif); font-size: clamp(1rem, 2.2vw, 1.2rem); font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .brand-link:hover, .brand-link:focus-visible { color: var(--brass-400); }
+    .site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.85rem; }
+    .site-nav a { color: #E2E8F0; text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0.4rem; min-height: 44px; display: inline-flex; align-items: center; border-bottom: 2px solid transparent; }
+    .site-nav a:hover, .site-nav a:focus-visible, .site-nav a[aria-current="page"] { color: #FFFFFF; border-bottom-color: var(--brass-400); }
+
+    .breadcrumb-bar { background-color: var(--paper-alt); border-bottom: 1px solid var(--rule-color); font-size: 0.8125rem; }
+    .breadcrumb-list { list-style: none; margin: 0; padding: 0.35rem 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; color: var(--ink-700); }
+    .breadcrumb-list li { display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; overflow-wrap: anywhere; }
+    .breadcrumb-list li + li::before { content: "/"; color: var(--ink-600); }
+    .breadcrumb-list a { color: var(--ink-700); padding: 0.35rem 0.15rem; min-height: 44px; display: inline-flex; align-items: center; }
+    .breadcrumb-list [aria-current="page"] { color: var(--ink-900); font-weight: 600; }
+
+    /* HERO */
+    .hero-banner { background-color: var(--navy-900); color: #FFFFFF; padding: clamp(1.45rem, 4vw, 2.6rem) 0; border-bottom: 1px solid var(--rule-strong); }
+    .hero-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.85rem; }
+    .eyebrow-tag { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-400); font-weight: 600; }
+    .tool-badge { display: inline-block; background-color: var(--navy-800); border: 1px solid var(--brass-500); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; letter-spacing: 0.04em; }
+    .hero-title { font-family: var(--font-serif); font-size: clamp(1.5rem, 3.6vw, 2.35rem); line-height: 1.2; font-weight: 700; margin: 0 0 0.85rem 0; color: #FFFFFF; overflow-wrap: anywhere; }
+    .hero-lede { font-size: clamp(0.95rem, 1.6vw, 1.06rem); line-height: 1.62; color: #E2E8F0; max-width: 82ch; margin: 0 0 1.1rem 0; }
+    .provenance-strip { background-color: var(--navy-800); border-left: 3px solid var(--brass-500); padding: 0.85rem 1rem; font-size: 0.86rem; color: #E2E8F0; line-height: 1.55; max-width: 88ch; }
+    .provenance-strip strong { color: #FFFFFF; }
+
+    /* LIVE COMMAND / RESULTS STRIP (Desktop Top 4-Card Band / Phone Fixed Bottom Bar) */
+    .results-strip { background-color: var(--navy-900); color: #FFFFFF; border-top: 2px solid var(--brass-500); border-bottom: 2px solid var(--brass-500); padding: 0.95rem 0; margin-top: 1.2rem; }
+    .results-strip-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.35rem 1rem; margin-bottom: 0.65rem; }
+    .results-strip-title { font-family: var(--font-mono); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-400); font-weight: 700; margin: 0; }
+    .results-strip-sub { font-family: var(--font-mono); font-size: 0.74rem; color: #CBD5E1; margin: 0; }
+    .results-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; }
+
+    .result-card { background-color: var(--navy-800); border: 1px solid var(--navy-700); border-top: 3px solid var(--brass-500); padding: 0.75rem 0.85rem; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 0.35rem; text-align: left; color: #FFFFFF; }
+    .result-card.is-pass { border-top-color: #22C55E; }
+    .result-card.is-fail { border-top-color: #EF4444; }
+    .result-card.is-baseline { border-top-color: #94A3B8; }
+    .rc-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.25rem 0.5rem; }
+    .rc-name { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: #E2E8F0; font-weight: 700; overflow-wrap: anywhere; }
+    .rc-badge { font-family: var(--font-mono); font-size: 0.69rem; color: var(--brass-400); font-weight: 700; }
+    .rc-total { font-family: var(--font-serif); font-size: clamp(1.02rem, 1.85vw, 1.3rem); font-weight: 700; color: #FFFFFF; line-height: 1.2; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .rc-sub { font-family: var(--font-mono); font-size: 0.73rem; font-weight: 600; color: #CBD5E1; overflow-wrap: anywhere; }
+    .rc-sub.is-pos { color: #86EFAC; }
+    .rc-sub.is-neg { color: #FCA5A5; }
+    .rc-sub.is-warn { color: #FCD34D; }
+    .rc-meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.2rem 0.5rem; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 0.35rem; margin-top: 0.1rem; font-family: var(--font-mono); font-size: 0.69rem; color: #CBD5E1; }
+    .rc-meta-item { min-width: 0; overflow-wrap: anywhere; }
+    .rc-meta-item strong { color: #FFFFFF; font-weight: 700; }
+
+    /* MAIN SECTIONS & TABS */
+    main { padding-bottom: 2.5rem; }
+    .section-block { padding: clamp(1.2rem, 3vw, 2rem) 0; border-bottom: 1px solid var(--rule-color); }
+    .section-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--navy-900); }
+    .section-title { font-family: var(--font-serif); font-size: clamp(1.18rem, 2.4vw, 1.48rem); font-weight: 700; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; }
+    .section-subtitle { font-size: 0.82rem; color: var(--ink-600); font-family: var(--font-mono); margin: 0; overflow-wrap: anywhere; }
+    .directions-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: 0.95rem 1.05rem; font-size: 0.92rem; line-height: 1.62; color: var(--ink-700); margin: 0 0 1rem 0; }
+    .tab-rule-note { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-left: 3px solid var(--brass-500); padding: 0.65rem 0.9rem; font-size: 0.85rem; color: var(--ink-700); margin: 0 0 1rem 0; line-height: 1.5; }
+
+    /* PRESETS & TABS BAR */
+    .preset-panel { background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.85rem 1rem; margin-bottom: 1rem; }
+    .preset-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.65rem; }
+    .preset-title { font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-900); margin: 0; }
+    .preset-status { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-600); }
+    .preset-grid { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .preset-btn { background-color: var(--paper-alt); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.45rem 0.75rem; font-size: 0.8rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; text-align: left; }
+    .preset-btn:hover, .preset-btn:focus-visible { background-color: var(--navy-900); color: #FFFFFF; }
+    .preset-btn.is-active { background-color: var(--navy-900); color: #FFFFFF; border-color: var(--brass-500); box-shadow: inset 0 -3px 0 var(--brass-500); }
+    .preset-btn.is-reset { background-color: var(--paper-card); border-color: var(--brass-600); color: var(--brass-600); }
+    .preset-btn.is-reset:hover, .preset-btn.is-reset:focus-visible { background-color: var(--brass-600); color: #FFFFFF; }
+
+    .tabs-bar { display: flex; flex-wrap: wrap; align-items: stretch; justify-content: space-between; gap: 0.65rem; margin-bottom: 1.15rem; border-bottom: 2px solid var(--navy-900); padding-bottom: 0.65rem; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .tab { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.55rem 1.05rem; font-family: var(--font-serif); font-size: 0.98rem; font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; }
+    .tab:hover, .tab:focus-visible { background-color: var(--paper-alt); }
+    .tab.active { background-color: var(--navy-900); color: #FFFFFF; border-color: var(--navy-900); box-shadow: inset 0 -3px 0 var(--brass-500); }
+    .tabs-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; }
+
+    /* PANEL & FORM ELEMENTS */
+    .btn-primary { background-color: var(--navy-900); color: #FFFFFF; border: 1px solid var(--navy-900); padding: 0.55rem 1rem; font-size: 0.86rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-primary:hover, .btn-primary:focus-visible { background-color: var(--brass-600); border-color: var(--brass-600); }
+    .btn-secondary { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.45rem 0.85rem; font-size: 0.82rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-secondary:hover, .btn-secondary:focus-visible { background-color: var(--navy-900); color: #FFFFFF; }
+
+    .frame { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--navy-900); padding: clamp(0.85rem, 2.2vw, 1.25rem); margin-bottom: 1.15rem; min-width: 0; }
+    .frame.is-brass { border-top-color: var(--brass-500); }
+    .block { padding: 0 0 1.1rem 0; margin: 0 0 1.1rem 0; border-bottom: 1px solid var(--rule-color); }
+    .block:last-child { padding-bottom: 0; margin-bottom: 0; border-bottom: none; }
+
+    .frame-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.45rem 0.85rem; margin-bottom: 0.4rem; }
+    .frame h2, .block h2 { font-family: var(--font-serif); font-size: clamp(1.05rem, 2vw, 1.25rem); font-weight: 700; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; }
+    .frame-tag { font-family: var(--font-mono); font-size: 0.71rem; font-weight: 700; text-transform: uppercase; padding: 0.18rem 0.5rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); color: var(--ink-700); }
+    .small { font-size: 0.88rem; color: var(--ink-700); margin: 0.35rem 0 0.85rem 0; line-height: 1.55; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem; align-items: end; }
+    .grid > div { min-width: 0; display: flex; flex-direction: column; gap: 0.28rem; }
+    .grid label { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-900); overflow-wrap: anywhere; }
+
+    input.in, select.in { width: 100%; min-width: 0; border: 1px solid #9F988A; background-color: var(--brass-100); color: var(--ink-900); font-family: var(--font-mono); font-size: 0.92rem; font-weight: 600; padding: 0.45rem 0.55rem; min-height: 44px; }
+    input.in[type="text"], select.in { font-family: var(--font-sans); font-weight: 600; }
+    input.in:focus, select.in:focus { background-color: #FFFFFF; border-color: var(--navy-900); outline: none; box-shadow: 0 0 0 1px var(--navy-900); }
+
+    .out { border: 1px solid var(--rule-color); background-color: var(--paper-alt); padding: 0.45rem 0.65rem; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.92rem; color: var(--ink-900); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .out b { font-weight: 700; color: var(--ink-900); }
+    .out b.big { font-size: 1.08rem; color: var(--navy-900); }
+
+    /* INNER TABLES & PRODUCT/USAGE LINE TABLES */
+    .scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--rule-strong); background-color: var(--paper-card); }
+    table.calc-table { width: 100%; border-collapse: collapse; min-width: 680px; }
+    table.calc-table.line-table { min-width: 1120px; }
+    table.calc-table.usage-table { min-width: 920px; }
+    table.calc-table th { background-color: var(--navy-900); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.03em; text-align: left; padding: 0.55rem 0.5rem; border: 1px solid var(--navy-800); white-space: nowrap; }
+    table.calc-table td { padding: 0.45rem 0.45rem; border-bottom: 1px solid var(--rule-color); border-right: 1px solid var(--rule-color); font-size: 0.85rem; vertical-align: middle; background-color: var(--paper-card); }
+    table.calc-table tr:nth-child(even) td { background-color: #FAF9F6; }
+    table.calc-table td.num { text-align: right; font-family: var(--font-mono); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    table.calc-table td .in { min-width: 72px; font-size: 0.85rem; min-height: 40px; padding: 0.35rem 0.45rem; }
+    table.calc-table td input[type="text"].in { min-width: 130px; }
+    table.calc-table td select.in { min-width: 128px; }
+
+    .del { background-color: var(--paper-alt); color: var(--fail-ink); border: 1px solid var(--fail-border); font-weight: 700; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 0.25rem 0.5rem; }
+    .del:hover, .del:focus-visible { background-color: var(--fail-ink); color: #FFFFFF; }
+
+    .terms-tag { display: inline-block; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.45rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); color: var(--ink-700); white-space: nowrap; }
+    .driver-pill { display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; padding: 0.16rem 0.42rem; border: 1px solid var(--rule-color); background-color: var(--paper-alt); color: var(--ink-700); white-space: nowrap; margin-top: 0.2rem; }
+    .driver-pill.is-min { background-color: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+    .driver-pill.is-vol { background-color: var(--pass-bg); color: var(--pass-ink); border-color: var(--pass-border); }
+
+    /* STATUS FLAGS & VARIANCE DELTAS */
+    .flag { display: inline-block; font-family: var(--font-mono); font-size: 0.73rem; font-weight: 700; padding: 0.2rem 0.55rem; letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid transparent; white-space: nowrap; }
+    .flag.pass { background-color: var(--pass-bg); color: var(--pass-ink); border-color: var(--pass-border); }
+    .flag.fail { background-color: var(--fail-bg); color: var(--fail-ink); border-color: var(--fail-border); }
+    .flag.warn { background-color: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+
+    .pos { color: var(--pass-ink); }
+    .neg { color: var(--fail-ink); }
+    .abs-delta { display: block; font-size: 0.72rem; color: var(--ink-600); font-weight: 600; margin-top: 0.12rem; }
+
+    /* VERDICT CALLOUT & SKU-MIX RULES */
+    .verdict-banner { background-color: #FBF6E8; border: 1px solid var(--brass-500); border-left: 5px solid var(--brass-500); padding: 0.85rem 1rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--ink-900); line-height: 1.58; }
+    .verdict-banner strong { color: var(--navy-900); }
+
+    .rule { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.8rem 0.95rem; margin-bottom: 0.75rem; font-size: 0.9rem; line-height: 1.55; color: var(--ink-900); }
+    .rule:last-child { margin-bottom: 0; }
+    .rule-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 0.45rem; }
+    .gauge-track { width: 100%; height: 10px; background-color: #E2DDD2; border: 1px solid var(--rule-strong); margin-top: 0.5rem; }
+    .gauge-fill { height: 100%; background-color: var(--navy-900); transition: width 0.15s ease; }
+    .gauge-fill.is-pass { background-color: var(--pass-border); }
+    .gauge-fill.is-fail { background-color: var(--fail-border); }
+    .gauge-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.4rem; font-family: var(--font-mono); font-size: 0.73rem; color: var(--ink-700); margin-top: 0.3rem; }
+
+    /* PROPORTIONAL COMPARISON BARS */
+    .shape-bars { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.85rem; margin-top: 1rem; }
+    .shape-card { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.75rem 0.85rem; min-width: 0; }
+    .shape-card-title { font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: var(--ink-900); margin: 0 0 0.5rem 0; }
+    .bar-row { margin-bottom: 0.45rem; }
+    .bar-row:last-child { margin-bottom: 0; }
+    .bar-row-lbl { display: flex; justify-content: space-between; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-700); margin-bottom: 0.2rem; }
+    .bar-row-lbl strong { color: var(--ink-900); }
+    .bar-track { width: 100%; height: 10px; background-color: #E2DDD2; border: 1px solid var(--rule-strong); }
+    .bar-fill { height: 100%; background-color: var(--navy-900); }
+    .bar-fill.is-old { background-color: #64748B; }
+    .bar-fill.is-new { background-color: var(--brass-600); }
+
+    /* DEAL BRIEF */
+    .brief-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--brass-500); padding: clamp(0.9rem, 2vw, 1.25rem); }
+    .brief-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.75rem; }
+    .copy-status { font-family: var(--font-mono); font-size: 0.8rem; color: var(--pass-ink); font-weight: 700; }
+    .brief-pre { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.85rem; margin: 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; color: var(--ink-900); white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; max-height: 26rem; overflow-y: auto; }
+
+    /* EXPLAINER & RELATED LINKS & FOOTER */
+    .two-col-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
+    .card-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 3px solid var(--navy-900); padding: clamp(0.95rem, 2.2vw, 1.3rem); min-width: 0; }
+    .card-box.is-brass-top { border-top-color: var(--brass-500); }
+    .card-box h3 { font-family: var(--font-serif); font-size: 1.08rem; margin: 0 0 0.6rem 0; color: var(--ink-900); }
+    .card-box p, .card-box ol { margin: 0 0 0.75rem 0; font-size: 0.92rem; line-height: 1.62; color: var(--ink-700); overflow-wrap: anywhere; }
+    .card-box ol { padding-left: 1.25rem; }
+    .card-box li { margin-bottom: 0.55rem; }
+    .card-box p:last-child, .card-box ol:last-child { margin-bottom: 0; }
+
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; }
+    .related-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.9rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.4rem; min-width: 0; }
+    .related-card-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; color: var(--brass-600); font-weight: 700; }
+    .related-card a { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--ink-900); min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .related-card p { font-size: 0.83rem; color: var(--ink-700); margin: 0; }
+
+    .site-footer { background-color: var(--navy-900); color: #E2E8F0; border-top: 3px solid var(--brass-500); padding: 2rem 0 2.5rem 0; font-size: 0.85rem; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+    .footer-heading { font-family: var(--font-serif); font-size: 0.95rem; color: #FFFFFF; margin: 0 0 0.6rem 0; }
+    .footer-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+    .footer-links a { color: #E2E8F0; min-height: 44px; display: inline-flex; align-items: center; }
+    .footer-links a:hover, .footer-links a:focus-visible { color: var(--brass-400); }
+    .footer-bottom { border-top: 1px solid var(--navy-700); padding-top: 1rem; font-size: 0.78rem; color: #CBD5E1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+
+    /* RESPONSIVE BREAKPOINTS */
+    @media (max-width: 980px) {
+      .results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .shape-bars { grid-template-columns: 1fr; }
+    }
+
+    /* PHONE MODE (<= 720px): Stacked line cards leading with SKU name + Sticky bottom totals bar */
+    @media (max-width: 720px) {
+      .two-col-grid { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr; }
+      input.in, select.in { font-size: 1rem; }
+      .preset-btn { width: 100%; justify-content: flex-start; }
+      .tab { flex: 1 1 auto; justify-content: center; font-size: 0.9rem; }
+
+      /* Accessible visually-clipped table header for stacked mobile cards (no display:none) */
+      .scroll.is-stacked { border: none; background: transparent; overflow-x: visible; }
+      table.calc-table.line-table,
+      table.calc-table.usage-table { min-width: 0; width: 100%; display: block; }
+      table.calc-table.line-table thead,
+      table.calc-table.usage-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+      }
+      table.calc-table.line-table tbody,
+      table.calc-table.usage-table tbody { display: flex; flex-direction: column; gap: 0.85rem; }
+      table.calc-table.line-table tbody tr,
+      table.calc-table.usage-table tbody tr {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.45rem 0.65rem;
+        border: 1px solid var(--rule-strong);
+        border-top: 3px solid var(--navy-900);
+        background-color: var(--paper-card);
+        padding: 0.75rem;
+      }
+      table.calc-table.line-table tbody td,
+      table.calc-table.usage-table tbody td {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.2rem;
+        border: none;
+        padding: 0;
+        background: transparent;
+        text-align: left;
+        min-width: 0;
+      }
+      table.calc-table.line-table tbody td:first-child,
+      table.calc-table.usage-table tbody td:first-child {
+        grid-column: 1 / -1;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid var(--rule-color);
+      }
+      table.calc-table.line-table tbody td:last-child,
+      table.calc-table.usage-table tbody td:last-child {
+        grid-column: 1 / -1;
+        align-items: flex-end;
+        padding-top: 0.25rem;
+      }
+      table.calc-table.line-table tbody td::before,
+      table.calc-table.usage-table tbody td::before {
+        content: attr(data-label);
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--ink-600);
+      }
+      table.calc-table.line-table tbody td.num,
+      table.calc-table.usage-table tbody td.num {
+        text-align: left;
+        background-color: var(--paper-alt);
+        border: 1px solid var(--rule-color);
+        padding: 0.35rem 0.45rem;
+        white-space: normal;
+      }
+      table.calc-table.line-table tbody td .in,
+      table.calc-table.usage-table tbody td .in { min-width: 0; width: 100%; font-size: 1rem; min-height: 44px; }
+
+      /* Sticky Bottom Results Strip on Phone */
+      .results-strip { position: fixed; bottom: 0; left: 0; right: 0; margin-top: 0; padding: 0.38rem 0; z-index: 50; box-shadow: 0 -4px 14px rgba(15, 30, 56, 0.36); }
+      .results-strip-head { margin-bottom: 0.22rem; }
+      .results-strip-title { font-size: 0.63rem; }
+      .results-strip-sub { font-size: 0.62rem; }
+      .results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.3rem; }
+      .result-card { padding: 0.32rem 0.42rem; gap: 0.08rem; border-top-width: 2px; }
+      .rc-name { font-size: 0.62rem; line-height: 1.15; }
+      .rc-badge { font-size: 0.59rem; }
+      .rc-total { font-size: 0.84rem; line-height: 1.15; }
+      .rc-sub { font-size: 0.6rem; line-height: 1.15; }
+      .rc-meta-grid { grid-template-columns: 1fr; gap: 0.04rem; padding-top: 0.14rem; margin-top: 0.04rem; font-size: 0.58rem; line-height: 1.15; }
+
+      .site-footer { padding-bottom: 14.5rem; }
+    }
+
+    @media (max-width: 380px) {
+      table.calc-table.line-table tbody tr,
+      table.calc-table.usage-table tbody tr { grid-template-columns: 1fr; }
+      .rc-total { font-size: 0.78rem; }
+      .rc-meta-grid { font-size: 0.55rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../../" class="brand-link">Fractional Deal Desk &amp; Contract Management</a>
+      <nav class="site-nav" aria-label="Primary Navigation">
+        <a href="../../">Home</a>
+        <a href="../../tools/" aria-current="page">Proof of Work</a>
+        <a href="../../tools/pricing-engines/">Pricing Engines</a>
+        <a href="../../services/">Practice &amp; Mandate Scope</a>
+        <a href="../../about/">Operator Record</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumb-bar" aria-label="Breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb-list">
+        <li><a href="../../">Home</a></li>
+        <li><a href="../../tools/">Proof of Work</a></li>
+        <li><a href="../../tools/pricing-engines/">Pricing Engines</a></li>
+        <li aria-current="page">Deal Pricing Solver</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="hero-banner">
+    <div class="container">
+      <div class="hero-meta-row">
+        <span class="eyebrow-tag">Proof of Work · Pricing Engines</span>
+        <span class="tool-badge">Tool 1 · Pricing Engines</span>
+      </div>
+      <h1 class="hero-title">Deal Pricing Solver</h1>
+      <p class="hero-lede">
+        Most discount fights are one triangle argued for days: list price, discount, and partner margin. Give the solver any two and it solves the third. It also includes price-per-user-per-month math and a multi-year block that shows year-by-year discounts, total contract value, retained margin after the partner's share, and whether the deal stays inside the margin floor you set.
+      </p>
+      <div class="provenance-strip">
+        <strong>Provenance &amp; Operating Record:</strong> Built from 15+ years in commercial contracts, deal desk, and revenue operations across contracts up to $300M and 3,000+ SKUs under management. All numbers preloaded here are generic sample values for demonstration only — rename any product or usage line, adjust list prices, seats, discounts, partner margins, coupons, and usage thresholds to model a real deal.
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE COMMAND / RESULTS STRIP (Desktop Top Band / Phone Sticky Bottom Bar) -->
+  <section class="results-strip" id="results-strip" aria-label="Live Deal Totals and Per-Unit Readout">
+    <div class="container">
+      <div class="results-strip-head">
+        <h2 class="results-strip-title" id="strip-title">Live Deal Totals · New Deal</h2>
+        <p class="results-strip-sub" id="strip-sub">Core identity: Net PUPM = List × (1 − Discount) × (1 − Partner Margin) = ARPU ÷ Months</p>
+      </div>
+      <div class="results-grid">
+        <div class="result-card is-baseline" id="strip-c1">
+          <div class="rc-top">
+            <span class="rc-name" id="sc1-label">Solver Triangle</span>
+            <span class="rc-badge" id="sc1-badge">Net PUPM</span>
+          </div>
+          <strong class="rc-total" id="sc1-val">$13.20</strong>
+          <span class="rc-sub" id="sc1-sub">TCV-solved PUPM: $13.20</span>
+          <div class="rc-meta-grid">
+            <span class="rc-meta-item" id="sc1-m1">List: <strong>$30.00</strong></span>
+            <span class="rc-meta-item" id="sc1-m2">Disc / PM: <strong>45% / 20%</strong></span>
+          </div>
+        </div>
+
+        <div class="result-card" id="strip-c2">
+          <div class="rc-top">
+            <span class="rc-name" id="sc2-label">Seat Economics</span>
+            <span class="rc-badge" id="sc2-badge">571 seats</span>
+          </div>
+          <strong class="rc-total" id="sc2-val">$46,300.86</strong>
+          <span class="rc-sub" id="sc2-sub">Blended PUPM: $6.83 · PUPY: $81.96</span>
+          <div class="rc-meta-grid">
+            <span class="rc-meta-item" id="sc2-m1">Raw ACV: <strong>$46,800.86</strong></span>
+            <span class="rc-meta-item" id="sc2-m2">Seat TCV: <strong>$138,902.59</strong></span>
+          </div>
+        </div>
+
+        <div class="result-card is-pass" id="strip-c3">
+          <div class="rc-top">
+            <span class="rc-name" id="sc3-label">Usage &amp; Concession</span>
+            <span class="rc-badge" id="sc3-badge">CONCESSION ACTIVE</span>
+          </div>
+          <strong class="rc-total" id="sc3-val">$153.90/mo</strong>
+          <span class="rc-sub is-pos" id="sc3-sub">Usage/yr: $1,846.80 · Off: $8.10/mo</span>
+          <div class="rc-meta-grid">
+            <span class="rc-meta-item" id="sc3-m1">Metered net: <strong>$162.00</strong></span>
+            <span class="rc-meta-item" id="sc3-m2">Per token: <strong>$0.00000270</strong></span>
+          </div>
+        </div>
+
+        <div class="result-card" id="strip-c4">
+          <div class="rc-top">
+            <span class="rc-name" id="sc4-label">Full Deal TCV</span>
+            <span class="rc-badge" id="sc4-badge">36 months</span>
+          </div>
+          <strong class="rc-total" id="sc4-val">$144,442.99</strong>
+          <span class="rc-sub" id="sc4-sub">Seats + usage after coupons &amp; concession</span>
+          <div class="rc-meta-grid">
+            <span class="rc-meta-item" id="sc4-m1">Seat TCV: <strong>$138,902.59</strong></span>
+            <span class="rc-meta-item" id="sc4-m2">Usage TCV: <strong>$5,540.40</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- DIRECTIONS & SCENARIO PRESETS -->
+    <section class="section-block" aria-labelledby="heading-directions">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-directions">How the working calculator runs</h2>
+        <p class="section-subtitle">Two views · seat &amp; usage lines · coupons · threshold concession · SKU-mix check</p>
+      </div>
+      <p class="directions-box">
+        Below is the working calculator built from that model — broader than the sheet it came from. Price a new deal line by line: products from the dropdowns (rename any line to the customer's own products), seats and per-use or per-token usage side by side, coupons on any line, and an extra concession that kicks in when usage reaches the level you set. Then flip to the second tab and run the same deal as old versus new. The sample names and numbers are samples where they need to be, but the mechanics are real: change anything yellow, and every result on the page answers. The formulas stay under the hood.
+      </p>
+
+      <div class="preset-panel" aria-label="Scenario Presets and Seed Reset">
+        <div class="preset-header">
+          <h3 class="preset-title">One-tap scenario presets &amp; sample reset</h3>
+          <span class="preset-status" id="preset-status">Active state: Seed Sample State (all defaults)</span>
+        </div>
+        <div class="preset-grid">
+          <button type="button" class="preset-btn is-reset is-active" data-preset="seed">Reset to Sample Data</button>
+          <button type="button" class="preset-btn" data-preset="min-binds">Case: Usage Minimum Binds (10 units vs 25 min)</button>
+          <button type="button" class="preset-btn" data-preset="threshold-miss">Case: Threshold Not Reached (100 units)</button>
+          <button type="button" class="preset-btn" data-preset="pdl-pass">Case: PDL Rule 1 Passes (120 Core seats)</button>
+          <button type="button" class="preset-btn" data-preset="token-1k">Case: Per-1K Token Pricing ($0.00270000)</button>
+          <button type="button" class="preset-btn" data-preset="zero-guard">Case: Zero-Divisor Guards ("—" check)</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALCULATOR ROOT -->
+    <section class="section-block" id="calc-root" aria-label="Deal Pricing Calculator Workspace">
+      <p class="tab-rule-note">
+        SAMPLE — All preloaded figures, product presets, and SKU-mix thresholds are generic sample values for demonstration only. Yellow-tinted fields are editable inputs; outputs update live across both views.
+      </p>
+
+      <div class="tabs-bar">
+        <div class="tabs" role="tablist" aria-label="Deal Calculator Views">
+          <button class="tab active" id="tab-v1" role="tab" aria-selected="true" aria-controls="v1" data-view="v1" type="button">1 · New Deal</button>
+          <button class="tab" id="tab-v2" role="tab" aria-selected="false" aria-controls="v2" data-view="v2" type="button">2 · Old vs New Deal</button>
+        </div>
+        <div class="tabs-actions">
+          <button type="button" class="btn-secondary" id="btn-sync-to-proposed">Copy New Deal → Proposed Deal</button>
+          <button type="button" class="btn-secondary" id="btn-reset-top">Reset All Inputs</button>
+        </div>
+      </div>
+
+      <!-- ============================ VIEW 1 · NEW DEAL ============================ -->
+      <section id="v1" role="tabpanel" aria-labelledby="tab-v1">
+
+        <div class="frame">
+          <div class="block">
+            <div class="frame-head">
+              <h2>1. Global contract baselines</h2>
+              <span class="frame-tag">Model §3 · Hemisphere B · Step 1</span>
+            </div>
+            <p class="small">The anchor for the whole calculator: net contract value per seat, spread across the term. (Model §3, Hemisphere B, Step 1.)</p>
+            <div class="grid">
+              <div><label for="b-arpu">Net ARPU — contract value per seat, per year ($)</label><input class="in" id="b-arpu" type="number" step="any" value="158.4"></div>
+              <div><label for="b-months">Contract duration (months)</label><input class="in" id="b-months" type="number" step="any" value="12"></div>
+              <div><label>Calculated Net PUPM ($ per seat / month)</label><div class="out"><b class="big" id="b-pupm">—</b></div></div>
+            </div>
+          </div>
+
+          <div class="block">
+            <div class="frame-head">
+              <h2>2. Pricing variable solver — flat matrix</h2>
+              <span class="frame-tag">Model §3 · Hemisphere A</span>
+            </div>
+            <p class="small">The analyst layout (Model §3, Hemisphere A): each row solves one variable from the other two, off the baselines above. Net PUPM = List × (1 − Discount) × (1 − Partner Margin).</p>
+            <div class="scroll"><table class="calc-table">
+              <thead>
+                <tr><th>Solve for</th><th>Partner Margin %</th><th>Discount %</th><th>List Price ($)</th><th>Result</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>List Price</b></td>
+                  <td><input class="in" id="m1-pm" type="number" step="any" value="20" aria-label="Solve List Price: Partner Margin %"></td>
+                  <td><input class="in" id="m1-disc" type="number" step="any" value="45" aria-label="Solve List Price: Discount %"></td>
+                  <td class="num">—</td>
+                  <td class="num"><span class="out"><b id="m1-out">—</b></span></td>
+                </tr>
+                <tr>
+                  <td><b>Discount</b></td>
+                  <td><input class="in" id="m2-pm" type="number" step="any" value="20" aria-label="Solve Discount: Partner Margin %"></td>
+                  <td class="num">—</td>
+                  <td><input class="in" id="m2-list" type="number" step="any" value="30" aria-label="Solve Discount: List Price"></td>
+                  <td class="num"><span class="out"><b id="m2-out">—</b></span></td>
+                </tr>
+                <tr>
+                  <td><b>Partner Margin</b></td>
+                  <td class="num">—</td>
+                  <td><input class="in" id="m3-disc" type="number" step="any" value="45" aria-label="Solve Partner Margin: Discount %"></td>
+                  <td><input class="in" id="m3-list" type="number" step="any" value="30" aria-label="Solve Partner Margin: List Price"></td>
+                  <td class="num"><span class="out"><b id="m3-out">—</b></span></td>
+                </tr>
+              </tbody>
+            </table></div>
+          </div>
+
+          <div class="block">
+            <div class="frame-head">
+              <h2>3. Smart calculator form</h2>
+              <span class="frame-tag">Model §3 · Hemisphere B · Step 2</span>
+            </div>
+            <p class="small">The field layout (Model §3, Hemisphere B, Step 2): pick what to solve for from the dropdown; the form asks only for the other two.</p>
+            <div class="grid">
+              <div><label for="s-target">What do you want to calculate?</label>
+                <select class="in" id="s-target">
+                  <option value="list" selected>Solve for List Price</option>
+                  <option value="disc">Solve for Discount</option>
+                  <option value="pm">Solve for Partner Margin</option>
+                </select></div>
+              <div id="s-f1-wrap"><label id="s-f1-label" for="s-f1">Enter Partner Margin (PM) %</label><input class="in" id="s-f1" type="number" step="any" value="20"></div>
+              <div id="s-f2-wrap"><label id="s-f2-label" for="s-f2">Enter Discount %</label><input class="in" id="s-f2" type="number" step="any" value="45"></div>
+              <div><label>Calculated result</label><div class="out"><b class="big" id="s-out">—</b></div></div>
+            </div>
+          </div>
+
+          <div class="block">
+            <div class="frame-head">
+              <h2>4. Get the list price from the TCV</h2>
+              <span class="frame-tag">Model §3 · Interactive TCV Form</span>
+            </div>
+            <p class="small">Start from a signed total instead (Model §3, Interactive TCV form): total contract value, term, and seats give the annual value and the per-seat prices.</p>
+            <div class="grid">
+              <div><label for="t-tcv">Total Contract Value — TCV ($)</label><input class="in" id="t-tcv" type="number" step="any" value="114048"></div>
+              <div><label for="t-years">Contract duration (years)</label><input class="in" id="t-years" type="number" step="any" value="4"></div>
+              <div><label for="t-seats">Number of seats / users</label><input class="in" id="t-seats" type="number" step="any" value="180"></div>
+              <div><label>Annual Contract Value — ACV ($)</label><div class="out"><b id="t-acv">—</b></div></div>
+              <div><label>Duration (months)</label><div class="out"><b id="t-months">—</b></div></div>
+              <div><label>Net ARPU ($ per seat / year)</label><div class="out"><b id="t-arpu">—</b></div></div>
+              <div><label>Net PUPM ($ per seat / month)</label><div class="out"><b id="t-pupm">—</b></div></div>
+              <div><label>Push TCV ARPU to baseline</label><button type="button" class="btn-secondary" id="btn-push-tcv">Use TCV ARPU in Step 1</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame">
+          <div class="frame-head">
+            <h2>5. New deal — product lines</h2>
+            <span class="frame-tag">Seats · Coupons · Per-Seat Pricing</span>
+          </div>
+          <p class="small">Up to four lines (the model's architecture). Pick a product from the dropdown — its list price fills in and stays editable. Unit price is per seat per month; ACV and TCV build from the net per-seat price.</p>
+          <div class="scroll is-stacked"><table class="calc-table line-table" id="nd-table">
+            <thead>
+              <tr><th>SKU name (editable)</th><th>Preset</th><th>List price ($/seat/mo)</th><th>Seats</th><th>Discount %</th><th>Partner Margin %</th><th>Term (months)</th><th>Terms</th><th>Net PUPM</th><th>Net ARPU (yr)</th><th>ACV ($)</th><th>TCV ($)</th><th>Coupon ($)</th><th>ACV after coupon</th><th>TCV after coupon</th><th></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table></div>
+          <p style="margin:12px 0 0"><button class="btn-secondary" type="button" id="add-nd">+ Add a product line</button></p>
+          <div class="grid" style="margin-top:14px">
+            <div><label>Total seats</label><div class="out"><b id="nd-seats">—</b></div></div>
+            <div><label>Seat ACV, before coupons ($)</label><div class="out"><b id="nd-acv-raw">—</b></div></div>
+            <div><label>Seat ACV, after coupons ($)</label><div class="out"><b id="nd-acv">—</b></div></div>
+            <div><label>Seat TCV, after coupons ($)</label><div class="out"><b id="nd-tcv">—</b></div></div>
+            <div><label>Blended Net PUPM ($)</label><div class="out"><b id="nd-pupm">—</b></div></div>
+            <div><label>Blended Net PUPY / ARPU ($)</label><div class="out"><b id="nd-pupy">—</b></div></div>
+            <div><label>Usage net / year, after concession ($)</label><div class="out"><b id="nd-usageyr">—</b></div></div>
+            <div><label>Full deal TCV — seats + usage ($)</label><div class="out"><b class="big" id="nd-fulltcv">—</b></div></div>
+          </div>
+          <p class="small" style="margin-top:0.85rem; margin-bottom:0;">Payment terms per line are Net 60 in the model's samples; they ride along as a label, they don't change the math.</p>
+        </div>
+
+        <div class="frame">
+          <div class="frame-head">
+            <h2>6. Usage lines — per use / per token, inside this deal</h2>
+            <span class="frame-tag">Consumption · Minimums · 8dp Per-Token</span>
+          </div>
+          <p class="small">Consumption pricing rides in the same deal as the seats. Pick the unit, set expected monthly volume and the rate; the committed minimum bills even when use runs below it. These lines feed the deal totals above and the concession below.</p>
+          <div class="scroll is-stacked"><table class="calc-table usage-table" id="ndu-table">
+            <thead>
+              <tr><th>Usage line name (editable)</th><th>Unit type</th><th>Usage / month</th><th>Price per unit ($)</th><th>Discount %</th><th>Committed min (units)</th><th>Billed &amp; Driver</th><th>Gross ($/mo)</th><th>Net ($/mo)</th><th>Annual ($/yr)</th><th>Effective per unit ($)</th><th>Per token ($)</th><th></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table></div>
+          <p style="margin:12px 0 0"><button class="btn-secondary" type="button" id="add-ndu">+ Add a usage line</button></p>
+        </div>
+
+        <div class="frame is-brass">
+          <div class="frame-head">
+            <h2>7. Deal levers — coupons &amp; the usage concession</h2>
+            <span class="frame-tag">Threshold Concession</span>
+          </div>
+          <p class="small">Coupons: every product line above has a Coupon ($) field — a flat amount off that line's contract value, spread across its years (the model's voucher idea, as a simple option on every line). Concession: when billed usage on the chosen meter reaches the threshold, an extra discount comes off those usage lines.</p>
+          <div class="grid">
+            <div><label for="g1-meter">Concession meter (unit type)</label>
+              <select class="in" id="g1-meter">
+                <option value="token1m" selected>Tokens — per 1M tokens</option>
+                <option value="token1k">Tokens — per 1K tokens</option>
+                <option value="use">Per use / per call</option>
+                <option value="api">Per API request</option>
+              </select></div>
+            <div><label for="g1-threshold">Usage threshold (billed units / month)</label><input class="in" id="g1-threshold" type="number" step="any" value="50"></div>
+            <div><label for="g1-extra">Extra discount when reached %</label><input class="in" id="g1-extra" type="number" step="any" value="5"></div>
+            <div><label>Billed units on the meter</label><div class="out"><b id="g1-units">—</b></div></div>
+            <div><label>Metered net before concession ($/mo)</label><div class="out"><b id="g1-before">—</b></div></div>
+            <div><label>Concession status</label><div class="out"><span class="flag" id="g1-status">—</span></div></div>
+            <div><label>Extra discount off ($/mo)</label><div class="out"><b id="g1-off">—</b></div></div>
+            <div><label>Metered usage net / month, after concession ($)</label><div class="out"><b class="big" id="g1-after">—</b></div></div>
+          </div>
+        </div>
+
+        <div class="frame">
+          <div class="frame-head">
+            <h2>8. ARPU expansion &amp; contraction utility</h2>
+            <span class="frame-tag">Model §4 · Standalone Sandbox</span>
+          </div>
+          <p class="small">A standalone sandbox (Model §4): take one current price and see the uplift and the concession at the same time, without touching the deal above.</p>
+          <div class="grid">
+            <div><label for="e-price">Current deal paying price ($)</label><input class="in" id="e-price" type="number" step="any" value="20.10"></div>
+            <div><label for="e-up">Price increase needed %</label><input class="in" id="e-up" type="number" step="any" value="10"></div>
+            <div><label for="e-down">Price decrease needed %</label><input class="in" id="e-down" type="number" step="any" value="10"></div>
+            <div><label>Increase result ($)</label><div class="out"><b id="e-up-out">—</b></div></div>
+            <div><label>Decrease result ($)</label><div class="out"><b id="e-down-out">—</b></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ VIEW 2 · OLD VS NEW ============================ -->
+      <section id="v2" role="tabpanel" aria-labelledby="tab-v2" hidden>
+        <div class="frame">
+          <div class="frame-head">
+            <h2>Current / old deal footprint</h2>
+            <span class="frame-tag">Model §5 · Baseline Ledger</span>
+          </div>
+          <p class="small">The baseline ledger (Model §5): what the customer has today, line by line. Dropdowns pick the product; list price fills in and stays editable.</p>
+          <div class="scroll is-stacked"><table class="calc-table line-table" id="old-table">
+            <thead>
+              <tr><th>SKU name (editable)</th><th>Preset</th><th>List price ($/seat/mo)</th><th>Seats</th><th>Discount %</th><th>Partner Margin %</th><th>Term (months)</th><th>Terms</th><th>Net PUPM</th><th>Net ARPU (yr)</th><th>ACV ($)</th><th>TCV ($)</th><th>Coupon ($)</th><th>ACV after coupon</th><th>TCV after coupon</th><th></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table></div>
+          <p style="margin:12px 0 0"><button class="btn-secondary" type="button" id="add-old">+ Add a product line</button></p>
+        </div>
+
+        <div class="frame">
+          <div class="frame-head">
+            <h2>Old deal — usage lines</h2>
+            <span class="frame-tag">Baseline Consumption</span>
+          </div>
+          <p class="small">What the old deal consumes today, priced the same way as the new side so the comparison is honest.</p>
+          <div class="scroll is-stacked"><table class="calc-table usage-table" id="oldu-table">
+            <thead>
+              <tr><th>Usage line name (editable)</th><th>Unit type</th><th>Usage / month</th><th>Price per unit ($)</th><th>Discount %</th><th>Committed min (units)</th><th>Billed &amp; Driver</th><th>Gross ($/mo)</th><th>Net ($/mo)</th><th>Annual ($/yr)</th><th>Effective per unit ($)</th><th>Per token ($)</th><th></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table></div>
+          <p style="margin:12px 0 0"><button class="btn-secondary" type="button" id="add-oldu">+ Add a usage line</button></p>
+        </div>
+
+        <div class="frame">
+          <div class="frame-head">
+            <h2>Proposed deal — discount / concession method</h2>
+            <span class="frame-tag">Model §7 · Proposed Footprint</span>
+          </div>
+          <p class="small">The new deal (Model §7), same shape. The comparison below reads line 1 against line 1, line 2 against line 2, line 3 against line 3 — so keep the same slot for the same product family.</p>
+          <div class="scroll is-stacked"><table class="calc-table line-table" id="new-table">
+            <thead>
+              <tr><th>SKU name (editable)</th><th>Preset</th><th>List price ($/seat/mo)</th><th>Seats</th><th>Discount %</th><th>Partner Margin %</th><th>Term (months)</th><th>Terms</th><th>Net PUPM</th><th>Net ARPU (yr)</th><th>ACV ($)</th><th>TCV ($)</th><th>Coupon ($)</th><th>ACV after coupon</th><th>TCV after coupon</th><th></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table></div>
+          <p style="margin:12px 0 0"><button class="btn-secondary" type="button" id="add-new">+ Add a product line</button></p>
+        </div>
+
+        <div class="frame">
+          <div class="frame-head">
+            <h2>Proposed deal — usage lines &amp; concession</h2>
+            <span class="frame-tag">Proposed Consumption &amp; Lever</span>
+          </div>
+          <p class="small">The new deal's consumption, with the same usage-threshold concession as the New Deal view: reach the threshold on the meter and the extra discount comes off the metered lines.</p>
+          <div class="scroll is-stacked"><table class="calc-table usage-table" id="newu-table">
+            <thead>
+              <tr><th>Usage line name (editable)</th><th>Unit type</th><th>Usage / month</th><th>Price per unit ($)</th><th>Discount %</th><th>Committed min (units)</th><th>Billed &amp; Driver</th><th>Gross ($/mo)</th><th>Net ($/mo)</th><th>Annual ($/yr)</th><th>Effective per unit ($)</th><th>Per token ($)</th><th></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table></div>
+          <p style="margin:12px 0 0"><button class="btn-secondary" type="button" id="add-newu">+ Add a usage line</button></p>
+          <div class="grid" style="margin-top:14px">
+            <div><label for="g2-meter">Concession meter (unit type)</label>
+              <select class="in" id="g2-meter">
+                <option value="token1m" selected>Tokens — per 1M tokens</option>
+                <option value="token1k">Tokens — per 1K tokens</option>
+                <option value="use">Per use / per call</option>
+                <option value="api">Per API request</option>
+              </select></div>
+            <div><label for="g2-threshold">Usage threshold (billed units / month)</label><input class="in" id="g2-threshold" type="number" step="any" value="50"></div>
+            <div><label for="g2-extra">Extra discount when reached %</label><input class="in" id="g2-extra" type="number" step="any" value="5"></div>
+            <div><label>Billed units on the meter</label><div class="out"><b id="g2-units">—</b></div></div>
+            <div><label>Metered net before concession ($/mo)</label><div class="out"><b id="g2-before">—</b></div></div>
+            <div><label>Concession status</label><div class="out"><span class="flag" id="g2-status">—</span></div></div>
+            <div><label>Extra discount off ($/mo)</label><div class="out"><b id="g2-off">—</b></div></div>
+            <div><label>Metered usage net / month, after concession ($)</label><div class="out"><b class="big" id="g2-after">—</b></div></div>
+          </div>
+        </div>
+
+        <div class="frame is-brass">
+          <div class="frame-head">
+            <h2>The comparison — what changed</h2>
+            <span class="frame-tag">Variance Verdict · % &amp; Dollar Deltas</span>
+          </div>
+          <p class="small">The model's variance indicators: Seat +/-, ARPU +/-, ARPA +/-, ACV +/-, TCV +/-. ARPA is the account's monthly value (ACV ÷ 12).</p>
+
+          <div class="verdict-banner" id="cmp-verdict-banner" aria-live="polite">
+            <strong>Deal Verdict:</strong> <span id="cmp-verdict-text">—</span>
+          </div>
+
+          <div class="scroll"><table class="calc-table" id="cmp-table">
+            <thead>
+              <tr><th>Line</th><th>Seat +/-</th><th>ARPU +/-</th><th>ARPA +/-</th><th>ACV +/-</th><th>TCV +/-</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table></div>
+
+          <div class="grid" style="margin-top:14px">
+            <div><label>Old — ACV / TCV ($)</label><div class="out"><b id="cmp-old">—</b></div></div>
+            <div><label>New — ACV / TCV ($)</label><div class="out"><b id="cmp-new">—</b></div></div>
+            <div><label>Total ACV change (after coupons)</label><div class="out"><b id="cmp-acv">—</b></div></div>
+            <div><label>Total TCV change (after coupons)</label><div class="out"><b id="cmp-tcv">—</b></div></div>
+            <div><label>Usage — old net / month ($)</label><div class="out"><b id="cmp-uold">—</b></div></div>
+            <div><label>Usage — new net / month, after concession ($)</label><div class="out"><b id="cmp-unew">—</b></div></div>
+            <div><label>Usage change</label><div class="out"><b id="cmp-udelta">—</b></div></div>
+            <div><label>Old vs New blended PUPM ($)</label><div class="out"><b id="cmp-pupm-pair">—</b></div></div>
+          </div>
+
+          <div class="shape-bars" id="cmp-shape-bars" aria-label="Old vs Proposed Deal Shape Bars"></div>
+        </div>
+
+        <div class="frame">
+          <div class="frame-head">
+            <h2>SKU-mix adjudication — the model's sample rules</h2>
+            <span class="frame-tag">Model §6 · PDL Hub Rules</span>
+          </div>
+          <p class="small">From the model's PDL hub (§6), its own example rules — an organization may have different rules; these are the ones documented in the model.</p>
+          <div class="rule">
+            <div class="rule-head">
+              <span class="flag" id="pdl-1-flag">—</span>
+              <b>Top-tier seat floor:</b>
+            </div>
+            <span id="pdl-1-text">—</span>
+            <div class="gauge-track"><div class="gauge-fill" id="pdl-1-bar" style="width:0%"></div></div>
+            <div class="gauge-meta"><span id="pdl-1-left">—</span><span id="pdl-1-right">—</span></div>
+          </div>
+          <div class="rule">
+            <div class="rule-head">
+              <span class="flag" id="pdl-2-flag">—</span>
+              <b>Mid-tier seat cap:</b>
+            </div>
+            <span id="pdl-2-text">—</span>
+            <div class="gauge-track"><div class="gauge-fill" id="pdl-2-bar" style="width:0%"></div></div>
+            <div class="gauge-meta"><span id="pdl-2-left">—</span><span id="pdl-2-right">—</span></div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- DEAL BRIEF -->
+    <section class="section-block" id="section-brief" aria-labelledby="heading-brief">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-brief">Deal Brief</h2>
+        <p class="section-subtitle">Copyable plain-text readout of solver outputs, deal totals, comparison &amp; SKU-mix verdict</p>
+      </div>
+      <div class="brief-panel">
+        <div class="brief-toolbar">
+          <button type="button" class="btn-primary" id="btn-copy-brief">Copy Deal Brief</button>
+          <span class="copy-status" id="brief-copy-status" aria-live="polite"></span>
+        </div>
+        <pre class="brief-pre" id="deal-brief-pre" tabindex="0" aria-label="Copyable Deal Pricing Brief"></pre>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS / LIMITS -->
+    <section class="section-block" id="section-notes" aria-labelledby="heading-notes">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-notes">Inputs, logic &amp; boundaries</h2>
+        <p class="section-subtitle">Core identity, rounding rules &amp; intentional omissions</p>
+      </div>
+      <div class="two-col-grid">
+        <article class="card-box">
+          <h3>How the solver &amp; line math connect</h3>
+          <ol>
+            <li><strong>Triangle identity:</strong> Net PUPM = List × (1 − Discount) × (1 − Partner Margin) = ARPU ÷ Months. Fix any two variables in the flat matrix or smart form and the third solves automatically off the baseline Net PUPM.</li>
+            <li><strong>Product lines &amp; coupons:</strong> Each product line prices seats in months (default 36), computes Net PUPM, Net ARPU (PUPY), ACV, and TCV, and spreads any flat Coupon ($) across the line's years on ACV while deducting the full coupon from TCV.</li>
+            <li><strong>Usage &amp; concession:</strong> Billed units = max(expected units, committed minimum). When billed units on the selected meter meet or exceed the threshold, the extra discount reduces that meter's monthly net usage and feeds the full-deal TCV.</li>
+          </ol>
+        </article>
+        <article class="card-box is-brass-top">
+          <h3>Sample boundaries &amp; standing omissions</h3>
+          <p>
+            <strong>Display &amp; zero guards:</strong> Currency outputs display to two decimal places; per-token prices display to eight decimal places. Empty inputs evaluate as zero, and any zero-divisor condition renders cleanly as "—" rather than NaN or Infinity.
+          </p>
+          <p>
+            <strong>Model scope:</strong> Every product name, price, discount, margin, usage rate, and SKU-mix rule on this page is a generic sample value from the model documentation. An organization's commercial policy may differ; nothing here constitutes pricing or legal advice.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- RELATED LINKS -->
+    <section class="section-block" aria-labelledby="heading-related">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-related">Related Pricing Engines &amp; Proof of Work</h2>
+        <p class="section-subtitle">Neighboring commercial models and deal-desk calculators</p>
+      </div>
+      <div class="related-grid">
+        <div class="related-card">
+          <span class="related-card-eyebrow">Hub</span>
+          <a href="../../tools/">Proof of Work Hub</a>
+          <p>All live commercial models, pricing engines, contract trackers, and decision tools.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Partition</span>
+          <a href="../../tools/pricing-engines/">Pricing Engines Partition</a>
+          <p>Deal pricing models, SaaS conversions, and commitment calculators built for live negotiation.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 2 · Pricing Engines</span>
+          <a href="../perpetual-to-saas-conversion/">Tool 2: Perpetual-to-SaaS Conversion Calculator</a>
+          <p>Compare staying on a perpetual license against three seat-driven SaaS options year by year.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 3 · Pricing Engines</span>
+          <a href="../perm-calculator/">Tool 3: Perm Calculator</a>
+          <p>Evaluate permanent license pricing, annual support streams, and cumulative contract value.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 14 · Pricing Engines</span>
+          <a href="../cloud-commit-playbook/">Tool 14: Cloud Commit &amp; Usage Playbook</a>
+          <p>Editable discount approval matrix, renewal TCV ratchet, and spend-based commit sizer.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h2 class="footer-heading">Fractional Deal Desk &amp; Contract Management</h2>
+          <p style="margin: 0; color: #CBD5E1; line-height: 1.5;">
+            Commercial contracts, deal desk architecture, and revenue operations controls. 15+ years in commercial contracts, deal desk, and revenue operations across contracts up to $300M and 3,000+ SKUs under management.
+          </p>
+        </div>
+        <div>
+          <h2 class="footer-heading">Proof of Work &amp; Pricing Engines</h2>
+          <ul class="footer-links">
+            <li><a href="../../tools/">Proof of Work Hub</a></li>
+            <li><a href="../../tools/pricing-engines/">Pricing Engines Partition</a></li>
+            <li><a href="../perpetual-to-saas-conversion/">Tool 2: Perpetual-to-SaaS Conversion Calculator</a></li>
+            <li><a href="../perm-calculator/">Tool 3: Perm Calculator</a></li>
+            <li><a href="../cloud-commit-playbook/">Tool 14: Cloud Commit &amp; Usage Playbook</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="footer-heading">Practice Information</h2>
+          <ul class="footer-links">
+            <li><a href="../../">Home</a></li>
+            <li><a href="../../services/">Practice &amp; Mandate Scope</a></li>
+            <li><a href="../../about/">Operator Record</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>Tool 1 · Deal Pricing Solver (S6-P01.a)</span>
+        <span>Sample model mechanics. Not pricing or legal advice.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+/* ==========================================================================
+   S6-P01a-deal-pricing-calculator.js — the Deal Pricing Calculator
+   (S6-P01.a tool page, /tools/deal-pricing-solver/).
+   Built Nov 8, 2026 to Lucky's own spec, from his model documents:
+   "Deal Pricing & Scenario Evaluation Model.xlsx" + "Enterprise Deal
+   Pricing Engine.pdf". Features: New Deal view (baselines, dual-layout
+   solver, TCV form, product lines with dropdowns + editable names +
+   add/delete lines, coupons, usage lines, usage-threshold concession,
+   ARPU expansion utility) and Old vs New view (both sides fully lined,
+   per-line and total variance, SKU-mix checks). Core identity:
+   Net PUPM = List x (1-Discount) x (1-Partner Margin) = ARPU / Months.
+   The CALC block is pure math, verified in node against the model's own
+   worked examples (28 checks at v1; regression re-run at every version).
+   Formulas never display; the page shows inputs and computed values only.
+   Rule: any change is recorded in ../../CHANGELOG.md with the CODE-MAP
+   updated in the same change (Code Labeling System, Rule 3).
+   ========================================================================== */
+
+
+var CALC = {
+  pupmFromArpu: function (arpu, months) { return months ? arpu / months : NaN; },
+  pupmLayer: function (list, disc, pm) { return list * (1 - disc) * (1 - pm); },
+  solveList: function (pupm, disc, pm) { var d = (1 - disc) * (1 - pm); return d ? pupm / d : NaN; },
+  solveDisc: function (pupm, list, pm) { var d = list * (1 - pm); return d ? 1 - pupm / d : NaN; },
+  solvePM: function (pupm, list, disc) { var d = list * (1 - disc); return d ? 1 - pupm / d : NaN; },
+  line: function (list, seats, disc, pm, months) {
+    var pupm = CALC.pupmLayer(list, disc, pm);
+    var pupy = pupm * 12;
+    var acv = pupy * seats;
+    var tcv = acv * (months / 12);
+    return { pupm: pupm, pupy: pupy, acv: acv, tcv: tcv, seats: seats, arpa: acv / 12 };
+  },
+  pctChange: function (oldV, newV) { return oldV ? (newV - oldV) / Math.abs(oldV) : NaN; },
+  expand: function (price, pct) { return price * (1 + pct); },
+  contract: function (price, pct) { return price * (1 - pct); },
+  usage: function (units, pricePerUnit, disc, minUnits) {
+    var billed = Math.max(units, minUnits || 0);
+    var gross = billed * pricePerUnit;
+    var net = gross * (1 - disc);
+    return { billed: billed, gross: gross, net: net, year: net * 12,
+             effPerUnit: billed ? net / billed : NaN };
+  },
+  applyCoupon: function (line, coupon, years) {
+    var out = { pupm: line.pupm, pupy: line.pupy, acv: line.acv, tcv: line.tcv,
+                seats: line.seats, arpa: line.arpa };
+    out.facv = line.acv - (years ? coupon / years : coupon);
+    out.ftcv = line.tcv - coupon;
+    return out;
+  },
+  threshold: function (items, meterType, thresholdUnits, extraPct) {
+    var units = 0, net = 0;
+    items.forEach(function (it) {
+      if (it.type === meterType) { units += it.billed; net += it.net; }
+    });
+    var triggered = thresholdUnits > 0 && units >= thresholdUnits;
+    var off = triggered ? net * extraPct : 0;
+    return { units: units, meteredNet: net, triggered: triggered, off: off, after: net - off };
+  }
+};
+
+/* ============================ PAGE WIRING ============================ */
+if (typeof document !== "undefined" && document.getElementById("calc-root")) (function () {
+  var PRODUCTS = [
+    { name: "Plus Ultra", list: 30, fam: "enterprise" },
+    { name: "Core Standard", list: 23, fam: "enterprise" },
+    { name: "Biz Plus", list: 22, fam: "business" },
+    { name: "Frontline Lite", list: 4, fam: "frontline" },
+    { name: "None", list: 0, fam: "none" }
+  ];
+  var UNIT_TYPES = [
+    { id: "token1m", name: "Tokens — per 1M tokens", per: 1000000 },
+    { id: "token1k", name: "Tokens — per 1K tokens", per: 1000 },
+    { id: "use", name: "Per use / per call", per: null },
+    { id: "api", name: "Per API request", per: null }
+  ];
+
+  var ND_SEED = [
+    { sku: "Core Standard", list: 23, seats: 86, disc: 45, pm: 12, months: 36, coupon: 1500 },
+    { sku: "Biz Plus", list: 22, seats: 230, disc: 45, pm: 12, months: 36, coupon: 0 },
+    { sku: "Frontline Lite", list: 4, seats: 255, disc: 45, pm: 12, months: 36, coupon: 0 },
+    { sku: "None", list: 0, seats: 0, disc: 0, pm: 0, months: 0, coupon: 0 }
+  ];
+  var OLD_SEED = [
+    { sku: "Plus Ultra", list: 30, seats: 50, disc: 45, pm: 20, months: 36, coupon: 0 },
+    { sku: "None", list: 0, seats: 0, disc: 0, pm: 0, months: 0, coupon: 0 },
+    { sku: "None", list: 0, seats: 0, disc: 0, pm: 0, months: 0, coupon: 0 }
+  ];
+  var NEW_SEED = [
+    { sku: "Core Standard", list: 23, seats: 86, disc: 45, pm: 12, months: 36, coupon: 1500 },
+    { sku: "Biz Plus", list: 22, seats: 230, disc: 45, pm: 12, months: 36, coupon: 0 },
+    { sku: "Frontline Lite", list: 4, seats: 255, disc: 45, pm: 12, months: 36, coupon: 0 }
+  ];
+  var NDU_SEED = [
+    { type: "token1m", name: "Token usage", usage: 60, price: 3.00, disc: 10, min: 25 },
+    { type: "use", name: "", usage: 0, price: 0, disc: 0, min: 0 }
+  ];
+  var OLDU_SEED = [
+    { type: "token1m", name: "Token usage", usage: 30, price: 3.60, disc: 0, min: 0 },
+    { type: "use", name: "", usage: 0, price: 0, disc: 0, min: 0 }
+  ];
+  var NEWU_SEED = [
+    { type: "token1m", name: "Token usage", usage: 55, price: 3.00, disc: 10, min: 25 },
+    { type: "use", name: "", usage: 0, price: 0, disc: 0, min: 0 }
+  ];
+
+  var SMART = {
+    list: { f1: "Enter Partner Margin (PM) %", f2: "Enter Discount %", v1: 20, v2: 45 },
+    disc: { f1: "Enter Partner Margin (PM) %", f2: "Enter List Price ($)", v1: 20, v2: 30 },
+    pm: { f1: "Enter Discount %", f2: "Enter List Price ($)", v1: 45, v2: 30 }
+  };
+
+  var counts = { nd: 0, old: 0, new: 0, ndu: 0, oldu: 0, newu: 0 };
+  var cmpRowsBuilt = -1;
+  var activeView = "v1";
+
+  function $(id) { return document.getElementById(id); }
+  function num(id) {
+    var el = $(id);
+    if (!el) return 0;
+    var v = parseFloat(el.value);
+    return isNaN(v) ? 0 : v;
+  }
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function money(v, dec) {
+    if (v === null || v === undefined || !isFinite(v)) return "—";
+    var d = dec === undefined ? 2 : dec;
+    return v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+  }
+  function moneyDollar(v, dec) {
+    if (v === null || v === undefined || !isFinite(v)) return "—";
+    var d = dec === undefined ? 2 : dec;
+    var neg = v < 0;
+    var absStr = Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+    return (neg ? "-$" : "$") + absStr;
+  }
+  function signedDollar(v, dec) {
+    if (v === null || v === undefined || !isFinite(v)) return "—";
+    var d = dec === undefined ? 2 : dec;
+    var absStr = Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+    if (v > 0) return "+$" + absStr;
+    if (v < 0) return "-$" + absStr;
+    return "$" + absStr;
+  }
+  function pctFmt(v) {
+    if (v === null || v === undefined || !isFinite(v)) return "—";
+    return (v * 100).toFixed(2) + "%";
+  }
+  function deltaHtml(pct, absDiff, unitType) {
+    var pctStr = isFinite(pct) ? ((pct > 0 ? "+" : "") + pctFmt(pct)) : "—";
+    var cls = isFinite(pct) ? (pct > 0 ? "pos" : (pct < 0 ? "neg" : "")) : "";
+    var absStr = "";
+    if (absDiff !== undefined && isFinite(absDiff)) {
+      if (unitType === "seats") {
+        absStr = '<span class="abs-delta">' + (absDiff > 0 ? "+" : "") + Math.round(absDiff) + " seats</span>";
+      } else {
+        absStr = '<span class="abs-delta">' + signedDollar(absDiff, 2) + "</span>";
+      }
+    }
+    return '<span class="num ' + cls + '">' + pctStr + "</span>" + absStr;
+  }
+
+  /* ---------- tabs (visitor-controlled app state) ---------- */
+  var tabs = document.querySelectorAll(".tab[data-view]");
+  function switchView(viewId) {
+    activeView = viewId;
+    tabs.forEach(function (x) {
+      var isAct = x.dataset.view === viewId;
+      x.classList.toggle("active", isAct);
+      x.setAttribute("aria-selected", isAct ? "true" : "false");
+    });
+    ["v1", "v2"].forEach(function (v) {
+      var panel = $(v);
+      if (v === viewId) {
+        panel.removeAttribute("hidden");
+        panel.style.display = "";
+      } else {
+        panel.setAttribute("hidden", "");
+        panel.style.display = "none";
+      }
+    });
+    recompute();
+  }
+  tabs.forEach(function (t) {
+    t.addEventListener("click", function () { switchView(t.dataset.view); });
+  });
+
+  /* ---------- product line tables ---------- */
+  function buildLineRow(table, prefix, i, d) {
+    var tbody = table.tBodies[0] || table;
+    var tr = document.createElement("tr");
+    var sel = '<select class="in" id="' + prefix + i + '-sku" aria-label="Preset product">' + PRODUCTS.map(function (p) {
+      return '<option value="' + p.name + '"' + (p.name === d.sku ? " selected" : "") + ">" + p.name + "</option>";
+    }).join("") + "</select>";
+    var dispName = d.name !== undefined ? d.name : (d.sku === "None" ? "" : d.sku);
+    tr.innerHTML =
+      '<td data-label="SKU name (editable)"><input class="in" id="' + prefix + i + '-name" type="text" value="' + escHtml(dispName) + '" placeholder="SKU name"></td>' +
+      '<td data-label="Preset">' + sel + "</td>" +
+      '<td data-label="List ($/seat/mo)"><input class="in" id="' + prefix + i + '-list" type="number" step="any" value="' + d.list + '"></td>' +
+      '<td data-label="Seats"><input class="in" id="' + prefix + i + '-seats" type="number" step="any" value="' + d.seats + '"></td>' +
+      '<td data-label="Discount %"><input class="in" id="' + prefix + i + '-disc" type="number" step="any" value="' + d.disc + '"></td>' +
+      '<td data-label="Partner Margin %"><input class="in" id="' + prefix + i + '-pm" type="number" step="any" value="' + d.pm + '"></td>' +
+      '<td data-label="Term (months)"><input class="in" id="' + prefix + i + '-months" type="number" step="any" value="' + d.months + '"></td>' +
+      '<td data-label="Payment terms"><span class="terms-tag">Net 60</span></td>' +
+      '<td data-label="Net PUPM" class="num" id="' + prefix + i + '-pupm">—</td>' +
+      '<td data-label="Net ARPU (yr)" class="num" id="' + prefix + i + '-pupy">—</td>' +
+      '<td data-label="ACV ($)" class="num" id="' + prefix + i + '-acv">—</td>' +
+      '<td data-label="TCV ($)" class="num" id="' + prefix + i + '-tcv">—</td>' +
+      '<td data-label="Coupon ($)"><input class="in" id="' + prefix + i + '-coupon" type="number" step="any" value="' + (d.coupon || 0) + '"></td>' +
+      '<td data-label="ACV after coupon" class="num" id="' + prefix + i + '-facv">—</td>' +
+      '<td data-label="TCV after coupon" class="num" id="' + prefix + i + '-ftcv">—</td>' +
+      '<td data-label="Remove"><button type="button" class="del" title="Delete this line" aria-label="Delete this product line">✕</button></td>';
+    tbody.appendChild(tr);
+
+    var skuEl = $(prefix + i + "-sku");
+    skuEl.dataset.prev = d.sku;
+    skuEl.addEventListener("change", function () {
+      var p = PRODUCTS.filter(function (x) { return x.name === this.value; }, this)[0];
+      var row = this.closest("tr");
+      row.querySelector('[id$="-list"]').value = p ? p.list : 0;
+      var nameEl = row.querySelector('[id$="-name"]');
+      if (!nameEl.value.trim() || nameEl.value === this.dataset.prev) {
+        nameEl.value = p && p.name !== "None" ? p.name : "";
+      }
+      this.dataset.prev = p ? p.name : "None";
+      setPresetStatus("", "Active state: Custom edited inputs");
+      recompute();
+    });
+    tr.querySelector(".del").addEventListener("click", function () {
+      var row = this.closest("tr");
+      var tbl = row.closest("table");
+      row.remove();
+      counts[prefix]--;
+      renumber(tbl, prefix);
+      setPresetStatus("", "Active state: Custom edited inputs");
+      recompute();
+    });
+  }
+
+  function buildLines(tableId, prefix, defaults) {
+    var table = $(tableId);
+    var tbody = table.tBodies[0] || table;
+    tbody.innerHTML = "";
+    counts[prefix] = 0;
+    defaults.forEach(function (d, i) { buildLineRow(table, prefix, i, d); });
+    counts[prefix] = defaults.length;
+  }
+
+  function addSeatLine(tableId, prefix) {
+    var i = counts[prefix]++;
+    buildLineRow($(tableId), prefix, i, { sku: "None", name: "", list: 0, seats: 0, disc: 0, pm: 0, months: 36, coupon: 0 });
+    setPresetStatus("", "Active state: Custom edited inputs");
+    recompute();
+  }
+
+  function readLine(prefix, i) {
+    var months = num(prefix + i + "-months");
+    var base = CALC.line(num(prefix + i + "-list"), num(prefix + i + "-seats"),
+      num(prefix + i + "-disc") / 100, num(prefix + i + "-pm") / 100, months);
+    return CALC.applyCoupon(base, num(prefix + i + "-coupon"), months / 12);
+  }
+
+  function paintLine(prefix, i, r) {
+    $(prefix + i + "-pupm").textContent = money(r.pupm);
+    $(prefix + i + "-pupy").textContent = money(r.pupy);
+    $(prefix + i + "-acv").textContent = money(r.acv);
+    $(prefix + i + "-tcv").textContent = money(r.tcv);
+    $(prefix + i + "-facv").textContent = money(r.facv);
+    $(prefix + i + "-ftcv").textContent = money(r.ftcv);
+  }
+
+  /* ---------- usage line tables ---------- */
+  function buildUsageRow(table, prefix, i, d) {
+    var tbody = table.tBodies[0] || table;
+    var tr = document.createElement("tr");
+    var sel = '<select class="in" id="' + prefix + i + '-type" aria-label="Usage unit type">' + UNIT_TYPES.map(function (u) {
+      return '<option value="' + u.id + '"' + (u.id === d.type ? " selected" : "") + ">" + u.name + "</option>";
+    }).join("") + "</select>";
+    tr.innerHTML =
+      '<td data-label="Usage line name (editable)"><input class="in" id="' + prefix + i + '-name" type="text" value="' + escHtml(d.name || "") + '" placeholder="Name this line"></td>' +
+      '<td data-label="Unit type">' + sel + "</td>" +
+      '<td data-label="Usage / month"><input class="in" id="' + prefix + i + '-usage" type="number" step="any" value="' + d.usage + '"></td>' +
+      '<td data-label="Price per unit ($)"><input class="in" id="' + prefix + i + '-price" type="number" step="any" value="' + d.price + '"></td>' +
+      '<td data-label="Discount %"><input class="in" id="' + prefix + i + '-disc" type="number" step="any" value="' + d.disc + '"></td>' +
+      '<td data-label="Committed min (units)"><input class="in" id="' + prefix + i + '-min" type="number" step="any" value="' + d.min + '"></td>' +
+      '<td data-label="Billed & Driver" class="num"><span id="' + prefix + i + '-billed">—</span><span class="driver-pill" id="' + prefix + i + '-driver">—</span></td>' +
+      '<td data-label="Gross ($/mo)" class="num" id="' + prefix + i + '-gross">—</td>' +
+      '<td data-label="Net ($/mo)" class="num" id="' + prefix + i + '-net">—</td>' +
+      '<td data-label="Annual ($/yr)" class="num" id="' + prefix + i + '-year">—</td>' +
+      '<td data-label="Effective per unit ($)" class="num" id="' + prefix + i + '-eff">—</td>' +
+      '<td data-label="Per token ($)" class="num" id="' + prefix + i + '-pertoken">—</td>' +
+      '<td data-label="Remove"><button type="button" class="del" title="Delete this line" aria-label="Delete this usage line">✕</button></td>';
+    tbody.appendChild(tr);
+
+    tr.querySelector(".del").addEventListener("click", function () {
+      var row = this.closest("tr");
+      var tbl = row.closest("table");
+      row.remove();
+      counts[prefix]--;
+      renumber(tbl, prefix);
+      setPresetStatus("", "Active state: Custom edited inputs");
+      recompute();
+    });
+  }
+
+  function buildUsage(tableId, prefix, defaults) {
+    var table = $(tableId);
+    var tbody = table.tBodies[0] || table;
+    tbody.innerHTML = "";
+    counts[prefix] = 0;
+    defaults.forEach(function (d, i) { buildUsageRow(table, prefix, i, d); });
+    counts[prefix] = defaults.length;
+  }
+
+  function addUsageLine(tableId, prefix) {
+    var i = counts[prefix]++;
+    buildUsageRow($(tableId), prefix, i, { type: "token1m", name: "", usage: 0, price: 0, disc: 0, min: 0 });
+    setPresetStatus("", "Active state: Custom edited inputs");
+    recompute();
+  }
+
+  function renumber(table, prefix) {
+    var rows = table.rows;
+    for (var j = 0; j < rows.length - 1; j++) {
+      var els = rows[j + 1].querySelectorAll("[id]");
+      els.forEach(function (el) {
+        el.id = el.id.replace(new RegExp("^" + prefix + "[0-9]+"), prefix + j);
+      });
+    }
+  }
+
+  function readUsage(prefix, i) {
+    var type = $(prefix + i + "-type").value;
+    var units = num(prefix + i + "-usage");
+    var minUnits = num(prefix + i + "-min");
+    var u = CALC.usage(units, num(prefix + i + "-price"), num(prefix + i + "-disc") / 100, minUnits);
+    u.type = type;
+    u.rawUnits = units;
+    u.minUnits = minUnits;
+    return u;
+  }
+
+  function paintUsage(prefix, i, u) {
+    var meta = UNIT_TYPES.filter(function (x) { return x.id === u.type; })[0];
+    $(prefix + i + "-billed").textContent = isFinite(u.billed) ? String(u.billed) : "—";
+    var drv = $(prefix + i + "-driver");
+    if (u.billed <= 0) {
+      drv.className = "driver-pill";
+      drv.textContent = "Inactive";
+    } else if (u.minUnits > u.rawUnits) {
+      drv.className = "driver-pill is-min";
+      drv.textContent = "Min binds";
+    } else {
+      drv.className = "driver-pill is-vol";
+      drv.textContent = "Volume binds";
+    }
+    $(prefix + i + "-gross").textContent = money(u.gross);
+    $(prefix + i + "-net").textContent = money(u.net);
+    $(prefix + i + "-year").textContent = money(u.year);
+    $(prefix + i + "-eff").textContent = money(u.effPerUnit, 4);
+    $(prefix + i + "-pertoken").textContent = meta && meta.per && isFinite(u.effPerUnit) ? "$" + (u.effPerUnit / meta.per).toFixed(8) : "—";
+  }
+
+  /* ---------- comparison table builder ---------- */
+  function ensureCmpRows(n) {
+    if (n === cmpRowsBuilt) return;
+    var table = $("cmp-table");
+    var tbody = table.tBodies[0];
+    tbody.innerHTML = "";
+    for (var i = 0; i < n; i++) {
+      var tr = document.createElement("tr");
+      tr.innerHTML = '<td id="cmp' + i + '-name">Line ' + (i + 1) + "</td>" +
+        '<td id="cmp' + i + '-seats">—</td><td id="cmp' + i + '-arpu">—</td>' +
+        '<td id="cmp' + i + '-arpa">—</td><td id="cmp' + i + '-acv">—</td><td id="cmp' + i + '-tcv">—</td>';
+      tbody.appendChild(tr);
+    }
+    var tt = document.createElement("tr");
+    tt.innerHTML = '<td><b>Totals</b></td><td id="cmpT-seats">—</td><td id="cmpT-arpu">—</td>' +
+      '<td id="cmpT-arpa">—</td><td id="cmpT-acv">—</td><td id="cmpT-tcv">—</td>';
+    tbody.appendChild(tt);
+    cmpRowsBuilt = n;
+  }
+
+  /* ---------- smart form labels ---------- */
+  $("s-target").addEventListener("change", function () {
+    var s = SMART[this.value];
+    $("s-f1-label").textContent = s.f1; $("s-f2-label").textContent = s.f2;
+    $("s-f1").value = s.v1; $("s-f2").value = s.v2;
+    setPresetStatus("", "Active state: Custom edited inputs");
+    recompute();
+  });
+
+  /* ---------- add-line buttons ---------- */
+  $("add-nd").addEventListener("click", function () { addSeatLine("nd-table", "nd"); });
+  $("add-old").addEventListener("click", function () { addSeatLine("old-table", "old"); });
+  $("add-new").addEventListener("click", function () { addSeatLine("new-table", "new"); });
+  $("add-ndu").addEventListener("click", function () { addUsageLine("ndu-table", "ndu"); });
+  $("add-oldu").addEventListener("click", function () { addUsageLine("oldu-table", "oldu"); });
+  $("add-newu").addEventListener("click", function () { addUsageLine("newu-table", "newu"); });
+
+  /* ---------- push TCV ARPU to Step 1 ---------- */
+  $("btn-push-tcv").addEventListener("click", function () {
+    var tcv = num("t-tcv"), yrs = num("t-years"), seats = num("t-seats");
+    var acv = yrs ? tcv / yrs : NaN, arpu = seats ? acv / seats : NaN;
+    if (isFinite(arpu) && yrs > 0) {
+      $("b-arpu").value = arpu.toFixed(4).replace(/\.?0+$/, "");
+      $("b-months").value = "12";
+      setPresetStatus("", "Active state: TCV ARPU pushed to Step 1");
+      recompute();
+    }
+  });
+
+  /* ---------- Copy New Deal -> Proposed Deal ---------- */
+  function readTableRowsForSync(prefix, count) {
+    var out = [];
+    for (var i = 0; i < count; i++) {
+      out.push({
+        sku: $(prefix + i + "-sku").value,
+        name: $(prefix + i + "-name").value,
+        list: num(prefix + i + "-list"),
+        seats: num(prefix + i + "-seats"),
+        disc: num(prefix + i + "-disc"),
+        pm: num(prefix + i + "-pm"),
+        months: num(prefix + i + "-months"),
+        coupon: num(prefix + i + "-coupon")
+      });
+    }
+    return out;
+  }
+  function readUsageRowsForSync(prefix, count) {
+    var out = [];
+    for (var i = 0; i < count; i++) {
+      out.push({
+        type: $(prefix + i + "-type").value,
+        name: $(prefix + i + "-name").value,
+        usage: num(prefix + i + "-usage"),
+        price: num(prefix + i + "-price"),
+        disc: num(prefix + i + "-disc"),
+        min: num(prefix + i + "-min")
+      });
+    }
+    return out;
+  }
+
+  $("btn-sync-to-proposed").addEventListener("click", function () {
+    buildLines("new-table", "new", readTableRowsForSync("nd", counts.nd));
+    buildUsage("newu-table", "newu", readUsageRowsForSync("ndu", counts.ndu));
+    $("g2-meter").value = $("g1-meter").value;
+    $("g2-threshold").value = $("g1-threshold").value;
+    $("g2-extra").value = $("g1-extra").value;
+    cmpRowsBuilt = -1;
+    setPresetStatus("", "Active state: New Deal synced to Proposed Deal");
+    switchView("v2");
+  });
+
+  /* ---------- Reset & Presets ---------- */
+  function setPresetStatus(key, label) {
+    document.querySelectorAll("[data-preset]").forEach(function (b) {
+      b.classList.toggle("is-active", b.getAttribute("data-preset") === key);
+    });
+    $("preset-status").textContent = label;
+  }
+
+  function resetToSeedState() {
+    $("b-arpu").value = "158.4";
+    $("b-months").value = "12";
+    $("m1-pm").value = "20"; $("m1-disc").value = "45";
+    $("m2-pm").value = "20"; $("m2-list").value = "30";
+    $("m3-disc").value = "45"; $("m3-list").value = "30";
+    $("s-target").value = "list";
+    $("s-f1-label").textContent = SMART.list.f1;
+    $("s-f2-label").textContent = SMART.list.f2;
+    $("s-f1").value = String(SMART.list.v1);
+    $("s-f2").value = String(SMART.list.v2);
+    $("t-tcv").value = "114048";
+    $("t-years").value = "4";
+    $("t-seats").value = "180";
+
+    buildLines("nd-table", "nd", ND_SEED);
+    buildLines("old-table", "old", OLD_SEED);
+    buildLines("new-table", "new", NEW_SEED);
+    buildUsage("ndu-table", "ndu", NDU_SEED);
+    buildUsage("oldu-table", "oldu", OLDU_SEED);
+    buildUsage("newu-table", "newu", NEWU_SEED);
+    cmpRowsBuilt = -1;
+
+    $("g1-meter").value = "token1m"; $("g1-threshold").value = "50"; $("g1-extra").value = "5";
+    $("g2-meter").value = "token1m"; $("g2-threshold").value = "50"; $("g2-extra").value = "5";
+    $("e-price").value = "20.10"; $("e-up").value = "10"; $("e-down").value = "10";
+
+    setPresetStatus("seed", "Active state: Seed Sample State (all defaults)");
+    recompute();
+  }
+
+  $("btn-reset-top").addEventListener("click", resetToSeedState);
+
+  var PRESET_HANDLERS = {
+    "seed": {
+      label: "Active state: Seed Sample State (all defaults)",
+      run: function () { /* resetToSeedState already ran */ }
+    },
+    "min-binds": {
+      label: "Active state: Case — Usage Minimum Binds (10 units vs 25 min)",
+      run: function () {
+        $("ndu0-usage").value = "10";
+        switchView("v1");
+      }
+    },
+    "threshold-miss": {
+      label: "Active state: Case — Threshold Not Reached (100 units)",
+      run: function () {
+        $("g1-threshold").value = "100";
+        switchView("v1");
+      }
+    },
+    "pdl-pass": {
+      label: "Active state: Case — PDL Rule 1 Passes (120 Core Standard seats)",
+      run: function () {
+        $("new0-seats").value = "120";
+        switchView("v2");
+      }
+    },
+    "token-1k": {
+      label: "Active state: Case — Per-1K Token Pricing ($0.00270000)",
+      run: function () {
+        $("ndu0-type").value = "token1k";
+        switchView("v1");
+      }
+    },
+    "zero-guard": {
+      label: "Active state: Case — Zero-Divisor Guards (\"—\" check)",
+      run: function () {
+        $("m1-disc").value = "100";
+        $("b-months").value = "0";
+        $("old0-seats").value = "0";
+        switchView("v1");
+      }
+    }
+  };
+
+  document.querySelectorAll("[data-preset]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var key = btn.getAttribute("data-preset");
+      resetToSeedState();
+      if (PRESET_HANDLERS[key]) {
+        PRESET_HANDLERS[key].run();
+        setPresetStatus(key, PRESET_HANDLERS[key].label);
+        recompute();
+      }
+    });
+  });
+
+  /* ---------- Copy Deal Brief ---------- */
+  $("btn-copy-brief").addEventListener("click", function () {
+    var text = $("deal-brief-pre").textContent;
+    var statusEl = $("brief-copy-status");
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { statusEl.textContent = "Copied Deal Brief to clipboard."; },
+        function () { fallbackCopy(text, statusEl); }
+      );
+    } else {
+      fallbackCopy(text, statusEl);
+    }
+  });
+  function fallbackCopy(text, statusEl) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "0";
+    ta.style.left = "0";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand("copy");
+      statusEl.textContent = "Copied Deal Brief to clipboard.";
+    } catch (e) {
+      statusEl.textContent = "Select the brief below and press Ctrl+C / Cmd+C.";
+    }
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- Main Recomputation & UI Paint ---------- */
+  function recompute() {
+    /* 1–4. Baselines + Solver + TCV Form */
+    var pupm = CALC.pupmFromArpu(num("b-arpu"), num("b-months"));
+    $("b-pupm").textContent = money(pupm);
+
+    var m1Out = CALC.solveList(pupm, num("m1-disc") / 100, num("m1-pm") / 100);
+    var m2Out = CALC.solveDisc(pupm, num("m2-list"), num("m2-pm") / 100);
+    var m3Out = CALC.solvePM(pupm, num("m3-list"), num("m3-disc") / 100);
+    $("m1-out").textContent = moneyDollar(m1Out);
+    $("m2-out").textContent = pctFmt(m2Out);
+    $("m3-out").textContent = pctFmt(m3Out);
+
+    var target = $("s-target").value, f1 = num("s-f1"), f2 = num("s-f2"), sres;
+    if (target === "list") sres = moneyDollar(CALC.solveList(pupm, f2 / 100, f1 / 100));
+    else if (target === "disc") sres = pctFmt(CALC.solveDisc(pupm, f2, f1 / 100));
+    else sres = pctFmt(CALC.solvePM(pupm, f2, f1 / 100));
+    $("s-out").textContent = sres;
+
+    var tcv = num("t-tcv"), yrs = num("t-years"), seats = num("t-seats");
+    var acv = yrs ? tcv / yrs : NaN, arpu = seats ? acv / seats : NaN;
+    var tcvPupm = CALC.pupmFromArpu(arpu, 12);
+    $("t-acv").textContent = money(acv);
+    $("t-months").textContent = yrs ? String(yrs * 12) : "—";
+    $("t-arpu").textContent = money(arpu);
+    $("t-pupm").textContent = money(tcvPupm);
+
+    /* 5. New-deal product lines */
+    var totSeats = 0, totAcv = 0, totTcv = 0, totAcvRaw = 0, maxNdMonths = 0;
+    for (var ni = 0; ni < counts.nd; ni++) {
+      var r = readLine("nd", ni); paintLine("nd", ni, r);
+      totSeats += r.seats; totAcv += r.facv; totTcv += r.ftcv; totAcvRaw += r.acv;
+      var mVal = num("nd" + ni + "-months");
+      if (mVal > maxNdMonths) maxNdMonths = mVal;
+    }
+    var blendedPupm = totSeats ? totAcvRaw / 12 / totSeats : NaN;
+    var blendedPupy = isFinite(blendedPupm) ? blendedPupm * 12 : NaN;
+    $("nd-seats").textContent = String(totSeats);
+    $("nd-acv-raw").textContent = money(totAcvRaw);
+    $("nd-acv").textContent = money(totAcv);
+    $("nd-tcv").textContent = money(totTcv);
+    $("nd-pupm").textContent = money(blendedPupm);
+    $("nd-pupy").textContent = money(blendedPupy);
+
+    /* 8. Expansion utility */
+    $("e-up-out").textContent = money(CALC.expand(num("e-price"), num("e-up") / 100));
+    $("e-down-out").textContent = money(CALC.contract(num("e-price"), num("e-down") / 100));
+
+    /* Old vs New (View 2) */
+    var olds = [], news = [];
+    for (var oi = 0; oi < counts.old; oi++) { var ro = readLine("old", oi); paintLine("old", oi, ro); olds.push(ro); }
+    for (var wi = 0; wi < counts.new; wi++) { var rw = readLine("new", wi); paintLine("new", wi, rw); news.push(rw); }
+    var sum = function (arr, k) { return arr.reduce(function (a, x) { return a + x[k]; }, 0); };
+    var oSeatsTot = sum(olds, "seats"), nSeatsTot = sum(news, "seats");
+    var oFacvTot = sum(olds, "facv"), nFacvTot = sum(news, "facv");
+    var oFtcvTot = sum(olds, "ftcv"), nFtcvTot = sum(news, "ftcv");
+    var oAcvRawTot = sum(olds, "acv"), nAcvRawTot = sum(news, "acv");
+    var oPupy = sum(olds, "pupy"), nPupy = sum(news, "pupy");
+    var oArpa = sum(olds, "arpa"), nArpa = sum(news, "arpa");
+    var ZERO = { seats: 0, pupy: 0, arpa: 0, facv: 0, ftcv: 0 };
+
+    var lineName = function (prefix, i) {
+      var nm = $(prefix + i + "-name").value.trim();
+      if (nm) return nm;
+      var sku = $(prefix + i + "-sku").value;
+      return sku === "None" ? "—" : sku;
+    };
+    var nCmp = Math.max(counts.old, counts.new);
+    ensureCmpRows(nCmp);
+    for (var i = 0; i < nCmp; i++) {
+      var oL = olds[i] || ZERO, nL = news[i] || ZERO;
+      $("cmp" + i + "-name").textContent =
+        (i < counts.old ? lineName("old", i) : "—") + " → " + (i < counts.new ? lineName("new", i) : "—");
+      $("cmp" + i + "-seats").innerHTML = deltaHtml(CALC.pctChange(oL.seats, nL.seats), nL.seats - oL.seats, "seats");
+      $("cmp" + i + "-arpu").innerHTML = deltaHtml(CALC.pctChange(oL.pupy, nL.pupy), nL.pupy - oL.pupy);
+      $("cmp" + i + "-arpa").innerHTML = deltaHtml(CALC.pctChange(oL.arpa, nL.arpa), nL.arpa - oL.arpa);
+      $("cmp" + i + "-acv").innerHTML = deltaHtml(CALC.pctChange(oL.facv, nL.facv), nL.facv - oL.facv);
+      $("cmp" + i + "-tcv").innerHTML = deltaHtml(CALC.pctChange(oL.ftcv, nL.ftcv), nL.ftcv - oL.ftcv);
+    }
+    $("cmpT-seats").innerHTML = deltaHtml(CALC.pctChange(oSeatsTot, nSeatsTot), nSeatsTot - oSeatsTot, "seats");
+    $("cmpT-arpu").innerHTML = deltaHtml(CALC.pctChange(oPupy, nPupy), nPupy - oPupy);
+    $("cmpT-arpa").innerHTML = deltaHtml(CALC.pctChange(oArpa, nArpa), nArpa - oArpa);
+    $("cmpT-acv").innerHTML = deltaHtml(CALC.pctChange(oFacvTot, nFacvTot), nFacvTot - oFacvTot);
+    $("cmpT-tcv").innerHTML = deltaHtml(CALC.pctChange(oFtcvTot, nFtcvTot), nFtcvTot - oFtcvTot);
+
+    var acvPct = CALC.pctChange(oFacvTot, nFacvTot);
+    var tcvPct = CALC.pctChange(oFtcvTot, nFtcvTot);
+    $("cmp-old").textContent = moneyDollar(oFacvTot) + " / " + moneyDollar(oFtcvTot);
+    $("cmp-new").textContent = moneyDollar(nFacvTot) + " / " + moneyDollar(nFtcvTot);
+    $("cmp-acv").textContent = isFinite(acvPct) ? ((acvPct > 0 ? "+" : "") + pctFmt(acvPct) + " (" + signedDollar(nFacvTot - oFacvTot) + ")") : ("— (" + signedDollar(nFacvTot - oFacvTot) + ")");
+    $("cmp-tcv").textContent = isFinite(tcvPct) ? ((tcvPct > 0 ? "+" : "") + pctFmt(tcvPct) + " (" + signedDollar(nFtcvTot - oFtcvTot) + ")") : ("— (" + signedDollar(nFtcvTot - oFtcvTot) + ")");
+
+    var oldBlendedPupm = oSeatsTot ? oAcvRawTot / 12 / oSeatsTot : NaN;
+    var newBlendedPupm = nSeatsTot ? nAcvRawTot / 12 / nSeatsTot : NaN;
+    $("cmp-pupm-pair").textContent = moneyDollar(oldBlendedPupm) + " → " + moneyDollar(newBlendedPupm);
+
+    /* SKU-mix checks on proposed deal */
+    var totalNewSeats = nSeatsTot;
+    var entSeats = 0, bizSeats = 0, frontSeats = 0;
+    for (var pi = 0; pi < counts.new; pi++) {
+      var prod = PRODUCTS.filter(function (x) { return x.name === $("new" + pi + "-sku").value; })[0];
+      if (prod && prod.fam === "enterprise") entSeats += news[pi].seats;
+      if (prod && prod.fam === "business") bizSeats += news[pi].seats;
+      if (prod && prod.fam === "frontline") frontSeats += news[pi].seats;
+    }
+    var floor = Math.max(0.15 * totalNewSeats, 100);
+    var f1ok = entSeats >= floor;
+    $("pdl-1-flag").className = "flag " + (f1ok ? "pass" : "fail");
+    $("pdl-1-flag").textContent = f1ok ? "PASS" : "FAIL";
+    $("pdl-1-text").textContent = "Each top-tier product family needs at least 15% of total seats or 100 seats, whichever is larger. Proposed: " +
+      entSeats + " top-tier seats of " + totalNewSeats + " total — floor is " + Math.ceil(floor) + ".";
+    var f1Pct = floor > 0 ? Math.min(100, (entSeats / floor) * 100) : 100;
+    $("pdl-1-bar").className = "gauge-fill " + (f1ok ? "is-pass" : "is-fail");
+    $("pdl-1-bar").style.width = f1Pct.toFixed(1) + "%";
+    $("pdl-1-left").textContent = "Enterprise seats: " + entSeats + " / " + Math.ceil(floor) + " required floor";
+    $("pdl-1-right").textContent = f1ok ? ("+" + Math.round(entSeats - floor) + " seats above floor") : (Math.ceil(floor - entSeats) + " seats short of floor");
+
+    var f2ok = bizSeats <= 300;
+    $("pdl-2-flag").className = "flag " + (f2ok ? "pass" : "fail");
+    $("pdl-2-flag").textContent = f2ok ? "PASS" : "FAIL";
+    $("pdl-2-text").textContent = "Mid-tier products together may not exceed 300 seats when mixed with top-tier products. Proposed: " + bizSeats + " mid-tier seats.";
+    var f2Pct = Math.min(100, (bizSeats / 300) * 100);
+    $("pdl-2-bar").className = "gauge-fill " + (f2ok ? "is-pass" : "is-fail");
+    $("pdl-2-bar").style.width = f2Pct.toFixed(1) + "%";
+    $("pdl-2-left").textContent = "Business seats: " + bizSeats + " / 300 cap";
+    $("pdl-2-right").textContent = f2ok ? ((300 - bizSeats) + " seats headroom") : ((bizSeats - 300) + " seats over cap");
+
+    /* Usage lines + threshold concessions */
+    var ndu = [], oldu = [], newu = [];
+    for (var ui1 = 0; ui1 < counts.ndu; ui1++) { var u1 = readUsage("ndu", ui1); paintUsage("ndu", ui1, u1); ndu.push(u1); }
+    for (var ui2 = 0; ui2 < counts.oldu; ui2++) { var u2 = readUsage("oldu", ui2); paintUsage("oldu", ui2, u2); oldu.push(u2); }
+    for (var ui3 = 0; ui3 < counts.newu; ui3++) { var u3 = readUsage("newu", ui3); paintUsage("newu", ui3, u3); newu.push(u3); }
+
+    function paintLever(g, res) {
+      $(g + "-units").textContent = String(res.units);
+      $(g + "-before").textContent = money(res.meteredNet);
+      var st = $(g + "-status");
+      st.className = "flag " + (res.triggered ? "pass" : "warn");
+      st.textContent = res.triggered ? "CONCESSION ACTIVE" : "NOT REACHED";
+      $(g + "-off").textContent = money(res.off);
+      $(g + "-after").textContent = money(res.after);
+      return res;
+    }
+    var g1 = paintLever("g1", CALC.threshold(ndu, $("g1-meter").value, num("g1-threshold"), num("g1-extra") / 100));
+    var g2 = paintLever("g2", CALC.threshold(newu, $("g2-meter").value, num("g2-threshold"), num("g2-extra") / 100));
+
+    var sumNet = function (arr) { return arr.reduce(function (a, u) { return a + u.net; }, 0); };
+    var ndUsageMo = sumNet(ndu) - g1.off;
+    var dealYears = counts.nd ? num("nd0-months") / 12 : 0;
+    var ndUsageYr = ndUsageMo * 12;
+    var ndFullTcv = totTcv + ndUsageYr * dealYears;
+    $("nd-usageyr").textContent = money(ndUsageYr);
+    $("nd-fulltcv").textContent = money(ndFullTcv);
+
+    var oldUsageMo = sumNet(oldu);
+    var newUsageMo = sumNet(newu) - g2.off;
+    var uDeltaPct = CALC.pctChange(oldUsageMo, newUsageMo);
+    $("cmp-uold").textContent = money(oldUsageMo);
+    $("cmp-unew").textContent = money(newUsageMo);
+    $("cmp-udelta").textContent = isFinite(uDeltaPct) ? ((uDeltaPct > 0 ? "+" : "") + pctFmt(uDeltaPct) + " (" + signedDollar(newUsageMo - oldUsageMo) + "/mo)") : ("— (" + signedDollar(newUsageMo - oldUsageMo) + "/mo)");
+
+    /* Verdict Banner + Shape Bars */
+    var verdictTxt = "Seats shift from " + oSeatsTot + " to " + nSeatsTot + " (" + (nSeatsTot - oSeatsTot >= 0 ? "+" : "") + (nSeatsTot - oSeatsTot) + "), " +
+      "Seat ACV moves from " + moneyDollar(oFacvTot) + " to " + moneyDollar(nFacvTot) + (isFinite(acvPct) ? " (" + (acvPct > 0 ? "+" : "") + pctFmt(acvPct) + ")" : "") + ", " +
+      "Seat TCV moves from " + moneyDollar(oFtcvTot) + " to " + moneyDollar(nFtcvTot) + ". " +
+      "Blended PUPM moves from " + moneyDollar(oldBlendedPupm) + " to " + moneyDollar(newBlendedPupm) + ". " +
+      "SKU-Mix checks: Rule 1 " + (f1ok ? "PASS" : "FAIL") + " (" + entSeats + "/" + Math.ceil(floor) + " top-tier), Rule 2 " + (f2ok ? "PASS" : "FAIL") + " (" + bizSeats + "/300 mid-tier).";
+    $("cmp-verdict-text").textContent = verdictTxt;
+
+    var maxAcvBar = Math.max(oFacvTot, nFacvTot, 1);
+    var maxSeatBar = Math.max(totalNewSeats, oSeatsTot, 1);
+    $("cmp-shape-bars").innerHTML =
+      '<div class="shape-card">' +
+      '<h3 class="shape-card-title">Annual Contract Value (After Coupons)</h3>' +
+      '<div class="bar-row"><div class="bar-row-lbl"><span>Old Deal ACV</span><strong>' + moneyDollar(oFacvTot) + '</strong></div><div class="bar-track"><div class="bar-fill is-old" style="width:' + ((oFacvTot / maxAcvBar) * 100).toFixed(1) + '%"></div></div></div>' +
+      '<div class="bar-row"><div class="bar-row-lbl"><span>Proposed Deal ACV</span><strong>' + moneyDollar(nFacvTot) + '</strong></div><div class="bar-track"><div class="bar-fill is-new" style="width:' + ((nFacvTot / maxAcvBar) * 100).toFixed(1) + '%"></div></div></div>' +
+      '</div>' +
+      '<div class="shape-card">' +
+      '<h3 class="shape-card-title">Proposed Seat Mix (' + totalNewSeats + ' total seats)</h3>' +
+      '<div class="bar-row"><div class="bar-row-lbl"><span>Top-Tier Enterprise</span><strong>' + entSeats + ' seats</strong></div><div class="bar-track"><div class="bar-fill" style="width:' + ((entSeats / maxSeatBar) * 100).toFixed(1) + '%"></div></div></div>' +
+      '<div class="bar-row"><div class="bar-row-lbl"><span>Mid-Tier Business</span><strong>' + bizSeats + ' seats</strong></div><div class="bar-track"><div class="bar-fill is-new" style="width:' + ((bizSeats / maxSeatBar) * 100).toFixed(1) + '%"></div></div></div>' +
+      '<div class="bar-row"><div class="bar-row-lbl"><span>Frontline</span><strong>' + frontSeats + ' seats</strong></div><div class="bar-track"><div class="bar-fill is-old" style="width:' + ((frontSeats / maxSeatBar) * 100).toFixed(1) + '%"></div></div></div>' +
+      '</div>';
+
+    /* Live Command / Results Strip (adapts to active tab) */
+    if (activeView === "v2") {
+      $("strip-title").textContent = "Live Deal Verdict · Old vs New";
+      $("strip-sub").textContent = "Old vs Proposed ACV/TCV, monthly usage delta & SKU-mix adjudication";
+
+      $("strip-c1").className = "result-card is-baseline";
+      $("sc1-label").textContent = "Old Deal Baseline";
+      $("sc1-badge").textContent = oSeatsTot + " seats";
+      $("sc1-val").textContent = moneyDollar(oFtcvTot);
+      $("sc1-sub").className = "rc-sub";
+      $("sc1-sub").textContent = "ACV: " + moneyDollar(oFacvTot) + " · PUPM: " + moneyDollar(oldBlendedPupm);
+      $("sc1-m1").innerHTML = "Old Usage: <strong>" + moneyDollar(oldUsageMo) + "/mo</strong>";
+      $("sc1-m2").innerHTML = "Lines: <strong>" + counts.old + "</strong>";
+
+      $("strip-c2").className = "result-card";
+      $("sc2-label").textContent = "Proposed Deal";
+      $("sc2-badge").textContent = nSeatsTot + " seats";
+      $("sc2-val").textContent = moneyDollar(nFtcvTot);
+      $("sc2-sub").className = "rc-sub";
+      $("sc2-sub").textContent = "ACV: " + moneyDollar(nFacvTot) + " · PUPM: " + moneyDollar(newBlendedPupm);
+      $("sc2-m1").innerHTML = "New Usage: <strong>" + moneyDollar(newUsageMo) + "/mo</strong>";
+      $("sc2-m2").innerHTML = "Concession: <strong>" + (g2.triggered ? "ACTIVE" : "NONE") + "</strong>";
+
+      $("strip-c3").className = "result-card " + (nFtcvTot >= oFtcvTot ? "is-pass" : "");
+      $("sc3-label").textContent = "ACV / TCV Variance";
+      $("sc3-badge").textContent = isFinite(tcvPct) ? ((tcvPct > 0 ? "+" : "") + pctFmt(tcvPct)) : "—";
+      $("sc3-val").textContent = signedDollar(nFtcvTot - oFtcvTot);
+      $("sc3-sub").className = "rc-sub " + (nFacvTot >= oFacvTot ? "is-pos" : "is-warn");
+      $("sc3-sub").textContent = "ACV diff: " + signedDollar(nFacvTot - oFacvTot) + (isFinite(acvPct) ? " (" + pctFmt(acvPct) + ")" : "");
+      $("sc3-m1").innerHTML = "Seat delta: <strong>" + (nSeatsTot - oSeatsTot >= 0 ? "+" : "") + (nSeatsTot - oSeatsTot) + "</strong>";
+      $("sc3-m2").innerHTML = "Usage delta: <strong>" + (isFinite(uDeltaPct) ? pctFmt(uDeltaPct) : "—") + "</strong>";
+
+      var allPdlOk = f1ok && f2ok;
+      $("strip-c4").className = "result-card " + (allPdlOk ? "is-pass" : "is-fail");
+      $("sc4-label").textContent = "SKU-Mix Rules";
+      $("sc4-badge").textContent = allPdlOk ? "ALL PASS" : "ACTION NEEDED";
+      $("sc4-val").textContent = "R1: " + (f1ok ? "PASS" : "FAIL") + " · R2: " + (f2ok ? "PASS" : "FAIL");
+      $("sc4-sub").className = "rc-sub " + (allPdlOk ? "is-pos" : "is-neg");
+      $("sc4-sub").textContent = "Top-tier: " + entSeats + "/" + Math.ceil(floor) + " · Mid-tier: " + bizSeats + "/300";
+      $("sc4-m1").innerHTML = "Enterprise: <strong>" + entSeats + " seats</strong>";
+      $("sc4-m2").innerHTML = "Business: <strong>" + bizSeats + " seats</strong>";
+    } else {
+      $("strip-title").textContent = "Live Deal Totals · New Deal";
+      $("strip-sub").textContent = "Core identity: Net PUPM = List × (1 − Discount) × (1 − Partner Margin) = ARPU ÷ Months";
+
+      $("strip-c1").className = "result-card is-baseline";
+      $("sc1-label").textContent = "Solver Triangle";
+      $("sc1-badge").textContent = "Net PUPM";
+      $("sc1-val").textContent = moneyDollar(pupm);
+      $("sc1-sub").className = "rc-sub";
+      $("sc1-sub").textContent = "TCV-solved PUPM: " + moneyDollar(tcvPupm);
+      $("sc1-m1").innerHTML = "Solve List: <strong>" + moneyDollar(m1Out) + "</strong>";
+      $("sc1-m2").innerHTML = "Disc / PM: <strong>" + pctFmt(m2Out) + " / " + pctFmt(m3Out) + "</strong>";
+
+      $("strip-c2").className = "result-card";
+      $("sc2-label").textContent = "Seat Economics";
+      $("sc2-badge").textContent = totSeats + " seats";
+      $("sc2-val").textContent = moneyDollar(totAcv);
+      $("sc2-sub").className = "rc-sub";
+      $("sc2-sub").textContent = "Blended PUPM: " + moneyDollar(blendedPupm) + " · PUPY: " + moneyDollar(blendedPupy);
+      $("sc2-m1").innerHTML = "Raw ACV: <strong>" + moneyDollar(totAcvRaw) + "</strong>";
+      $("sc2-m2").innerHTML = "Seat TCV: <strong>" + moneyDollar(totTcv) + "</strong>";
+
+      $("strip-c3").className = "result-card " + (g1.triggered ? "is-pass" : "");
+      $("sc3-label").textContent = "Usage & Concession";
+      $("sc3-badge").textContent = g1.triggered ? "CONCESSION ACTIVE" : "NOT REACHED";
+      $("sc3-val").textContent = isFinite(ndUsageMo) ? (moneyDollar(ndUsageMo) + "/mo") : "—";
+      $("sc3-sub").className = "rc-sub " + (g1.triggered ? "is-pos" : "is-warn");
+      $("sc3-sub").textContent = "Usage/yr: " + moneyDollar(ndUsageYr) + " · Off: " + moneyDollar(g1.off) + "/mo";
+      $("sc3-m1").innerHTML = "Metered net: <strong>" + moneyDollar(g1.meteredNet) + "</strong>";
+      var firstTokTxt = ndu.length && isFinite(ndu[0].effPerUnit) ? (function () {
+        var meta0 = UNIT_TYPES.filter(function (x) { return x.id === ndu[0].type; })[0];
+        return meta0 && meta0.per ? "$" + (ndu[0].effPerUnit / meta0.per).toFixed(8) : moneyDollar(ndu[0].effPerUnit, 4);
+      })() : "—";
+      $("sc3-m2").innerHTML = "Per token: <strong>" + firstTokTxt + "</strong>";
+
+      $("strip-c4").className = "result-card";
+      $("sc4-label").textContent = "Full Deal TCV";
+      $("sc4-badge").textContent = (counts.nd ? num("nd0-months") : 0) + " months";
+      $("sc4-val").textContent = moneyDollar(ndFullTcv);
+      $("sc4-sub").className = "rc-sub";
+      $("sc4-sub").textContent = "Seats + usage after coupons & concession";
+      $("sc4-m1").innerHTML = "Seat TCV: <strong>" + moneyDollar(totTcv) + "</strong>";
+      $("sc4-m2").innerHTML = "Usage TCV: <strong>" + moneyDollar(ndUsageYr * dealYears) + "</strong>";
+    }
+
+    /* Deal Brief */
+    var brief = [];
+    brief.push("DEAL PRICING SOLVER — DEAL BRIEF (SAMPLE MODEL)");
+    brief.push("================================================");
+    brief.push("SOLVER & BASELINES");
+    brief.push("- Baseline Net ARPU: " + moneyDollar(num("b-arpu")) + " over " + num("b-months") + " mo => Net PUPM: " + moneyDollar(pupm));
+    brief.push("- Flat Matrix Results: List " + moneyDollar(m1Out) + " | Disc " + pctFmt(m2Out) + " | PM " + pctFmt(m3Out));
+    brief.push("- TCV Reverse Form: TCV " + moneyDollar(tcv) + " / " + yrs + " yrs / " + seats + " seats => ACV " + moneyDollar(acv) + " | ARPU " + moneyDollar(arpu) + " | PUPM " + moneyDollar(tcvPupm));
+    brief.push("");
+    brief.push("NEW DEAL (VIEW 1)");
+    brief.push("- Total Seats: " + totSeats + " | Blended Net PUPM: " + moneyDollar(blendedPupm) + " | Blended Net PUPY: " + moneyDollar(blendedPupy));
+    brief.push("- Seat ACV (raw -> after coupons): " + moneyDollar(totAcvRaw) + " -> " + moneyDollar(totAcv));
+    brief.push("- Seat TCV (after coupons): " + moneyDollar(totTcv));
+    brief.push("- Usage Concession (" + $("g1-meter").value + ", threshold " + num("g1-threshold") + ", extra " + num("g1-extra") + "%): " + (g1.triggered ? "TRIGGERED" : "NOT REACHED") + " | Off: " + moneyDollar(g1.off) + "/mo | Net after: " + moneyDollar(ndUsageMo) + "/mo (" + moneyDollar(ndUsageYr) + "/yr)");
+    brief.push("- Full Deal TCV (seats + usage, " + (dealYears * 12) + " mo): " + moneyDollar(ndFullTcv));
+    brief.push("");
+    brief.push("OLD VS NEW & SKU-MIX ADJUDICATION (VIEW 2)");
+    brief.push("- Old Deal (" + oSeatsTot + " seats): ACV " + moneyDollar(oFacvTot) + " / TCV " + moneyDollar(oFtcvTot) + " | Usage: " + moneyDollar(oldUsageMo) + "/mo");
+    brief.push("- Proposed Deal (" + nSeatsTot + " seats): ACV " + moneyDollar(nFacvTot) + " / TCV " + moneyDollar(nFtcvTot) + " | Usage after concession: " + moneyDollar(newUsageMo) + "/mo");
+    brief.push("- Total Variance: ACV " + (isFinite(acvPct) ? pctFmt(acvPct) : "—") + " (" + signedDollar(nFacvTot - oFacvTot) + ") | TCV " + (isFinite(tcvPct) ? pctFmt(tcvPct) : "—") + " (" + signedDollar(nFtcvTot - oFtcvTot) + ")");
+    brief.push("- Rule 1 (Top-tier floor): " + (f1ok ? "PASS" : "FAIL") + " — " + entSeats + " enterprise seats of " + totalNewSeats + " total (floor " + Math.ceil(floor) + ")");
+    brief.push("- Rule 2 (Mid-tier cap): " + (f2ok ? "PASS" : "FAIL") + " — " + bizSeats + " business seats (cap 300)");
+    $("deal-brief-pre").textContent = brief.join("\n");
+  }
+
+  /* ---------- Self-Check Battery (Part C Anchors + All 8 Interaction Cases) ---------- */
+  function near(a, b, tol) { return Math.abs(a - b) <= (tol || 1e-2); }
+  function runSelfCheckBattery() {
+    /* Anchors via pure CALC */
+    var pupm0 = CALC.pupmFromArpu(158.4, 12);
+    console.assert(near(pupm0, 13.20, 1e-4), "Anchor baseline PUPM fail");
+    console.assert(near(CALC.pupmLayer(30, 0.45, 0.20), 13.20, 1e-4), "Anchor pupmLayer fail");
+    console.assert(near(CALC.solveList(13.20, 0.45, 0.20), 30.00, 1e-4), "Anchor solveList fail");
+    console.assert(near(CALC.solveDisc(13.20, 30, 0.20), 0.45, 1e-4), "Anchor solveDisc fail");
+    console.assert(near(CALC.solvePM(13.20, 30, 0.45), 0.20, 1e-4), "Anchor solvePM fail");
+
+    var l1 = CALC.applyCoupon(CALC.line(23, 86, 0.45, 0.12, 36), 1500, 3);
+    var l2 = CALC.applyCoupon(CALC.line(22, 230, 0.45, 0.12, 36), 0, 3);
+    var l3 = CALC.applyCoupon(CALC.line(4, 255, 0.45, 0.12, 36), 0, 3);
+    console.assert(near(l1.pupm, 11.132, 1e-3) && near(l1.acv, 11488.224, 1e-2) && near(l1.tcv, 34464.672, 1e-2), "Anchor L1 raw fail");
+    console.assert(near(l1.facv, 10988.224, 1e-2) && near(l1.ftcv, 32964.672, 1e-2), "Anchor L1 after coupon fail");
+    console.assert(near(l2.pupm, 10.648, 1e-3) && near(l2.acv, 29388.48, 1e-2) && near(l2.tcv, 88165.44, 1e-2), "Anchor L2 fail");
+    console.assert(near(l3.pupm, 1.936, 1e-3) && near(l3.acv, 5924.16, 1e-2) && near(l3.tcv, 17772.48, 1e-2), "Anchor L3 fail");
+    console.assert(near(l1.facv + l2.facv + l3.facv, 46300.864, 1e-2) && near(l1.ftcv + l2.ftcv + l3.ftcv, 138902.592, 1e-2), "Anchor deal totals fail");
+
+    var uNd = CALC.usage(60, 3.00, 0.10, 25); uNd.type = "token1m";
+    console.assert(uNd.billed === 60 && near(uNd.gross, 180) && near(uNd.net, 162) && near(uNd.year, 1944) && near(uNd.effPerUnit, 2.70), "Anchor usage ND fail");
+    var thNd = CALC.threshold([uNd], "token1m", 50, 0.05);
+    console.assert(thNd.triggered && near(thNd.off, 8.10) && near(thNd.after, 153.90), "Anchor threshold ND fail");
+    console.assert(near((l1.ftcv + l2.ftcv + l3.ftcv) + thNd.after * 12 * 3, 144442.992, 1e-2), "Anchor full TCV fail");
+
+    var o1 = CALC.applyCoupon(CALC.line(30, 50, 0.45, 0.20, 36), 0, 3);
+    console.assert(near(o1.facv, 7920) && near(o1.ftcv, 23760), "Anchor old totals fail");
+    console.assert(near(CALC.pctChange(7920, 46300.864) * 100, 484.6068, 1e-2), "Anchor ACV delta fail");
+
+    var uOld = CALC.usage(30, 3.60, 0, 0);
+    var uProp = CALC.usage(55, 3.00, 0.10, 25); uProp.type = "token1m";
+    var thProp = CALC.threshold([uProp], "token1m", 50, 0.05);
+    console.assert(near(uOld.net, 108) && near(uProp.net, 148.50) && thProp.triggered && near(thProp.off, 7.425) && near(thProp.after, 141.075), "Anchor old/prop usage fail");
+    console.assert(near(CALC.expand(20.10, 0.10), 22.11) && near(CALC.contract(20.10, 0.10), 18.09), "Anchor expansion fail");
+
+    /* Interaction Cases 1–8 against live DOM + Reset */
+    /* Case 3: Minimum binds */
+    var uMin = CALC.usage(10, 3.00, 0.10, 25);
+    console.assert(uMin.billed === 25 && near(uMin.net, 67.50), "Case 3 min binds fail");
+    /* Case 4: Threshold edge */
+    var thMiss = CALC.threshold([uNd], "token1m", 100, 0.05);
+    console.assert(!thMiss.triggered && thMiss.off === 0 && near(thMiss.after, 162), "Case 4 threshold miss fail");
+    /* Case 6: Zero-divisor guards in DOM */
+    $("m1-disc").value = "100"; $("b-months").value = "0"; $("old0-seats").value = "0";
+    recompute();
+    console.assert($("b-pupm").textContent === "—" && $("m1-out").textContent === "—" && $("cmp-acv").textContent.indexOf("NaN") === -1, "Case 6 zero-divisor DOM guard fail");
+    /* Case 5: PDL flip */
+    resetToSeedState();
+    $("new0-seats").value = "120";
+    recompute();
+    console.assert($("pdl-1-flag").textContent === "PASS", "Case 5 PDL flip fail");
+    /* Case 7: Per-token at 1K */
+    resetToSeedState();
+    $("ndu0-type").value = "token1k";
+    recompute();
+    console.assert($("ndu0-pertoken").textContent === "$0.00270000", "Case 7 per-token 1K fail");
+    /* Case 8: Final reset restores seed state exactly */
+    resetToSeedState();
+    console.assert($("nd-tcv").textContent === "138,902.59" && $("nd-fulltcv").textContent === "144,442.99" && $("pdl-1-flag").textContent === "FAIL", "Case 8 reset verification fail");
+  }
+
+  document.addEventListener("input", function (e) {
+    if (e.target && e.target.closest("#calc-root")) {
+      setPresetStatus("", "Active state: Custom edited inputs");
+      recompute();
+    }
+  });
+  document.addEventListener("change", function (e) {
+    if (e.target && e.target.closest("#calc-root") && e.target.id !== "s-target") {
+      setPresetStatus("", "Active state: Custom edited inputs");
+      recompute();
+    }
+  });
+
+  resetToSeedState();
+  runSelfCheckBattery();
+})();
+  </script>
+</body>
+</html>
