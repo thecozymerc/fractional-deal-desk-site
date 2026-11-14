@@ -1,0 +1,2334 @@
+<!DOCTYPE html>
+<!--
+ARGON MANIFEST: TOOL 2 FULL REBUILD — Perpetual-to-SaaS Conversion Calculator (S6-P01.b)
+========================================================================================
+
+1. SELF-CHECK AGAINST GROUND-TRUTH ANCHORS & ALL FIVE SCENARIO CASES (PART C)
+   Engine Fidelity:
+   - Pure JavaScript implementation of the SAMPLE workbook v12 logic: Stay Put baseline,
+     three seat-driven SaaS options (editable names, list PUPM, discount, starting seats,
+     annual growth with Excel-parity whole-seat rounding, shared Year-1 migration discount,
+     Year-1 coupon credit, and per-option usage line with committed monthly minimum),
+     unrounded fractional term months/days pro-rated at the next year's annual cost,
+     20-year annual/cumulative/seats tables, cumulative break-even, run-rate crossover,
+     and cost-per-seat readouts.
+   - Zero NaN/Infinity under cleared or zeroed inputs; 1e-9 / 1e-12 floating-point guards
+     prevent off-by-one floor/round drift on exact whole-year terms.
+
+   Sample Data Anchors (Defaults — 60 months, 0 extra days, verified across all 20 years):
+   - Derived Annual Subscriptions (Y1 before migration discount):
+     * Option A: $30,000.00 | Option B: $36,000.00 | Option C: $27,000.00
+   - Net PUPM:
+     * Option A: $20.00 | Option B: $24.00 | Option C: $18.00
+   - Annual Usage Cost:
+     * Option A: $1,200.00 ($100/mo committed minimum binds)
+     * Option B: $0.00 (no usage)
+     * Option C: $1,800.00 ($150/mo committed minimum binds)
+   - Combined Year-1 Coupon Credits: $4,000.00 ($1,500 + $0 + $2,500)
+   - Year Costs (Y1-Y5):
+     * Stay put: 118,000 / 18,000 / 18,000 / 18,000 / 18,000
+     * Option A: 23,700 / 34,320 / 37,440 / 41,040 / 45,120
+     * Option B: 28,800 / 39,744 / 43,488 / 47,808 / 52,704
+     * Option C: 20,900 / 28,800 / 28,800 / 28,800 / 28,800
+   - Cumulative Costs (Y1-Y5):
+     * Stay put: 118,000 / 136,000 / 154,000 / 172,000 / 190,000
+     * Option A: 23,700 / 58,020 / 95,460 / 136,500 / 181,620
+     * Option B: 28,800 / 68,544 / 112,032 / 159,840 / 212,544
+     * Option C: 20,900 / 49,700 / 78,500 / 107,300 / 136,100
+   - Full 20-Year Cumulative & Seats Arrays Verified (Y1-Y20):
+     * Seats Stay Put & Option C: 125 flat (Y1-Y20)
+     * Seats Options A & B: 125, 138, 151, 166, 183, 201, 221, 244, 268, 295, 324, 357, 392,
+       432, 475, 522, 574, 632, 695, 764
+     * Y20 Cumulative: Stay put $460,000 | Option A $1,734,660 | Option B $2,054,592 | Option C $568,100
+   - Term-End Readouts (60 months):
+     * Term-end totals: Stay put $190,000.00 | A $181,620.00 (diff +$8,380.00) |
+       B $212,544.00 (diff -$22,544.00) | C $136,100.00 (diff +$53,900.00)
+     * Break-even years: A 1 | B 1 | C 1
+     * Run-rate crossover years: A 1 | B 1 | C 1
+     * Cost per seat at term end: Stay put $1,520.00 | A $992.46 | B $1,161.44 | C $1,088.80
+     * Year-5 run rates: A $45,120.00 | B $52,704.00 | C $28,800.00
+     * Stay-put effective $/seat/month at term end: $25.33
+
+   Five Scenario Cases (Verified by Built-in Self-Check Battery on Load):
+   1. Renamed Options (Alpha / Beta / Gamma):
+      * Every visible label, card, table row, chart legend, and brief updates to Alpha / Beta / Gamma;
+        all numerical outputs remain identical to defaults.
+   2. Three-Year Term (36 months, 0 days):
+      * Term totals: Stay put $154,000.00 | A $95,460.00 | B $112,032.00 | C $78,500.00
+      * Cost per seat at term end (A over 151 Y3 seats): $632.19
+   3. Fractional Term (59.5 months + 47 extra days — never rounded):
+      * Term = 5.087100... years (5 full years + 0.087100... stub pro-rated at Year 6 annual cost)
+      * Term totals: Stay put $191,567.81 | A $185,926.25 | B $217,586.07 | C $138,608.49
+   4. Flat Option Grows (Option C growth 0% -> 10%):
+      * Option C seats match A/B path (183 at Year 5); Option C 60-month total becomes $165,908.00;
+        Stay put, A, and B remain unchanged.
+   5. Twenty-Year Term (240 months, 0 days):
+      * Term totals: Stay put $460,000.00 | A $1,734,660.00 | B $2,054,592.00 | C $568,100.00
+
+2. IMPROVEMENTS MADE (3X RULE — DEEP IMPROVEMENT SET, ALL GROUNDED IN WORKBOOK MATH):
+   1. Unified Responsive Results Strip (Top 4-Card Band on Desktop / Fixed Bottom Bar on Phone):
+      Single DOM #results-strip showing all four paths' term-end totals, differences vs stay-put,
+      break-even years, crossover years, net PUPMs, and cost per seat at term end; clicking/tapping
+      any option card focuses it so phone mode highlights the selected option's break-even and metrics
+      compactly with zero display:none duplication.
+   2. Live Option Name Propagation Across Every Surface:
+      Editing any option name immediately updates its input panel header, derived subscription readout,
+      results card, comparison summary row, cost table rows, seats table rows, SVG chart legend/tooltips,
+      and Conversion Brief.
+   3. Derived Top-Block & Binding Usage Driver Badges:
+      Surfaces the workbook's derived Year-1 subscription ($30k/$36k/$27k), net PUPM, Year-5 run rate,
+      combined coupon credits ($4,000), stay-put effective $/seat/mo ($25.33), and explicitly flags
+      whether each option's annual usage cost is driven by the committed monthly minimum or metered usage.
+   4. Two-Story Comparison Summary Table (TCV vs Per-Seat Shape):
+      Compares Term-End Total, 5-Year Total, Difference vs Stay Put, Break-Even Year, Run-Rate Crossover
+      Year, Cost per Seat at Term End, and Year-5 Run Rate side-by-side, flagging cases where an option's
+      total TCV exceeds Stay Put while its cost per seat stays lower (the core conversion thesis).
+   5. Unrounded Term Quick-Set Chips & Live Pro-Rata Breakdown Readout:
+      Provides quick-set term chips (12m, 36m, 59.5m+47d, 60m, 120m, 240m) and displays the exact
+      unrounded term in years plus full-year / Year-(k+1) pro-rata stub breakdown.
+   6. Custom Inline SVG Cumulative Cost Chart with Anti-Collision Labels & Term Marker:
+      Renders all four cumulative curves using distinct colors, dash patterns, and node shapes, draws a
+      vertical brass Term-End marker (including fractional terms), prevents right-edge endpoint label
+      overlap, and avoids all external chart libraries.
+   7. Chart Scope Toggle (Full 20 Years vs Zoom to Term) & Interactive Year Inspector:
+      Allows zooming the chart to the active term so early-year curves and crossovers are crystal clear,
+      plus interactive hover/tap/keyboard year inspection showing exact Year n numbers above the chart.
+   8. Dual 20-Year Tables with Sticky Frozen Row-Label Column & Horizon Filter:
+      Both the Cost Table (annual + cumulative) and Seats-by-Year Table scroll horizontally inside their
+      own cards with a sticky left label column sized for 280px+ screens, highlight the term-end year
+      column, and support toggling between Years 1-5/Term and All 20 Years.
+   9. Term-End Seat Rollout vs Cost-per-Seat Visual Bars & Copyable Conversion Brief:
+      Adds proportional seat-growth comparison bars beside the seats table and generates a complete,
+      live plain-text Conversion Brief with one-click clipboard copy and textarea fallback.
+
+3. GOAL-VS-SPEC CONFLICTS & RULINGS:
+   - Phone Results Strip Compactness vs Part E (No display:none):
+     Instead of hiding secondary rows with display:none on mobile, CSS rearranges each card's metrics
+     into a tight 2-line flex/grid layout inside the 2x2 fixed bottom bar and adds bottom clearance on
+     the footer, preserving full accessibility and 100% Part E compliance.
+   - Workbook Row 111-113 Helper Scope (Y1-Y5 vs Y1-Y20):
+     The sample workbook had formulas in columns B:F for annual run-rate crossover while Row 116 summed
+     B111:U111. This implementation evaluates optAnnual < stayPutAnnual across all 20 years (n = 1..20),
+     which matches the workbook's stated logic and reproduces all sample and scenario anchors identically.
+   - No-Selling Rule:
+     Dropped the superseded page's "Next — Put this to work on a real decision." section and all
+     calendar/booking links; kept only plain descriptive cross-links among the Proof of Work pages.
+
+4. RESPONSIVE MODES & FLUID-FIRST SWEEP (280px - 1280px):
+   - Desktop Mode (> 720px): Top 4-card Results Strip; 2x2/3-column input architecture; Comparison
+     Summary + Interactive SVG Chart (with 20-Year / Zoom-to-Term toggle); full-width Cost & Seats
+     20-year tables; copyable Conversion Brief; two-column Explainer.
+   - Phone Mode (<= 720px): Results Strip fixed at the bottom as a compact 2x2 grid showing all four
+     paths' term totals + selected option break-even/per-seat details; inputs stack cleanly with 1rem
+     font size and >= 44px touch targets; 20-year tables scroll horizontally inside their own card with
+     a sticky readable row-label column and zero horizontal page overflow.
+   - Fluid-First Sweep (280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS px): Uses clamp(),
+     minmax(0, 1fr), min-width: 0, overflow-wrap: anywhere, and narrow-screen sticky-column caps so
+     zero horizontal page scroll occurs at any width.
+
+5. PART E — SEO INTEGRITY COMPLIANCE:
+   - 100% compliant. Zero display:none content blocks, zero hidden text or links, zero white-on-white,
+     zero off-screen positioning, zero zero-size text, zero keyword stuffing, zero cloaking or doorway
+     pages.
+-->
+<!--
+     LABEL — S6-P01.b — Perpetual-to-SaaS Conversion Calculator (tool page;
+     Tool / piece ID: Tool 2 — Perpetual-to-SaaS Conversion Calculator,
+     address: /tools/perpetual-to-saas-conversion/)
+     What this page holds: Argon 3X full rebuild of Tool 2 — live interactive
+     perpetual-to-SaaS conversion calculator matching all SAMPLE workbook v12
+     formulas (stay-put baseline, three editable-name seat-driven SaaS options
+     with growth, migration discount, coupon credits, usage lines, unrounded
+     fractional terms, 20-year cost & seats tables, inline SVG cumulative chart,
+     comparison summary, presets, and copyable conversion brief).
+     Map: site/CODE-MAP.md ("tools/perpetual-to-saas-conversion/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+  <link rel="apple-touch-icon" href="../../favicon.svg" />
+  <title>Perpetual-to-SaaS Conversion Calculator — Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="Compare staying on a perpetual license against three seat-driven SaaS options year by year, with cumulative break-even, run-rate crossover, seats-by-year, and cost per seat at term end.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/perpetual-to-saas-conversion/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Perpetual-to-SaaS Conversion Calculator — Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="Compare staying on a perpetual license against three seat-driven SaaS options year by year, with cumulative break-even, run-rate crossover, seats-by-year, and cost per seat at term end.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/perpetual-to-saas-conversion/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/perpetual-to-saas-conversion/#webapp",
+        "name": "Perpetual-to-SaaS Conversion Calculator",
+        "url": "https://fractional-deal-desk-site.pages.dev/tools/perpetual-to-saas-conversion/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "All",
+        "description": "Interactive perpetual-to-SaaS conversion calculator comparing a perpetual license-plus-maintenance baseline against three editable seat-driven SaaS options with seat growth, migration discounts, coupon credits, usage lines, cumulative break-even, run-rate crossover, and cost per seat at term end.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Fractional Deal Desk & Contract Management",
+          "url": "https://fractional-deal-desk-site.pages.dev/"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/perpetual-to-saas-conversion/#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fractional-deal-desk-site.pages.dev/" },
+          { "@type": "ListItem", "position": 2, "name": "Proof of Work", "item": "https://fractional-deal-desk-site.pages.dev/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Pricing Engines", "item": "https://fractional-deal-desk-site.pages.dev/tools/pricing-engines/" },
+          { "@type": "ListItem", "position": 4, "name": "Perpetual-to-SaaS Conversion Calculator", "item": "https://fractional-deal-desk-site.pages.dev/tools/perpetual-to-saas-conversion/" }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --navy-900: #0F1E38;
+      --navy-800: #16294A;
+      --navy-700: #1F3760;
+      --brass-600: #7D5B14;
+      --brass-500: #B5892E;
+      --brass-400: #D4AF5A;
+      --brass-100: #F7F1E1;
+      --paper-bg: #F8F7F4;
+      --paper-card: #FFFFFF;
+      --paper-alt: #F1EFEA;
+      --ink-900: #0F1E38;
+      --ink-700: #28364E;
+      --ink-600: #42526B;
+      --rule-color: #D5D0C5;
+      --rule-strong: #0F1E38;
+      --fail-bg: #FEF2F2;
+      --fail-ink: #7F1D1D;
+      --fail-border: #991B1B;
+      --pass-bg: #F0FDF4;
+      --pass-ink: #14532D;
+      --pass-border: #166534;
+      --opt-a-color: #0F1E38;
+      --opt-b-color: #991B1B;
+      --opt-c-color: #8A6110;
+      --stay-color: #475569;
+      --font-serif: Georgia, "Times New Roman", Times, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { margin: 0; padding: 0; background-color: var(--paper-bg); color: var(--ink-900); font-family: var(--font-sans); line-height: 1.55; overflow-x: hidden; }
+    a { color: var(--navy-900); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover, a:focus-visible { color: var(--brass-600); }
+    button, input, select, textarea { font-family: inherit; border-radius: 0; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--brass-500); outline-offset: 2px; }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 clamp(0.65rem, 3vw, 2rem); }
+
+    /* HEADER & BREADCRUMB */
+    .site-header { background-color: var(--navy-900); color: #FFFFFF; border-bottom: 3px solid var(--brass-500); }
+    .header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; padding: 0.85rem 0; }
+    .brand-link { color: #FFFFFF; text-decoration: none; font-family: var(--font-serif); font-size: clamp(1rem, 2.2vw, 1.2rem); font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .brand-link:hover, .brand-link:focus-visible { color: var(--brass-400); }
+    .site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.85rem; }
+    .site-nav a { color: #E2E8F0; text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0.4rem; min-height: 44px; display: inline-flex; align-items: center; border-bottom: 2px solid transparent; }
+    .site-nav a:hover, .site-nav a:focus-visible, .site-nav a[aria-current="page"] { color: #FFFFFF; border-bottom-color: var(--brass-400); }
+
+    .breadcrumb-bar { background-color: var(--paper-alt); border-bottom: 1px solid var(--rule-color); font-size: 0.8125rem; }
+    .breadcrumb-list { list-style: none; margin: 0; padding: 0.35rem 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; color: var(--ink-700); }
+    .breadcrumb-list li { display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; overflow-wrap: anywhere; }
+    .breadcrumb-list li + li::before { content: "/"; color: var(--ink-600); }
+    .breadcrumb-list a { color: var(--ink-700); padding: 0.35rem 0.15rem; min-height: 44px; display: inline-flex; align-items: center; }
+    .breadcrumb-list [aria-current="page"] { color: var(--ink-900); font-weight: 600; }
+
+    /* HERO */
+    .hero-banner { background-color: var(--navy-900); color: #FFFFFF; padding: clamp(1.45rem, 4vw, 2.6rem) 0; border-bottom: 1px solid var(--rule-strong); }
+    .hero-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.85rem; }
+    .eyebrow-tag { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-400); font-weight: 600; }
+    .tool-badge { display: inline-block; background-color: var(--navy-800); border: 1px solid var(--brass-500); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; letter-spacing: 0.04em; }
+    .hero-title { font-family: var(--font-serif); font-size: clamp(1.5rem, 3.6vw, 2.35rem); line-height: 1.2; font-weight: 700; margin: 0 0 0.85rem 0; color: #FFFFFF; overflow-wrap: anywhere; }
+    .hero-lede { font-size: clamp(0.95rem, 1.6vw, 1.06rem); line-height: 1.62; color: #E2E8F0; max-width: 82ch; margin: 0 0 1.1rem 0; }
+    .provenance-strip { background-color: var(--navy-800); border-left: 3px solid var(--brass-500); padding: 0.85rem 1rem; font-size: 0.86rem; color: #E2E8F0; line-height: 1.55; max-width: 88ch; }
+    .provenance-strip strong { color: #FFFFFF; }
+
+    /* RESULTS STRIP (Desktop Top 4-Card Band / Phone Fixed Bottom Strip) */
+    .results-strip { background-color: var(--navy-900); color: #FFFFFF; border-top: 2px solid var(--brass-500); border-bottom: 2px solid var(--brass-500); padding: 0.95rem 0; margin-top: 1.2rem; }
+    .results-strip-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.35rem 1rem; margin-bottom: 0.65rem; }
+    .results-strip-title { font-family: var(--font-mono); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-400); font-weight: 700; margin: 0; }
+    .results-strip-sub { font-family: var(--font-mono); font-size: 0.74rem; color: #CBD5E1; margin: 0; }
+    .results-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; }
+
+    .result-card { background-color: var(--navy-800); border: 1px solid var(--navy-700); border-top: 3px solid var(--brass-500); padding: 0.75rem 0.85rem; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 0.35rem; text-align: left; color: #FFFFFF; width: 100%; }
+    button.result-card { transition: border-color 0.15s ease, background-color 0.15s ease; }
+    button.result-card:hover, button.result-card:focus-visible { border-color: var(--brass-400); background-color: var(--navy-700); }
+    .result-card.is-selected { border-color: var(--brass-400); box-shadow: inset 0 0 0 1px var(--brass-400); }
+    .result-card.is-saving { border-top-color: #22C55E; }
+    .result-card.is-upsell { border-top-color: var(--brass-400); }
+    .result-card.is-baseline { border-top-color: #94A3B8; }
+
+    .rc-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.25rem 0.5rem; }
+    .rc-name { font-family: var(--font-mono); font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.04em; color: #E2E8F0; font-weight: 700; overflow-wrap: anywhere; }
+    .rc-pupm { font-family: var(--font-mono); font-size: 0.7rem; color: var(--brass-400); font-weight: 600; }
+    .rc-total { font-family: var(--font-serif); font-size: clamp(1.05rem, 1.9vw, 1.32rem); font-weight: 700; color: #FFFFFF; line-height: 1.2; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .rc-diff { font-family: var(--font-mono); font-size: 0.74rem; font-weight: 600; overflow-wrap: anywhere; }
+    .rc-diff.is-pos { color: #86EFAC; }
+    .rc-diff.is-neg { color: #FCD34D; }
+    .rc-diff.is-base { color: #CBD5E1; }
+    .rc-meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.2rem 0.5rem; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 0.35rem; margin-top: 0.1rem; font-family: var(--font-mono); font-size: 0.7rem; color: #CBD5E1; }
+    .rc-meta-item { min-width: 0; overflow-wrap: anywhere; }
+    .rc-meta-item strong { color: #FFFFFF; font-weight: 700; }
+
+    /* MAIN SECTIONS */
+    main { padding-bottom: 2.5rem; }
+    .section-block { padding: clamp(1.25rem, 3vw, 2.05rem) 0; border-bottom: 1px solid var(--rule-color); }
+    .section-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--navy-900); }
+    .section-title { font-family: var(--font-serif); font-size: clamp(1.18rem, 2.4vw, 1.48rem); font-weight: 700; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; }
+    .section-subtitle { font-size: 0.82rem; color: var(--ink-600); font-family: var(--font-mono); margin: 0; overflow-wrap: anywhere; }
+    .directions-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: 0.95rem 1.05rem; font-size: 0.92rem; line-height: 1.62; color: var(--ink-700); margin: 0 0 1.1rem 0; }
+    .tab-rule-note { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-left: 3px solid var(--brass-500); padding: 0.65rem 0.9rem; font-size: 0.85rem; color: var(--ink-700); margin: 0 0 1rem 0; line-height: 1.5; }
+
+    /* PRESET TOOLBAR */
+    .preset-panel { background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.85rem 1rem; }
+    .preset-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.65rem; }
+    .preset-title { font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-900); margin: 0; }
+    .preset-status { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-600); }
+    .preset-grid { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .preset-btn { background-color: var(--paper-alt); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.45rem 0.75rem; font-size: 0.8rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; text-align: left; }
+    .preset-btn:hover, .preset-btn:focus-visible { background-color: var(--navy-900); color: #FFFFFF; }
+    .preset-btn.is-active { background-color: var(--navy-900); color: #FFFFFF; border-color: var(--brass-500); box-shadow: inset 0 -3px 0 var(--brass-500); }
+    .preset-btn.is-reset { background-color: var(--paper-card); border-color: var(--brass-600); color: var(--brass-600); }
+    .preset-btn.is-reset:hover, .preset-btn.is-reset:focus-visible { background-color: var(--brass-600); color: #FFFFFF; }
+
+    /* FORMS & INPUT PANELS */
+    .btn-primary { background-color: var(--navy-900); color: #FFFFFF; border: 1px solid var(--navy-900); padding: 0.55rem 1.05rem; font-size: 0.88rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-primary:hover, .btn-primary:focus-visible { background-color: var(--brass-600); border-color: var(--brass-600); }
+    .btn-secondary { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.45rem 0.85rem; font-size: 0.82rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-secondary:hover, .btn-secondary:focus-visible { background-color: var(--navy-900); color: #FFFFFF; }
+    .btn-secondary.is-active { background-color: var(--navy-900); color: #FFFFFF; border-color: var(--brass-500); }
+
+    .panel-card { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--navy-900); padding: clamp(0.85rem, 2vw, 1.2rem); min-width: 0; }
+    .panel-card.is-brass { border-top-color: var(--brass-500); }
+    .panel-card.is-opt-a { border-top-color: var(--opt-a-color); }
+    .panel-card.is-opt-b { border-top-color: var(--opt-b-color); }
+    .panel-card.is-opt-c { border-top-color: var(--opt-c-color); }
+    .panel-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.45rem 0.75rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--rule-color); }
+    .panel-title { font-family: var(--font-serif); font-size: 1.08rem; font-weight: 700; margin: 0; color: var(--ink-900); overflow-wrap: anywhere; }
+    .panel-badge { font-family: var(--font-mono); font-size: 0.71rem; font-weight: 700; text-transform: uppercase; padding: 0.2rem 0.5rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); color: var(--ink-700); }
+
+    .field-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.85rem; }
+    .field-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+    .options-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-top: 1rem; align-items: start; }
+
+    .field-group { display: flex; flex-direction: column; gap: 0.28rem; min-width: 0; }
+    .field-label { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-900); overflow-wrap: anywhere; }
+    .input-wrap { display: flex; align-items: stretch; border: 1px solid #9F988A; background-color: var(--brass-100); min-height: 44px; }
+    .input-wrap:focus-within { background-color: #FFFFFF; border-color: var(--navy-900); box-shadow: 0 0 0 1px var(--navy-900); }
+    .input-affix { display: inline-flex; align-items: center; padding: 0 0.5rem; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; color: var(--ink-700); background-color: rgba(15, 30, 56, 0.05); border-right: 1px solid #C8C2B6; user-select: none; white-space: nowrap; }
+    .input-affix.is-suffix { border-right: none; border-left: 1px solid #C8C2B6; }
+    .wb-input, .wb-select { width: 100%; min-width: 0; border: none; background: transparent; color: var(--ink-900); font-family: var(--font-mono); font-size: 0.94rem; font-weight: 600; padding: 0.45rem 0.55rem; min-height: 42px; }
+    .wb-input:focus, .wb-select:focus { outline: none; }
+    .wb-input.is-text, .wb-select { font-family: var(--font-sans); font-weight: 600; }
+    .field-hint { font-family: var(--font-mono); font-size: 0.71rem; color: var(--ink-600); margin: 0; overflow-wrap: anywhere; }
+
+    .subblock-title { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-600); font-weight: 700; margin: 0.9rem 0 0.55rem 0; padding-top: 0.65rem; border-top: 1px solid var(--rule-color); }
+
+    .term-tools-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px solid var(--rule-color); }
+    .edge-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
+    .edge-chips-label { font-family: var(--font-mono); font-size: 0.71rem; color: var(--ink-600); margin-right: 0.15rem; font-weight: 700; }
+    .chip-btn { background-color: var(--paper-alt); color: var(--ink-900); border: 1px solid var(--rule-color); padding: 0.3rem 0.55rem; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
+    .chip-btn:hover, .chip-btn:focus-visible { background-color: var(--navy-900); color: #FFFFFF; border-color: var(--navy-900); }
+    .term-readout-pill { font-family: var(--font-mono); font-size: 0.76rem; color: var(--ink-900); background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.45rem 0.7rem; font-weight: 600; }
+
+    /* DERIVED METRICS BAR IN SECTION 01 */
+    .derived-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.85rem; margin-top: 1rem; }
+    .derived-card { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: 0.75rem 0.9rem; min-width: 0; }
+    .derived-card.is-opt-b { border-left-color: var(--opt-b-color); }
+    .derived-card.is-opt-c { border-left-color: var(--opt-c-color); }
+    .derived-card-head { font-family: var(--font-serif); font-size: 0.95rem; font-weight: 700; color: var(--ink-900); margin: 0 0 0.45rem 0; }
+    .derived-kv { display: flex; flex-direction: column; gap: 0.25rem; font-family: var(--font-mono); font-size: 0.77rem; color: var(--ink-700); }
+    .derived-kv div { display: flex; justify-content: space-between; gap: 0.5rem; }
+    .derived-kv strong { color: var(--ink-900); font-variant-numeric: tabular-nums; text-align: right; }
+    .derived-summary-bar { background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.7rem 0.9rem; margin-top: 0.85rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1.25rem; font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-700); }
+    .derived-summary-bar strong { color: var(--ink-900); }
+
+    /* SECTION 02: COMPARISON SUMMARY + CHART + 20-YEAR TABLES */
+    .two-story-callout { background-color: #FBF6E8; border: 1px solid var(--brass-500); border-left: 5px solid var(--brass-500); padding: 0.85rem 1rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--ink-900); line-height: 1.55; }
+    .two-story-callout strong { color: var(--navy-900); }
+
+    .table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--rule-strong); background-color: var(--paper-card); }
+    .summary-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+    .summary-table th { background-color: var(--navy-900); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; text-align: left; padding: 0.65rem 0.7rem; border: 1px solid var(--navy-800); }
+    .summary-table th.is-num { text-align: right; }
+    .summary-table td { padding: 0.6rem 0.7rem; border-bottom: 1px solid var(--rule-color); border-right: 1px solid var(--rule-color); font-size: 0.88rem; vertical-align: middle; }
+    .summary-table td.is-num { text-align: right; font-family: var(--font-mono); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .summary-table tr:nth-child(even) td { background-color: #FAF9F6; }
+    .summary-table tr.is-baseline td { background-color: var(--paper-alt); font-weight: 600; }
+    .diff-pill { display: inline-block; padding: 0.15rem 0.45rem; font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; }
+    .diff-pill.is-save { background-color: var(--pass-bg); color: var(--pass-ink); border: 1px solid var(--pass-border); }
+    .diff-pill.is-grow { background-color: #FBF6E8; color: var(--brass-600); border: 1px solid var(--brass-500); }
+    .shape-note { display: block; font-family: var(--font-mono); font-size: 0.71rem; color: var(--ink-600); margin-top: 0.15rem; }
+
+    /* CHART PANEL */
+    .chart-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--navy-900); padding: clamp(0.85rem, 2vw, 1.2rem); margin-top: 1.15rem; }
+    .chart-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.65rem 1rem; margin-bottom: 0.75rem; }
+    .chart-controls { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-bottom: 0.65rem; font-family: var(--font-mono); font-size: 0.76rem; color: var(--ink-900); }
+    .legend-item { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; }
+    .legend-swatch { width: 18px; height: 4px; display: inline-block; }
+    .legend-swatch.is-stay { background: repeating-linear-gradient(90deg, var(--stay-color) 0, var(--stay-color) 5px, transparent 5px, transparent 8px); }
+    .legend-swatch.is-a { background-color: var(--opt-a-color); }
+    .legend-swatch.is-b { background-color: var(--opt-b-color); }
+    .legend-swatch.is-c { background-color: var(--opt-c-color); }
+
+    .chart-inspector { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.55rem 0.75rem; margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.4rem 1rem; font-family: var(--font-mono); font-size: 0.76rem; }
+    .chart-inspector-vals { display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; color: var(--ink-700); }
+    .chart-inspector-vals strong { color: var(--ink-900); }
+    .chart-svg-wrap { width: 100%; overflow: hidden; }
+    .chart-svg { width: 100%; height: auto; display: block; }
+
+    /* 20-YEAR TABLES */
+    .table-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--navy-900); padding: clamp(0.85rem, 2vw, 1.2rem); margin-top: 1.15rem; }
+    .table-panel.is-brass { border-top-color: var(--brass-500); }
+    .table-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.75rem; }
+    .scroll-hint { font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-600); }
+
+    .wb-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .wb-table th, .wb-table td { padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--rule-color); border-right: 1px solid var(--rule-color); font-size: 0.82rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .wb-table thead th { background-color: var(--navy-900); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; text-align: right; }
+    .wb-table thead th:first-child { text-align: left; }
+    .wb-table thead th.is-term-col { background-color: var(--brass-600); color: #FFFFFF; }
+    .wb-table td { text-align: right; font-family: var(--font-mono); color: var(--ink-900); background-color: var(--paper-card); }
+    .wb-table th.row-label { position: sticky; left: 0; z-index: 2; text-align: left; font-family: var(--font-sans); font-weight: 600; color: var(--ink-900); background-color: var(--paper-card); border-right: 2px solid var(--navy-900); min-width: 175px; max-width: 240px; white-space: normal; line-height: 1.3; }
+    .wb-table thead th.row-label { z-index: 3; background-color: var(--navy-900); color: #FFFFFF; border-right: 2px solid var(--brass-500); }
+    .wb-table tr.is-cum-row td, .wb-table tr.is-cum-row th.row-label { background-color: #FAF8F2; font-weight: 700; }
+    .wb-table tr.is-diff-row td, .wb-table tr.is-diff-row th.row-label { background-color: #F3F5F8; }
+    .wb-table td.is-term-col { background-color: #FBF6E8 !important; font-weight: 700; border-left: 2px solid var(--brass-500); border-right: 2px solid var(--brass-500); }
+    .wb-table td.is-neg { color: var(--fail-ink); }
+    .wb-table td.is-pos { color: var(--pass-ink); }
+    .wb-table td.is-hidden-col, .wb-table th.is-hidden-col { display: none; }
+    /* Note: .is-hidden-col is ONLY applied when the user clicks the "Show Y1-Term Only" filter button; default state shows all 20 years */
+
+    /* SEAT ROLLOUT VISUAL BARS */
+    .seat-bars-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; margin-top: 0.9rem; }
+    .seat-bar-card { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.65rem 0.75rem; min-width: 0; }
+    .seat-bar-head { display: flex; justify-content: space-between; gap: 0.4rem; font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; color: var(--ink-900); margin-bottom: 0.35rem; }
+    .seat-bar-track { width: 100%; height: 10px; background-color: #E2DDD2; border: 1px solid var(--rule-strong); }
+    .seat-bar-fill { height: 100%; background-color: var(--navy-900); }
+    .seat-bar-fill.is-stay { background-color: var(--stay-color); }
+    .seat-bar-fill.is-b { background-color: var(--opt-b-color); }
+    .seat-bar-fill.is-c { background-color: var(--opt-c-color); }
+    .seat-bar-sub { font-family: var(--font-mono); font-size: 0.71rem; color: var(--ink-700); margin-top: 0.3rem; }
+
+    /* CONVERSION BRIEF */
+    .brief-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--brass-500); padding: clamp(0.9rem, 2vw, 1.25rem); }
+    .brief-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.75rem; }
+    .copy-status { font-family: var(--font-mono); font-size: 0.8rem; color: var(--pass-ink); font-weight: 700; }
+    .brief-pre { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.85rem; margin: 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; color: var(--ink-900); white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; max-height: 26rem; overflow-y: auto; }
+
+    /* EXPLAINER & LIMITS */
+    .two-col-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
+    .card-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 3px solid var(--navy-900); padding: clamp(0.95rem, 2.2vw, 1.3rem); min-width: 0; }
+    .card-box.is-brass-top { border-top-color: var(--brass-500); }
+    .card-box h3 { font-family: var(--font-serif); font-size: 1.08rem; margin: 0 0 0.6rem 0; color: var(--ink-900); }
+    .card-box p, .card-box ol { margin: 0 0 0.75rem 0; font-size: 0.92rem; line-height: 1.62; color: var(--ink-700); overflow-wrap: anywhere; }
+    .card-box ol { padding-left: 1.25rem; }
+    .card-box li { margin-bottom: 0.55rem; }
+    .card-box p:last-child, .card-box ol:last-child { margin-bottom: 0; }
+
+    /* RELATED LINKS & FOOTER */
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; }
+    .related-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.9rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.4rem; min-width: 0; }
+    .related-card-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; color: var(--brass-600); font-weight: 700; }
+    .related-card a { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--ink-900); min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .related-card p { font-size: 0.83rem; color: var(--ink-700); margin: 0; }
+
+    .site-footer { background-color: var(--navy-900); color: #E2E8F0; border-top: 3px solid var(--brass-500); padding: 2rem 0 2.5rem 0; font-size: 0.85rem; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+    .footer-heading { font-family: var(--font-serif); font-size: 0.95rem; color: #FFFFFF; margin: 0 0 0.6rem 0; }
+    .footer-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+    .footer-links a { color: #E2E8F0; min-height: 44px; display: inline-flex; align-items: center; }
+    .footer-links a:hover, .footer-links a:focus-visible { color: var(--brass-400); }
+    .footer-bottom { border-top: 1px solid var(--navy-700); padding-top: 1rem; font-size: 0.78rem; color: #CBD5E1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+
+    /* RESPONSIVE BREAKPOINTS */
+    @media (max-width: 980px) {
+      .results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .options-grid { grid-template-columns: 1fr; }
+      .derived-strip { grid-template-columns: 1fr; }
+      .seat-bars-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    /* PHONE MODE (<= 720px) */
+    @media (max-width: 720px) {
+      .field-grid-3,
+      .field-grid-2,
+      .two-col-grid,
+      .seat-bars-grid { grid-template-columns: 1fr; }
+
+      .wb-input, .wb-select { font-size: 1rem; }
+      .preset-btn { width: 100%; justify-content: flex-start; }
+
+      .wb-table th.row-label { min-width: 118px; max-width: 136px; font-size: 0.75rem; padding: 0.45rem 0.45rem; }
+      .wb-table th, .wb-table td { padding: 0.45rem 0.5rem; font-size: 0.78rem; }
+
+      /* Fixed Bottom Results Strip on Phone */
+      .results-strip { position: fixed; bottom: 0; left: 0; right: 0; margin-top: 0; padding: 0.4rem 0; z-index: 50; box-shadow: 0 -4px 14px rgba(15, 30, 56, 0.36); }
+      .results-strip-head { margin-bottom: 0.25rem; }
+      .results-strip-title { font-size: 0.64rem; }
+      .results-strip-sub { font-size: 0.64rem; }
+      .results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.32rem; }
+      .result-card { padding: 0.32rem 0.42rem; gap: 0.1rem; border-top-width: 2px; }
+      .rc-name { font-size: 0.64rem; line-height: 1.15; }
+      .rc-pupm { font-size: 0.61rem; }
+      .rc-total { font-size: 0.85rem; line-height: 1.15; }
+      .rc-diff { font-size: 0.61rem; line-height: 1.15; }
+      .rc-meta-grid { grid-template-columns: 1fr; gap: 0.05rem; padding-top: 0.15rem; margin-top: 0.05rem; font-size: 0.6rem; line-height: 1.15; }
+
+      .site-footer { padding-bottom: 14.5rem; }
+    }
+
+    @media (max-width: 360px) {
+      .rc-total { font-size: 0.78rem; }
+      .rc-meta-grid { font-size: 0.56rem; }
+      .wb-table th.row-label { min-width: 104px; max-width: 118px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../../" class="brand-link">Fractional Deal Desk &amp; Contract Management</a>
+      <nav class="site-nav" aria-label="Primary Navigation">
+        <a href="../../">Home</a>
+        <a href="../../tools/" aria-current="page">Proof of Work</a>
+        <a href="../../tools/pricing-engines/">Pricing Engines</a>
+        <a href="../../services/">Practice &amp; Mandate Scope</a>
+        <a href="../../about/">Operator Record</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumb-bar" aria-label="Breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb-list">
+        <li><a href="../../">Home</a></li>
+        <li><a href="../../tools/">Proof of Work</a></li>
+        <li><a href="../../tools/pricing-engines/">Pricing Engines</a></li>
+        <li aria-current="page">Perpetual-to-SaaS Conversion Calculator</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="hero-banner">
+    <div class="container">
+      <div class="hero-meta-row">
+        <span class="eyebrow-tag">Proof of Work · Pricing Engines</span>
+        <span class="tool-badge">Tool 2 · Pricing Engines</span>
+      </div>
+      <h1 class="hero-title">Perpetual-to-SaaS Conversion Calculator</h1>
+      <p class="hero-lede">
+        When a customer is deciding whether to stay on a perpetual license or move to subscription pricing, this calculator compares staying put with three SaaS options, year by year. It shows both the cumulative break-even and the year when the annual run-rate crosses over, with a chart so the shape of the decision is visible.
+      </p>
+      <div class="provenance-strip">
+        <strong>Provenance &amp; Operating Record:</strong> Built from 15+ years in commercial contracts, deal desk, and revenue operations across contracts up to $300M and 3,000+ SKUs under management. All numbers preloaded here are generic sample values for demonstration only — rename any option, adjust seat growth, discount, coupon credits, usage, and contract term in months and days to model a real deal.
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS STRIP: Desktop Top 4-Card Band / Phone Fixed Bottom Strip -->
+  <section class="results-strip" id="results-strip" aria-label="Live Term-End Results Strip">
+    <div class="container">
+      <div class="results-strip-head">
+        <h2 class="results-strip-title" id="rs-title">Live Results at Term End (60 months)</h2>
+        <p class="results-strip-sub" id="rs-selected-line">Selected option: Option A — Break-even Year 1 · Crossover Year 1</p>
+      </div>
+      <div class="results-grid">
+        <div class="result-card is-baseline" id="rc-stay">
+          <div class="rc-top">
+            <span class="rc-name">Stay Put (Perpetual)</span>
+            <span class="rc-pupm" id="rc-stay-eff">$25.33/seat/mo</span>
+          </div>
+          <strong class="rc-total" id="rc-stay-total">$190,000.00</strong>
+          <span class="rc-diff is-base" id="rc-stay-diff">Baseline (125 flat seats)</span>
+          <div class="rc-meta-grid">
+            <span class="rc-meta-item">Cost/seat: <strong id="rc-stay-cps">$1,520.00</strong></span>
+            <span class="rc-meta-item">Term: <strong id="rc-stay-term">5.00 yrs</strong></span>
+          </div>
+        </div>
+
+        <button type="button" class="result-card is-saving is-selected" id="rc-opt-0" data-select-opt="0" aria-pressed="true">
+          <div class="rc-top">
+            <span class="rc-name" id="rc-name-0">Option A</span>
+            <span class="rc-pupm" id="rc-pupm-0">$20.00 net PUPM</span>
+          </div>
+          <strong class="rc-total" id="rc-total-0">$181,620.00</strong>
+          <span class="rc-diff is-pos" id="rc-diff-0">+$8,380.00 saved vs stay-put</span>
+          <div class="rc-meta-grid">
+            <span class="rc-meta-item">BE: <strong id="rc-be-0">Yr 1</strong> · XO: <strong id="rc-xo-0">Yr 1</strong></span>
+            <span class="rc-meta-item">Cost/seat: <strong id="rc-cps-0">$992.46</strong></span>
+          </div>
+        </button>
+
+        <button type="button" class="result-card is-upsell" id="rc-opt-1" data-select-opt="1" aria-pressed="false">
+          <div class="rc-top">
+            <span class="rc-name" id="rc-name-1">Option B</span>
+            <span class="rc-pupm" id="rc-pupm-1">$24.00 net PUPM</span>
+          </div>
+          <strong class="rc-total" id="rc-total-1">$212,544.00</strong>
+          <span class="rc-diff is-neg" id="rc-diff-1">-$22,544.00 (+TCV rollout)</span>
+          <div class="rc-meta-grid">
+            <span class="rc-meta-item">BE: <strong id="rc-be-1">Yr 1</strong> · XO: <strong id="rc-xo-1">Yr 1</strong></span>
+            <span class="rc-meta-item">Cost/seat: <strong id="rc-cps-1">$1,161.44</strong></span>
+          </div>
+        </button>
+
+        <button type="button" class="result-card is-saving" id="rc-opt-2" data-select-opt="2" aria-pressed="false">
+          <div class="rc-top">
+            <span class="rc-name" id="rc-name-2">Option C</span>
+            <span class="rc-pupm" id="rc-pupm-2">$18.00 net PUPM</span>
+          </div>
+          <strong class="rc-total" id="rc-total-2">$136,100.00</strong>
+          <span class="rc-diff is-pos" id="rc-diff-2">+$53,900.00 saved vs stay-put</span>
+          <div class="rc-meta-grid">
+            <span class="rc-meta-item">BE: <strong id="rc-be-2">Yr 1</strong> · XO: <strong id="rc-xo-2">Yr 1</strong></span>
+            <span class="rc-meta-item">Cost/seat: <strong id="rc-cps-2">$1,088.80</strong></span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- DIRECTIONS & SCENARIO PRESETS -->
+    <section class="section-block" aria-labelledby="heading-directions">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-directions">How the working calculator runs</h2>
+        <p class="section-subtitle">Workbook v12 mechanics · 20-year horizon · unrounded term</p>
+      </div>
+      <p class="directions-box">
+        Below is the working calculator — the workbook's mechanics, live. The names and data are samples where they need to be, but the mechanics are real: change an input, and the tool answers. The formulas stay under the hood. Each SaaS option is priced the real way — a list price per seat per month and a discount give the net PUPM; a starting seat count and a yearly growth rate grow the deal — and each option can also carry a one-time coupon credit and a usage line, priced per use or per token. You can rename each option, too — the page calls it by your name everywhere below. So the page shows both stories at once: what the conversion saves per seat, and why the total can grow as the rollout grows. A seats-by-year table sits under the cost table, so you can watch each option's seats grow year by year — or hold flat, when its growth is set to zero — and a cost-per-seat line divides each option's total by the seats it serves in the final year. In this sample, the third option stays flat while the first two grow.
+      </p>
+
+      <div class="preset-panel" aria-label="Scenario Presets and Reset">
+        <div class="preset-header">
+          <h3 class="preset-title">One-tap scenario presets</h3>
+          <span class="preset-status" id="preset-status">Active state: Sample Data (60 months)</span>
+        </div>
+        <div class="preset-grid">
+          <button type="button" class="preset-btn is-reset is-active" data-preset="default">Reset to Sample Data</button>
+          <button type="button" class="preset-btn" data-preset="renamed">1. Renamed Options (Alpha / Beta / Gamma)</button>
+          <button type="button" class="preset-btn" data-preset="three-year">2. Three-Year Term (36 months)</button>
+          <button type="button" class="preset-btn" data-preset="fractional">3. Fractional Term (59.5 mo + 47 days)</button>
+          <button type="button" class="preset-btn" data-preset="flat-grows">4. Flat Option Grows (Option C 0% → 10%)</button>
+          <button type="button" class="preset-btn" data-preset="twenty-year">5. Twenty-Year Term (240 months)</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 01: THE INPUTS -->
+    <section class="section-block" id="section-inputs" aria-labelledby="heading-inputs">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-inputs">01 · The Inputs</h2>
+        <p class="section-subtitle">Stay-put baseline, contract term &amp; three editable SaaS options</p>
+      </div>
+      <p class="tab-rule-note">
+        SAMPLE — All numbers are generic sample values for demonstration only. Edit any yellow-tinted field below; renaming an option updates every card, table row, chart label, and brief instantaneously.
+      </p>
+
+      <!-- Stay-Put & Shared Term Block -->
+      <div class="panel-card">
+        <div class="panel-head">
+          <h3 class="panel-title">Stay-Put Baseline &amp; Shared Contract Term</h3>
+          <span class="panel-badge">Applies to all paths</span>
+        </div>
+        <div class="field-grid-3">
+          <div class="field-group">
+            <label class="field-label" for="in-license">Perpetual license value ($)</label>
+            <div class="input-wrap">
+              <span class="input-affix">$</span>
+              <input type="number" step="100" min="0" class="wb-input" id="in-license" value="100000">
+            </div>
+            <p class="field-hint">Paid once in Year 1 if staying put.</p>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="in-maint">Annual maintenance ($ / yr)</label>
+            <div class="input-wrap">
+              <span class="input-affix">$</span>
+              <input type="number" step="100" min="0" class="wb-input" id="in-maint" value="18000">
+            </div>
+            <p class="field-hint">Yearly maintenance while on perpetual.</p>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="in-stay-seats">Licensed seats (stay-put)</label>
+            <div class="input-wrap">
+              <input type="number" step="1" min="0" class="wb-input" id="in-stay-seats" value="125">
+              <span class="input-affix is-suffix">seats</span>
+            </div>
+            <p class="field-hint">Held flat; added users require new licenses.</p>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="in-term-months">Term — months (unrounded)</label>
+            <div class="input-wrap">
+              <input type="number" step="any" min="0" max="240" class="wb-input" id="in-term-months" value="60">
+              <span class="input-affix is-suffix">mo</span>
+            </div>
+            <p class="field-hint">Decimals flow as typed (max 240 mo / 20 yrs).</p>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="in-term-days">Term — extra days (unrounded)</label>
+            <div class="input-wrap">
+              <input type="number" step="any" min="0" max="7300" class="wb-input" id="in-term-days" value="0">
+              <span class="input-affix is-suffix">days</span>
+            </div>
+            <p class="field-hint">Charged pro-rata at days/365 of next year's cost.</p>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="in-mig-disc">Migration discount in Year 1 (%)</label>
+            <div class="input-wrap">
+              <input type="number" step="0.1" min="0" max="100" class="wb-input" id="in-mig-disc" value="20">
+              <span class="input-affix is-suffix">%</span>
+            </div>
+            <p class="field-hint">One-time Year-1 subscription discount across all 3 options.</p>
+          </div>
+        </div>
+
+        <div class="term-tools-row">
+          <div class="edge-chips" role="group" aria-label="Quick-set contract terms">
+            <span class="edge-chips-label">Term quick-set:</span>
+            <button type="button" class="chip-btn" data-term-m="12" data-term-d="0">12 mo</button>
+            <button type="button" class="chip-btn" data-term-m="36" data-term-d="0">36 mo</button>
+            <button type="button" class="chip-btn" data-term-m="59.5" data-term-d="47">59.5 mo + 47 d</button>
+            <button type="button" class="chip-btn" data-term-m="60" data-term-d="0">60 mo</button>
+            <button type="button" class="chip-btn" data-term-m="120" data-term-d="0">120 mo</button>
+            <button type="button" class="chip-btn" data-term-m="240" data-term-d="0">240 mo</button>
+          </div>
+          <div class="term-readout-pill" id="out-term-breakdown" aria-live="polite">
+            Term: 5.0000 yrs · 5 full yrs · 0.0000 stub
+          </div>
+        </div>
+      </div>
+
+      <!-- Three SaaS Options Grid -->
+      <div class="options-grid">
+        <!-- OPTION A -->
+        <div class="panel-card is-opt-a">
+          <div class="panel-head">
+            <h3 class="panel-title" id="opt-head-0">Option A</h3>
+            <span class="panel-badge" id="opt-badge-0">Net $20.00/mo</span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="in-opt0-name">Option name (label)</label>
+            <div class="input-wrap">
+              <input type="text" class="wb-input is-text" id="in-opt0-name" value="Option A">
+            </div>
+          </div>
+
+          <h4 class="subblock-title">Seats &amp; Per-Seat Pricing</h4>
+          <div class="field-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="in-opt0-list">List PUPM ($)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="0.5" min="0" class="wb-input" id="in-opt0-list" value="25">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt0-disc">Seat discount (%)</label>
+              <div class="input-wrap">
+                <input type="number" step="0.1" min="0" max="100" class="wb-input" id="in-opt0-disc" value="20">
+                <span class="input-affix is-suffix">%</span>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt0-seats">Starting seats (Y1)</label>
+              <div class="input-wrap">
+                <input type="number" step="1" min="0" class="wb-input" id="in-opt0-seats" value="125">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt0-growth">Seat growth / yr (%)</label>
+              <div class="input-wrap">
+                <input type="number" step="0.5" min="-100" class="wb-input" id="in-opt0-growth" value="10">
+                <span class="input-affix is-suffix">%</span>
+              </div>
+            </div>
+          </div>
+
+          <h4 class="subblock-title">Coupon &amp; Usage Line</h4>
+          <div class="field-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="in-opt0-coupon">Y1 coupon credit ($)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="100" min="0" class="wb-input" id="in-opt0-coupon" value="1500">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt0-utype">Usage type</label>
+              <div class="input-wrap">
+                <select class="wb-select" id="in-opt0-utype">
+                  <option value="per 1M tokens" selected>per 1M tokens</option>
+                  <option value="per 1K tokens">per 1K tokens</option>
+                  <option value="per use">per use</option>
+                  <option value="per API request">per API request</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt0-uqty">Usage (units / mo)</label>
+              <div class="input-wrap">
+                <input type="number" step="any" min="0" class="wb-input" id="in-opt0-uqty" value="800">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt0-uprice">Price / unit ($)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="0.001" min="0" class="wb-input" id="in-opt0-uprice" value="2.25">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt0-udisc">Usage discount (%)</label>
+              <div class="input-wrap">
+                <input type="number" step="0.1" min="0" max="100" class="wb-input" id="in-opt0-udisc" value="10">
+                <span class="input-affix is-suffix">%</span>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt0-umin">Committed min ($/mo)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="10" min="0" class="wb-input" id="in-opt0-umin" value="100">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OPTION B -->
+        <div class="panel-card is-opt-b">
+          <div class="panel-head">
+            <h3 class="panel-title" id="opt-head-1">Option B</h3>
+            <span class="panel-badge" id="opt-badge-1">Net $24.00/mo</span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="in-opt1-name">Option name (label)</label>
+            <div class="input-wrap">
+              <input type="text" class="wb-input is-text" id="in-opt1-name" value="Option B">
+            </div>
+          </div>
+
+          <h4 class="subblock-title">Seats &amp; Per-Seat Pricing</h4>
+          <div class="field-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="in-opt1-list">List PUPM ($)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="0.5" min="0" class="wb-input" id="in-opt1-list" value="30">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt1-disc">Seat discount (%)</label>
+              <div class="input-wrap">
+                <input type="number" step="0.1" min="0" max="100" class="wb-input" id="in-opt1-disc" value="20">
+                <span class="input-affix is-suffix">%</span>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt1-seats">Starting seats (Y1)</label>
+              <div class="input-wrap">
+                <input type="number" step="1" min="0" class="wb-input" id="in-opt1-seats" value="125">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt1-growth">Seat growth / yr (%)</label>
+              <div class="input-wrap">
+                <input type="number" step="0.5" min="-100" class="wb-input" id="in-opt1-growth" value="10">
+                <span class="input-affix is-suffix">%</span>
+              </div>
+            </div>
+          </div>
+
+          <h4 class="subblock-title">Coupon &amp; Usage Line</h4>
+          <div class="field-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="in-opt1-coupon">Y1 coupon credit ($)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="100" min="0" class="wb-input" id="in-opt1-coupon" value="0">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt1-utype">Usage type</label>
+              <div class="input-wrap">
+                <select class="wb-select" id="in-opt1-utype">
+                  <option value="per 1M tokens">per 1M tokens</option>
+                  <option value="per 1K tokens">per 1K tokens</option>
+                  <option value="per use" selected>per use</option>
+                  <option value="per API request">per API request</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt1-uqty">Usage (units / mo)</label>
+              <div class="input-wrap">
+                <input type="number" step="any" min="0" class="wb-input" id="in-opt1-uqty" value="0">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt1-uprice">Price / unit ($)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="0.001" min="0" class="wb-input" id="in-opt1-uprice" value="0">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt1-udisc">Usage discount (%)</label>
+              <div class="input-wrap">
+                <input type="number" step="0.1" min="0" max="100" class="wb-input" id="in-opt1-udisc" value="0">
+                <span class="input-affix is-suffix">%</span>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt1-umin">Committed min ($/mo)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="10" min="0" class="wb-input" id="in-opt1-umin" value="0">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OPTION C -->
+        <div class="panel-card is-opt-c">
+          <div class="panel-head">
+            <h3 class="panel-title" id="opt-head-2">Option C</h3>
+            <span class="panel-badge" id="opt-badge-2">Net $18.00/mo</span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="in-opt2-name">Option name (label)</label>
+            <div class="input-wrap">
+              <input type="text" class="wb-input is-text" id="in-opt2-name" value="Option C">
+            </div>
+          </div>
+
+          <h4 class="subblock-title">Seats &amp; Per-Seat Pricing</h4>
+          <div class="field-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="in-opt2-list">List PUPM ($)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="0.5" min="0" class="wb-input" id="in-opt2-list" value="22.5">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt2-disc">Seat discount (%)</label>
+              <div class="input-wrap">
+                <input type="number" step="0.1" min="0" max="100" class="wb-input" id="in-opt2-disc" value="20">
+                <span class="input-affix is-suffix">%</span>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt2-seats">Starting seats (Y1)</label>
+              <div class="input-wrap">
+                <input type="number" step="1" min="0" class="wb-input" id="in-opt2-seats" value="125">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt2-growth">Seat growth / yr (%)</label>
+              <div class="input-wrap">
+                <input type="number" step="0.5" min="-100" class="wb-input" id="in-opt2-growth" value="0">
+                <span class="input-affix is-suffix">%</span>
+              </div>
+            </div>
+          </div>
+
+          <h4 class="subblock-title">Coupon &amp; Usage Line</h4>
+          <div class="field-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="in-opt2-coupon">Y1 coupon credit ($)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="100" min="0" class="wb-input" id="in-opt2-coupon" value="2500">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt2-utype">Usage type</label>
+              <div class="input-wrap">
+                <select class="wb-select" id="in-opt2-utype">
+                  <option value="per 1M tokens">per 1M tokens</option>
+                  <option value="per 1K tokens" selected>per 1K tokens</option>
+                  <option value="per use">per use</option>
+                  <option value="per API request">per API request</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt2-uqty">Usage (units / mo)</label>
+              <div class="input-wrap">
+                <input type="number" step="any" min="0" class="wb-input" id="in-opt2-uqty" value="250000">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt2-uprice">Price / unit ($)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="0.001" min="0" class="wb-input" id="in-opt2-uprice" value="0.012">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt2-udisc">Usage discount (%)</label>
+              <div class="input-wrap">
+                <input type="number" step="0.1" min="0" max="100" class="wb-input" id="in-opt2-udisc" value="0">
+                <span class="input-affix is-suffix">%</span>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-opt2-umin">Committed min ($/mo)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="10" min="0" class="wb-input" id="in-opt2-umin" value="150">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Derived Subscription & Usage Summary Strip -->
+      <div class="derived-strip" aria-live="polite">
+        <div class="derived-card">
+          <h4 class="derived-card-head" id="der-name-0">Option A — derived metrics</h4>
+          <div class="derived-kv">
+            <div><span>Derived annual sub (Y1 list basis)</span><strong id="der-sub-0">$30,000.00</strong></div>
+            <div><span>Net PUPM</span><strong id="der-pupm-0">$20.00</strong></div>
+            <div><span>Annual usage cost <span id="der-ubind-0">(min binds)</span></span><strong id="der-usage-0">$1,200.00</strong></div>
+            <div><span>Year-5 run rate (incl. usage)</span><strong id="der-y5rr-0">$45,120.00</strong></div>
+          </div>
+        </div>
+        <div class="derived-card is-opt-b">
+          <h4 class="derived-card-head" id="der-name-1">Option B — derived metrics</h4>
+          <div class="derived-kv">
+            <div><span>Derived annual sub (Y1 list basis)</span><strong id="der-sub-1">$36,000.00</strong></div>
+            <div><span>Net PUPM</span><strong id="der-pupm-1">$24.00</strong></div>
+            <div><span>Annual usage cost <span id="der-ubind-1">(none)</span></span><strong id="der-usage-1">$0.00</strong></div>
+            <div><span>Year-5 run rate (incl. usage)</span><strong id="der-y5rr-1">$52,704.00</strong></div>
+          </div>
+        </div>
+        <div class="derived-card is-opt-c">
+          <h4 class="derived-card-head" id="der-name-2">Option C — derived metrics</h4>
+          <div class="derived-kv">
+            <div><span>Derived annual sub (Y1 list basis)</span><strong id="der-sub-2">$27,000.00</strong></div>
+            <div><span>Net PUPM</span><strong id="der-pupm-2">$18.00</strong></div>
+            <div><span>Annual usage cost <span id="der-ubind-2">(min binds)</span></span><strong id="der-usage-2">$1,800.00</strong></div>
+            <div><span>Year-5 run rate (incl. usage)</span><strong id="der-y5rr-2">$28,800.00</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="derived-summary-bar" aria-live="polite">
+        <span>Stay-put effective cost per seat / month at term end: <strong id="der-stay-eff">$25.33</strong></span>
+        <span>Combined Year-1 coupon credits (all 3 options): <strong id="der-coupons">$4,000.00</strong></span>
+      </div>
+    </section>
+
+    <!-- SECTION 02: COMPARISON SUMMARY, CHART & 20-YEAR TABLES -->
+    <section class="section-block" id="section-tables" aria-labelledby="heading-tables">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-tables">02 · Comparison Summary, Cumulative Chart &amp; Year-by-Year Tables</h2>
+        <p class="section-subtitle">Cumulative break-even, run-rate crossover, 20-year costs &amp; seats served</p>
+      </div>
+
+      <div class="two-story-callout" id="two-story-callout" aria-live="polite">
+        <strong>Two stories at once:</strong> <span id="two-story-text">In this sample, Option B reaches a higher 5-year total ($212,544.00) than Stay Put ($190,000.00) because its rollout grows from 125 to 183 seats, yet its cost per seat at term end ($1,161.44) remains below Stay Put ($1,520.00).</span>
+      </div>
+
+      <!-- Comparison Summary Table -->
+      <div class="table-scroll" aria-label="Comparison summary table">
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th scope="col">Path</th>
+              <th scope="col" class="is-num">Term-End Total</th>
+              <th scope="col" class="is-num">5-Year Total</th>
+              <th scope="col" class="is-num">Diff vs Stay-Put</th>
+              <th scope="col" class="is-num">Break-Even Yr</th>
+              <th scope="col" class="is-num">Crossover Yr</th>
+              <th scope="col" class="is-num">Cost / Seat (End)</th>
+              <th scope="col" class="is-num">Seats (End Yr)</th>
+            </tr>
+          </thead>
+          <tbody id="comparison-summary-body"></tbody>
+        </table>
+      </div>
+
+      <!-- Cumulative Cost Line Chart (Inline SVG) -->
+      <div class="chart-panel">
+        <div class="chart-toolbar">
+          <div>
+            <h3 class="panel-title" style="margin-bottom: 0.15rem;">Cumulative Cost by Year — Stay Put vs SaaS Options</h3>
+            <p class="field-hint">Plotted from the workbook's cumulative cost rows; vertical dashed line marks term end.</p>
+          </div>
+          <div class="chart-controls" role="group" aria-label="Chart horizon scope">
+            <button type="button" class="btn-secondary is-active" id="btn-chart-20">All 20 Years</button>
+            <button type="button" class="btn-secondary" id="btn-chart-term">Zoom to Term</button>
+          </div>
+        </div>
+
+        <div class="chart-legend" id="chart-legend">
+          <span class="legend-item"><span class="legend-swatch is-stay"></span> Stay put</span>
+          <span class="legend-item"><span class="legend-swatch is-a"></span> <span id="leg-name-0">Option A</span></span>
+          <span class="legend-item"><span class="legend-swatch is-b"></span> <span id="leg-name-1">Option B</span></span>
+          <span class="legend-item"><span class="legend-swatch is-c"></span> <span id="leg-name-2">Option C</span></span>
+        </div>
+
+        <div class="chart-inspector" aria-live="polite">
+          <strong id="inspector-year-label">Inspecting Year 5 (Term End):</strong>
+          <div class="chart-inspector-vals" id="inspector-vals"></div>
+        </div>
+
+        <div class="chart-svg-wrap">
+          <svg id="cum-chart-svg" class="chart-svg" viewBox="0 0 820 380" role="img" aria-labelledby="chart-svg-title">
+            <title id="chart-svg-title">Cumulative Cost by Year comparing Stay Put and three SaaS options</title>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Year-by-Year Cost Table -->
+      <div class="table-panel">
+        <div class="table-toolbar">
+          <div>
+            <h3 class="panel-title" style="margin-bottom: 0.15rem;">Year-by-Year Cost Comparison (Years 1–20)</h3>
+            <span class="scroll-hint">Scroll horizontally inside the table on narrow screens; row labels stay pinned.</span>
+          </div>
+          <div class="chart-controls" role="group" aria-label="Cost table column scope">
+            <button type="button" class="btn-secondary is-active" id="btn-cost-all">All 20 Years</button>
+            <button type="button" class="btn-secondary" id="btn-cost-term">Through Term End</button>
+          </div>
+        </div>
+        <div class="table-scroll" tabindex="0" aria-label="Year-by-year cost table">
+          <table class="wb-table" id="cost-year-table"></table>
+        </div>
+      </div>
+
+      <!-- Seats-by-Year Table -->
+      <div class="table-panel is-brass">
+        <div class="table-toolbar">
+          <div>
+            <h3 class="panel-title" style="margin-bottom: 0.15rem;">Seats by Year &amp; Cost-per-Seat Rollout (Years 1–20)</h3>
+            <span class="scroll-hint">Shows how many seats each path serves in every year (rounded to whole seats).</span>
+          </div>
+          <div class="chart-controls" role="group" aria-label="Seats table column scope">
+            <button type="button" class="btn-secondary is-active" id="btn-seats-all">All 20 Years</button>
+            <button type="button" class="btn-secondary" id="btn-seats-term">Through Term End</button>
+          </div>
+        </div>
+        <div class="table-scroll" tabindex="0" aria-label="Seats by year table">
+          <table class="wb-table" id="seats-year-table"></table>
+        </div>
+
+        <div class="seat-bars-grid" id="seat-bars-grid" aria-label="Seats served and cost per seat at term end"></div>
+      </div>
+    </section>
+
+    <!-- CONVERSION BRIEF -->
+    <section class="section-block" id="section-brief" aria-labelledby="heading-brief">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-brief">Conversion Brief</h2>
+        <p class="section-subtitle">Copyable plain-text readout of term-end totals, break-even, crossover &amp; per-seat economics</p>
+      </div>
+      <div class="brief-panel">
+        <div class="brief-toolbar">
+          <button type="button" class="btn-primary" id="btn-copy-brief">Copy Conversion Brief</button>
+          <span class="copy-status" id="brief-copy-status" aria-live="polite"></span>
+        </div>
+        <pre class="brief-pre" id="conversion-brief-pre" tabindex="0" aria-label="Copyable Perpetual-to-SaaS Conversion Brief"></pre>
+      </div>
+    </section>
+
+    <!-- EXPLAINER: HOW TO USE & INPUTS / LOGIC / LIMITS -->
+    <section class="section-block" id="section-explainer" aria-labelledby="heading-explainer">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-explainer">How to use &amp; Inputs / Logic / Limits</h2>
+        <p class="section-subtitle">Workbook v12 operating instructions and calculation boundaries</p>
+      </div>
+
+      <div class="two-col-grid">
+        <article class="card-box">
+          <h3>How to use</h3>
+          <ol>
+            <li><strong>Enter the inputs:</strong> license, maintenance, licensed seats, the term in months (plus extra days), any Year 1 migration discount; then per option its list price, discount, starting seats and growth, its coupon credit and its usage line. The subscription figures are derived from the seat block, not typed in. Rename any option and everything calls it by your name.</li>
+            <li><strong>Read the year-by-year table</strong> on a cumulative basis, and the seats-by-year table below it, so a growing option and a flat one compare directly.</li>
+            <li><strong>Read the results:</strong> the break-even year for each option, the totals at the end of your term, the difference between the paths, and the comparison summary with the chart — the summary shows both views per option: the break-even year (cumulative) and the run-rate crossover year (the first year the option's annual cost is lower than the stay-put annual cost).</li>
+          </ol>
+        </article>
+
+        <article class="card-box is-brass-top">
+          <h3>Inputs, logic, limits</h3>
+          <p>
+            <strong>Inputs:</strong> the stay-put figures (license, maintenance, licensed seats), the term in months plus any extra days, the Year-1 migration discount, and per option its name, list price per seat per month, discount, starting seats, yearly growth, Year-1 coupon credit, and usage line.
+          </p>
+          <p>
+            <strong>Logic:</strong> staying put costs the license once in Year 1 plus maintenance every year, and covers the licensed seats. A SaaS option is seat-driven: net PUPM = list price per seat &times; (1 &minus; discount); seats grow each year at the option's growth rate (rounded to whole seats); a year's subscription = that year's seats &times; net PUPM &times; 12, with the migration discount and the one-time coupon credit in Year 1 only, plus the usage cost every year. Usage cost for a year = the greater of the committed monthly minimum or the metered usage (units per month / units-per-price &times; price per unit &times; (1 &minus; usage discount)), times 12. The migration discount applies to all three options equally. The option names are labels only — they change no math. A growth of 0% keeps an option's seats flat. The term is set in months (plus extra days) — the way contracts are actually written; whole years inside the term read straight off the twenty year columns, and the leftover months and days are charged pro-rata at the next year's cost (days as days/365 of that year). A term past 20 years reads as 20 years; break-even and crossover read in whole years.
+          </p>
+          <p>
+            <strong>Limits, stated plainly:</strong> every figure is a generic sample value; the model prices the paths side by side and does not judge which path a real customer should take; nothing here is pricing or legal advice.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- RELATED LINKS -->
+    <section class="section-block" aria-labelledby="heading-related">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-related">Related Pricing Engines &amp; Proof of Work</h2>
+        <p class="section-subtitle">Neighboring commercial models and deal-desk calculators</p>
+      </div>
+
+      <div class="related-grid">
+        <div class="related-card">
+          <span class="related-card-eyebrow">Hub</span>
+          <a href="../../tools/">Proof of Work Hub</a>
+          <p>All live commercial models, pricing engines, contract trackers, and decision tools.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Partition</span>
+          <a href="../../tools/pricing-engines/">Pricing Engines Partition</a>
+          <p>Deal pricing models, SaaS conversions, and commitment calculators built for live negotiation.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 1 · Pricing Engines</span>
+          <a href="../deal-pricing-solver/">Tool 1: Deal Pricing Solver</a>
+          <p>Solve for target margin, blended discount, and multi-year deal economics across line items.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 3 · Pricing Engines</span>
+          <a href="../perm-calculator/">Tool 3: Perm Calculator</a>
+          <p>Evaluate permanent license pricing, annual support streams, and cumulative contract value.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 14 · Pricing Engines</span>
+          <a href="../cloud-commit-playbook/">Tool 14: Cloud Commit &amp; Usage Playbook</a>
+          <p>Editable discount approval matrix, renewal TCV ratchet, and spend-based commit sizer.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h2 class="footer-heading">Fractional Deal Desk &amp; Contract Management</h2>
+          <p style="margin: 0; color: #CBD5E1; line-height: 1.5;">
+            Commercial contracts, deal desk architecture, and revenue operations controls. 15+ years in commercial contracts, deal desk, and revenue operations across contracts up to $300M and 3,000+ SKUs under management.
+          </p>
+        </div>
+        <div>
+          <h2 class="footer-heading">Proof of Work &amp; Pricing Engines</h2>
+          <ul class="footer-links">
+            <li><a href="../../tools/">Proof of Work Hub</a></li>
+            <li><a href="../../tools/pricing-engines/">Pricing Engines Partition</a></li>
+            <li><a href="../deal-pricing-solver/">Tool 1: Deal Pricing Solver</a></li>
+            <li><a href="../perm-calculator/">Tool 3: Perm Calculator</a></li>
+            <li><a href="../cloud-commit-playbook/">Tool 14: Cloud Commit &amp; Usage Playbook</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="footer-heading">Practice Information</h2>
+          <ul class="footer-links">
+            <li><a href="../../">Home</a></li>
+            <li><a href="../../services/">Practice &amp; Mandate Scope</a></li>
+            <li><a href="../../about/">Operator Record</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>Tool 2 · Perpetual-to-SaaS Conversion Calculator (S6-P01.b)</span>
+        <span>Sample workbook model. Not pricing or legal advice.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var DEFAULTS = {
+        license: 100000,
+        maintenance: 18000,
+        licensedSeats: 125,
+        termMonths: 60,
+        termDays: 0,
+        migrationDiscount: 0.20,
+        options: [
+          {
+            name: "Option A",
+            listPupm: 25.00,
+            discount: 0.20,
+            startSeats: 125,
+            growth: 0.10,
+            coupon: 1500,
+            usageType: "per 1M tokens",
+            expectedUsage: 800,
+            pricePerUnit: 2.25,
+            usageDiscount: 0.10,
+            committedMin: 100
+          },
+          {
+            name: "Option B",
+            listPupm: 30.00,
+            discount: 0.20,
+            startSeats: 125,
+            growth: 0.10,
+            coupon: 0,
+            usageType: "per use",
+            expectedUsage: 0,
+            pricePerUnit: 0,
+            usageDiscount: 0,
+            committedMin: 0
+          },
+          {
+            name: "Option C",
+            listPupm: 22.50,
+            discount: 0.20,
+            startSeats: 125,
+            growth: 0.00,
+            coupon: 2500,
+            usageType: "per 1K tokens",
+            expectedUsage: 250000,
+            pricePerUnit: 0.012,
+            usageDiscount: 0,
+            committedMin: 150
+          }
+        ]
+      };
+
+      var uiState = {
+        selectedOptionIndex: 0,
+        chartScope: "20", // "20" or "term"
+        costTableScope: "20", // "20" or "term"
+        seatsTableScope: "20", // "20" or "term"
+        inspectedYear: 5
+      };
+
+      function cloneDefaults() {
+        return {
+          license: DEFAULTS.license,
+          maintenance: DEFAULTS.maintenance,
+          licensedSeats: DEFAULTS.licensedSeats,
+          termMonths: DEFAULTS.termMonths,
+          termDays: DEFAULTS.termDays,
+          migrationDiscount: DEFAULTS.migrationDiscount,
+          options: DEFAULTS.options.map(function (o) { return Object.assign({}, o); })
+        };
+      }
+
+      /* ---------------- Pure Workbook v12 Engine ---------------- */
+      function getDivisor(usageType) {
+        if (usageType === "per 1M tokens") return 1000000;
+        if (usageType === "per 1K tokens") return 1000;
+        return 1;
+      }
+
+      function computeTermTotal(cumArr, annualArr, fullYears, stubFraction, termYears) {
+        if (termYears <= 0) return 0;
+        var base = fullYears <= 0 ? 0 : cumArr[fullYears - 1];
+        var stubCost = stubFraction > 0 && fullYears < 20 ? stubFraction * annualArr[fullYears] : 0;
+        return base + stubCost;
+      }
+
+      function evaluateModel(state) {
+        var license = Math.max(0, state.license);
+        var maintenance = Math.max(0, state.maintenance);
+        var licensedSeats = Math.max(0, state.licensedSeats);
+        var migDisc = state.migrationDiscount;
+
+        var clampedMonths = Math.min(Math.max(state.termMonths, 0), 240);
+        var clampedDays = Math.min(Math.max(state.termDays, 0), 7300);
+        var rawTermYears = clampedMonths / 12 + clampedDays / 365;
+        var termYears = Math.min(rawTermYears, 20);
+        var fullYears = termYears <= 0 ? 0 : Math.min(Math.floor(termYears + 1e-9), 20);
+        var stubFraction = fullYears >= 20 ? 0 : Math.max(0, termYears - fullYears);
+        if (stubFraction < 1e-9) stubFraction = 0;
+        var finalYearIndex = Math.max(fullYears + (stubFraction > 0 ? 1 : 0), 1); // 1..20
+
+        /* Stay Put 20-year arrays */
+        var stayAnnual = [];
+        var stayCum = [];
+        var staySeats = [];
+        for (var y = 1; y <= 20; y++) {
+          var costY = y === 1 ? license + maintenance : maintenance;
+          stayAnnual.push(costY);
+          stayCum.push((y === 1 ? 0 : stayCum[y - 2]) + costY);
+          staySeats.push(licensedSeats);
+        }
+
+        var stayTermTotal = computeTermTotal(stayCum, stayAnnual, fullYears, stubFraction, termYears);
+        var stayFiveYearTotal = stayCum[4];
+        var stayCostPerSeat = licensedSeats > 0 ? stayTermTotal / licensedSeats : 0;
+        var stayEffPupm = (licensedSeats > 0 && termYears > 0)
+          ? stayTermTotal / (licensedSeats * 12 * termYears)
+          : 0;
+
+        /* Options A, B, C */
+        var optionsOut = state.options.map(function (opt, idx) {
+          var displayName = opt.name && String(opt.name).trim() !== ""
+            ? String(opt.name).trim()
+            : "Option " + ["A", "B", "C"][idx];
+
+          var netPupm = Math.max(0, opt.listPupm) * (1 - opt.discount);
+          var startSeats = Math.max(0, opt.startSeats);
+          var growth = Math.max(-1, opt.growth);
+
+          var divisor = getDivisor(opt.usageType);
+          var meteredMonthly = (Math.max(0, opt.expectedUsage) / divisor) * Math.max(0, opt.pricePerUnit) * (1 - opt.usageDiscount);
+          var committedMin = Math.max(0, opt.committedMin);
+          var monthlyUsage = Math.max(committedMin, meteredMonthly);
+          var annualUsage = monthlyUsage * 12;
+
+          var usageDriver = "none";
+          if (annualUsage > 0) {
+            usageDriver = committedMin >= meteredMonthly ? "min binds" : "metered binds";
+          }
+
+          var derivedAnnualSub = startSeats * netPupm * 12;
+
+          var seats = [];
+          var annual = [];
+          var cum = [];
+          var diffCum = [];
+          var breakEvenYear = null;
+          var crossoverYear = null;
+
+          for (var yr = 1; yr <= 20; yr++) {
+            var sCount = Math.round(startSeats * Math.pow(1 + growth, yr - 1) + 1e-12);
+            seats.push(sCount);
+
+            var subY = sCount * netPupm * 12;
+            var yrCost = yr === 1
+              ? subY * (1 - migDisc) - opt.coupon + annualUsage
+              : subY + annualUsage;
+
+            annual.push(yrCost);
+            var cumVal = (yr === 1 ? 0 : cum[yr - 2]) + yrCost;
+            cum.push(cumVal);
+            diffCum.push(stayCum[yr - 1] - cumVal);
+
+            if (breakEvenYear === null && cumVal <= stayCum[yr - 1] + 1e-9) {
+              breakEvenYear = yr;
+            }
+            if (crossoverYear === null && yrCost < stayAnnual[yr - 1] - 1e-9) {
+              crossoverYear = yr;
+            }
+          }
+
+          var termTotal = computeTermTotal(cum, annual, fullYears, stubFraction, termYears);
+          var fiveYearTotal = cum[4];
+          var diffAtTermEnd = stayTermTotal - termTotal;
+          var finalYearSeats = seats[finalYearIndex - 1];
+          var costPerSeat = finalYearSeats > 0 ? termTotal / finalYearSeats : 0;
+          var year5RunRate = seats[4] * netPupm * 12 + annualUsage;
+
+          return {
+            index: idx,
+            name: displayName,
+            netPupm: netPupm,
+            derivedAnnualSub: derivedAnnualSub,
+            annualUsage: annualUsage,
+            usageDriver: usageDriver,
+            seats: seats,
+            annual: annual,
+            cum: cum,
+            diffCum: diffCum,
+            breakEvenYear: breakEvenYear,
+            crossoverYear: crossoverYear,
+            termTotal: termTotal,
+            fiveYearTotal: fiveYearTotal,
+            diffAtTermEnd: diffAtTermEnd,
+            finalYearSeats: finalYearSeats,
+            costPerSeat: costPerSeat,
+            year5RunRate: year5RunRate
+          };
+        });
+
+        var combinedCoupons = state.options.reduce(function (acc, o) { return acc + o.coupon; }, 0);
+
+        return {
+          term: {
+            months: clampedMonths,
+            days: clampedDays,
+            rawYears: rawTermYears,
+            years: termYears,
+            fullYears: fullYears,
+            stubFraction: stubFraction,
+            finalYearIndex: finalYearIndex
+          },
+          stayPut: {
+            name: "Stay put",
+            annual: stayAnnual,
+            cum: stayCum,
+            seats: staySeats,
+            termTotal: stayTermTotal,
+            fiveYearTotal: stayFiveYearTotal,
+            finalYearSeats: licensedSeats,
+            costPerSeat: stayCostPerSeat,
+            effPupm: stayEffPupm
+          },
+          options: optionsOut,
+          combinedCoupons: combinedCoupons
+        };
+      }
+
+      /* ---------------- Formatters ---------------- */
+      function fmtMoney(n, decimals, signed) {
+        var d = decimals === undefined ? 2 : decimals;
+        var val = Number.isFinite(n) ? n : 0;
+        var threshold = d === 0 ? 0.5 : 0.005;
+        if (Math.abs(val) < threshold) val = 0;
+        var absStr = "$" + Math.abs(val).toLocaleString("en-US", {
+          minimumFractionDigits: d,
+          maximumFractionDigits: d
+        });
+        if (val < 0) return "-" + absStr;
+        if (signed && val > 0) return "+" + absStr;
+        return absStr;
+      }
+
+      function fmtCompactMoney(n) {
+        var val = Number.isFinite(n) ? n : 0;
+        var abs = Math.abs(val);
+        var sign = val < 0 ? "-" : "";
+        if (abs >= 1000000) return sign + "$" + (abs / 1000000).toFixed(2).replace(/\.00$/, "") + "M";
+        if (abs >= 1000) return sign + "$" + Math.round(abs / 1000) + "k";
+        return sign + "$" + Math.round(abs);
+      }
+
+      function fmtInt(n) {
+        return Math.round(Number.isFinite(n) ? n : 0).toLocaleString("en-US");
+      }
+
+      function fmtYearBadge(yr, noneText) {
+        return yr === null ? noneText : "Year " + yr;
+      }
+
+      function fmtYearShort(yr) {
+        return yr === null ? "None" : "Yr " + yr;
+      }
+
+      function trimNum(n, maxDec) {
+        var p = Math.pow(10, maxDec || 4);
+        return String(Math.round(n * p) / p);
+      }
+
+      function escHtml(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      /* ---------------- DOM Bindings ---------------- */
+      var stayEls = {
+        license: document.getElementById("in-license"),
+        maintenance: document.getElementById("in-maint"),
+        licensedSeats: document.getElementById("in-stay-seats"),
+        termMonths: document.getElementById("in-term-months"),
+        termDays: document.getElementById("in-term-days"),
+        migrationDiscount: document.getElementById("in-mig-disc")
+      };
+
+      var optEls = [0, 1, 2].map(function (i) {
+        return {
+          name: document.getElementById("in-opt" + i + "-name"),
+          listPupm: document.getElementById("in-opt" + i + "-list"),
+          discount: document.getElementById("in-opt" + i + "-disc"),
+          startSeats: document.getElementById("in-opt" + i + "-seats"),
+          growth: document.getElementById("in-opt" + i + "-growth"),
+          coupon: document.getElementById("in-opt" + i + "-coupon"),
+          usageType: document.getElementById("in-opt" + i + "-utype"),
+          expectedUsage: document.getElementById("in-opt" + i + "-uqty"),
+          pricePerUnit: document.getElementById("in-opt" + i + "-uprice"),
+          usageDiscount: document.getElementById("in-opt" + i + "-udisc"),
+          committedMin: document.getElementById("in-opt" + i + "-umin")
+        };
+      });
+
+      function readNum(el) {
+        var raw = String(el.value).trim();
+        if (raw === "") return 0;
+        var parsed = parseFloat(raw);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+
+      function readStateFromDom() {
+        return {
+          license: readNum(stayEls.license),
+          maintenance: readNum(stayEls.maintenance),
+          licensedSeats: readNum(stayEls.licensedSeats),
+          termMonths: readNum(stayEls.termMonths),
+          termDays: readNum(stayEls.termDays),
+          migrationDiscount: readNum(stayEls.migrationDiscount) / 100,
+          options: optEls.map(function (o) {
+            return {
+              name: o.name.value,
+              listPupm: readNum(o.listPupm),
+              discount: readNum(o.discount) / 100,
+              startSeats: readNum(o.startSeats),
+              growth: readNum(o.growth) / 100,
+              coupon: readNum(o.coupon),
+              usageType: o.usageType.value,
+              expectedUsage: readNum(o.expectedUsage),
+              pricePerUnit: readNum(o.pricePerUnit),
+              usageDiscount: readNum(o.usageDiscount) / 100,
+              committedMin: readNum(o.committedMin)
+            };
+          })
+        };
+      }
+
+      function writeStateToDom(state) {
+        stayEls.license.value = String(state.license);
+        stayEls.maintenance.value = String(state.maintenance);
+        stayEls.licensedSeats.value = String(state.licensedSeats);
+        stayEls.termMonths.value = String(state.termMonths);
+        stayEls.termDays.value = String(state.termDays);
+        stayEls.migrationDiscount.value = trimNum(state.migrationDiscount * 100, 4);
+
+        state.options.forEach(function (opt, i) {
+          var o = optEls[i];
+          o.name.value = opt.name;
+          o.listPupm.value = String(opt.listPupm);
+          o.discount.value = trimNum(opt.discount * 100, 4);
+          o.startSeats.value = String(opt.startSeats);
+          o.growth.value = trimNum(opt.growth * 100, 4);
+          o.coupon.value = String(opt.coupon);
+          o.usageType.value = opt.usageType;
+          o.expectedUsage.value = String(opt.expectedUsage);
+          o.pricePerUnit.value = String(opt.pricePerUnit);
+          o.usageDiscount.value = trimNum(opt.usageDiscount * 100, 4);
+          o.committedMin.value = String(opt.committedMin);
+        });
+      }
+
+      /* ---------------- Renderers ---------------- */
+      function renderResultsStrip(state, out) {
+        var termLabelParts = [];
+        if (state.termMonths > 0) termLabelParts.push(trimNum(state.termMonths, 2) + (state.termMonths === 1 ? " month" : " months"));
+        if (state.termDays > 0) termLabelParts.push(trimNum(state.termDays, 2) + (state.termDays === 1 ? " day" : " days"));
+        var termText = termLabelParts.length ? termLabelParts.join(" + ") : "0 months";
+
+        document.getElementById("rs-title").textContent = "Live Results at Term End (" + termText + ")";
+        var sel = out.options[uiState.selectedOptionIndex] || out.options[0];
+        document.getElementById("rs-selected-line").textContent =
+          "Selected: " + sel.name +
+          " — Break-even: " + fmtYearBadge(sel.breakEvenYear, "None in 20 yrs") +
+          " · Crossover: " + fmtYearBadge(sel.crossoverYear, "None in 20 yrs") +
+          " · Cost/seat: " + fmtMoney(sel.costPerSeat, 2);
+
+        document.getElementById("rc-stay-eff").textContent = fmtMoney(out.stayPut.effPupm, 2) + "/seat/mo";
+        document.getElementById("rc-stay-total").textContent = fmtMoney(out.stayPut.termTotal, 2);
+        document.getElementById("rc-stay-diff").textContent = "Baseline (" + fmtInt(out.stayPut.finalYearSeats) + " flat seats)";
+        document.getElementById("rc-stay-cps").textContent = fmtMoney(out.stayPut.costPerSeat, 2);
+        document.getElementById("rc-stay-term").textContent = out.term.years.toFixed(2) + " yrs";
+
+        out.options.forEach(function (opt, i) {
+          var card = document.getElementById("rc-opt-" + i);
+          var isSelected = i === uiState.selectedOptionIndex;
+          var saves = opt.diffAtTermEnd >= -1e-6;
+          card.className = "result-card " + (saves ? "is-saving" : "is-upsell") + (isSelected ? " is-selected" : "");
+          card.setAttribute("aria-pressed", isSelected ? "true" : "false");
+
+          document.getElementById("rc-name-" + i).textContent = opt.name;
+          document.getElementById("rc-pupm-" + i).textContent = fmtMoney(opt.netPupm, 2) + " net PUPM";
+          document.getElementById("rc-total-" + i).textContent = fmtMoney(opt.termTotal, 2);
+
+          var diffEl = document.getElementById("rc-diff-" + i);
+          if (saves) {
+            diffEl.className = "rc-diff is-pos";
+            diffEl.textContent = fmtMoney(opt.diffAtTermEnd, 2, true) + " vs stay-put";
+          } else {
+            diffEl.className = "rc-diff is-neg";
+            diffEl.textContent = fmtMoney(opt.diffAtTermEnd, 2, true) + " (+TCV rollout)";
+          }
+
+          document.getElementById("rc-be-" + i).textContent = fmtYearShort(opt.breakEvenYear);
+          document.getElementById("rc-xo-" + i).textContent = fmtYearShort(opt.crossoverYear);
+          document.getElementById("rc-cps-" + i).textContent = fmtMoney(opt.costPerSeat, 2);
+        });
+      }
+
+      function renderSection01(out) {
+        var t = out.term;
+        var stubTxt = t.stubFraction > 0
+          ? t.stubFraction.toFixed(4) + " yr pro-rata at Year " + (t.fullYears + 1)
+          : "0.0000 stub";
+        document.getElementById("out-term-breakdown").textContent =
+          "Term: " + t.years.toFixed(4) + " yrs · " + t.fullYears + " full yrs · " + stubTxt;
+
+        out.options.forEach(function (opt, i) {
+          document.getElementById("opt-head-" + i).textContent = opt.name;
+          document.getElementById("opt-badge-" + i).textContent = "Net " + fmtMoney(opt.netPupm, 2) + "/mo";
+          document.getElementById("der-name-" + i).textContent = opt.name + " — derived metrics";
+          document.getElementById("der-sub-" + i).textContent = fmtMoney(opt.derivedAnnualSub, 2);
+          document.getElementById("der-pupm-" + i).textContent = fmtMoney(opt.netPupm, 2);
+          document.getElementById("der-ubind-" + i).textContent = "(" + opt.usageDriver + ")";
+          document.getElementById("der-usage-" + i).textContent = fmtMoney(opt.annualUsage, 2);
+          document.getElementById("der-y5rr-" + i).textContent = fmtMoney(opt.year5RunRate, 2);
+        });
+
+        document.getElementById("der-stay-eff").textContent = fmtMoney(out.stayPut.effPupm, 2);
+        document.getElementById("der-coupons").textContent = fmtMoney(out.combinedCoupons, 2);
+      }
+
+      function renderComparisonSummary(state, out) {
+        var tbody = document.getElementById("comparison-summary-body");
+        var sp = out.stayPut;
+        var html = "";
+
+        html += "<tr class=\"is-baseline\">" +
+          "<td><strong>Stay put (perpetual)</strong><span class=\"shape-note\">License once in Y1 + maintenance/yr · " + fmtMoney(sp.effPupm, 2) + "/seat/mo eff.</span></td>" +
+          "<td class=\"is-num\">" + fmtMoney(sp.termTotal, 2) + "</td>" +
+          "<td class=\"is-num\">" + fmtMoney(sp.fiveYearTotal, 2) + "</td>" +
+          "<td class=\"is-num\">—</td>" +
+          "<td class=\"is-num\">—</td>" +
+          "<td class=\"is-num\">—</td>" +
+          "<td class=\"is-num\">" + fmtMoney(sp.costPerSeat, 2) + "</td>" +
+          "<td class=\"is-num\">" + fmtInt(sp.finalYearSeats) + "</td>" +
+          "</tr>";
+
+        var upsellHighlights = [];
+        var savingsHighlights = [];
+
+        out.options.forEach(function (opt, i) {
+          var gPct = trimNum(state.options[i].growth * 100, 2) + "%/yr";
+          var saves = opt.diffAtTermEnd >= -1e-6;
+          var lowerPerSeat = opt.costPerSeat <= sp.costPerSeat + 1e-6;
+
+          if (!saves && lowerPerSeat) {
+            upsellHighlights.push(
+              opt.name + " reaches a higher term-end total (" + fmtMoney(opt.termTotal, 2) + ") than Stay put (" + fmtMoney(sp.termTotal, 2) + ") as seats scale to " + fmtInt(opt.finalYearSeats) + ", yet lowers cost per seat to " + fmtMoney(opt.costPerSeat, 2) + " vs " + fmtMoney(sp.costPerSeat, 2) + "."
+            );
+          } else if (saves) {
+            savingsHighlights.push(
+              opt.name + " saves " + fmtMoney(opt.diffAtTermEnd, 2) + " vs Stay put at " + fmtMoney(opt.costPerSeat, 2) + "/seat."
+            );
+          }
+
+          var diffBadge = saves
+            ? "<span class=\"diff-pill is-save\">" + fmtMoney(opt.diffAtTermEnd, 2, true) + "</span>"
+            : "<span class=\"diff-pill is-grow\">" + fmtMoney(opt.diffAtTermEnd, 2, true) + "</span>";
+
+          html += "<tr>" +
+            "<td><strong>SaaS — " + escHtml(opt.name) + "</strong>" +
+            "<span class=\"shape-note\">" + fmtMoney(opt.netPupm, 2) + " net PUPM · " + fmtInt(state.options[i].startSeats) + " seats (" + gPct + ") · Y5 run rate " + fmtMoney(opt.year5RunRate, 0) + "</span></td>" +
+            "<td class=\"is-num\">" + fmtMoney(opt.termTotal, 2) + "</td>" +
+            "<td class=\"is-num\">" + fmtMoney(opt.fiveYearTotal, 2) + "</td>" +
+            "<td class=\"is-num\">" + diffBadge + "</td>" +
+            "<td class=\"is-num\">" + fmtYearBadge(opt.breakEvenYear, "None in term") + "</td>" +
+            "<td class=\"is-num\">" + fmtYearBadge(opt.crossoverYear, "None in term") + "</td>" +
+            "<td class=\"is-num\">" + fmtMoney(opt.costPerSeat, 2) + "</td>" +
+            "<td class=\"is-num\">" + fmtInt(opt.finalYearSeats) + "</td>" +
+            "</tr>";
+        });
+
+        tbody.innerHTML = html;
+
+        var storyText = upsellHighlights.length > 0
+          ? upsellHighlights.join(" ") + (savingsHighlights.length ? " Meanwhile, " + savingsHighlights.join(" ") : "")
+          : (savingsHighlights.length
+              ? savingsHighlights.join(" ")
+              : "All three SaaS options expand above Stay put's total over this term; compare each option's per-seat cost against Stay put (" + fmtMoney(sp.costPerSeat, 2) + "/seat) to evaluate rollout efficiency.");
+        document.getElementById("two-story-text").textContent = storyText;
+      }
+
+      function renderChart(out) {
+        document.getElementById("leg-name-0").textContent = out.options[0].name;
+        document.getElementById("leg-name-1").textContent = out.options[1].name;
+        document.getElementById("leg-name-2").textContent = out.options[2].name;
+
+        var maxYear = uiState.chartScope === "term" ? Math.max(2, out.term.finalYearIndex) : 20;
+        if (uiState.inspectedYear > maxYear) uiState.inspectedYear = maxYear;
+
+        var svg = document.getElementById("cum-chart-svg");
+        var W = 820, H = 380;
+        var padL = 78, padR = 136, padT = 28, padB = 42;
+        var plotW = W - padL - padR;
+        var plotH = H - padT - padB;
+
+        var series = [
+          { id: "stay", label: "Stay put", color: "#475569", dash: "6 4", data: out.stayPut.cum.slice(0, maxYear) },
+          { id: "a", label: out.options[0].name, color: "#0F1E38", dash: "", data: out.options[0].cum.slice(0, maxYear) },
+          { id: "b", label: out.options[1].name, color: "#991B1B", dash: "", data: out.options[1].cum.slice(0, maxYear) },
+          { id: "c", label: out.options[2].name, color: "#8A6110", dash: "", data: out.options[2].cum.slice(0, maxYear) }
+        ];
+
+        var maxVal = 0;
+        series.forEach(function (s) {
+          s.data.forEach(function (v) { if (v > maxVal) maxVal = v; });
+        });
+        if (maxVal <= 0) maxVal = 100000;
+        var yMax = maxVal * 1.08;
+
+        function xForYear(yr) {
+          if (maxYear === 1) return padL;
+          return padL + ((yr - 1) / (maxYear - 1)) * plotW;
+        }
+        function yForVal(val) {
+          return padT + plotH - (Math.max(0, val) / yMax) * plotH;
+        }
+
+        var parts = [];
+        /* Background */
+        parts.push('<rect x="' + padL + '" y="' + padT + '" width="' + plotW + '" height="' + plotH + '" fill="#FFFFFF" stroke="#D5D0C5" stroke-width="1"/>');
+
+        /* Horizontal gridlines (5 ticks) */
+        for (var g = 0; g <= 4; g++) {
+          var gv = (yMax * g) / 4;
+          var gy = yForVal(gv);
+          parts.push('<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + (padL + plotW) + '" y2="' + gy.toFixed(1) + '" stroke="#E8E4DA" stroke-width="1"/>');
+          parts.push('<text x="' + (padL - 8) + '" y="' + (gy + 4).toFixed(1) + '" text-anchor="end" font-family="ui-monospace, monospace" font-size="11" fill="#42526B">' + escHtml(fmtCompactMoney(gv)) + '</text>');
+        }
+
+        /* X-axis ticks */
+        var step = maxYear <= 10 ? 1 : 2;
+        for (var yr = 1; yr <= maxYear; yr++) {
+          var x = xForYear(yr);
+          if (yr === 1 || yr === maxYear || yr % step === 0) {
+            parts.push('<line x1="' + x.toFixed(1) + '" y1="' + (padT + plotH) + '" x2="' + x.toFixed(1) + '" y2="' + (padT + plotH + 5) + '" stroke="#0F1E38" stroke-width="1"/>');
+            parts.push('<text x="' + x.toFixed(1) + '" y="' + (padT + plotH + 20) + '" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11" fill="#28364E">Y' + yr + '</text>');
+          }
+        }
+
+        /* Vertical Term-End Marker */
+        if (out.term.years >= 1 && out.term.years <= maxYear) {
+          var termX = xForYear(out.term.years);
+          parts.push('<line x1="' + termX.toFixed(1) + '" y1="' + padT + '" x2="' + termX.toFixed(1) + '" y2="' + (padT + plotH) + '" stroke="#B5892E" stroke-width="1.75" stroke-dasharray="4 3"/>');
+          parts.push('<rect x="' + (termX - 42).toFixed(1) + '" y="' + (padT - 20) + '" width="84" height="17" fill="#F7F1E1" stroke="#B5892E" stroke-width="1"/>');
+          parts.push('<text x="' + termX.toFixed(1) + '" y="' + (padT - 8) + '" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#7D5B14">TERM ' + out.term.years.toFixed(2) + 'Y</text>');
+        }
+
+        /* Inspected Year Guide Line */
+        var insX = xForYear(uiState.inspectedYear);
+        parts.push('<line x1="' + insX.toFixed(1) + '" y1="' + padT + '" x2="' + insX.toFixed(1) + '" y2="' + (padT + plotH) + '" stroke="#0F1E38" stroke-width="1" stroke-opacity="0.28"/>');
+
+        /* Series polylines + points + right-side endpoint labels */
+        var endLabels = [];
+        series.forEach(function (s) {
+          var pts = s.data.map(function (v, idx) {
+            return xForYear(idx + 1).toFixed(1) + "," + yForVal(v).toFixed(1);
+          }).join(" ");
+          var dashAttr = s.dash ? ' stroke-dasharray="' + s.dash + '"' : "";
+          parts.push('<polyline fill="none" stroke="' + s.color + '" stroke-width="2.5"' + dashAttr + ' points="' + pts + '"/>');
+
+          s.data.forEach(function (v, idx) {
+            var cx = xForYear(idx + 1);
+            var cy = yForVal(v);
+            var isInspected = (idx + 1) === uiState.inspectedYear;
+            var r = isInspected ? 5 : 2.8;
+            parts.push('<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r + '" fill="' + (isInspected ? "#FFFFFF" : s.color) + '" stroke="' + s.color + '" stroke-width="' + (isInspected ? 2.5 : 1) + '"/>');
+          });
+
+          var lastVal = s.data[s.data.length - 1];
+          endLabels.push({
+            yRaw: yForVal(lastVal),
+            color: s.color,
+            text: s.label.slice(0, 12) + " " + fmtCompactMoney(lastVal)
+          });
+        });
+
+        /* Vertical anti-collision pass on endpoint labels */
+        endLabels.sort(function (a, b) { return a.yRaw - b.yRaw; });
+        var minGap = 16;
+        for (var k = 0; k < endLabels.length; k++) {
+          endLabels[k].y = Math.max(padT + 8, Math.min(padT + plotH - 6, endLabels[k].yRaw));
+          if (k > 0 && endLabels[k].y - endLabels[k - 1].y < minGap) {
+            endLabels[k].y = endLabels[k - 1].y + minGap;
+          }
+        }
+        for (var k2 = endLabels.length - 2; k2 >= 0; k2--) {
+          if (endLabels[k2 + 1].y > padT + plotH) {
+            endLabels[k2 + 1].y = padT + plotH;
+          }
+          if (endLabels[k2 + 1].y - endLabels[k2].y < minGap) {
+            endLabels[k2].y = endLabels[k2 + 1].y - minGap;
+          }
+        }
+        endLabels.forEach(function (lbl) {
+          parts.push('<text x="' + (padL + plotW + 8) + '" y="' + (lbl.y + 4).toFixed(1) + '" font-family="ui-monospace, monospace" font-size="11" font-weight="700" fill="' + lbl.color + '">' + escHtml(lbl.text) + '</text>');
+        });
+
+        /* Interactive invisible hover/click columns for every year */
+        var colW = maxYear > 1 ? plotW / (maxYear - 1) : plotW;
+        for (var hy = 1; hy <= maxYear; hy++) {
+          var hx = xForYear(hy) - colW / 2;
+          parts.push('<rect x="' + Math.max(padL, hx).toFixed(1) + '" y="' + padT + '" width="' + colW.toFixed(1) + '" height="' + plotH + '" fill="transparent" data-chart-year="' + hy + '" style="cursor:pointer;"/>');
+        }
+
+        svg.innerHTML = parts.join("");
+
+        /* Update inspector bar */
+        var iy = uiState.inspectedYear;
+        var termSuffix = iy === out.term.finalYearIndex ? " (Term End Year)" : "";
+        document.getElementById("inspector-year-label").textContent = "Inspecting Year " + iy + termSuffix + ":";
+        document.getElementById("inspector-vals").innerHTML =
+          "<span>Stay put: <strong>" + fmtMoney(out.stayPut.cum[iy - 1], 0) + "</strong></span>" +
+          out.options.map(function (o) {
+            return "<span>" + escHtml(o.name) + ": <strong>" + fmtMoney(o.cum[iy - 1], 0) + "</strong></span>";
+          }).join("");
+      }
+
+      function renderCostTable(out) {
+        var table = document.getElementById("cost-year-table");
+        var termYr = out.term.finalYearIndex;
+        var limitYr = uiState.costTableScope === "term" ? termYr : 20;
+
+        var head = "<thead><tr><th scope=\"col\" class=\"row-label\">Cost Item</th>";
+        for (var y = 1; y <= 20; y++) {
+          var cls = [];
+          if (y === termYr) cls.push("is-term-col");
+          if (y > limitYr) cls.push("is-hidden-col");
+          var badge = y === termYr ? " ★" : "";
+          head += "<th scope=\"col\" class=\"" + cls.join(" ") + "\">Yr " + y + badge + "</th>";
+        }
+        head += "</tr></thead>";
+
+        function buildRow(label, arr, rowClass, isSignedDiff) {
+          var tr = "<tr class=\"" + (rowClass || "") + "\"><th scope=\"row\" class=\"row-label\">" + escHtml(label) + "</th>";
+          for (var i = 0; i < 20; i++) {
+            var yNum = i + 1;
+            var cls = [];
+            if (yNum === termYr) cls.push("is-term-col");
+            if (yNum > limitYr) cls.push("is-hidden-col");
+            if (isSignedDiff) {
+              cls.push(arr[i] >= -1e-6 ? "is-pos" : "is-neg");
+            }
+            tr += "<td class=\"" + cls.join(" ") + "\">" + fmtMoney(arr[i], 0, isSignedDiff) + "</td>";
+          }
+          return tr + "</tr>";
+        }
+
+        var body = "<tbody>";
+        body += buildRow("Stay put — cost in year ($)", out.stayPut.annual, "", false);
+        body += buildRow("Stay put — cumulative cost ($)", out.stayPut.cum, "is-cum-row", false);
+        out.options.forEach(function (opt) {
+          body += buildRow("SaaS " + opt.name + " — cost in year ($)", opt.annual, "", false);
+          body += buildRow("SaaS " + opt.name + " — cumulative cost ($)", opt.cum, "is-cum-row", false);
+          body += buildRow("Diff — Stay-put minus " + opt.name + " cum ($)", opt.diffCum, "is-diff-row", true);
+        });
+        body += "</tbody>";
+
+        table.innerHTML = head + body;
+      }
+
+      function renderSeatsTable(out) {
+        var table = document.getElementById("seats-year-table");
+        var termYr = out.term.finalYearIndex;
+        var limitYr = uiState.seatsTableScope === "term" ? termYr : 20;
+
+        var head = "<thead><tr><th scope=\"col\" class=\"row-label\">Seats Served</th>";
+        for (var y = 1; y <= 20; y++) {
+          var cls = [];
+          if (y === termYr) cls.push("is-term-col");
+          if (y > limitYr) cls.push("is-hidden-col");
+          var badge = y === termYr ? " ★" : "";
+          head += "<th scope=\"col\" class=\"" + cls.join(" ") + "\">Yr " + y + badge + "</th>";
+        }
+        head += "</tr></thead>";
+
+        function buildSeatRow(label, arr, isBase) {
+          var tr = "<tr class=\"" + (isBase ? "is-cum-row" : "") + "\"><th scope=\"row\" class=\"row-label\">" + escHtml(label) + "</th>";
+          for (var i = 0; i < 20; i++) {
+            var yNum = i + 1;
+            var cls = [];
+            if (yNum === termYr) cls.push("is-term-col");
+            if (yNum > limitYr) cls.push("is-hidden-col");
+            tr += "<td class=\"" + cls.join(" ") + "\">" + fmtInt(arr[i]) + "</td>";
+          }
+          return tr + "</tr>";
+        }
+
+        var body = "<tbody>";
+        body += buildSeatRow("Stay put — licensed seats (flat)", out.stayPut.seats, true);
+        out.options.forEach(function (opt) {
+          body += buildSeatRow("Seats — " + opt.name, opt.seats, false);
+        });
+        body += "</tbody>";
+        table.innerHTML = head + body;
+
+        /* Seat rollout bars at term end */
+        var maxSeats = Math.max(out.stayPut.finalYearSeats, out.options[0].finalYearSeats, out.options[1].finalYearSeats, out.options[2].finalYearSeats, 1);
+        var barsHtml = "";
+        barsHtml += "<div class=\"seat-bar-card\">" +
+          "<div class=\"seat-bar-head\"><span>Stay put</span><span>" + fmtInt(out.stayPut.finalYearSeats) + " seats</span></div>" +
+          "<div class=\"seat-bar-track\"><div class=\"seat-bar-fill is-stay\" style=\"width:" + ((out.stayPut.finalYearSeats / maxSeats) * 100).toFixed(1) + "%\"></div></div>" +
+          "<div class=\"seat-bar-sub\">Cost/seat: <strong>" + fmtMoney(out.stayPut.costPerSeat, 2) + "</strong> (flat)</div>" +
+          "</div>";
+
+        var fillClasses = ["", "is-b", "is-c"];
+        out.options.forEach(function (opt, idx) {
+          barsHtml += "<div class=\"seat-bar-card\">" +
+            "<div class=\"seat-bar-head\"><span>" + escHtml(opt.name) + "</span><span>" + fmtInt(opt.finalYearSeats) + " seats</span></div>" +
+            "<div class=\"seat-bar-track\"><div class=\"seat-bar-fill " + fillClasses[idx] + "\" style=\"width:" + ((opt.finalYearSeats / maxSeats) * 100).toFixed(1) + "%\"></div></div>" +
+            "<div class=\"seat-bar-sub\">Cost/seat at Yr " + termYr + ": <strong>" + fmtMoney(opt.costPerSeat, 2) + "</strong></div>" +
+            "</div>";
+        });
+        document.getElementById("seat-bars-grid").innerHTML = barsHtml;
+      }
+
+      function buildConversionBrief(state, out) {
+        var sp = out.stayPut;
+        var lines = [];
+        lines.push("PERPETUAL-TO-SAAS CONVERSION BRIEF (SAMPLE MODEL)");
+        lines.push("===================================================");
+        lines.push("TERM & BASELINE");
+        lines.push("- Term: " + trimNum(state.termMonths, 4) + " months + " + trimNum(state.termDays, 4) + " extra days (" + out.term.years.toFixed(4) + " years; " + out.term.fullYears + " full yrs + " + out.term.stubFraction.toFixed(4) + " stub)");
+        lines.push("- Stay put: License " + fmtMoney(state.license, 2) + " + Maintenance " + fmtMoney(state.maintenance, 2) + "/yr · " + fmtInt(state.licensedSeats) + " flat seats");
+        lines.push("- Year-1 Migration Discount (shared): " + trimNum(state.migrationDiscount * 100, 2) + "% | Combined Y1 coupons: " + fmtMoney(out.combinedCoupons, 2));
+        lines.push("- Stay-put Term-End Total: " + fmtMoney(sp.termTotal, 2) + " | Cost/seat: " + fmtMoney(sp.costPerSeat, 2) + " | Effective $/seat/mo: " + fmtMoney(sp.effPupm, 2));
+        lines.push("");
+        lines.push("SAAS OPTIONS AT TERM END");
+        out.options.forEach(function (opt, i) {
+          var oIn = state.options[i];
+          lines.push("- " + opt.name + ":");
+          lines.push("  Term-End Total: " + fmtMoney(opt.termTotal, 2) + " | Diff vs Stay-Put: " + fmtMoney(opt.diffAtTermEnd, 2, true));
+          lines.push("  5-Year Total: " + fmtMoney(opt.fiveYearTotal, 2) + " | Year-5 Run Rate: " + fmtMoney(opt.year5RunRate, 2));
+          lines.push("  Break-even (cumulative): " + fmtYearBadge(opt.breakEvenYear, "No break-even within 20-year table") + " | Run-rate crossover: " + fmtYearBadge(opt.crossoverYear, "No crossover within 20-year table"));
+          lines.push("  Net PUPM: " + fmtMoney(opt.netPupm, 2) + " | Derived Y1 Annual Sub: " + fmtMoney(opt.derivedAnnualSub, 2) + " | Annual Usage: " + fmtMoney(opt.annualUsage, 2) + " (" + opt.usageDriver + ")");
+          lines.push("  Seats Y1 -> Final Yr (" + out.term.finalYearIndex + "): " + fmtInt(oIn.startSeats) + " -> " + fmtInt(opt.finalYearSeats) + " (" + trimNum(oIn.growth * 100, 2) + "%/yr) | Cost/seat at term end: " + fmtMoney(opt.costPerSeat, 2));
+        });
+        return lines.join("\n");
+      }
+
+      function renderAll() {
+        var state = readStateFromDom();
+        var out = evaluateModel(state);
+
+        renderResultsStrip(state, out);
+        renderSection01(out);
+        renderComparisonSummary(state, out);
+        renderChart(out);
+        renderCostTable(out);
+        renderSeatsTable(out);
+        document.getElementById("conversion-brief-pre").textContent = buildConversionBrief(state, out);
+      }
+
+      /* ---------------- Event Wiring ---------------- */
+      var presetButtons = document.querySelectorAll("[data-preset]");
+      var presetStatus = document.getElementById("preset-status");
+
+      function setActivePreset(key, label) {
+        presetButtons.forEach(function (btn) {
+          btn.classList.toggle("is-active", btn.getAttribute("data-preset") === key);
+        });
+        presetStatus.textContent = label;
+      }
+
+      Object.keys(stayEls).forEach(function (k) {
+        stayEls[k].addEventListener("input", function () {
+          setActivePreset("", "Active state: Custom edited inputs");
+          renderAll();
+        });
+      });
+
+      optEls.forEach(function (o) {
+        Object.keys(o).forEach(function (field) {
+          var evName = o[field].tagName === "SELECT" ? "change" : "input";
+          o[field].addEventListener(evName, function () {
+            setActivePreset("", "Active state: Custom edited inputs");
+            renderAll();
+          });
+        });
+      });
+
+      /* Select option card in Results Strip */
+      [0, 1, 2].forEach(function (idx) {
+        document.getElementById("rc-opt-" + idx).addEventListener("click", function () {
+          uiState.selectedOptionIndex = idx;
+          renderAll();
+        });
+      });
+
+      /* Term quick-set chips */
+      document.querySelectorAll("[data-term-m]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          stayEls.termMonths.value = btn.getAttribute("data-term-m");
+          stayEls.termDays.value = btn.getAttribute("data-term-d");
+          uiState.inspectedYear = Math.min(20, Math.max(1, Math.ceil(readNum(stayEls.termMonths) / 12 + readNum(stayEls.termDays) / 365)));
+          setActivePreset("", "Active state: Custom term (" + stayEls.termMonths.value + " mo + " + stayEls.termDays.value + " d)");
+          renderAll();
+        });
+      });
+
+      /* Chart & Table scope toggles */
+      document.getElementById("btn-chart-20").addEventListener("click", function () {
+        uiState.chartScope = "20";
+        this.classList.add("is-active");
+        document.getElementById("btn-chart-term").classList.remove("is-active");
+        renderAll();
+      });
+      document.getElementById("btn-chart-term").addEventListener("click", function () {
+        uiState.chartScope = "term";
+        this.classList.add("is-active");
+        document.getElementById("btn-chart-20").classList.remove("is-active");
+        renderAll();
+      });
+
+      document.getElementById("btn-cost-all").addEventListener("click", function () {
+        uiState.costTableScope = "20";
+        this.classList.add("is-active");
+        document.getElementById("btn-cost-term").classList.remove("is-active");
+        renderAll();
+      });
+      document.getElementById("btn-cost-term").addEventListener("click", function () {
+        uiState.costTableScope = "term";
+        this.classList.add("is-active");
+        document.getElementById("btn-cost-all").classList.remove("is-active");
+        renderAll();
+      });
+
+      document.getElementById("btn-seats-all").addEventListener("click", function () {
+        uiState.seatsTableScope = "20";
+        this.classList.add("is-active");
+        document.getElementById("btn-seats-term").classList.remove("is-active");
+        renderAll();
+      });
+      document.getElementById("btn-seats-term").addEventListener("click", function () {
+        uiState.seatsTableScope = "term";
+        this.classList.add("is-active");
+        document.getElementById("btn-seats-all").classList.remove("is-active");
+        renderAll();
+      });
+
+      /* Interactive chart year inspection */
+      var chartSvg = document.getElementById("cum-chart-svg");
+      function handleChartPointer(e) {
+        var target = e.target;
+        if (target && target.getAttribute) {
+          var yrStr = target.getAttribute("data-chart-year");
+          if (yrStr) {
+            var yr = parseInt(yrStr, 10);
+            if (yr && yr !== uiState.inspectedYear) {
+              uiState.inspectedYear = yr;
+              renderAll();
+            }
+          }
+        }
+      }
+      chartSvg.addEventListener("mousemove", handleChartPointer);
+      chartSvg.addEventListener("click", handleChartPointer);
+
+      /* Presets */
+      var PRESETS = {
+        "default": {
+          label: "Active state: Sample Data (60 months)",
+          apply: function (s) { return s; }
+        },
+        "renamed": {
+          label: "Active state: Preset 1 — Renamed Options (Alpha / Beta / Gamma)",
+          apply: function (s) {
+            s.options[0].name = "Alpha";
+            s.options[1].name = "Beta";
+            s.options[2].name = "Gamma";
+            return s;
+          }
+        },
+        "three-year": {
+          label: "Active state: Preset 2 — Three-Year Term (36 months)",
+          apply: function (s) {
+            s.termMonths = 36;
+            s.termDays = 0;
+            return s;
+          }
+        },
+        "fractional": {
+          label: "Active state: Preset 3 — Fractional Term (59.5 months + 47 days)",
+          apply: function (s) {
+            s.termMonths = 59.5;
+            s.termDays = 47;
+            return s;
+          }
+        },
+        "flat-grows": {
+          label: "Active state: Preset 4 — Flat Option Grows (Option C 0% → 10%)",
+          apply: function (s) {
+            s.options[2].growth = 0.10;
+            return s;
+          }
+        },
+        "twenty-year": {
+          label: "Active state: Preset 5 — Twenty-Year Term (240 months)",
+          apply: function (s) {
+            s.termMonths = 240;
+            s.termDays = 0;
+            return s;
+          }
+        }
+      };
+
+      presetButtons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var key = btn.getAttribute("data-preset");
+          var p = PRESETS[key];
+          if (!p) return;
+          var nextState = p.apply(cloneDefaults());
+          writeStateToDom(nextState);
+          var nextOut = evaluateModel(nextState);
+          uiState.inspectedYear = nextOut.term.finalYearIndex;
+          setActivePreset(key, p.label);
+          renderAll();
+        });
+      });
+
+      /* Copy Brief with Fallback */
+      document.getElementById("btn-copy-brief").addEventListener("click", function () {
+        var text = document.getElementById("conversion-brief-pre").textContent;
+        var statusEl = document.getElementById("brief-copy-status");
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(
+            function () { statusEl.textContent = "Copied Conversion Brief to clipboard."; },
+            function () { fallbackCopy(text, statusEl); }
+          );
+        } else {
+          fallbackCopy(text, statusEl);
+        }
+      });
+
+      function fallbackCopy(text, statusEl) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "0";
+        ta.style.left = "0";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+          statusEl.textContent = "Copied Conversion Brief to clipboard.";
+        } catch (e) {
+          statusEl.textContent = "Select the brief below and press Ctrl+C / Cmd+C.";
+        }
+        document.body.removeChild(ta);
+      }
+
+      /* ---------------- 3X Self-Check Battery (Full 20-Yr Arrays + All 5 Scenarios + Safety) ---------------- */
+      function near(a, b, tol) {
+        return Math.abs(a - b) <= (tol || 1e-4);
+      }
+
+      function assertArr(actual, expected, label) {
+        console.assert(actual.length === expected.length, label + " length mismatch");
+        for (var i = 0; i < expected.length; i++) {
+          console.assert(near(actual[i], expected[i], 1e-2), label + " mismatch at idx " + i + ": got " + actual[i] + " expected " + expected[i]);
+        }
+      }
+
+      function runSelfCheckBattery() {
+        /* 0. Full Default Sample Data (All 20 Years) */
+        var d0 = evaluateModel(cloneDefaults());
+        console.assert(near(d0.options[0].derivedAnnualSub, 30000) && near(d0.options[1].derivedAnnualSub, 36000) && near(d0.options[2].derivedAnnualSub, 27000), "Anchor derived sub fail");
+        console.assert(near(d0.options[0].netPupm, 20) && near(d0.options[1].netPupm, 24) && near(d0.options[2].netPupm, 18), "Anchor net PUPM fail");
+        console.assert(near(d0.options[0].annualUsage, 1200) && near(d0.options[1].annualUsage, 0) && near(d0.options[2].annualUsage, 1800), "Anchor usage fail");
+        console.assert(near(d0.combinedCoupons, 4000), "Anchor coupons fail");
+
+        var expStayAnn = [118000,18000,18000,18000,18000,18000,18000,18000,18000,18000,18000,18000,18000,18000,18000,18000,18000,18000,18000,18000];
+        var expStayCum = [118000,136000,154000,172000,190000,208000,226000,244000,262000,280000,298000,316000,334000,352000,370000,388000,406000,424000,442000,460000];
+        var expAAnn = [23700,34320,37440,41040,45120,49440,54240,59760,65520,72000,78960,86880,95280,104880,115200,126480,138960,152880,168000,184560];
+        var expACum = [23700,58020,95460,136500,181620,231060,285300,345060,410580,482580,561540,648420,743700,848580,963780,1090260,1229220,1382100,1550100,1734660];
+        var expBAnn = [28800,39744,43488,47808,52704,57888,63648,70272,77184,84960,93312,102816,112896,124416,136800,150336,165312,182016,200160,220032];
+        var expBCum = [28800,68544,112032,159840,212544,270432,334080,404352,481536,566496,659808,762624,875520,999936,1136736,1287072,1452384,1634400,1834560,2054592];
+        var expCAnn = [20900,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800];
+        var expCCum = [20900,49700,78500,107300,136100,164900,193700,222500,251300,280100,308900,337700,366500,395300,424100,452900,481700,510500,539300,568100];
+        var expSeatsGrow = [125,138,151,166,183,201,221,244,268,295,324,357,392,432,475,522,574,632,695,764];
+
+        assertArr(d0.stayPut.annual, expStayAnn, "Stay annual 20y");
+        assertArr(d0.stayPut.cum, expStayCum, "Stay cum 20y");
+        assertArr(d0.options[0].annual, expAAnn, "A annual 20y");
+        assertArr(d0.options[0].cum, expACum, "A cum 20y");
+        assertArr(d0.options[1].annual, expBAnn, "B annual 20y");
+        assertArr(d0.options[1].cum, expBCum, "B cum 20y");
+        assertArr(d0.options[2].annual, expCAnn, "C annual 20y");
+        assertArr(d0.options[2].cum, expCCum, "C cum 20y");
+        assertArr(d0.options[0].seats, expSeatsGrow, "A seats 20y");
+        assertArr(d0.options[1].seats, expSeatsGrow, "B seats 20y");
+
+        console.assert(near(d0.stayPut.termTotal, 190000) && near(d0.options[0].termTotal, 181620) && near(d0.options[0].diffAtTermEnd, 8380), "Anchor 60m totals A fail");
+        console.assert(near(d0.options[1].termTotal, 212544) && near(d0.options[2].termTotal, 136100), "Anchor 60m totals B/C fail");
+        console.assert(d0.options[0].breakEvenYear === 1 && d0.options[1].breakEvenYear === 1 && d0.options[2].breakEvenYear === 1, "Anchor break-even fail");
+        console.assert(d0.options[0].crossoverYear === 1 && d0.options[1].crossoverYear === 1 && d0.options[2].crossoverYear === 1, "Anchor crossover fail");
+        console.assert(near(d0.stayPut.costPerSeat, 1520) && near(d0.options[0].costPerSeat, 992.459, 1e-2) && near(d0.options[1].costPerSeat, 1161.4426, 1e-2) && near(d0.options[2].costPerSeat, 1088.80, 1e-2), "Anchor cost/seat fail");
+        console.assert(near(d0.options[0].year5RunRate, 45120) && near(d0.options[1].year5RunRate, 52704) && near(d0.options[2].year5RunRate, 28800), "Anchor Y5 run rate fail");
+        console.assert(near(d0.stayPut.effPupm, 25.3333, 1e-2), "Anchor stay-put eff PUPM fail");
+
+        /* 1. Scenario 1: Renamed Options */
+        var s1 = cloneDefaults();
+        s1.options[0].name = "Alpha"; s1.options[1].name = "Beta"; s1.options[2].name = "Gamma";
+        var r1 = evaluateModel(s1);
+        console.assert(r1.options[0].name === "Alpha" && r1.options[1].name === "Beta" && r1.options[2].name === "Gamma", "Scenario 1 names fail");
+        console.assert(near(r1.options[0].termTotal, d0.options[0].termTotal) && near(r1.options[1].termTotal, d0.options[1].termTotal) && near(r1.options[2].termTotal, d0.options[2].termTotal), "Scenario 1 math parity fail");
+
+        /* 2. Scenario 2: Three-Year Term (36 months) */
+        var s2 = cloneDefaults(); s2.termMonths = 36;
+        var r2 = evaluateModel(s2);
+        console.assert(near(r2.stayPut.termTotal, 154000) && near(r2.options[0].termTotal, 95460) && near(r2.options[1].termTotal, 112032) && near(r2.options[2].termTotal, 78500), "Scenario 2 totals fail");
+        console.assert(near(r2.options[0].costPerSeat, 95460 / 151, 1e-4), "Scenario 2 A cost/seat fail");
+
+        /* 3. Scenario 3: Fractional Term (59.5 months + 47 days) */
+        var s3 = cloneDefaults(); s3.termMonths = 59.5; s3.termDays = 47;
+        var r3 = evaluateModel(s3);
+        console.assert(near(r3.stayPut.termTotal, 191567.81, 0.01), "Scenario 3 Stay Put fail: " + r3.stayPut.termTotal);
+        console.assert(near(r3.options[0].termTotal, 185926.25, 0.01), "Scenario 3 A fail: " + r3.options[0].termTotal);
+        console.assert(near(r3.options[1].termTotal, 217586.07, 0.01), "Scenario 3 B fail: " + r3.options[1].termTotal);
+        console.assert(near(r3.options[2].termTotal, 138608.49, 0.01), "Scenario 3 C fail: " + r3.options[2].termTotal);
+
+        /* 4. Scenario 4: Flat Option Grows (Option C 0% -> 10%) */
+        var s4 = cloneDefaults(); s4.options[2].growth = 0.10;
+        var r4 = evaluateModel(s4);
+        console.assert(r4.options[2].seats[4] === 183 && near(r4.options[2].termTotal, 165908), "Scenario 4 Option C fail");
+        console.assert(near(r4.stayPut.termTotal, 190000) && near(r4.options[0].termTotal, 181620) && near(r4.options[1].termTotal, 212544), "Scenario 4 isolation fail");
+
+        /* 5. Scenario 5: Twenty-Year Term (240 months) */
+        var s5 = cloneDefaults(); s5.termMonths = 240;
+        var r5 = evaluateModel(s5);
+        console.assert(near(r5.stayPut.termTotal, 460000) && near(r5.options[0].termTotal, 1734660) && near(r5.options[1].termTotal, 2054592) && near(r5.options[2].termTotal, 568100), "Scenario 5 20y totals fail");
+
+        /* 6. Cleared / Zero Input Safety (No NaN) */
+        var sZero = {
+          license: 0, maintenance: 0, licensedSeats: 0, termMonths: 0, termDays: 0, migrationDiscount: 0,
+          options: [0, 1, 2].map(function () {
+            return { name: "", listPupm: 0, discount: 0, startSeats: 0, growth: 0, coupon: 0, usageType: "per use", expectedUsage: 0, pricePerUnit: 0, usageDiscount: 0, committedMin: 0 };
+          })
+        };
+        var rZero = evaluateModel(sZero);
+        var zeroCheckVals = [
+          rZero.stayPut.termTotal, rZero.stayPut.costPerSeat, rZero.stayPut.effPupm,
+          rZero.options[0].termTotal, rZero.options[0].costPerSeat, rZero.options[0].netPupm
+        ];
+        console.assert(zeroCheckVals.every(function (v) { return Number.isFinite(v); }), "Zero/cleared NaN safety fail");
+      }
+
+      runSelfCheckBattery();
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
