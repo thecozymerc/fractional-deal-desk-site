@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<!--
+ARGON MANIFEST: TOOL 14 FULL REBUILD - Cloud Commit & Usage Playbook (S6-P01.d)
+================================================================================
+
+1. SELF-CHECK AGAINST GROUND-TRUTH ANCHORS & ALL SIX BOUNDARY CASES (PART C)
+   Engine Fidelity:
+   - Pure JavaScript implementation of all 25 workbook formulas across Discount Matrix, Renewal Check, and Commit & Usage, with shared live matrix state so any re-tiering immediately updates Route-a-discount and both Renewal Check routings.
+   - Zero NaN/Infinity under cleared or zeroed inputs; 1e-12 precision rounding applied at band-threshold comparisons to prevent IEEE-754 drift at exact percentage boundaries.
+
+   Sample Data Anchors (Defaults):
+   - Route-a-discount at 25.00% -> Band 3 -> "Pricing Approval"
+   - Renewal Check (Current $100,000, List $140,000, Asked 25.00%):
+     * Renewal TCV: $105,000.00
+     * Growth ($): +$5,000.00
+     * Growth (%): +5.00%
+     * Verdict: "CLEARS — renewal grows"
+     * Deepest growing discount: 28.5714% (displays 28.57%)
+     * Asked approver: Band 3 -> "Pricing Approval"
+     * Counter-play approver: Band 3 -> "Pricing Approval"
+   - Commit & Usage (Usage $7,000, Commitment $6,000, Discount 25.00%, Term 12):
+     * List value covered (Covers): $8,000.00
+     * Usage covered: $7,000.00
+     * Overage billed at full price: $0.00
+     * You pay per month: $6,000.00
+     * On-demand cost per month: $7,000.00
+     * Savings per month: $1,000.00
+     * Effective discount: 14.2857% (displays 14.29%)
+     * Commitment actually used: $5,250.00
+     * Unused commitment (paid, never used): $750.00
+     * You pay over the term: $72,000.00
+     * Savings over the term: $12,000.00
+
+   Six Boundary Cases (Verified by Built-in Self-Check Battery on Load):
+   1. Band Edges:
+      * Asked 10.00% -> Band 1 ("Sales")
+      * Asked 35.00% -> Band 3 ("Pricing Approval")
+      * Asked 35.01% -> Band 4 ("Pricing + Executive Review")
+   2. Blocked Renewal (Asked 30.00%):
+      * Renewal TCV: $98,000.00 | Growth: -$2,000.00 (-2.00%)
+      * Verdict: "BLOCKED — renewal shrinks"
+      * Deepest growing discount: 28.5714% (28.57%) -> Counter-play approver: Band 3 ("Pricing Approval")
+   3. Re-Tier the Matrix (Band 2 "to" 20.00% -> 15.00%):
+      * Band 3 "from" automatically updates to 15.00%
+      * Asked 18.00% routes to Band 3 ("Pricing Approval") [was Band 2 "Sales Manager" at sample tiers]
+      * Asked 25.00% remains Band 3 ("Pricing Approval")
+      * Renewal Check routings (asked at 18.00% and 25.00%, plus deepest) read through the same edited matrix
+   4. Overage & No Waste (Usage $10,000, Commitment $6,000, Discount 25.00%, Term 12):
+      * Covers $8,000.00 | Covered $8,000.00 | Overage $2,000.00 | Pay $8,000.00/mo
+      * Savings $2,000.00/mo | Effective discount 20.00%
+      * Used $6,000.00 | Unused $0.00 | Term pay $96,000.00 | Term savings $24,000.00
+   5. Full-Discount Guard (Commit discount 100.00%):
+      * Covers $0.00 (guard active) | Covered $0.00 | Overage $7,000.00
+      * Pay $13,000.00/mo | Savings -$6,000.00/mo | Effective discount -85.71%
+      * Used $0.00 | Unused $6,000.00 | Term pay $156,000.00 | Term savings -$72,000.00
+   6. Zero Current TCV (Current $0, List $140,000, Asked 25.00%):
+      * Growth (%) 0.00% (guard active) | Growth ($) +$105,000.00
+      * Renewal TCV $105,000.00 | Verdict "CLEARS — renewal grows" | Deepest 100.00% -> Band 4
+
+2. IMPROVEMENTS MADE (WITHIN ENGINE & NON-SELLING BOUNDS):
+   - Unified Responsive Verdict Strip: Single DOM element promoted to a 4-card top executive summary band on desktop (> 720px) and fixed as a compact 2x2 bottom verdict bar on phone (<= 720px), ensuring live answers stay visible at all times with zero display:none duplication.
+   - Active Band Row Highlight & Edge Quick-Test Chips: Highlighted the currently matched tier inside the Discount Matrix table and added one-tap boundary chips (10%, 20%, 25%, 35%, 35.01%) inside Route-a-discount so visitors can probe exact <= tier edges effortlessly.
+   - Ratchet Headroom & One-Click Counter-Play Action: Added a derived ceiling comparison line in Section 02 (headroom remaining vs. amount exceeding the ratchet) plus a button to apply the exact deepest growing discount into the Renewal Check input.
+   - Visual Usage & Commitment Allocation Bars: Added CSS proportional allocation bars in Section 03 showing Usage (Covered vs. Overage) and Commitment (Actually Used vs. Paid Unused Waste) strictly from the workbook's computed figures.
+   - Live Copyable Playbook Brief: Dynamically updates in plain text from the live state with clipboard copy and textarea fallback.
+
+3. GOAL-VS-SPEC CONFLICTS & RULINGS:
+   - Verdict Strip Desktop vs. Mobile Placement vs. Part E: Rendered a single #verdict-strip element that sits in normal document flow at the top on desktop (> 720px) and switches to position:fixed bottom bar on phone (<= 720px), honoring both responsive modes without duplicating DOM content or using display:none.
+   - Preset 3 (Re-Tier Matrix) Synchronized Asked Inputs: Clicking Preset 3 sets Band 2 "to" to 15.00% and sets both Route-a-discount asked and Renewal Check asked to 18.00% so visitors immediately see both the standalone router and Renewal Check's asked approver shift from "Sales Manager" to "Pricing Approval" (while the self-check battery explicitly verifies both 18.00% and 25.00%).
+   - Superseded Closing Section Removed: Dropped "Next - Put this to work on a real book of deals." and all booking/calendar links in compliance with the standing no-selling rule.
+   - Sibling Tool Link Addresses: Linked Tool 1 (../deal-pricing-solver/), Tool 2 (../perpetual-to-saas-conversion/), and Tool 3 (../perm-calculator/) using the site's /tools/<kebab-case>/ convention (verify against site/CODE-MAP.md on deploy).
+
+4. RESPONSIVE MODES & FLUID-FIRST SWEEP (280px - 1280px):
+   - Desktop Mode (> 720px): Top 4-card Verdict Strip above presets; 4-column editable Discount Matrix table; balanced 2-column input/output grids in Sections 01-03 and explainer; full reading measure.
+   - Phone Mode (<= 720px): Verdict Strip fixed at the bottom as a compact 2x2 summary grid with main/footer bottom clearance; Discount Matrix table rows reflow into labeled stacked cards with 16px (1rem) inputs and >= 44px touch targets; preset chips and all multi-column grids stack cleanly.
+   - Fluid-First Sweep (280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS px): Built with relative units, minmax(0, 1fr), min-width: 0, overflow-wrap: anywhere, and single-column fallback <= 380px so zero horizontal page scroll occurs at any width.
+
+5. PART E - SEO INTEGRITY COMPLIANCE:
+   - 100% compliant. Zero display:none content blocks, zero hidden text or links, zero white-on-white, zero off-screen positioning, zero zero-size text, zero keyword stuffing, zero cloaking or doorway pages.
+-->
+<!--
+     LABEL - S6-P01.d - Cloud Commit & Usage Playbook (tool page;
+     Tool / piece ID: Tool 14 - Cloud Commit & Usage Playbook,
+     address: /tools/cloud-commit-playbook/)
+     What this page holds: Argon full rebuild of Tool 14 - live interactive
+     cloud deal-desk playbook implementing all 25 formulas from the original
+     SAMPLE workbook (Discount Matrix with editable tiers and approvers,
+     Renewal Check TCV ratchet with counter-play routing, Commit & Usage sizer
+     with unused-commitment waste, one-tap presets, and copyable brief).
+     Map: site/CODE-MAP.md ("tools/cloud-commit-playbook/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+  <link rel="apple-touch-icon" href="../../favicon.svg" />
+  <title>Cloud Commit &amp; Usage Playbook — Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="Interactive cloud deal-desk playbook with an editable discount matrix and approval routing, a renewal TCV ratchet with counter-play pricing, and a commit-and-usage sizer showing unused commitment.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/cloud-commit-playbook/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Cloud Commit &amp; Usage Playbook — Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="Interactive cloud deal-desk playbook with an editable discount matrix and approval routing, a renewal TCV ratchet with counter-play pricing, and a commit-and-usage sizer showing unused commitment.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/cloud-commit-playbook/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/cloud-commit-playbook/#webapp",
+        "name": "Cloud Commit & Usage Playbook",
+        "url": "https://fractional-deal-desk-site.pages.dev/tools/cloud-commit-playbook/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "All",
+        "description": "Working sample cloud deal-desk playbook with an editable discount matrix and approval routing, a renewal TCV ratchet that calculates its deepest growing counter-play, and a spend-based commit sizer showing unused commitment.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Fractional Deal Desk & Contract Management",
+          "url": "https://fractional-deal-desk-site.pages.dev/"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/cloud-commit-playbook/#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fractional-deal-desk-site.pages.dev/" },
+          { "@type": "ListItem", "position": 2, "name": "Proof of Work", "item": "https://fractional-deal-desk-site.pages.dev/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Pricing Engines", "item": "https://fractional-deal-desk-site.pages.dev/tools/pricing-engines/" },
+          { "@type": "ListItem", "position": 4, "name": "Cloud Commit & Usage Playbook", "item": "https://fractional-deal-desk-site.pages.dev/tools/cloud-commit-playbook/" }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --navy-900: #0F1E38;
+      --navy-800: #16294A;
+      --navy-700: #1F3760;
+      --brass-600: #7D5B14;
+      --brass-500: #B5892E;
+      --brass-400: #D4AF5A;
+      --brass-100: #F7F1E1;
+      --paper-bg: #F8F7F4;
+      --paper-card: #FFFFFF;
+      --paper-alt: #F1EFEA;
+      --ink-900: #0F1E38;
+      --ink-700: #28364E;
+      --ink-600: #42526B;
+      --rule-color: #D5D0C5;
+      --rule-strong: #0F1E38;
+      --fail-bg: #FEF2F2;
+      --fail-ink: #7F1D1D;
+      --fail-border: #991B1B;
+      --pass-bg: #F0FDF4;
+      --pass-ink: #14532D;
+      --pass-border: #166534;
+      --font-serif: Georgia, "Times New Roman", Times, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { margin: 0; padding: 0; background-color: var(--paper-bg); color: var(--ink-900); font-family: var(--font-sans); line-height: 1.55; overflow-x: hidden; }
+    a { color: var(--navy-900); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover, a:focus-visible { color: var(--brass-600); }
+    button, input, textarea { font-family: inherit; border-radius: 0; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--brass-500); outline-offset: 2px; }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 clamp(0.65rem, 3vw, 2rem); }
+
+    /* HEADER & BREADCRUMB */
+    .site-header { background-color: var(--navy-900); color: #FFFFFF; border-bottom: 3px solid var(--brass-500); }
+    .header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; padding: 0.85rem 0; }
+    .brand-link { color: #FFFFFF; text-decoration: none; font-family: var(--font-serif); font-size: clamp(1rem, 2.2vw, 1.2rem); font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .brand-link:hover, .brand-link:focus-visible { color: var(--brass-400); }
+    .site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.85rem; }
+    .site-nav a { color: #E2E8F0; text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0.4rem; min-height: 44px; display: inline-flex; align-items: center; border-bottom: 2px solid transparent; }
+    .site-nav a:hover, .site-nav a:focus-visible, .site-nav a[aria-current="page"] { color: #FFFFFF; border-bottom-color: var(--brass-400); }
+
+    .breadcrumb-bar { background-color: var(--paper-alt); border-bottom: 1px solid var(--rule-color); font-size: 0.8125rem; }
+    .breadcrumb-list { list-style: none; margin: 0; padding: 0.35rem 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; color: var(--ink-700); }
+    .breadcrumb-list li { display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; overflow-wrap: anywhere; }
+    .breadcrumb-list li + li::before { content: "/"; color: var(--ink-600); }
+    .breadcrumb-list a { color: var(--ink-700); padding: 0.35rem 0.15rem; min-height: 44px; display: inline-flex; align-items: center; }
+    .breadcrumb-list [aria-current="page"] { color: var(--ink-900); font-weight: 600; }
+
+    /* HERO */
+    .hero-banner { background-color: var(--navy-900); color: #FFFFFF; padding: clamp(1.5rem, 4vw, 2.75rem) 0; border-bottom: 1px solid var(--rule-strong); }
+    .hero-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.85rem; }
+    .eyebrow-tag { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-400); font-weight: 600; }
+    .tool-badge { display: inline-block; background-color: var(--navy-800); border: 1px solid var(--brass-500); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; letter-spacing: 0.04em; }
+    .hero-title { font-family: var(--font-serif); font-size: clamp(1.55rem, 3.6vw, 2.35rem); line-height: 1.2; font-weight: 700; margin: 0 0 0.9rem 0; color: #FFFFFF; overflow-wrap: anywhere; }
+    .hero-lede { font-size: clamp(0.95rem, 1.6vw, 1.06rem); line-height: 1.62; color: #E2E8F0; max-width: 82ch; margin: 0 0 1.15rem 0; }
+    .provenance-strip { background-color: var(--navy-800); border-left: 3px solid var(--brass-500); padding: 0.85rem 1rem; font-size: 0.86rem; color: #E2E8F0; line-height: 1.55; max-width: 86ch; }
+    .provenance-strip strong { color: #FFFFFF; }
+
+    /* DIRECTIONS & SECTIONS */
+    main { padding-bottom: 2.5rem; }
+    .section-block { padding: clamp(1.25rem, 3vw, 2.1rem) 0; border-bottom: 1px solid var(--rule-color); }
+    .section-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--navy-900); }
+    .section-title { font-family: var(--font-serif); font-size: clamp(1.2rem, 2.4vw, 1.5rem); font-weight: 700; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; }
+    .section-subtitle { font-size: 0.82rem; color: var(--ink-600); font-family: var(--font-mono); margin: 0; overflow-wrap: anywhere; }
+    .directions-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: 0.9rem 1.05rem; font-size: 0.92rem; line-height: 1.6; color: var(--ink-700); margin: 0 0 1.1rem 0; }
+    .tab-rule-note { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-left: 3px solid var(--brass-500); padding: 0.65rem 0.9rem; font-size: 0.85rem; color: var(--ink-700); margin: 0 0 1rem 0; line-height: 1.5; }
+
+    /* VERDICT STRIP (Desktop Top Band / Phone Fixed Bottom Bar) */
+    .verdict-strip { background-color: var(--navy-900); color: #FFFFFF; border-top: 2px solid var(--brass-500); border-bottom: 2px solid var(--brass-500); padding: 0.95rem 0; margin-top: 1.25rem; }
+    .verdict-strip-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.4rem 1rem; margin-bottom: 0.65rem; }
+    .verdict-strip-title { font-family: var(--font-mono); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-400); font-weight: 700; margin: 0; }
+    .verdict-strip-sub { font-family: var(--font-mono); font-size: 0.74rem; color: #CBD5E1; margin: 0; }
+    .verdict-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; }
+    .verdict-card { background-color: var(--navy-800); border: 1px solid var(--navy-700); border-top: 3px solid var(--brass-500); padding: 0.75rem 0.85rem; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 0.25rem; }
+    .verdict-card.is-pass { border-top-color: #22C55E; }
+    .verdict-card.is-fail { border-top-color: #EF4444; background-color: #2A161D; border-color: #7F1D1D; }
+    .verdict-label { font-family: var(--font-mono); font-size: 0.71rem; text-transform: uppercase; letter-spacing: 0.04em; color: #CBD5E1; font-weight: 600; overflow-wrap: anywhere; }
+    .verdict-value { font-family: var(--font-serif); font-size: clamp(1rem, 1.8vw, 1.25rem); font-weight: 700; color: #FFFFFF; line-height: 1.25; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+    .verdict-sub { font-family: var(--font-mono); font-size: 0.72rem; color: var(--brass-400); overflow-wrap: anywhere; }
+    .verdict-card.is-pass .verdict-sub { color: #86EFAC; }
+    .verdict-card.is-fail .verdict-sub { color: #FCA5A5; }
+
+    /* PRESET TOOLBAR */
+    .preset-panel { background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.85rem 1rem; margin-top: 1.1rem; }
+    .preset-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.65rem; }
+    .preset-title { font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-900); margin: 0; }
+    .preset-status { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-600); }
+    .preset-grid { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .preset-btn { background-color: var(--paper-alt); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.45rem 0.75rem; font-size: 0.8rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; text-align: left; }
+    .preset-btn:hover, .preset-btn:focus-visible { background-color: var(--navy-900); color: #FFFFFF; }
+    .preset-btn.is-active { background-color: var(--navy-900); color: #FFFFFF; border-color: var(--brass-500); box-shadow: inset 0 -3px 0 var(--brass-500); }
+    .preset-btn.is-reset { background-color: var(--paper-card); border-color: var(--brass-600); color: var(--brass-600); }
+    .preset-btn.is-reset:hover, .preset-btn.is-reset:focus-visible { background-color: var(--brass-600); color: #FFFFFF; }
+
+    /* FORM INPUTS & BUTTONS */
+    .btn-primary { background-color: var(--navy-900); color: #FFFFFF; border: 1px solid var(--navy-900); padding: 0.55rem 1.05rem; font-size: 0.88rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-primary:hover, .btn-primary:focus-visible { background-color: var(--brass-600); border-color: var(--brass-600); }
+    .btn-secondary { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.45rem 0.9rem; font-size: 0.84rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-secondary:hover, .btn-secondary:focus-visible { background-color: var(--navy-900); color: #FFFFFF; }
+
+    .field-group { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+    .field-label { font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-900); overflow-wrap: anywhere; }
+    .input-wrap { display: flex; align-items: stretch; border: 1px solid #9F988A; background-color: var(--brass-100); min-height: 44px; }
+    .input-wrap:focus-within { background-color: #FFFFFF; border-color: var(--navy-900); box-shadow: 0 0 0 1px var(--navy-900); }
+    .input-affix { display: inline-flex; align-items: center; padding: 0 0.55rem; font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; color: var(--ink-700); background-color: rgba(15, 30, 56, 0.05); border-right: 1px solid #C8C2B6; user-select: none; }
+    .input-affix.is-suffix { border-right: none; border-left: 1px solid #C8C2B6; }
+    .wb-input { width: 100%; min-width: 0; border: none; background: transparent; color: var(--ink-900); font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600; padding: 0.45rem 0.6rem; min-height: 42px; }
+    .wb-input:focus { outline: none; }
+    .wb-input.is-text { font-family: var(--font-sans); font-weight: 600; }
+    .field-hint { font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-600); margin: 0; }
+
+    /* SECTION 01: MATRIX TABLE + ROUTE A DISCOUNT */
+    .matrix-layout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 1.15rem; align-items: start; }
+    .panel-card { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--navy-900); padding: clamp(0.85rem, 2vw, 1.2rem); min-width: 0; }
+    .panel-card.is-brass { border-top-color: var(--brass-500); }
+    .panel-title { font-family: var(--font-serif); font-size: 1.08rem; font-weight: 700; margin: 0 0 0.75rem 0; color: var(--ink-900); }
+
+    .matrix-table { width: 100%; border-collapse: collapse; }
+    .matrix-table th { text-align: left; font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: #FFFFFF; background-color: var(--navy-900); padding: 0.6rem 0.65rem; border: 1px solid var(--navy-900); }
+    .matrix-table td { padding: 0.5rem 0.55rem; border: 1px solid var(--rule-color); vertical-align: middle; background-color: var(--paper-card); }
+    .matrix-table tr.is-active-band td { background-color: #FBF6E8; border-color: var(--brass-500); }
+    .matrix-table tr.is-active-band td:first-child { border-left: 4px solid var(--brass-500); }
+    .band-name-cell { font-family: var(--font-mono); font-size: 0.84rem; font-weight: 700; color: var(--navy-900); white-space: nowrap; }
+    .band-tag { display: inline-block; margin-left: 0.35rem; font-size: 0.68rem; text-transform: uppercase; padding: 0.1rem 0.35rem; background-color: var(--navy-900); color: #FFFFFF; vertical-align: middle; }
+    .computed-cell { font-family: var(--font-mono); font-size: 0.88rem; font-weight: 700; color: var(--ink-700); background-color: var(--paper-alt); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .computed-cell small { display: block; font-size: 0.68rem; font-weight: 500; color: var(--ink-600); }
+
+    .edge-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; margin: 0.65rem 0 0.9rem 0; }
+    .edge-chips-label { font-family: var(--font-mono); font-size: 0.71rem; color: var(--ink-600); margin-right: 0.15rem; }
+    .chip-btn { background-color: var(--paper-alt); color: var(--ink-900); border: 1px solid var(--rule-color); padding: 0.3rem 0.55rem; font-family: var(--font-mono); font-size: 0.76rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
+    .chip-btn:hover, .chip-btn:focus-visible { background-color: var(--navy-900); color: #FFFFFF; border-color: var(--navy-900); }
+
+    .route-result-box { border: 1px solid var(--rule-strong); background-color: var(--paper-alt); padding: 0.85rem; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+    .metric-pair { min-width: 0; }
+    .metric-pair-label { display: block; font-family: var(--font-mono); font-size: 0.71rem; text-transform: uppercase; color: var(--ink-600); font-weight: 700; margin-bottom: 0.2rem; }
+    .metric-pair-val { display: block; font-family: var(--font-serif); font-size: 1.15rem; font-weight: 700; color: var(--ink-900); overflow-wrap: anywhere; }
+
+    /* SECTION 02 & 03 GRIDS */
+    .split-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 1.15rem; align-items: start; }
+    .inputs-stack { display: flex; flex-direction: column; gap: 0.85rem; }
+
+    .verdict-banner { border: 1px solid var(--rule-strong); padding: 0.85rem 1rem; margin-bottom: 0.9rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.65rem; }
+    .verdict-banner.is-pass { background-color: var(--pass-bg); border-color: var(--pass-border); border-left: 5px solid var(--pass-border); }
+    .verdict-banner.is-fail { background-color: var(--fail-bg); border-color: var(--fail-border); border-left: 5px solid var(--fail-border); }
+    .verdict-banner-text { font-family: var(--font-serif); font-size: 1.15rem; font-weight: 700; margin: 0; }
+    .verdict-banner.is-pass .verdict-banner-text { color: var(--pass-ink); }
+    .verdict-banner.is-fail .verdict-banner-text { color: var(--fail-ink); }
+    .verdict-banner-sub { font-family: var(--font-mono); font-size: 0.78rem; margin: 0.2rem 0 0 0; color: var(--ink-700); }
+
+    .output-table { width: 100%; border-collapse: collapse; }
+    .output-table th, .output-table td { padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--rule-color); text-align: left; font-size: 0.9rem; }
+    .output-table th { font-weight: 600; color: var(--ink-700); width: 58%; overflow-wrap: anywhere; }
+    .output-table td { font-family: var(--font-mono); font-weight: 700; color: var(--ink-900); text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .output-table tr.is-emphasis th, .output-table tr.is-emphasis td { background-color: var(--paper-alt); border-top: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); }
+    .output-table tr.is-waste td { color: var(--fail-ink); }
+    .output-table tr.is-waste.is-zero td { color: var(--pass-ink); }
+    .output-table td.is-neg { color: var(--fail-ink); }
+    .output-table td.is-pos { color: var(--pass-ink); }
+
+    .routing-pair-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; margin-top: 0.9rem; }
+    .routing-card { border: 1px solid var(--rule-color); background-color: var(--paper-alt); padding: 0.75rem 0.85rem; border-left: 4px solid var(--navy-900); min-width: 0; }
+    .routing-card.is-counter { border-left-color: var(--brass-500); background-color: #FBF6E8; }
+    .routing-card-label { font-family: var(--font-mono); font-size: 0.71rem; text-transform: uppercase; color: var(--ink-600); font-weight: 700; margin-bottom: 0.25rem; display: block; }
+    .routing-card-approver { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 700; color: var(--ink-900); display: block; overflow-wrap: anywhere; }
+    .routing-card-meta { font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-700); margin-top: 0.2rem; display: block; }
+
+    /* ALLOCATION BARS (SECTION 03) */
+    .alloc-block { margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid var(--rule-color); display: flex; flex-direction: column; gap: 0.75rem; }
+    .alloc-row-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 0.75rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-700); margin-bottom: 0.25rem; }
+    .alloc-bar { width: 100%; height: 14px; background-color: var(--paper-alt); border: 1px solid var(--rule-strong); display: flex; overflow: hidden; }
+    .alloc-seg-used { background-color: var(--navy-900); height: 100%; }
+    .alloc-seg-covered { background-color: var(--pass-border); height: 100%; }
+    .alloc-seg-overage { background-color: var(--brass-500); height: 100%; }
+    .alloc-seg-waste { background-color: var(--fail-border); height: 100%; }
+
+    /* PLAYBOOK BRIEF */
+    .brief-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--brass-500); padding: clamp(0.9rem, 2vw, 1.25rem); }
+    .brief-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.75rem; }
+    .copy-status { font-family: var(--font-mono); font-size: 0.8rem; color: var(--pass-ink); font-weight: 700; }
+    .brief-pre { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.85rem; margin: 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; color: var(--ink-900); white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; max-height: 24rem; overflow-y: auto; }
+
+    /* EXPLAINER & LIMITS */
+    .two-col-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
+    .card-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 3px solid var(--navy-900); padding: clamp(0.95rem, 2.2vw, 1.3rem); min-width: 0; }
+    .card-box.is-brass-top { border-top-color: var(--brass-500); }
+    .card-box h3 { font-family: var(--font-serif); font-size: 1.08rem; margin: 0 0 0.55rem 0; color: var(--ink-900); }
+    .card-box p { margin: 0 0 0.75rem 0; font-size: 0.92rem; line-height: 1.62; color: var(--ink-700); overflow-wrap: anywhere; }
+    .card-box p:last-child { margin-bottom: 0; }
+
+    /* RELATED LINKS & FOOTER */
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; }
+    .related-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.9rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.4rem; min-width: 0; }
+    .related-card-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; color: var(--brass-600); font-weight: 700; }
+    .related-card a { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--ink-900); min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .related-card p { font-size: 0.83rem; color: var(--ink-700); margin: 0; }
+
+    .site-footer { background-color: var(--navy-900); color: #E2E8F0; border-top: 3px solid var(--brass-500); padding: 2rem 0 2.5rem 0; font-size: 0.85rem; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+    .footer-heading { font-family: var(--font-serif); font-size: 0.95rem; color: #FFFFFF; margin: 0 0 0.6rem 0; }
+    .footer-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+    .footer-links a { color: #E2E8F0; min-height: 44px; display: inline-flex; align-items: center; }
+    .footer-links a:hover, .footer-links a:focus-visible { color: var(--brass-400); }
+    .footer-bottom { border-top: 1px solid var(--navy-700); padding-top: 1rem; font-size: 0.78rem; color: #CBD5E1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+
+    /* PHONE MODE (<= 720px) */
+    @media (max-width: 720px) {
+      .matrix-layout,
+      .split-grid,
+      .two-col-grid,
+      .routing-pair-grid,
+      .route-result-box { grid-template-columns: 1fr; }
+
+      .wb-input { font-size: 1rem; }
+
+      /* Matrix Table -> Stacked Readable Cards */
+      .matrix-table, .matrix-table tbody, .matrix-table tr, .matrix-table td { display: block; width: 100%; }
+      .matrix-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+      .matrix-table tr { border: 1px solid var(--rule-strong); margin-bottom: 0.75rem; background-color: var(--paper-card); }
+      .matrix-table tr.is-active-band { border: 2px solid var(--brass-500); }
+      .matrix-table td { border: none; border-bottom: 1px solid var(--rule-color); padding: 0.55rem 0.65rem; }
+      .matrix-table td:last-child { border-bottom: none; }
+      .matrix-table td[data-label]::before { content: attr(data-label); display: block; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-600); margin-bottom: 0.3rem; }
+
+      .preset-btn { width: 100%; justify-content: flex-start; }
+
+      /* Fixed Bottom Verdict Strip on Phone */
+      .verdict-strip { position: fixed; bottom: 0; left: 0; right: 0; margin-top: 0; padding: 0.45rem 0; z-index: 50; box-shadow: 0 -3px 12px rgba(15, 30, 56, 0.32); }
+      .verdict-strip-head { display: flex; margin-bottom: 0.3rem; }
+      .verdict-strip-sub { font-size: 0.68rem; }
+      .verdict-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem; }
+      .verdict-card { padding: 0.35rem 0.45rem; border-top-width: 2px; gap: 0.1rem; }
+      .verdict-label { font-size: 0.62rem; line-height: 1.15; }
+      .verdict-value { font-size: 0.85rem; line-height: 1.15; }
+      .verdict-sub { font-size: 0.62rem; line-height: 1.15; }
+
+      .site-footer { padding-bottom: 10.5rem; }
+    }
+
+    @media (max-width: 380px) {
+      .output-table th, .output-table td { display: block; width: 100%; text-align: left; padding: 0.35rem 0.5rem; }
+      .output-table th { border-bottom: none; font-size: 0.8rem; color: var(--ink-600); padding-bottom: 0.1rem; }
+      .output-table td { padding-top: 0; padding-bottom: 0.55rem; font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../../" class="brand-link">Fractional Deal Desk &amp; Contract Management</a>
+      <nav class="site-nav" aria-label="Primary Navigation">
+        <a href="../../">Home</a>
+        <a href="../../tools/" aria-current="page">Proof of Work</a>
+        <a href="../../tools/pricing-engines/">Pricing Engines</a>
+        <a href="../../services/">Practice &amp; Mandate Scope</a>
+        <a href="../../about/">Operator Record</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumb-bar" aria-label="Breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb-list">
+        <li><a href="../../">Home</a></li>
+        <li><a href="../../tools/">Proof of Work</a></li>
+        <li><a href="../../tools/pricing-engines/">Pricing Engines</a></li>
+        <li aria-current="page">Cloud Commit &amp; Usage Playbook</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="hero-banner">
+    <div class="container">
+      <div class="hero-meta-row">
+        <span class="eyebrow-tag">Proof of Work · Pricing Engines</span>
+        <span class="tool-badge">Tool 14 · Pricing Engines</span>
+      </div>
+      <h1 class="hero-title">Cloud Commit &amp; Usage Playbook</h1>
+      <p class="hero-lede">
+        A playbook is not a document — it is the order decisions get made in. This one runs the way an enterprise cloud deal desk runs: <strong>governance first</strong> (a discount matrix that says who may approve what), <strong>the renewal gate second</strong> (no discount clears if it shrinks the renewal), and <strong>the value levers third</strong> (the commit, sized against real usage, with the waste showing). Three tabs, all of it live, all of it sample data.
+      </p>
+      <div class="provenance-strip">
+        <strong>Provenance &amp; Operating Record:</strong> Built from 15+ years in commercial contracts, deal desk, and revenue operations across contracts up to $300M and 3,000+ SKUs under management. This workbook is an <strong>original sample</strong> built in November 2026 for this site — its structure follows enterprise cloud deal-desk governance and its commit mechanics reflect public cloud committed-use documentation (Google Cloud CUD documentation and FinOps Foundation material). Every threshold, approver name, and dollar figure is generic fictional sample data.
+      </div>
+    </div>
+  </section>
+
+  <!-- VERDICT STRIP: Desktop Top Summary Band / Phone Fixed Bottom Strip -->
+  <section class="verdict-strip" id="verdict-strip" aria-label="Live Playbook Headline Answers">
+    <div class="container">
+      <div class="verdict-strip-head">
+        <h2 class="verdict-strip-title">Live Playbook Verdict Strip</h2>
+        <p class="verdict-strip-sub">Computed directly from your inputs below</p>
+      </div>
+      <div class="verdict-grid">
+        <div class="verdict-card">
+          <span class="verdict-label">Asked discount — approved by</span>
+          <strong class="verdict-value" id="vs-asked-approver">Pricing Approval</strong>
+          <span class="verdict-sub" id="vs-asked-meta">Band 3 at 25.00% asked</span>
+        </div>
+        <div class="verdict-card is-pass" id="vs-renewal-card">
+          <span class="verdict-label">Renewal check</span>
+          <strong class="verdict-value" id="vs-renewal-verdict">CLEARS — renewal grows</strong>
+          <span class="verdict-sub" id="vs-renewal-delta">+$5,000.00 (+5.00%)</span>
+        </div>
+        <div class="verdict-card">
+          <span class="verdict-label">Deepest growing discount</span>
+          <strong class="verdict-value" id="vs-deepest-pct">28.57%</strong>
+          <span class="verdict-sub" id="vs-deepest-approver">Counter-play: Pricing Approval</span>
+        </div>
+        <div class="verdict-card">
+          <span class="verdict-label">Commit — effective discount</span>
+          <strong class="verdict-value" id="vs-commit-eff">14.29%</strong>
+          <span class="verdict-sub" id="vs-commit-unused">$750.00/mo paid, never used</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- PRESETS & DIRECTIONS -->
+    <section class="section-block" aria-labelledby="heading-directions">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-directions">How to run this playbook</h2>
+        <p class="section-subtitle">Shared live matrix · 25 workbook formulas</p>
+      </div>
+      <p class="directions-box">
+        Start on the Discount Matrix: the thresholds and approver names are inputs, so re-tier it and every route in the workbook moves; set a discount in the Route-a-discount block and the matrix names its approver. The Renewal Check takes the current TCV, the renewal's list value, and the discount being asked: it returns the renewal TCV, the verdict under the ratchet rule, and the deepest discount that would still grow the renewal — with the approver for that counter-play read back through the matrix. The Commit &amp; Usage section sizes a spend-based commitment against expected usage: what the commitment covers, what bills at full price, what you pay, what you save, the effective discount, and the commitment dollars paid and never used.
+      </p>
+
+      <div class="preset-panel" aria-label="Boundary Case Presets and Reset">
+        <div class="preset-header">
+          <h3 class="preset-title">One-tap scenario presets &amp; boundary cases</h3>
+          <span class="preset-status" id="preset-status">Active state: Sample Data (Defaults)</span>
+        </div>
+        <div class="preset-grid">
+          <button type="button" class="preset-btn is-reset is-active" data-preset="default">Reset to Sample Data</button>
+          <button type="button" class="preset-btn" data-preset="band-edges">1. Band Edges (35.01% ask)</button>
+          <button type="button" class="preset-btn" data-preset="blocked-renewal">2. Blocked Renewal (30% ask)</button>
+          <button type="button" class="preset-btn" data-preset="retier-matrix">3. Re-Tier Matrix (Band 2 → 15%, 18% ask)</button>
+          <button type="button" class="preset-btn" data-preset="overage-no-waste">4. Overage &amp; No Waste ($10k usage)</button>
+          <button type="button" class="preset-btn" data-preset="full-discount-guard">5. Full-Discount Guard (100% commit)</button>
+          <button type="button" class="preset-btn" data-preset="zero-current-tcv">6. Zero Current TCV ($0)</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 01: DISCOUNT MATRIX -->
+    <section class="section-block" id="section-matrix" aria-labelledby="heading-matrix">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-matrix">01 · Discount Matrix (Governance)</h2>
+        <p class="section-subtitle">Editable thresholds &amp; approver names · drives every route</p>
+      </div>
+      <p class="tab-rule-note">
+        SAMPLE DATA — every threshold, approver name and figure in this workbook is a generic sample value. The matrix below is editable: re-tier it and every route in this workbook moves.
+      </p>
+
+      <div class="matrix-layout">
+        <div class="panel-card">
+          <h3 class="panel-title">Approval Band Matrix</h3>
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th scope="col">Band</th>
+                <th scope="col">Discount from</th>
+                <th scope="col">Discount to (Input)</th>
+                <th scope="col">Approved by (Input)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr id="band-row-1">
+                <td class="band-name-cell" data-label="Band">Band 1 <span class="band-tag" id="band-tag-1">Active</span></td>
+                <td class="computed-cell" data-label="Discount from">0.00% <small>Fixed floor</small></td>
+                <td data-label="Discount to (%)">
+                  <div class="input-wrap">
+                    <input type="number" step="0.01" class="wb-input" id="in-b1-to" value="10" aria-label="Band 1 Discount to percentage">
+                    <span class="input-affix is-suffix">%</span>
+                  </div>
+                </td>
+                <td data-label="Approved by">
+                  <div class="input-wrap">
+                    <input type="text" class="wb-input is-text" id="in-b1-app" value="Sales" aria-label="Band 1 Approved by">
+                  </div>
+                </td>
+              </tr>
+              <tr id="band-row-2">
+                <td class="band-name-cell" data-label="Band">Band 2 <span class="band-tag" id="band-tag-2">Active</span></td>
+                <td class="computed-cell" data-label="Discount from" id="out-b2-from">10.00% <small>= Band 1 to</small></td>
+                <td data-label="Discount to (%)">
+                  <div class="input-wrap">
+                    <input type="number" step="0.01" class="wb-input" id="in-b2-to" value="20" aria-label="Band 2 Discount to percentage">
+                    <span class="input-affix is-suffix">%</span>
+                  </div>
+                </td>
+                <td data-label="Approved by">
+                  <div class="input-wrap">
+                    <input type="text" class="wb-input is-text" id="in-b2-app" value="Sales Manager" aria-label="Band 2 Approved by">
+                  </div>
+                </td>
+              </tr>
+              <tr id="band-row-3" class="is-active-band">
+                <td class="band-name-cell" data-label="Band">Band 3 <span class="band-tag" id="band-tag-3">Active</span></td>
+                <td class="computed-cell" data-label="Discount from" id="out-b3-from">20.00% <small>= Band 2 to</small></td>
+                <td data-label="Discount to (%)">
+                  <div class="input-wrap">
+                    <input type="number" step="0.01" class="wb-input" id="in-b3-to" value="35" aria-label="Band 3 Discount to percentage">
+                    <span class="input-affix is-suffix">%</span>
+                  </div>
+                </td>
+                <td data-label="Approved by">
+                  <div class="input-wrap">
+                    <input type="text" class="wb-input is-text" id="in-b3-app" value="Pricing Approval" aria-label="Band 3 Approved by">
+                  </div>
+                </td>
+              </tr>
+              <tr id="band-row-4">
+                <td class="band-name-cell" data-label="Band">Band 4 <span class="band-tag" id="band-tag-4">Active</span></td>
+                <td class="computed-cell" data-label="Discount from" id="out-b4-from">35.00% <small>= Band 3 to</small></td>
+                <td data-label="Discount to (%)">
+                  <div class="input-wrap">
+                    <input type="number" step="0.01" class="wb-input" id="in-b4-to" value="100" aria-label="Band 4 Discount to percentage">
+                    <span class="input-affix is-suffix">%</span>
+                  </div>
+                </td>
+                <td data-label="Approved by">
+                  <div class="input-wrap">
+                    <input type="text" class="wb-input is-text" id="in-b4-app" value="Pricing + Executive Review" aria-label="Band 4 Approved by">
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel-card is-brass">
+          <h3 class="panel-title">Route a Discount</h3>
+          <div class="field-group">
+            <label class="field-label" for="in-matrix-asked">Discount asked (%)</label>
+            <div class="input-wrap">
+              <input type="number" step="0.01" class="wb-input" id="in-matrix-asked" value="25">
+              <span class="input-affix is-suffix">%</span>
+            </div>
+            <p class="field-hint">Routes to the first band where Discount asked &le; Discount to.</p>
+          </div>
+
+          <div class="edge-chips" role="group" aria-label="Test band edge discounts">
+            <span class="edge-chips-label">Test edges:</span>
+            <button type="button" class="chip-btn" data-edge="10">10%</button>
+            <button type="button" class="chip-btn" data-edge="18">18%</button>
+            <button type="button" class="chip-btn" data-edge="25">25%</button>
+            <button type="button" class="chip-btn" data-edge="35">35%</button>
+            <button type="button" class="chip-btn" data-edge="35.01">35.01%</button>
+          </div>
+
+          <div class="route-result-box" aria-live="polite">
+            <div class="metric-pair">
+              <span class="metric-pair-label">Routed band</span>
+              <strong class="metric-pair-val" id="out-matrix-band">Band 3</strong>
+            </div>
+            <div class="metric-pair">
+              <span class="metric-pair-label">Approved by</span>
+              <strong class="metric-pair-val" id="out-matrix-approver">Pricing Approval</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 02: RENEWAL CHECK -->
+    <section class="section-block" id="section-renewal" aria-labelledby="heading-renewal">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-renewal">02 · Renewal Check (The TCV Ratchet)</h2>
+        <p class="section-subtitle">Gate &amp; counter-play pricing · routed through the matrix above</p>
+      </div>
+      <p class="tab-rule-note">
+        The rule: the renewal comes back bigger than the current term. A discount that shrinks the renewal does not clear — the sheet works out the deepest discount that still grows it, and who would have to approve that instead.
+      </p>
+
+      <div class="split-grid">
+        <div class="panel-card">
+          <h3 class="panel-title">Renewal Inputs</h3>
+          <div class="inputs-stack">
+            <div class="field-group">
+              <label class="field-label" for="in-ren-current">Current TCV ($)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="100" min="0" class="wb-input" id="in-ren-current" value="100000">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-ren-list">Renewal list value ($)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="100" min="0" class="wb-input" id="in-ren-list" value="140000">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-ren-asked">Discount asked (%)</label>
+              <div class="input-wrap">
+                <input type="number" step="0.01" class="wb-input" id="in-ren-asked" value="25">
+                <span class="input-affix is-suffix">%</span>
+              </div>
+              <p class="field-hint">Evaluated against Current TCV and routed through Section 01.</p>
+            </div>
+            <button type="button" class="btn-secondary" id="btn-apply-counterplay">Apply deepest growing discount (28.57%)</button>
+          </div>
+        </div>
+
+        <div class="panel-card is-brass" aria-live="polite">
+          <div class="verdict-banner is-pass" id="ren-verdict-banner">
+            <div>
+              <p class="verdict-banner-text" id="out-ren-verdict">CLEARS — renewal grows</p>
+              <p class="verdict-banner-sub" id="out-ren-ceiling-note">Asked 25.00% vs. 28.57% ceiling — 3.57% headroom remaining</p>
+            </div>
+          </div>
+
+          <table class="output-table">
+            <tbody>
+              <tr class="is-emphasis">
+                <th scope="row">Renewal TCV ($)</th>
+                <td id="out-ren-tcv">$105,000.00</td>
+              </tr>
+              <tr>
+                <th scope="row">Growth ($)</th>
+                <td id="out-ren-growth-usd" class="is-pos">+$5,000.00</td>
+              </tr>
+              <tr>
+                <th scope="row">Growth (%)</th>
+                <td id="out-ren-growth-pct" class="is-pos">+5.00%</td>
+              </tr>
+              <tr class="is-emphasis">
+                <th scope="row">Deepest discount that still grows the renewal</th>
+                <td id="out-ren-deepest">28.57%</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="routing-pair-grid">
+            <div class="routing-card">
+              <span class="routing-card-label">Asked discount — approved by</span>
+              <strong class="routing-card-approver" id="out-ren-asked-app">Pricing Approval</strong>
+              <span class="routing-card-meta" id="out-ren-asked-band">Band 3 at 25.00% asked</span>
+            </div>
+            <div class="routing-card is-counter">
+              <span class="routing-card-label">Counter-play — approved by</span>
+              <strong class="routing-card-approver" id="out-ren-deep-app">Pricing Approval</strong>
+              <span class="routing-card-meta" id="out-ren-deep-band">Band 3 at 28.57% deepest</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 03: COMMIT & USAGE -->
+    <section class="section-block" id="section-commit" aria-labelledby="heading-commit">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-commit">03 · Commit &amp; Usage (Spend-Based Commit)</h2>
+        <p class="section-subtitle">Simplified sample model · coverage, overage &amp; unused waste</p>
+      </div>
+      <p class="tab-rule-note">
+        Simplified sample mechanics: you commit to a monthly amount; the commit discount applies to the usage that commitment covers; usage above the covered amount bills at full price; commitment you never use is still paid.
+      </p>
+
+      <div class="split-grid">
+        <div class="panel-card">
+          <h3 class="panel-title">Commit Inputs</h3>
+          <div class="inputs-stack">
+            <div class="field-group">
+              <label class="field-label" for="in-com-usage">Expected usage at list ($ / month)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="100" min="0" class="wb-input" id="in-com-usage" value="7000">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-com-commit">Monthly commitment ($)</label>
+              <div class="input-wrap">
+                <span class="input-affix">$</span>
+                <input type="number" step="100" min="0" class="wb-input" id="in-com-commit" value="6000">
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-com-disc">Commit discount (%)</label>
+              <div class="input-wrap">
+                <input type="number" step="0.01" min="0" max="100" class="wb-input" id="in-com-disc" value="25">
+                <span class="input-affix is-suffix">%</span>
+              </div>
+              <p class="field-hint">At 100% discount, the workbook guard returns $0.00 covered.</p>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="in-com-term">Term (months)</label>
+              <div class="input-wrap">
+                <input type="number" step="1" min="0" class="wb-input" id="in-com-term" value="12">
+                <span class="input-affix is-suffix">mo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-card is-brass" aria-live="polite">
+          <h3 class="panel-title">Monthly &amp; Term Economics</h3>
+          <table class="output-table">
+            <tbody>
+              <tr>
+                <th scope="row">List value the commitment covers ($)</th>
+                <td id="out-com-covers">$8,000.00</td>
+              </tr>
+              <tr>
+                <th scope="row">Usage covered by the commitment ($)</th>
+                <td id="out-com-covered">$7,000.00</td>
+              </tr>
+              <tr>
+                <th scope="row">Overage billed at full price ($)</th>
+                <td id="out-com-overage">$0.00</td>
+              </tr>
+              <tr class="is-emphasis">
+                <th scope="row">You pay per month ($)</th>
+                <td id="out-com-pay">$6,000.00</td>
+              </tr>
+              <tr>
+                <th scope="row">On-demand cost per month ($)</th>
+                <td id="out-com-ondemand">$7,000.00</td>
+              </tr>
+              <tr>
+                <th scope="row">Savings per month ($)</th>
+                <td id="out-com-savings" class="is-pos">$1,000.00</td>
+              </tr>
+              <tr class="is-emphasis">
+                <th scope="row">Effective discount</th>
+                <td id="out-com-eff">14.29%</td>
+              </tr>
+              <tr>
+                <th scope="row">Commitment actually used ($)</th>
+                <td id="out-com-used">$5,250.00</td>
+              </tr>
+              <tr class="is-waste" id="row-com-unused">
+                <th scope="row">Unused commitment — paid, never used ($)</th>
+                <td id="out-com-unused">$750.00</td>
+              </tr>
+              <tr class="is-emphasis">
+                <th scope="row">You pay over the term ($)</th>
+                <td id="out-com-term-pay">$72,000.00</td>
+              </tr>
+              <tr>
+                <th scope="row">Savings over the term ($)</th>
+                <td id="out-com-term-savings" class="is-pos">$12,000.00</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="alloc-block" aria-label="Commitment and Usage Breakdown">
+            <div>
+              <div class="alloc-row-head">
+                <span>Usage mix (Covered vs. Overage)</span>
+                <span id="alloc-usage-label">$7,000.00 covered / $0.00 overage</span>
+              </div>
+              <div class="alloc-bar">
+                <div class="alloc-seg-covered" id="bar-covered" style="width: 100%;"></div>
+                <div class="alloc-seg-overage" id="bar-overage" style="width: 0%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="alloc-row-head">
+                <span>Commitment utilization (Used vs. Paid Waste)</span>
+                <span id="alloc-commit-label">$5,250.00 used / $750.00 unused</span>
+              </div>
+              <div class="alloc-bar">
+                <div class="alloc-seg-used" id="bar-used" style="width: 87.5%;"></div>
+                <div class="alloc-seg-waste" id="bar-waste" style="width: 12.5%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLAYBOOK BRIEF -->
+    <section class="section-block" id="section-brief" aria-labelledby="heading-brief">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-brief">Playbook Brief</h2>
+        <p class="section-subtitle">Live plain-text summary of your current tiers, renewal gate &amp; commit math</p>
+      </div>
+      <div class="brief-panel">
+        <div class="brief-toolbar">
+          <button type="button" class="btn-primary" id="btn-copy-brief">Copy Playbook Brief</button>
+          <span class="copy-status" id="brief-copy-status" aria-live="polite"></span>
+        </div>
+        <pre class="brief-pre" id="playbook-brief-pre" tabindex="0" aria-label="Copyable Cloud Commit and Usage Playbook Brief"></pre>
+      </div>
+    </section>
+
+    <!-- EXPLAINER & INPUTS / LOGIC / LIMITS -->
+    <section class="section-block" id="section-explainer" aria-labelledby="heading-provenance">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-provenance">Where this playbook comes from</h2>
+        <p class="section-subtitle">Build provenance, design choices &amp; operating boundaries</p>
+      </div>
+
+      <div class="two-col-grid">
+        <article class="card-box">
+          <h3>Original sample &amp; deliberate choices</h3>
+          <p>
+            This workbook is an original sample, built in November 2026 for this site. Its structure follows how enterprise cloud deal desks actually organize their playbooks — the pattern that falls out of the real thing: the approval rules sit in front of the plays, not inside them; the standard path is short and the exceptions carry the weight; and every play ends in a routing line, a named owner for the next step, rather than an explanation. The commit mechanics are the public ones — committed-use discounts are documented openly by the cloud providers (Google Cloud's published CUD documentation is the reference here) and by practitioner bodies like the FinOps Foundation. No internal system, codename, real threshold, figure or SKU from any company is carried over; every number on this page is a generic sample value.
+          </p>
+          <p>
+            Three choices in the build are deliberate. First, the matrix is the input: on most sites a discount matrix is a screenshot, and a screenshot cannot be argued with — here a visitor can re-tier it and watch the routes change, which is what a matrix is for. Second, the ratchet computes its own counter-play: a blocked renewal does not just say no, it prices the deepest discount that still grows the TCV and names who would approve it, which turns a refusal into a negotiation position. Third, the waste line: commitment tools usually show coverage and savings and stop; this one also shows the commitment dollars paid and never used, because that is the number that decides whether the commit was sized right.
+          </p>
+        </article>
+
+        <article class="card-box is-brass-top">
+          <h3>Inputs, logic, limits</h3>
+          <p>
+            Inputs: the matrix's band thresholds and approver names, the discount asked, the current TCV and renewal list value, and the commit block (expected usage at list, the monthly commitment, the commit discount, the term in months). Logic: the band chain and the nested-IF routing are the workbook's own formulas; the ratchet verdict compares the discounted renewal TCV against the current TCV, and the counter-play discount is the exact depth at which the two are equal, capped at zero; the commit tab covers usage up to the list value the commitment buys at its discount, bills the rest at full price, and counts any commitment left unused as paid waste. Limits, stated plainly: the thresholds and approvers are generic sample values — every real company's matrix is its own; the commit mechanics are a simplified sample of spend-based committed-use discounts, not any provider's actual program terms; and nothing here is pricing or legal advice — it is a working sample of how the decisions get sequenced.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- RELATED LINKS -->
+    <section class="section-block" aria-labelledby="heading-related">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-related">Related Pricing Engines &amp; Proof of Work</h2>
+        <p class="section-subtitle">Neighboring commercial models and deal-desk calculators</p>
+      </div>
+
+      <div class="related-grid">
+        <div class="related-card">
+          <span class="related-card-eyebrow">Hub</span>
+          <a href="../../tools/">Proof of Work Hub</a>
+          <p>All live commercial models, pricing engines, contract trackers, and decision tools.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Partition</span>
+          <a href="../../tools/pricing-engines/">Pricing Engines Partition</a>
+          <p>Deal pricing models, SaaS conversions, and commitment calculators built for live negotiation.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 1 · Pricing Engines</span>
+          <a href="../deal-pricing-solver/">Tool 1: Deal Pricing Solver</a>
+          <p>Solve for target margin, blended discount, and multi-year deal economics across line items.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 2 · Pricing Engines</span>
+          <a href="../perpetual-to-saas-conversion/">Tool 2: Perpetual-to-SaaS Conversion</a>
+          <p>Model license-plus-maintenance transitions into recurring SaaS pricing with payback windows.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 3 · Pricing Engines</span>
+          <a href="../perm-calculator/">Tool 3: Perm Calculator</a>
+          <p>Evaluate permanent license pricing, annual support streams, and cumulative contract value.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h2 class="footer-heading">Fractional Deal Desk &amp; Contract Management</h2>
+          <p style="margin: 0; color: #CBD5E1; line-height: 1.5;">
+            Commercial contracts, deal desk architecture, and revenue operations controls. 15+ years of operating experience across contracts up to $300M and 3,000+ SKUs under management.
+          </p>
+        </div>
+        <div>
+          <h2 class="footer-heading">Proof of Work &amp; Pricing Engines</h2>
+          <ul class="footer-links">
+            <li><a href="../../tools/">Proof of Work Hub</a></li>
+            <li><a href="../../tools/pricing-engines/">Pricing Engines Partition</a></li>
+            <li><a href="../deal-pricing-solver/">Tool 1: Deal Pricing Solver</a></li>
+            <li><a href="../perpetual-to-saas-conversion/">Tool 2: Perpetual-to-SaaS Conversion</a></li>
+            <li><a href="../perm-calculator/">Tool 3: Perm Calculator</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="footer-heading">Practice Information</h2>
+          <ul class="footer-links">
+            <li><a href="../../">Home</a></li>
+            <li><a href="../../services/">Practice &amp; Mandate Scope</a></li>
+            <li><a href="../../about/">Operator Record</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>Tool 14 · Cloud Commit &amp; Usage Playbook (S6-P01.d)</span>
+        <span>Original sample workbook model. Not pricing or legal advice.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var DEFAULTS = {
+        b1To: 0.10, b1App: "Sales",
+        b2To: 0.20, b2App: "Sales Manager",
+        b3To: 0.35, b3App: "Pricing Approval",
+        b4To: 1.00, b4App: "Pricing + Executive Review",
+        matrixAsked: 0.25,
+        renCurrent: 100000,
+        renList: 140000,
+        renAsked: 0.25,
+        comUsage: 7000,
+        comCommit: 6000,
+        comDisc: 0.25,
+        comTerm: 12
+      };
+
+      /* ---------------- Pure Workbook Engine ---------------- */
+      function cmpLe(a, b) {
+        return Math.round(a * 1e12) <= Math.round(b * 1e12);
+      }
+
+      function routeThroughMatrix(discount, m) {
+        var band = cmpLe(discount, m.b1To) ? 1
+          : cmpLe(discount, m.b2To) ? 2
+          : cmpLe(discount, m.b3To) ? 3
+          : 4;
+        var approvers = [m.b1App, m.b2App, m.b3App, m.b4App];
+        var rawApp = approvers[band - 1];
+        return {
+          band: band,
+          approver: rawApp && String(rawApp).trim() !== "" ? String(rawApp).trim() : "— (unassigned)"
+        };
+      }
+
+      function evaluatePlaybook(state) {
+        var matrix = {
+          b1From: 0,
+          b1To: state.b1To,
+          b1App: state.b1App,
+          b2From: state.b1To,
+          b2To: state.b2To,
+          b2App: state.b2App,
+          b3From: state.b2To,
+          b3To: state.b3To,
+          b3App: state.b3App,
+          b4From: state.b3To,
+          b4To: state.b4To,
+          b4App: state.b4App
+        };
+
+        var matrixRoute = routeThroughMatrix(state.matrixAsked, matrix);
+
+        /* Renewal Check formulas (Sheet 2) */
+        var renTcv = state.renList * (1 - state.renAsked);
+        var growthUsd = renTcv - state.renCurrent;
+        var growthPct = state.renCurrent === 0 ? 0 : (renTcv / state.renCurrent) - 1;
+        var clears = Math.round(renTcv * 1e9) >= Math.round(state.renCurrent * 1e9);
+        var verdict = clears ? "CLEARS — renewal grows" : "BLOCKED — renewal shrinks";
+        var deepest = state.renList <= 0 ? 0 : Math.max(0, 1 - (state.renCurrent / state.renList));
+        var renAskedRoute = routeThroughMatrix(state.renAsked, matrix);
+        var renDeepRoute = routeThroughMatrix(deepest, matrix);
+
+        /* Commit & Usage formulas (Sheet 3) */
+        var covers = state.comDisc < 1 ? state.comCommit / (1 - state.comDisc) : 0;
+        var covered = Math.min(state.comUsage, covers);
+        var overage = state.comUsage - covered;
+        var payMonth = state.comCommit + overage;
+        var onDemand = state.comUsage;
+        var savingsMonth = onDemand - payMonth;
+        var effDisc = state.comUsage <= 0 ? 0 : savingsMonth / state.comUsage;
+        var usedCommit = Math.min(state.comCommit, state.comUsage * (1 - state.comDisc));
+        var unusedCommit = state.comCommit - usedCommit;
+        var termPay = payMonth * state.comTerm;
+        var termSavings = savingsMonth * state.comTerm;
+
+        return {
+          matrix: matrix,
+          matrixRoute: matrixRoute,
+          renewal: {
+            tcv: renTcv,
+            growthUsd: growthUsd,
+            growthPct: growthPct,
+            clears: clears,
+            verdict: verdict,
+            deepest: deepest,
+            askedRoute: renAskedRoute,
+            deepRoute: renDeepRoute
+          },
+          commit: {
+            covers: covers,
+            covered: covered,
+            overage: overage,
+            payMonth: payMonth,
+            onDemand: onDemand,
+            savingsMonth: savingsMonth,
+            effDisc: effDisc,
+            usedCommit: usedCommit,
+            unusedCommit: unusedCommit,
+            termPay: termPay,
+            termSavings: termSavings
+          }
+        };
+      }
+
+      /* ---------------- Formatters ---------------- */
+      function fmtMoney(n, signed) {
+        var val = Number.isFinite(n) ? n : 0;
+        if (Math.abs(val) < 0.005) val = 0;
+        var absStr = "$" + Math.abs(val).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+        if (val < 0) return "-" + absStr;
+        if (signed && val > 0) return "+" + absStr;
+        return absStr;
+      }
+
+      function fmtPct(n, signed) {
+        var val = Number.isFinite(n) ? n * 100 : 0;
+        if (Math.abs(val) < 0.005) val = 0;
+        var absStr = Math.abs(val).toFixed(2) + "%";
+        if (val < 0) return "-" + absStr;
+        if (signed && val > 0) return "+" + absStr;
+        return absStr;
+      }
+
+      /* ---------------- DOM References ---------------- */
+      var els = {
+        b1To: document.getElementById("in-b1-to"),
+        b1App: document.getElementById("in-b1-app"),
+        b2To: document.getElementById("in-b2-to"),
+        b2App: document.getElementById("in-b2-app"),
+        b3To: document.getElementById("in-b3-to"),
+        b3App: document.getElementById("in-b3-app"),
+        b4To: document.getElementById("in-b4-to"),
+        b4App: document.getElementById("in-b4-app"),
+        matrixAsked: document.getElementById("in-matrix-asked"),
+        renCurrent: document.getElementById("in-ren-current"),
+        renList: document.getElementById("in-ren-list"),
+        renAsked: document.getElementById("in-ren-asked"),
+        comUsage: document.getElementById("in-com-usage"),
+        comCommit: document.getElementById("in-com-commit"),
+        comDisc: document.getElementById("in-com-disc"),
+        comTerm: document.getElementById("in-com-term")
+      };
+
+      function readNum(el) {
+        var raw = el.value.trim();
+        if (raw === "") return 0;
+        var parsed = parseFloat(raw);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+
+      function readStateFromDom() {
+        return {
+          b1To: readNum(els.b1To) / 100,
+          b1App: els.b1App.value,
+          b2To: readNum(els.b2To) / 100,
+          b2App: els.b2App.value,
+          b3To: readNum(els.b3To) / 100,
+          b3App: els.b3App.value,
+          b4To: readNum(els.b4To) / 100,
+          b4App: els.b4App.value,
+          matrixAsked: readNum(els.matrixAsked) / 100,
+          renCurrent: readNum(els.renCurrent),
+          renList: readNum(els.renList),
+          renAsked: readNum(els.renAsked) / 100,
+          comUsage: readNum(els.comUsage),
+          comCommit: readNum(els.comCommit),
+          comDisc: readNum(els.comDisc) / 100,
+          comTerm: readNum(els.comTerm)
+        };
+      }
+
+      function writeStateToDom(s) {
+        els.b1To.value = (s.b1To * 100).toString();
+        els.b1App.value = s.b1App;
+        els.b2To.value = (s.b2To * 100).toString();
+        els.b2App.value = s.b2App;
+        els.b3To.value = (s.b3To * 100).toString();
+        els.b3App.value = s.b3App;
+        els.b4To.value = (s.b4To * 100).toString();
+        els.b4App.value = s.b4App;
+        els.matrixAsked.value = (s.matrixAsked * 100).toString();
+        els.renCurrent.value = s.renCurrent.toString();
+        els.renList.value = s.renList.toString();
+        els.renAsked.value = (s.renAsked * 100).toString();
+        els.comUsage.value = s.comUsage.toString();
+        els.comCommit.value = s.comCommit.toString();
+        els.comDisc.value = (s.comDisc * 100).toString();
+        els.comTerm.value = s.comTerm.toString();
+      }
+
+      function buildBrief(state, out) {
+        var m = out.matrix;
+        var r = out.renewal;
+        var c = out.commit;
+        var lines = [];
+        lines.push("CLOUD COMMIT & USAGE PLAYBOOK — LIVE BRIEF (SAMPLE MODEL)");
+        lines.push("==========================================================");
+        lines.push("HEADLINE ANSWERS");
+        lines.push("- Asked discount (" + fmtPct(state.matrixAsked, false) + ") — approved by: " + out.matrixRoute.approver + " (Band " + out.matrixRoute.band + ")");
+        lines.push("- Renewal check: " + r.verdict + " (" + fmtMoney(r.growthUsd, true) + " / " + fmtPct(r.growthPct, true) + ")");
+        lines.push("- Deepest discount that still grows renewal: " + fmtPct(r.deepest, false) + " -> Counter-play approver: " + r.deepRoute.approver + " (Band " + r.deepRoute.band + ")");
+        lines.push("- Commit effective discount: " + fmtPct(c.effDisc, false) + " | Unused commitment: " + fmtMoney(c.unusedCommit, false) + "/mo");
+        lines.push("");
+        lines.push("01 · DISCOUNT MATRIX (CURRENT TIERS)");
+        lines.push("- Band 1: 0.00% to " + fmtPct(m.b1To, false) + " -> " + (m.b1App.trim() || "—"));
+        lines.push("- Band 2: " + fmtPct(m.b2From, false) + " to " + fmtPct(m.b2To, false) + " -> " + (m.b2App.trim() || "—"));
+        lines.push("- Band 3: " + fmtPct(m.b3From, false) + " to " + fmtPct(m.b3To, false) + " -> " + (m.b3App.trim() || "—"));
+        lines.push("- Band 4: " + fmtPct(m.b4From, false) + " to " + fmtPct(m.b4To, false) + " -> " + (m.b4App.trim() || "—"));
+        lines.push("");
+        lines.push("02 · RENEWAL CHECK (TCV RATCHET)");
+        lines.push("- Current TCV: " + fmtMoney(state.renCurrent, false) + " | Renewal list: " + fmtMoney(state.renList, false) + " | Discount asked: " + fmtPct(state.renAsked, false));
+        lines.push("- Renewal TCV: " + fmtMoney(r.tcv, false) + " | Growth: " + fmtMoney(r.growthUsd, true) + " (" + fmtPct(r.growthPct, true) + ")");
+        lines.push("- Verdict: " + r.verdict);
+        lines.push("- Asked approver: " + r.askedRoute.approver + " (Band " + r.askedRoute.band + ")");
+        lines.push("- Deepest growing discount: " + fmtPct(r.deepest, false) + " -> Counter-play approver: " + r.deepRoute.approver + " (Band " + r.deepRoute.band + ")");
+        lines.push("");
+        lines.push("03 · COMMIT & USAGE (" + state.comTerm + "-MONTH TERM)");
+        lines.push("- Expected usage: " + fmtMoney(state.comUsage, false) + "/mo | Monthly commit: " + fmtMoney(state.comCommit, false) + " | Commit discount: " + fmtPct(state.comDisc, false));
+        lines.push("- Covers: " + fmtMoney(c.covers, false) + " | Covered: " + fmtMoney(c.covered, false) + " | Overage: " + fmtMoney(c.overage, false));
+        lines.push("- You pay/mo: " + fmtMoney(c.payMonth, false) + " | On-demand/mo: " + fmtMoney(c.onDemand, false) + " | Savings/mo: " + fmtMoney(c.savingsMonth, false) + " (" + fmtPct(c.effDisc, false) + " effective)");
+        lines.push("- Commitment used: " + fmtMoney(c.usedCommit, false) + "/mo | Unused (paid, never used): " + fmtMoney(c.unusedCommit, false) + "/mo");
+        lines.push("- Term pay: " + fmtMoney(c.termPay, false) + " | Term savings: " + fmtMoney(c.termSavings, false));
+        return lines.join("\n");
+      }
+
+      function render() {
+        var state = readStateFromDom();
+        var out = evaluatePlaybook(state);
+        var m = out.matrix;
+        var r = out.renewal;
+        var c = out.commit;
+
+        /* Verdict Strip */
+        document.getElementById("vs-asked-approver").textContent = out.matrixRoute.approver;
+        document.getElementById("vs-asked-meta").textContent = "Band " + out.matrixRoute.band + " at " + fmtPct(state.matrixAsked, false) + " asked";
+
+        var renCard = document.getElementById("vs-renewal-card");
+        renCard.className = "verdict-card " + (r.clears ? "is-pass" : "is-fail");
+        document.getElementById("vs-renewal-verdict").textContent = r.verdict;
+        document.getElementById("vs-renewal-delta").textContent = fmtMoney(r.growthUsd, true) + " (" + fmtPct(r.growthPct, true) + ")";
+
+        document.getElementById("vs-deepest-pct").textContent = fmtPct(r.deepest, false);
+        document.getElementById("vs-deepest-approver").textContent = "Counter-play: " + r.deepRoute.approver;
+
+        document.getElementById("vs-commit-eff").textContent = fmtPct(c.effDisc, false);
+        document.getElementById("vs-commit-unused").textContent = fmtMoney(c.unusedCommit, false) + "/mo paid, never used";
+
+        /* Section 01: Matrix Table & Route */
+        document.getElementById("out-b2-from").innerHTML = fmtPct(m.b2From, false) + " <small>= Band 1 to</small>";
+        document.getElementById("out-b3-from").innerHTML = fmtPct(m.b3From, false) + " <small>= Band 2 to</small>";
+        document.getElementById("out-b4-from").innerHTML = fmtPct(m.b4From, false) + " <small>= Band 3 to</small>";
+
+        for (var b = 1; b <= 4; b++) {
+          var row = document.getElementById("band-row-" + b);
+          var tag = document.getElementById("band-tag-" + b);
+          var active = b === out.matrixRoute.band;
+          row.className = active ? "is-active-band" : "";
+          tag.style.visibility = active ? "visible" : "hidden";
+        }
+        document.getElementById("out-matrix-band").textContent = "Band " + out.matrixRoute.band;
+        document.getElementById("out-matrix-approver").textContent = out.matrixRoute.approver;
+
+        /* Section 02: Renewal Check */
+        var banner = document.getElementById("ren-verdict-banner");
+        banner.className = "verdict-banner " + (r.clears ? "is-pass" : "is-fail");
+        document.getElementById("out-ren-verdict").textContent = r.verdict;
+
+        var diffPct = r.deepest - state.renAsked;
+        var ceilingMsg = state.renList <= 0
+          ? "Renewal list value is $0.00 — deepest growing discount defaults to 0.00%."
+          : (diffPct >= -1e-9
+              ? "Asked " + fmtPct(state.renAsked, false) + " vs. " + fmtPct(r.deepest, false) + " ceiling — " + fmtPct(Math.max(0, diffPct), false) + " headroom remaining"
+              : "Asked " + fmtPct(state.renAsked, false) + " vs. " + fmtPct(r.deepest, false) + " ceiling — exceeds ratchet by " + fmtPct(Math.abs(diffPct), false));
+        document.getElementById("out-ren-ceiling-note").textContent = ceilingMsg;
+
+        document.getElementById("out-ren-tcv").textContent = fmtMoney(r.tcv, false);
+        var gUsdEl = document.getElementById("out-ren-growth-usd");
+        gUsdEl.textContent = fmtMoney(r.growthUsd, true);
+        gUsdEl.className = r.growthUsd < 0 ? "is-neg" : "is-pos";
+
+        var gPctEl = document.getElementById("out-ren-growth-pct");
+        gPctEl.textContent = fmtPct(r.growthPct, true);
+        gPctEl.className = r.growthPct < 0 ? "is-neg" : "is-pos";
+
+        document.getElementById("out-ren-deepest").textContent = fmtPct(r.deepest, false);
+        document.getElementById("out-ren-asked-app").textContent = r.askedRoute.approver;
+        document.getElementById("out-ren-asked-band").textContent = "Band " + r.askedRoute.band + " at " + fmtPct(state.renAsked, false) + " asked";
+        document.getElementById("out-ren-deep-app").textContent = r.deepRoute.approver;
+        document.getElementById("out-ren-deep-band").textContent = "Band " + r.deepRoute.band + " at " + fmtPct(r.deepest, false) + " deepest";
+
+        var applyBtn = document.getElementById("btn-apply-counterplay");
+        applyBtn.textContent = "Apply deepest growing discount (" + fmtPct(r.deepest, false) + ")";
+        applyBtn.dataset.deepestPct = (r.deepest * 100).toFixed(6);
+
+        /* Section 03: Commit & Usage */
+        document.getElementById("out-com-covers").textContent = fmtMoney(c.covers, false);
+        document.getElementById("out-com-covered").textContent = fmtMoney(c.covered, false);
+        document.getElementById("out-com-overage").textContent = fmtMoney(c.overage, false);
+        document.getElementById("out-com-pay").textContent = fmtMoney(c.payMonth, false);
+        document.getElementById("out-com-ondemand").textContent = fmtMoney(c.onDemand, false);
+
+        var savEl = document.getElementById("out-com-savings");
+        savEl.textContent = fmtMoney(c.savingsMonth, false);
+        savEl.className = c.savingsMonth < 0 ? "is-neg" : "is-pos";
+
+        var effEl = document.getElementById("out-com-eff");
+        effEl.textContent = fmtPct(c.effDisc, false);
+        effEl.className = c.effDisc < 0 ? "is-neg" : "";
+
+        document.getElementById("out-com-used").textContent = fmtMoney(c.usedCommit, false);
+        document.getElementById("out-com-unused").textContent = fmtMoney(c.unusedCommit, false);
+        document.getElementById("row-com-unused").className = "is-waste" + (Math.abs(c.unusedCommit) < 0.005 ? " is-zero" : "");
+
+        document.getElementById("out-com-term-pay").textContent = fmtMoney(c.termPay, false);
+        var termSavEl = document.getElementById("out-com-term-savings");
+        termSavEl.textContent = fmtMoney(c.termSavings, false);
+        termSavEl.className = c.termSavings < 0 ? "is-neg" : "is-pos";
+
+        /* Allocation bars */
+        var usageTotal = state.comUsage > 0 ? state.comUsage : 0;
+        var covShare = usageTotal > 0 ? Math.max(0, Math.min(100, (c.covered / usageTotal) * 100)) : 0;
+        var overShare = usageTotal > 0 ? Math.max(0, 100 - covShare) : 0;
+        document.getElementById("bar-covered").style.width = covShare.toFixed(2) + "%";
+        document.getElementById("bar-overage").style.width = overShare.toFixed(2) + "%";
+        document.getElementById("alloc-usage-label").textContent = fmtMoney(c.covered, false) + " covered / " + fmtMoney(c.overage, false) + " overage";
+
+        var commitTotal = state.comCommit > 0 ? state.comCommit : 0;
+        var usedShare = commitTotal > 0 ? Math.max(0, Math.min(100, (c.usedCommit / commitTotal) * 100)) : 0;
+        var wasteShare = commitTotal > 0 ? Math.max(0, 100 - usedShare) : 0;
+        document.getElementById("bar-used").style.width = usedShare.toFixed(2) + "%";
+        document.getElementById("bar-waste").style.width = wasteShare.toFixed(2) + "%";
+        document.getElementById("alloc-commit-label").textContent = fmtMoney(c.usedCommit, false) + " used / " + fmtMoney(c.unusedCommit, false) + " unused";
+
+        /* Playbook Brief */
+        document.getElementById("playbook-brief-pre").textContent = buildBrief(state, out);
+      }
+
+      /* ---------------- Event Wiring ---------------- */
+      var presetButtons = document.querySelectorAll("[data-preset]");
+      var presetStatus = document.getElementById("preset-status");
+
+      function setActivePresetButton(name, label) {
+        presetButtons.forEach(function (btn) {
+          btn.classList.toggle("is-active", btn.getAttribute("data-preset") === name);
+        });
+        presetStatus.textContent = label;
+      }
+
+      Object.keys(els).forEach(function (k) {
+        els[k].addEventListener("input", function () {
+          setActivePresetButton("", "Active state: Custom edited inputs");
+          render();
+        });
+      });
+
+      document.querySelectorAll("[data-edge]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          els.matrixAsked.value = btn.getAttribute("data-edge");
+          setActivePresetButton("", "Active state: Custom edge test (" + btn.getAttribute("data-edge") + "%)");
+          render();
+        });
+      });
+
+      document.getElementById("btn-apply-counterplay").addEventListener("click", function () {
+        var val = this.dataset.deepestPct;
+        if (val !== undefined) {
+          els.renAsked.value = Number(parseFloat(val).toFixed(4)).toString();
+          setActivePresetButton("", "Active state: Counter-play discount applied to Renewal Check");
+          render();
+        }
+      });
+
+      var PRESETS = {
+        "default": {
+          label: "Active state: Sample Data (Defaults)",
+          apply: function (s) { return s; }
+        },
+        "band-edges": {
+          label: "Active state: Preset 1 — Band Edges (35.01% routes Band 4)",
+          apply: function (s) { s.matrixAsked = 0.3501; return s; }
+        },
+        "blocked-renewal": {
+          label: "Active state: Preset 2 — Blocked Renewal (30.00% shrinks TCV)",
+          apply: function (s) { s.renAsked = 0.30; return s; }
+        },
+        "retier-matrix": {
+          label: "Active state: Preset 3 — Re-Tiered Matrix (Band 2 to 15%, 18% ask)",
+          apply: function (s) { s.b2To = 0.15; s.matrixAsked = 0.18; s.renAsked = 0.18; return s; }
+        },
+        "overage-no-waste": {
+          label: "Active state: Preset 4 — Overage & No Waste ($10k usage)",
+          apply: function (s) { s.comUsage = 10000; return s; }
+        },
+        "full-discount-guard": {
+          label: "Active state: Preset 5 — Full-Discount Guard (100% commit discount)",
+          apply: function (s) { s.comDisc = 1.00; return s; }
+        },
+        "zero-current-tcv": {
+          label: "Active state: Preset 6 — Zero Current TCV ($0)",
+          apply: function (s) { s.renCurrent = 0; return s; }
+        }
+      };
+
+      presetButtons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var key = btn.getAttribute("data-preset");
+          var p = PRESETS[key];
+          if (!p) return;
+          var nextState = p.apply(Object.assign({}, DEFAULTS));
+          writeStateToDom(nextState);
+          setActivePresetButton(key, p.label);
+          render();
+        });
+      });
+
+      /* Copy Brief with Fallback */
+      document.getElementById("btn-copy-brief").addEventListener("click", function () {
+        var pre = document.getElementById("playbook-brief-pre");
+        var statusEl = document.getElementById("brief-copy-status");
+        var text = pre.textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(
+            function () { statusEl.textContent = "Copied Playbook Brief to clipboard."; },
+            function () { fallbackCopy(text, statusEl); }
+          );
+        } else {
+          fallbackCopy(text, statusEl);
+        }
+      });
+
+      function fallbackCopy(text, statusEl) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "0";
+        ta.style.left = "0";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+          statusEl.textContent = "Copied Playbook Brief to clipboard.";
+        } catch (e) {
+          statusEl.textContent = "Select the brief below and press Ctrl+C / Cmd+C.";
+        }
+        document.body.removeChild(ta);
+      }
+
+      /* ---------------- Self-Check Battery (Anchors + 6 Boundary Cases) ---------------- */
+      function near(a, b, tol) {
+        return Math.abs(a - b) <= (tol || 1e-6);
+      }
+
+      function runSelfCheckBattery() {
+        /* 0. Sample Defaults */
+        var d0 = evaluatePlaybook(Object.assign({}, DEFAULTS));
+        console.assert(d0.matrixRoute.band === 3 && d0.matrixRoute.approver === "Pricing Approval", "Anchor Matrix fail");
+        console.assert(near(d0.renewal.tcv, 105000) && near(d0.renewal.growthUsd, 5000) && near(d0.renewal.growthPct, 0.05), "Anchor Renewal math fail");
+        console.assert(d0.renewal.verdict === "CLEARS — renewal grows" && near(d0.renewal.deepest, 1 - 100000 / 140000), "Anchor Renewal verdict/deepest fail");
+        console.assert(d0.renewal.askedRoute.approver === "Pricing Approval" && d0.renewal.deepRoute.approver === "Pricing Approval", "Anchor Renewal approvers fail");
+        console.assert(near(d0.commit.covers, 8000) && near(d0.commit.covered, 7000) && near(d0.commit.overage, 0), "Anchor Commit coverage fail");
+        console.assert(near(d0.commit.payMonth, 6000) && near(d0.commit.onDemand, 7000) && near(d0.commit.savingsMonth, 1000), "Anchor Commit pay/savings fail");
+        console.assert(near(d0.commit.effDisc, 1000 / 7000) && near(d0.commit.usedCommit, 5250) && near(d0.commit.unusedCommit, 750), "Anchor Commit waste fail");
+        console.assert(near(d0.commit.termPay, 72000) && near(d0.commit.termSavings, 12000), "Anchor Commit term fail");
+
+        /* 1. Band Edges */
+        var e10 = evaluatePlaybook(Object.assign({}, DEFAULTS, { matrixAsked: 0.10 }));
+        var e35 = evaluatePlaybook(Object.assign({}, DEFAULTS, { matrixAsked: 0.35 }));
+        var e3501 = evaluatePlaybook(Object.assign({}, DEFAULTS, { matrixAsked: 0.3501 }));
+        console.assert(e10.matrixRoute.band === 1 && e10.matrixRoute.approver === "Sales", "Case 1 (10%) fail");
+        console.assert(e35.matrixRoute.band === 3 && e35.matrixRoute.approver === "Pricing Approval", "Case 1 (35%) fail");
+        console.assert(e3501.matrixRoute.band === 4 && e3501.matrixRoute.approver === "Pricing + Executive Review", "Case 1 (35.01%) fail");
+
+        /* 2. Blocked Renewal */
+        var c2 = evaluatePlaybook(Object.assign({}, DEFAULTS, { renAsked: 0.30 }));
+        console.assert(near(c2.renewal.tcv, 98000) && near(c2.renewal.growthUsd, -2000) && near(c2.renewal.growthPct, -0.02), "Case 2 math fail");
+        console.assert(c2.renewal.verdict === "BLOCKED — renewal shrinks" && near(c2.renewal.deepest, 1 - 100000 / 140000) && c2.renewal.deepRoute.approver === "Pricing Approval", "Case 2 verdict/counter-play fail");
+
+        /* 3. Re-Tier Matrix */
+        var c3a = evaluatePlaybook(Object.assign({}, DEFAULTS, { b2To: 0.15, matrixAsked: 0.18, renAsked: 0.18 }));
+        var c3b = evaluatePlaybook(Object.assign({}, DEFAULTS, { b2To: 0.15, matrixAsked: 0.25, renAsked: 0.25 }));
+        console.assert(near(c3a.matrix.b3From, 0.15) && c3a.matrixRoute.band === 3 && c3a.matrixRoute.approver === "Pricing Approval", "Case 3 (18% matrix) fail");
+        console.assert(c3a.renewal.askedRoute.band === 3 && c3a.renewal.askedRoute.approver === "Pricing Approval", "Case 3 (18% renewal) fail");
+        console.assert(c3b.matrixRoute.band === 3 && c3b.renewal.askedRoute.band === 3, "Case 3 (25%) fail");
+
+        /* 4. Overage & No Waste */
+        var c4 = evaluatePlaybook(Object.assign({}, DEFAULTS, { comUsage: 10000 }));
+        console.assert(near(c4.commit.covers, 8000) && near(c4.commit.covered, 8000) && near(c4.commit.overage, 2000), "Case 4 coverage fail");
+        console.assert(near(c4.commit.payMonth, 8000) && near(c4.commit.savingsMonth, 2000) && near(c4.commit.effDisc, 0.20), "Case 4 savings fail");
+        console.assert(near(c4.commit.usedCommit, 6000) && near(c4.commit.unusedCommit, 0) && near(c4.commit.termPay, 96000) && near(c4.commit.termSavings, 24000), "Case 4 waste/term fail");
+
+        /* 5. Full-Discount Guard */
+        var c5 = evaluatePlaybook(Object.assign({}, DEFAULTS, { comDisc: 1.00 }));
+        console.assert(near(c5.commit.covers, 0) && near(c5.commit.covered, 0) && near(c5.commit.overage, 7000), "Case 5 guard coverage fail");
+        console.assert(near(c5.commit.payMonth, 13000) && near(c5.commit.savingsMonth, -6000) && near(c5.commit.effDisc, -6000 / 7000), "Case 5 negative savings fail");
+        console.assert(near(c5.commit.usedCommit, 0) && near(c5.commit.unusedCommit, 6000), "Case 5 waste fail");
+
+        /* 6. Zero Current TCV */
+        var c6 = evaluatePlaybook(Object.assign({}, DEFAULTS, { renCurrent: 0 }));
+        console.assert(near(c6.renewal.growthPct, 0) && near(c6.renewal.tcv, 105000) && c6.renewal.verdict === "CLEARS — renewal grows", "Case 6 zero TCV guard fail");
+
+        /* 7. Cleared / Zero-Input Safety (No NaN) */
+        var c7 = evaluatePlaybook({
+          b1To: 0, b1App: "", b2To: 0, b2App: "", b3To: 0, b3App: "", b4To: 0, b4App: "",
+          matrixAsked: 0, renCurrent: 0, renList: 0, renAsked: 0,
+          comUsage: 0, comCommit: 0, comDisc: 0, comTerm: 0
+        });
+        var vals = [
+          c7.renewal.tcv, c7.renewal.growthUsd, c7.renewal.growthPct, c7.renewal.deepest,
+          c7.commit.covers, c7.commit.covered, c7.commit.overage, c7.commit.payMonth,
+          c7.commit.onDemand, c7.commit.savingsMonth, c7.commit.effDisc,
+          c7.commit.usedCommit, c7.commit.unusedCommit, c7.commit.termPay, c7.commit.termSavings
+        ];
+        console.assert(vals.every(function (v) { return Number.isFinite(v); }), "Zero/cleared NaN safety fail");
+      }
+
+      runSelfCheckBattery();
+      render();
+    })();
+  </script>
+</body>
+</html>
