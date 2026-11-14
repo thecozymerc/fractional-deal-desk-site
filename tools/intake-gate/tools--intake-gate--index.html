@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<!-- ARGON MANIFEST:
+================================================================================
+1. SELF-CHECK AGAINST GROUND TRUTH DATA & ANCHORS
+================================================================================
+- Untouched Initial Queue KPIs:
+  * TOTAL DEALS SUBMITTED         : 5 (Queue ACV: $819,000)
+  * CLEAN FIRST-PASS              : 2
+  * FIRST-PASS YIELD %            : 40%
+  * HELD AT GATE                  : 2
+  * UNAUTHORIZED APPROVALS CAUGHT : 1
+- Per-Deal Evaluation (Exact Workbook Rules):
+  * DEAL-101 · Sample Corp A · Renewal · $120,000 · 15% · Y Y Y Y Y · Pre-Approved
+    -> Readiness: 100% | Flag: OK | Routing: FAST-TRACK (Pre-Approved) | Note: Clean submission
+  * DEAL-102 · Sample Corp B · New Business · $85,000 · 25% · N Y Y Y N · Pending
+    -> Readiness: 60%  | Flag: OK | Routing: HOLD – RETURN TO SALES | Note: ACTION REQUIRED – Missing Baseline Items
+  * DEAL-103 · Sample Corp C · Mid-Term Reset · $210,000 · 35% · Y N N Y N · Approved
+    -> Readiness: 40%  | Flag: AUDIT ALERT: Approved Without Baseline | Routing: STOP – REVOKE & AUDIT | Note: ACTION REQUIRED – Missing Baseline Items
+  * DEAL-104 · Sample Corp D · Expansion · $64,000 · 10% · Y Y Y Y Y · Pre-Approved
+    -> Readiness: 100% | Flag: OK | Routing: FAST-TRACK (Pre-Approved) | Note: Clean submission
+  * DEAL-105 · Sample Corp E · Renewal · $340,000 · 42% · Y Y Y N Y · Pending
+    -> Readiness: 80%  | Flag: OK | Routing: HOLD – RETURN TO SALES | Note: ACTION REQUIRED – Missing Baseline Items
+- Standing Law & SEO Integrity:
+  * Demonstrate, Never Sell : Zero sales pitch sections, zero prices, zero book/buy CTA buttons. "The Deal Check" appears solely as a plain descriptive link (/tools/deal-check/) among the other navigation links.
+  * No Start-Date Bragging  : Removed the lingering "Corporate Roles Since 2006" item from the hero credential strip on the live base page. Zero "since 2006" phrasing anywhere in the document.
+  * No Employer Names/Fakes : Zero employer names, zero invented facts, sample data labeled fictional.
+  * SEO Integrity           : No hidden text or links, no keyword stuffing, no cloaking. Title tag, meta description, canonical URL, WebApplication + BreadcrumbList JSON-LD match visible page content.
+  * Partition URL Fidelity  : Every partition link and JSON-LD BreadcrumbList item for "Deal Desk Controls" points to the live address /tools/stories-and-sandboxes/ (https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/).
+
+================================================================================
+2. IMPROVEMENTS MADE
+================================================================================
+- Designed Partition Identity Across the Frame:
+  * Hero Meta Row: Paired the brass badge ("Tool 5 · Deal Desk Controls") with a dual-context eyebrow ("Proof of Work — Deal Desk Controls · Intake Gate") linking directly to the live partition page (/tools/stories-and-sandboxes/).
+  * Breadcrumb Bar: Styled the four-level hierarchy (Home / Proof of Work / Deal Desk Controls / Intake Gate) with partition reference code "REF: S6-P05.1 · DEAL DESK CONTROLS · GATE-LOG-V5".
+  * Hero Credential Strip: Replaced the stale "Corporate Roles Since 2006" span from the live base file with "Partition · Deal Desk Controls".
+  * Related Proof of Work Grid: Added a dedicated "Deal Desk Controls (Partition S6-P05)" card linking to /tools/stories-and-sandboxes/ alongside the Proof of Work Hub (/tools/), sibling Tool 7 labeled under "Tool 7 · Deal Desk Controls" (/tools/qtc-diagnostic/), and Tool 3 labeled under "Tool 3 · Pricing Engines" (/tools/perm-calculator/).
+  * Masthead, Footer & Gate Report: Added "Deal Desk Controls" (/tools/stories-and-sandboxes/) to primary and footer navigation, removed CTA button highlight on "The Deal Check" so it sits as a plain link among peers, and stamped "Partition: Deal Desk Controls (S6-P05)" in the plain-text Gate Report footer.
+- Compacted CSS rules onto single lines so the entire HTML document exports cleanly in one pass through </html> without truncation.
+
+================================================================================
+3. CONFLICTS FLAGGED
+================================================================================
+- Live Base File Credential Strip Contained "Corporate Roles Since 2006":
+  The live base page still had `<span>Corporate Roles Since 2006</span>` inside `.credential-strip` and `class="nav-cta"` on the masthead link to `/tools/deal-check/`. Per the prompt's explicit standing-law rule ("no sales copy, no prices, no 'since 2006' phrasing, anywhere, including in navigation and footer labels"), both were cleaned so the page is 100% compliant.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="apple-touch-icon" href="../../favicon.svg" />
+  <title>Intake Gate &amp; Submission Scorecard — Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="Score every sales deal submission against five baseline checks—account verified, prior contract linked, eligibility confirmed, SKU mix valid, and docs complete—and trigger an automatic discount approval audit alert before incomplete deals bypass the deal desk.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/intake-gate/">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Intake Gate &amp; Submission Scorecard — Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="Score every sales deal submission against five baseline checks and fire an automatic discount approval audit alert when incomplete or over-discounted deals are marked Approved.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/intake-gate/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Intake Gate & Submission Scorecard",
+        "url": "https://fractional-deal-desk-site.pages.dev/tools/intake-gate/",
+        "description": "A deal desk intake gate and submission scorecard that evaluates incoming sales deals against five baseline readiness checks, routes clean deals to fast-track, holds incomplete submissions, and fires an audit alert on unauthorized discount approvals.",
+        "applicationCategory": "BusinessApplication",
+        "applicationSubCategory": "Deal Desk Controls",
+        "operatingSystem": "All",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fractional-deal-desk-site.pages.dev/" },
+          { "@type": "ListItem", "position": 2, "name": "Proof of Work", "item": "https://fractional-deal-desk-site.pages.dev/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Deal Desk Controls", "item": "https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/" },
+          { "@type": "ListItem", "position": 4, "name": "Intake Gate", "item": "https://fractional-deal-desk-site.pages.dev/tools/intake-gate/" }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg-navy: #0A1124; --bg-navy-panel: #101B35; --bg-navy-hover: #172546;
+      --bg-ivory: #F6F4EE; --bg-paper: #FFFFFF; --bg-subtle: #EDEAE1;
+      --ink-primary: #0A1124; --ink-secondary: #2E3A52;
+      --ink-on-navy: #F8FAFC; --ink-on-navy-muted: #CBD5E1;
+      --brass: #B89146; --brass-light: #DFBE7F; --brass-dark: #6E5015;
+      --border-strong: #0A1124; --border-mid: #CBD5E1; --border-subtle: #DCD8CE;
+      --alert-bg: #FEF2F2; --alert-border: #991B1B; --alert-ink: #7F1D1D; --alert-solid: #881337;
+      --hold-bg: #FFFBEB; --hold-border: #B45309; --hold-ink: #78350F;
+      --ok-bg: #F0FDF4; --ok-border: #15803D; --ok-ink: #14532D;
+      --fin-bg: #EFF6FF; --fin-border: #1D4ED8; --fin-ink: #1E3A8A;
+      --font-serif: Georgia, "Times New Roman", Times, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      --max-w: 1360px;
+    }
+    *, *::before, *::after { box-sizing: border-box; border-radius: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background-color: var(--bg-ivory); color: var(--ink-primary); font-family: var(--font-sans); line-height: 1.55; overflow-x: hidden; }
+    .skip-link { position: fixed; top: 0; left: 0; background: var(--brass-light); color: var(--bg-navy); font-weight: 700; padding: 0.75rem 1.25rem; z-index: 9999; text-decoration: none; border: 2px solid var(--bg-navy); transform: translateY(-120%); }
+    .skip-link:focus { transform: translateY(0); outline: 3px solid var(--bg-navy); }
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, pre:focus-visible { outline: 2px solid var(--brass-dark); outline-offset: 2px; }
+
+    .site-masthead { background-color: var(--bg-navy); color: var(--ink-on-navy); border-bottom: 3px solid var(--brass); }
+    .masthead-inner { max-width: var(--max-w); margin: 0 auto; padding: 0.875rem 1.25rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand-mark { display: flex; flex-direction: column; text-decoration: none; color: var(--ink-on-navy); min-height: 44px; justify-content: center; }
+    .brand-title { font-family: var(--font-serif); font-size: 1.125rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; }
+    .brand-subtitle { font-family: var(--font-mono); font-size: 0.75rem; color: var(--brass-light); letter-spacing: 0.06em; text-transform: uppercase; }
+    .site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem; }
+    .site-nav a { color: var(--ink-on-navy); text-decoration: none; font-size: 0.875rem; font-weight: 600; padding: 0.625rem 0.875rem; min-height: 44px; display: inline-flex; align-items: center; border: 1px solid transparent; }
+    .site-nav a:hover { border-color: var(--brass); color: var(--brass-light); }
+
+    .breadcrumb-bar { background-color: var(--bg-navy-panel); border-bottom: 1px solid #263554; color: var(--ink-on-navy-muted); font-family: var(--font-mono); font-size: 0.75rem; }
+    .breadcrumb-inner { max-width: var(--max-w); margin: 0 auto; padding: 0.5rem 1.25rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    .breadcrumb-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem; }
+    .breadcrumb-list li { display: inline-flex; align-items: center; gap: 0.375rem; }
+    .breadcrumb-list a { color: var(--brass-light); text-decoration: underline; text-underline-offset: 3px; padding: 0.25rem; min-height: 32px; display: inline-flex; align-items: center; }
+    .breadcrumb-list a:hover { color: #FFFFFF; }
+    .doc-ref { color: var(--brass-light); letter-spacing: 0.05em; }
+
+    .hero-header { background-color: var(--bg-navy); color: var(--ink-on-navy); border-bottom: 4px solid var(--brass); padding: 2.25rem 1.25rem; }
+    .hero-inner { max-width: var(--max-w); margin: 0 auto; }
+    .hero-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 0.875rem; }
+    .tool-badge { background-color: var(--brass-light); color: var(--bg-navy); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.3rem 0.65rem; }
+    .tool-eyebrow { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--brass-light); }
+    .tool-eyebrow a { color: var(--brass-light); text-decoration: underline; text-underline-offset: 3px; }
+    .tool-eyebrow a:hover { color: #FFFFFF; }
+    .hero-header h1 { font-family: var(--font-serif); font-size: clamp(1.75rem, 3.5vw, 2.6rem); font-weight: 700; line-height: 1.18; margin: 0 0 1.25rem 0; color: #FFFFFF; }
+    .hero-intro-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+    @media (min-width: 900px) { .hero-intro-grid { grid-template-columns: 7fr 5fr; gap: 2rem; align-items: start; } }
+    .hero-copy p { margin: 0 0 1rem 0; font-size: 1.02rem; color: var(--ink-on-navy); }
+    .hero-copy p:last-child { margin-bottom: 0; }
+    .hero-provenance-box { background-color: var(--bg-navy-panel); border: 1px solid var(--brass); border-left: 4px solid var(--brass-light); padding: 1.125rem 1.25rem; }
+    .provenance-title { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-light); margin: 0 0 0.45rem 0; }
+    .hero-provenance-box p { margin: 0; font-size: 0.88rem; color: var(--ink-on-navy); }
+    .credential-strip { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.4rem; margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px solid #2A3B5C; font-family: var(--font-mono); font-size: 0.75rem; color: var(--brass-light); }
+
+    .main-container { max-width: var(--max-w); margin: 0 auto; padding: 2rem 1.25rem 3.5rem; }
+    .section-block { margin-bottom: 2.5rem; }
+    .section-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.75rem; border-bottom: 2px solid var(--border-strong); padding-bottom: 0.5rem; margin-bottom: 1.25rem; }
+    .section-header h2 { font-family: var(--font-serif); font-size: clamp(1.25rem, 2.2vw, 1.55rem); font-weight: 700; margin: 0; color: var(--ink-primary); }
+    .section-tag { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--brass-dark); }
+
+    .kpi-strip { display: grid; grid-template-columns: 1fr; gap: 0.875rem; }
+    @media (min-width: 560px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .kpi-strip { grid-template-columns: repeat(5, 1fr); } }
+    .kpi-card { background-color: var(--bg-paper); border: 2px solid var(--border-strong); padding: 1.125rem; display: flex; flex-direction: column; justify-content: space-between; min-height: 124px; }
+    .kpi-card.kpi-alert-active { border-color: var(--alert-border); background-color: var(--alert-bg); }
+    .kpi-card.kpi-hold-active { border-color: var(--hold-border); background-color: var(--hold-bg); }
+    .kpi-label { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-secondary); margin-bottom: 0.5rem; }
+    .kpi-card.kpi-alert-active .kpi-label { color: var(--alert-ink); }
+    .kpi-card.kpi-hold-active .kpi-label { color: var(--hold-ink); }
+    .kpi-value { font-family: var(--font-mono); font-size: 2.125rem; font-weight: 700; line-height: 1.1; color: var(--ink-primary); font-variant-numeric: tabular-nums; margin-bottom: 0.35rem; }
+    .kpi-card.kpi-alert-active .kpi-value { color: var(--alert-ink); }
+    .kpi-card.kpi-hold-active .kpi-value { color: var(--hold-ink); }
+    .kpi-sub { font-size: 0.78rem; color: var(--ink-secondary); }
+
+    .decision-panel { background-color: var(--bg-paper); border: 2px solid var(--border-strong); padding: 1.25rem; }
+    .decision-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+    .decision-item { border: 1px solid var(--border-mid); border-left-width: 6px; padding: 0.875rem 1rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; }
+    .decision-item.decision-alert { background-color: var(--alert-bg); border-color: var(--alert-border); color: var(--alert-ink); }
+    .decision-item.decision-hold { background-color: var(--hold-bg); border-color: var(--hold-border); color: var(--hold-ink); }
+    .decision-item-body { flex: 1 1 520px; }
+    .decision-badge-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; }
+    .severity-pill { padding: 0.15rem 0.5rem; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: #FFFFFF; }
+    .pill-alert { background-color: var(--alert-solid); }
+    .pill-hold { background-color: var(--hold-ink); }
+    .decision-reason { font-size: 0.92rem; line-height: 1.45; color: var(--ink-primary); margin: 0; }
+    .decision-empty { padding: 0.75rem 1rem; background-color: var(--ok-bg); border: 1px solid var(--ok-border); border-left-width: 6px; color: var(--ok-ink); font-family: var(--font-mono); font-size: 0.875rem; font-weight: 600; margin: 0; }
+    .btn-locate { background-color: var(--bg-paper); color: var(--ink-primary); border: 1px solid var(--border-strong); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; padding: 0.5rem 0.85rem; min-height: 44px; cursor: pointer; text-transform: uppercase; }
+    .btn-locate:hover { background-color: var(--bg-navy); color: #FFFFFF; }
+
+    .table-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.875rem; background-color: var(--bg-subtle); border: 1px solid var(--border-subtle); padding: 0.75rem 1rem; }
+    .toolbar-note { font-size: 0.85rem; color: var(--ink-secondary); margin: 0; }
+    .toolbar-actions { display: flex; flex-wrap: wrap; gap: 0.625rem; }
+    .btn { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.625rem 1.125rem; min-height: 44px; min-width: 44px; border: 2px solid var(--border-strong); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+    .btn-primary { background-color: var(--bg-navy); color: #FFFFFF; border-color: var(--bg-navy); }
+    .btn-primary:hover { background-color: var(--bg-navy-hover); }
+    .btn-brass { background-color: var(--brass-light); color: var(--bg-navy); border-color: var(--bg-navy); }
+    .btn-brass:hover { background-color: #EAD09C; }
+    .btn-secondary { background-color: var(--bg-paper); color: var(--ink-primary); }
+    .btn-secondary:hover { background-color: var(--bg-subtle); }
+
+    .gate-table-wrap { background-color: var(--bg-paper); border: 2px solid var(--border-strong); overflow-x: auto; width: 100%; }
+    .gate-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+    .gate-table th { background-color: var(--bg-navy); color: var(--ink-on-navy); font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.65rem 0.45rem; text-align: left; border-right: 1px solid #263554; border-bottom: 2px solid var(--brass); vertical-align: bottom; }
+    .gate-table th.col-check { text-align: center; width: 58px; background-color: var(--bg-navy-panel); }
+    .gate-table th.col-num { text-align: right; }
+    .gate-table td { padding: 0.45rem; border-bottom: 1px solid var(--border-mid); border-right: 1px solid #E2E8F0; vertical-align: middle; }
+    .gate-table tr.row-alert { background-color: #FFF5F5; }
+    .gate-table tr.row-hold { background-color: #FFFDF5; }
+    .gate-table tr.row-highlight { outline: 3px solid var(--brass); outline-offset: -3px; }
+
+    .cell-input { width: 100%; min-height: 44px; padding: 0.35rem 0.45rem; font-family: var(--font-sans); font-size: 0.8125rem; color: var(--ink-primary); background-color: #FFFFFF; border: 1px solid #64748B; }
+    .cell-input.mono-input { font-family: var(--font-mono); font-weight: 600; }
+    .cell-input.num-input { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .check-select { width: 50px; min-width: 44px; min-height: 44px; padding: 0.25rem; font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 700; text-align: center; border: 2px solid var(--border-strong); cursor: pointer; }
+    .check-select.val-Y { background-color: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+    .check-select.val-N { background-color: var(--alert-bg); color: var(--alert-ink); border-color: var(--alert-border); }
+    .status-select { width: 100%; min-width: 116px; min-height: 44px; padding: 0.35rem; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; border: 1px solid var(--border-strong); background-color: #FFFFFF; color: var(--ink-primary); cursor: pointer; }
+    .status-select.status-Approved { background-color: var(--bg-navy); color: #FFFFFF; }
+    .readiness-cell { font-family: var(--font-mono); font-size: 0.9375rem; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .readiness-100 { color: var(--ok-ink); }
+    .readiness-low { color: var(--alert-ink); }
+
+    .computed-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.71rem; font-weight: 700; padding: 0.25rem 0.45rem; border: 1px solid transparent; line-height: 1.3; }
+    .flag-alert { background-color: var(--alert-solid); color: #FFFFFF; border-color: var(--alert-solid); }
+    .flag-ok { background-color: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+    .route-stop { background-color: var(--alert-bg); color: var(--alert-ink); border-color: var(--alert-border); }
+    .route-hold { background-color: var(--hold-bg); color: var(--hold-ink); border-color: var(--hold-border); }
+    .route-fast { background-color: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+    .route-finance { background-color: var(--fin-bg); color: var(--fin-ink); border-color: var(--fin-border); }
+    .note-primary { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; display: block; }
+    .note-clean { color: var(--ok-ink); }
+    .note-action { color: var(--alert-ink); }
+    .note-missing-detail { display: block; font-size: 0.72rem; color: var(--ink-secondary); margin-top: 0.15rem; }
+    .btn-delete-row { background-color: #FFFFFF; color: var(--alert-ink); border: 1px solid var(--alert-border); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; min-width: 44px; min-height: 44px; padding: 0.25rem 0.5rem; cursor: pointer; }
+    .btn-delete-row:hover { background-color: var(--alert-solid); color: #FFFFFF; }
+
+    @media (max-width: 1060px) {
+      .gate-table thead { display: none; }
+      .gate-table, .gate-table tbody, .gate-table tr, .gate-table td { display: block; width: 100%; }
+      .gate-table tr { border-bottom: 3px solid var(--border-strong); padding: 0.75rem; }
+      .gate-table td { border-right: none; border-bottom: 1px solid var(--border-subtle); padding: 0.45rem 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; text-align: right; }
+      .gate-table td::before { content: attr(data-label); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--ink-secondary); text-align: left; flex: 0 0 42%; }
+      .gate-table td > * { flex: 1 1 52%; }
+      .gate-table td.td-check > .check-select { flex: 0 0 64px; margin-left: auto; }
+      .gate-table td.td-actions { justify-content: flex-end; border-bottom: none; }
+    }
+
+    .report-container { background-color: var(--bg-navy); color: var(--ink-on-navy); border: 2px solid var(--border-strong); padding: 1.25rem; }
+    .report-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 0.875rem; border-bottom: 1px solid #2A3B5C; }
+    .report-toolbar-title { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brass-light); }
+    .report-actions { display: flex; flex-wrap: wrap; gap: 0.625rem; }
+    .report-output { width: 100%; min-height: 300px; background-color: #060B18; color: #F1F5F9; border: 1px solid var(--brass); padding: 1rem; font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.55; white-space: pre-wrap; word-break: break-word; overflow-x: auto; margin: 0; }
+
+    .methodology-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+    @media (min-width: 900px) { .methodology-grid { grid-template-columns: 1fr 1fr; } }
+    .info-card { background-color: var(--bg-paper); border: 2px solid var(--border-strong); padding: 1.375rem; }
+    .info-card h3 { font-family: var(--font-serif); font-size: 1.1875rem; margin: 0 0 0.75rem 0; color: var(--ink-primary); border-bottom: 1px solid var(--border-mid); padding-bottom: 0.5rem; }
+    .info-card p { margin: 0 0 0.875rem 0; font-size: 0.9375rem; color: var(--ink-secondary); }
+    .rule-list { margin: 0; padding-left: 1.2rem; font-size: 0.9rem; color: var(--ink-secondary); }
+    .rule-list li { margin-bottom: 0.5rem; }
+    .rule-list code { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 700; color: var(--ink-primary); background-color: var(--bg-subtle); padding: 0.1rem 0.35rem; }
+
+    .related-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    @media (min-width: 768px) { .related-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1120px) { .related-grid { grid-template-columns: repeat(4, 1fr); } }
+    .related-card { background-color: var(--bg-paper); border: 2px solid var(--border-strong); padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; }
+    .related-card-tag { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brass-dark); margin-bottom: 0.4rem; }
+    .related-card h3 { font-family: var(--font-serif); font-size: 1.0625rem; margin: 0 0 0.5rem 0; }
+    .related-card p { font-size: 0.875rem; color: var(--ink-secondary); margin: 0 0 1rem 0; }
+    .related-card a { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 700; color: var(--ink-primary); text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; }
+    .related-card a:hover { color: var(--brass-dark); }
+
+    .site-footer { background-color: var(--bg-navy); color: var(--ink-on-navy-muted); border-top: 3px solid var(--brass); padding: 2.25rem 1.25rem; font-size: 0.875rem; }
+    .footer-inner { max-width: var(--max-w); margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.5rem; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .footer-links a { color: var(--brass-light); text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; padding: 0 0.25rem; }
+    .footer-links a:hover { color: #FFFFFF; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to Intake Gate &amp; Scorecard</a>
+
+  <header class="site-masthead">
+    <div class="masthead-inner">
+      <a href="../../" class="brand-mark" aria-label="Fractional Deal Desk and Contract Management Home">
+        <span class="brand-title">Fractional Deal Desk &amp; Contract Management</span>
+        <span class="brand-subtitle">Commercial Contracts · Pricing Governance · Revenue Operations</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary Navigation">
+        <a href="../../tools/">Proof of Work Hub</a>
+        <a href="../stories-and-sandboxes/">Deal Desk Controls</a>
+        <a href="../perm-calculator/">Tool 3: Perm Calculator</a>
+        <a href="../spend-variance/">Tool 4: Spend Variance</a>
+        <a href="../qtc-diagnostic/">Tool 7: QTC Diagnostic</a>
+        <a href="../deal-check/">The Deal Check</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumb-bar" aria-label="Breadcrumb">
+    <div class="breadcrumb-inner">
+      <ol class="breadcrumb-list">
+        <li><a href="../../">Home</a><span>/</span></li>
+        <li><a href="../../tools/">Proof of Work</a><span>/</span></li>
+        <li><a href="../stories-and-sandboxes/">Deal Desk Controls</a><span>/</span></li>
+        <li aria-current="page">Intake Gate</li>
+      </ol>
+      <span class="doc-ref">REF: S6-P05.1 · DEAL DESK CONTROLS · GATE-LOG-V5</span>
+    </div>
+  </nav>
+
+  <section class="hero-header">
+    <div class="hero-inner">
+      <div class="hero-meta-row">
+        <span class="tool-badge">Tool 5 · Deal Desk Controls</span>
+        <span class="tool-eyebrow">Proof of Work — <a href="../stories-and-sandboxes/">Deal Desk Controls</a> · Intake Gate</span>
+      </div>
+      <h1>Intake Gate &amp; Submission Scorecard</h1>
+      <div class="hero-intro-grid">
+        <div class="hero-copy">
+          <p>
+            This deal desk intake gate scores each incoming submission against five baseline checks and routes it by rule: clean deals fast-track, incomplete deals are held at the gate and returned to Sales with a pushback note, and any deal marked Approved without its baseline checks or above the discount threshold fires an immediate discount approval audit alert.
+          </p>
+          <p>
+            Built directly from the operator’s intake gate workbook, this tool reflects 15+ years in commercial contracts, deal desk, and revenue operations—commercial contracts up to $300M, and pricing catalogs of 3,000+ SKUs under management. All sample deals and accounts pre-loaded below are fictional.
+          </p>
+        </div>
+        <aside class="hero-provenance-box" aria-label="Operator Provenance">
+          <p class="provenance-title">Vault-Door Intake Discipline</p>
+          <p>
+            Inspect the live sample queue below: <strong>DEAL-103</strong> arrives marked <strong>Approved</strong> at 40% readiness with a 35% discount. The intake gate catches the unauthorized sign-off, fires an <strong>AUDIT ALERT</strong>, and routes the deal to <strong>STOP – REVOKE &amp; AUDIT</strong>.
+          </p>
+          <div class="credential-strip">
+            <span>15+ Yrs Deal Desk &amp; Contracts</span>
+            <span>Partition · Deal Desk Controls</span>
+            <span>Contracts Up to $300M</span>
+            <span>3,000+ SKUs Managed</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <main id="main-content" class="main-container">
+
+    <!-- 1) KPI STRIP (5 cards, live) -->
+    <section class="section-block" aria-labelledby="heading-kpi">
+      <div class="section-header">
+        <h2 id="heading-kpi">1. Queue Scorecard &amp; First-Pass Yield</h2>
+        <span class="section-tag">Live Intake Metrics</span>
+      </div>
+      <div class="kpi-strip">
+        <article class="kpi-card">
+          <div class="kpi-label">TOTAL DEALS SUBMITTED</div>
+          <div class="kpi-value" id="kpi-total">5</div>
+          <div class="kpi-sub" id="kpi-total-acv">Queue ACV: $819,000</div>
+        </article>
+        <article class="kpi-card">
+          <div class="kpi-label">CLEAN FIRST-PASS</div>
+          <div class="kpi-value" id="kpi-clean">2</div>
+          <div class="kpi-sub">5 of 5 baseline checks passed</div>
+        </article>
+        <article class="kpi-card">
+          <div class="kpi-label">FIRST-PASS YIELD %</div>
+          <div class="kpi-value" id="kpi-yield">40%</div>
+          <div class="kpi-sub">Share of submissions ready at intake</div>
+        </article>
+        <article class="kpi-card kpi-hold-active" id="card-held">
+          <div class="kpi-label">HELD AT GATE</div>
+          <div class="kpi-value" id="kpi-held">2</div>
+          <div class="kpi-sub">Returned to Sales for missing baseline</div>
+        </article>
+        <article class="kpi-card kpi-alert-active" id="card-unauthorized">
+          <div class="kpi-label">UNAUTHORIZED APPROVALS CAUGHT</div>
+          <div class="kpi-value" id="kpi-unauthorized">1</div>
+          <div class="kpi-sub">Approved without baseline or &gt;20% disc.</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 2) NEEDS A DECISION (live, worst first) -->
+    <section class="section-block" aria-labelledby="heading-decision">
+      <div class="section-header">
+        <h2 id="heading-decision">2. Needs a Decision (Worst First: Audit Alerts → Held Deals)</h2>
+        <span class="section-tag">Exception &amp; Audit Queue</span>
+      </div>
+      <div class="decision-panel" id="decision-container" aria-live="polite"></div>
+    </section>
+
+    <!-- 3) THE GATE LOG (one editable table) -->
+    <section class="section-block" aria-labelledby="heading-gate-log">
+      <div class="section-header">
+        <h2 id="heading-gate-log">3. The Gate Log: Deal Submission Checklist &amp; Routing Table</h2>
+        <span class="section-tag">5 Baseline Checks · Automatic Routing</span>
+      </div>
+      <div class="table-toolbar">
+        <p class="toolbar-note">
+          Change any <strong>Y / N</strong> baseline check, edit <strong>Requested Discount %</strong>, or switch <strong>Approval Status</strong> to test live gate routing.
+        </p>
+        <div class="toolbar-actions">
+          <button type="button" class="btn btn-primary" id="btn-add-deal">+ Add Deal</button>
+          <button type="button" class="btn btn-secondary" id="btn-reset-top">Reset Sample Deals</button>
+        </div>
+      </div>
+      <div class="gate-table-wrap">
+        <table class="gate-table" aria-label="The Gate Log Deal Submission Scorecard">
+          <thead>
+            <tr>
+              <th scope="col">Deal ID</th>
+              <th scope="col">Account</th>
+              <th scope="col">Deal Type</th>
+              <th scope="col" class="col-num">Proposed ACV ($)</th>
+              <th scope="col" class="col-num">Requested Discount %</th>
+              <th scope="col" class="col-check">Account Verified</th>
+              <th scope="col" class="col-check">Prior Contract Linked</th>
+              <th scope="col" class="col-check">Eligibility Confirmed</th>
+              <th scope="col" class="col-check">SKU Mix Valid</th>
+              <th scope="col" class="col-check">Docs Complete</th>
+              <th scope="col">Approval Status</th>
+              <th scope="col" class="col-num">Readiness %</th>
+              <th scope="col">Flag</th>
+              <th scope="col">Routing</th>
+              <th scope="col">Pushback Note</th>
+              <th scope="col">Delete</th>
+            </tr>
+          </thead>
+          <tbody id="gate-log-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 4) GATE REPORT (live, Copy button) -->
+    <section class="section-block" aria-labelledby="heading-report">
+      <div class="section-header">
+        <h2 id="heading-report">4. Gate Report (Plain-Text Triage Roll-Up)</h2>
+        <span class="section-tag">Copy &amp; Send After Triage</span>
+      </div>
+      <div class="report-container">
+        <div class="report-toolbar">
+          <span class="report-toolbar-title">Live Deal Desk Gate Report</span>
+          <div class="report-actions">
+            <button type="button" class="btn btn-brass" id="btn-copy-report">Copy Gate Report</button>
+            <a href="#gate-report-text" class="btn btn-secondary" id="btn-email-report">Email Report to Myself</a>
+            <button type="button" class="btn btn-secondary" id="btn-reset-bottom">Reset</button>
+          </div>
+        </div>
+        <pre class="report-output" id="gate-report-text" tabindex="0" aria-label="Plain-text Gate Report"></pre>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section-block" aria-labelledby="heading-how">
+      <div class="section-header">
+        <h2 id="heading-how">How the Deal Intake Gate &amp; Discount Approval Audit Works</h2>
+        <span class="section-tag">Workbook Logic &amp; Baseline Checks</span>
+      </div>
+      <div class="methodology-grid">
+        <div class="info-card">
+          <h3>How It Works</h3>
+          <p>
+            For each deal, enter the deal type, proposed ACV, and requested discount, then answer the five baseline checks Yes or No: account verified, prior contract linked, eligibility confirmed, SKU mix valid, docs complete. The Readiness Score is the share of Yes answers. Set the approval status — and if a deal is marked Approved before all five checks pass, or with a discount over 20%, the gate fires an <strong>AUDIT ALERT</strong> and routes the deal to <strong>STOP – REVOKE &amp; AUDIT</strong>. Clean deals fast-track; incomplete deals are held and returned to Sales with a pushback note explaining what is missing.
+          </p>
+          <ul class="rule-list">
+            <li><strong>Readiness %:</strong> <code>(Y answers among the 5 checks) / 5</code>.</li>
+            <li><strong>Flag:</strong> <code>Status = "Approved" AND (Readiness &lt; 100% OR Discount &gt; 20%)</code> → <code>AUDIT ALERT: Approved Without Baseline</code>; else <code>OK</code>.</li>
+            <li><strong>Routing:</strong> Alert → <code>STOP – REVOKE &amp; AUDIT</code>; <code>Readiness &lt; 100%</code> → <code>HOLD – RETURN TO SALES</code>; <code>Discount &le; 15%</code> → <code>FAST-TRACK (Pre-Approved)</code>; else → <code>ROUTE TO DEAL DESK – FINANCE</code>.</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3>What the Five Baseline Checks Verify</h3>
+          <ul class="rule-list">
+            <li><strong>Account Verified:</strong> Legal entity name, billing address, and CRM account hierarchy match the order form.</li>
+            <li><strong>Prior Contract Linked:</strong> Executed MSA, active order forms, and prior amendments are linked on renewals, expansions, and mid-term resets.</li>
+            <li><strong>Eligibility Confirmed:</strong> Volume tier minimums, multi-year ramp terms, or promotional rules are satisfied.</li>
+            <li><strong>SKU Mix Valid:</strong> Required base licenses, implementation packages, and support SKUs are paired without deprecated or conflicting items.</li>
+            <li><strong>Docs Complete:</strong> Redlines, exception approvals, and supporting schedules are attached before commercial sign-off.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Tools (Partition S6-P05 & Library Navigation) -->
+    <section class="section-block" aria-labelledby="heading-related">
+      <div class="section-header">
+        <h2 id="heading-related">Related Deal Desk Controls &amp; Quote-to-Cash Proof of Work</h2>
+        <span class="section-tag">Partition S6-P05 · Deal Desk Controls</span>
+      </div>
+      <div class="related-grid">
+        <article class="related-card">
+          <div>
+            <div class="related-card-tag">Partition S6-P05 · Four Control Instruments</div>
+            <h3>Deal Desk Controls Partition</h3>
+            <p>Open the Deal Desk Controls partition housing Tool 5 (Intake Gate), Tool 6 (Redlining Playbook), Tool 7 (QTC Diagnostic), and Tool 8 (Bundling Sandbox).</p>
+          </div>
+          <a href="../stories-and-sandboxes/">Open Deal Desk Controls →</a>
+        </article>
+        <article class="related-card">
+          <div>
+            <div class="related-card-tag">Tool 7 · Deal Desk Controls</div>
+            <h3>QTC Leakage &amp; Control Diagnostic</h3>
+            <p>Audit your end-to-end quote-to-cash process across intake, pricing, legal review, and billing handoffs to spot where margin leaks.</p>
+          </div>
+          <a href="../qtc-diagnostic/">Run Tool 7: QTC Diagnostic →</a>
+        </article>
+        <article class="related-card">
+          <div>
+            <div class="related-card-tag">Tool 3 · Pricing Engines</div>
+            <h3>Commercial Contract &amp; SKU Permutation Calculator</h3>
+            <p>Measure how unbundled add-ons, tiers, and custom contract terms multiply SKU permutations and break SKU mix validation at intake.</p>
+          </div>
+          <a href="../perm-calculator/">Run Tool 3: Perm Calculator →</a>
+        </article>
+        <article class="related-card">
+          <div>
+            <div class="related-card-tag">Hub · All Interactive Workbooks</div>
+            <h3>Deal Desk &amp; Contract Management Proof of Work Hub</h3>
+            <p>Inspect all interactive deal desk, pricing governance, and contract management tools built from production operator workbooks.</p>
+          </div>
+          <a href="../../tools/">Explore the Proof of Work Hub →</a>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <strong style="color: #FFFFFF; font-family: var(--font-serif);">Fractional Deal Desk &amp; Contract Management</strong>
+        <p style="margin: 0.35rem 0 0 0;">Senior operator practice: 15+ years in commercial contracts, deal desk, and revenue operations · Contracts up to $300M · 3,000+ SKUs under management. Sample data is fictional.</p>
+      </div>
+      <nav class="footer-links" aria-label="Footer Navigation">
+        <a href="../../">Home</a>
+        <a href="../../tools/">Proof of Work Hub</a>
+        <a href="../stories-and-sandboxes/">Deal Desk Controls</a>
+        <a href="../perm-calculator/">Tool 3: Perm Calculator</a>
+        <a href="../spend-variance/">Tool 4: Spend Variance</a>
+        <a href="../intake-gate/">Tool 5: Intake Gate</a>
+        <a href="../qtc-diagnostic/">Tool 7: QTC Diagnostic</a>
+        <a href="../deal-check/">The Deal Check</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var CHECKS = [
+        { key: "accountVerified", label: "Account Verified" },
+        { key: "priorContractLinked", label: "Prior Contract Linked" },
+        { key: "eligibilityConfirmed", label: "Eligibility Confirmed" },
+        { key: "skuMixValid", label: "SKU Mix Valid" },
+        { key: "docsComplete", label: "Docs Complete" }
+      ];
+
+      var SAMPLE_DEALS = [
+        { id: "DEAL-101", account: "Sample Corp A", dealType: "Renewal", acv: 120000, discount: 15, accountVerified: "Y", priorContractLinked: "Y", eligibilityConfirmed: "Y", skuMixValid: "Y", docsComplete: "Y", status: "Pre-Approved" },
+        { id: "DEAL-102", account: "Sample Corp B", dealType: "New Business", acv: 85000, discount: 25, accountVerified: "N", priorContractLinked: "Y", eligibilityConfirmed: "Y", skuMixValid: "Y", docsComplete: "N", status: "Pending" },
+        { id: "DEAL-103", account: "Sample Corp C", dealType: "Mid-Term Reset", acv: 210000, discount: 35, accountVerified: "Y", priorContractLinked: "N", eligibilityConfirmed: "N", skuMixValid: "Y", docsComplete: "N", status: "Approved" },
+        { id: "DEAL-104", account: "Sample Corp D", dealType: "Expansion", acv: 64000, discount: 10, accountVerified: "Y", priorContractLinked: "Y", eligibilityConfirmed: "Y", skuMixValid: "Y", docsComplete: "Y", status: "Pre-Approved" },
+        { id: "DEAL-105", account: "Sample Corp E", dealType: "Renewal", acv: 340000, discount: 42, accountVerified: "Y", priorContractLinked: "Y", eligibilityConfirmed: "Y", skuMixValid: "N", docsComplete: "Y", status: "Pending" }
+      ];
+
+      var deals = [];
+      var nextDealNum = 106;
+
+      function cloneSample() {
+        return SAMPLE_DEALS.map(function (d, i) {
+          return {
+            uid: "row-" + (i + 1) + "-" + Date.now(),
+            id: d.id, account: d.account, dealType: d.dealType, acv: d.acv, discount: d.discount,
+            accountVerified: d.accountVerified, priorContractLinked: d.priorContractLinked,
+            eligibilityConfirmed: d.eligibilityConfirmed, skuMixValid: d.skuMixValid,
+            docsComplete: d.docsComplete, status: d.status
+          };
+        });
+      }
+
+      function safeNum(v) {
+        if (v === "" || v === null || v === undefined) return 0;
+        var n = parseFloat(String(v).replace(/[^0-9.\-]/g, ""));
+        return Number.isFinite(n) ? n : 0;
+      }
+
+      function fmtCurrency(v) {
+        var n = safeNum(v);
+        return (n < 0 ? "-$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US");
+      }
+
+      function fmtPct(v) {
+        var n = safeNum(v);
+        return Number.isInteger(n) ? n + "%" : parseFloat(n.toFixed(1)) + "%";
+      }
+
+      function esc(s) {
+        return String(s == null ? "" : s)
+          .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+      }
+
+      function evaluateDeal(d) {
+        var yes = 0;
+        var missing = [];
+        for (var i = 0; i < CHECKS.length; i++) {
+          if (d[CHECKS[i].key] === "Y") yes++;
+          else missing.push(CHECKS[i].label);
+        }
+        var readiness = Math.round((yes / 5) * 100);
+        var disc = safeNum(d.discount);
+        var acv = safeNum(d.acv);
+        var status = d.status || "Pending";
+
+        var isAlert = status === "Approved" && (readiness < 100 || disc > 20);
+        var flag = isAlert ? "AUDIT ALERT: Approved Without Baseline" : "OK";
+
+        var routing = "";
+        if (isAlert) routing = "STOP – REVOKE & AUDIT";
+        else if (readiness < 100) routing = "HOLD – RETURN TO SALES";
+        else if (disc <= 15) routing = "FAST-TRACK (Pre-Approved)";
+        else routing = "ROUTE TO DEAL DESK – FINANCE";
+
+        var note = readiness === 100 ? "Clean submission" : "ACTION REQUIRED – Missing Baseline Items";
+
+        return { readiness: readiness, missing: missing, disc: disc, acv: acv, isAlert: isAlert, flag: flag, routing: routing, note: note };
+      }
+
+      function render(keepInputs) {
+        var total = deals.length, clean = 0, held = 0, unauthorized = 0, totalAcv = 0;
+        var alerts = [], heldList = [], fastList = [], finList = [], map = {};
+
+        for (var i = 0; i < deals.length; i++) {
+          var d = deals[i];
+          var m = evaluateDeal(d);
+          map[d.uid] = m;
+          totalAcv += m.acv;
+          if (m.readiness === 100) clean++;
+          if (m.routing === "HOLD – RETURN TO SALES") held++;
+          if (m.isAlert) unauthorized++;
+
+          if (m.isAlert) alerts.push({ d: d, m: m });
+          else if (m.routing === "HOLD – RETURN TO SALES") heldList.push({ d: d, m: m });
+          else if (m.routing === "FAST-TRACK (Pre-Approved)") fastList.push({ d: d, m: m });
+          else finList.push({ d: d, m: m });
+        }
+
+        var yieldPct = total > 0 ? fmtPct((clean / total) * 100) : "0%";
+
+        document.getElementById("kpi-total").textContent = String(total);
+        document.getElementById("kpi-total-acv").textContent = "Queue ACV: " + fmtCurrency(totalAcv);
+        document.getElementById("kpi-clean").textContent = String(clean);
+        document.getElementById("kpi-yield").textContent = yieldPct;
+        document.getElementById("kpi-held").textContent = String(held);
+        document.getElementById("kpi-unauthorized").textContent = String(unauthorized);
+
+        document.getElementById("card-held").classList.toggle("kpi-hold-active", held > 0);
+        document.getElementById("card-unauthorized").classList.toggle("kpi-alert-active", unauthorized > 0);
+
+        renderDecision(alerts, heldList);
+        if (!keepInputs) buildTable(map);
+        else updateComputedCells(map);
+        renderReport(total, clean, yieldPct, held, unauthorized, totalAcv, alerts, heldList, fastList, finList);
+      }
+
+      function renderDecision(alerts, heldList) {
+        var box = document.getElementById("decision-container");
+        if (alerts.length === 0 && heldList.length === 0) {
+          box.innerHTML = '<p class="decision-empty">No submissions require exception triage — zero audit alerts and zero deals held at the gate.</p>';
+          return;
+        }
+        var html = '<ul class="decision-list">';
+        for (var i = 0; i < alerts.length; i++) {
+          var a = alerts[i];
+          var why = "";
+          if (a.m.missing.length > 0 && a.m.disc > 20) {
+            why = "Marked <strong>Approved</strong> at <strong>" + a.m.readiness + "% readiness</strong> with a <strong>" + fmtPct(a.m.disc) + " discount</strong> (&gt;20% limit) — checks answered No: <strong>" + esc(a.m.missing.join(", ")) + "</strong>.";
+          } else if (a.m.missing.length > 0) {
+            why = "Marked <strong>Approved</strong> at <strong>" + a.m.readiness + "% readiness</strong> — checks answered No: <strong>" + esc(a.m.missing.join(", ")) + "</strong>.";
+          } else {
+            why = "Marked <strong>Approved</strong> with a <strong>" + fmtPct(a.m.disc) + " discount</strong> (&gt;20% threshold) without Deal Desk / Finance sign-off.";
+          }
+          html +=
+            '<li class="decision-item decision-alert"><div class="decision-item-body">' +
+            '<div class="decision-badge-row"><span class="severity-pill pill-alert">AUDIT ALERT · STOP – REVOKE &amp; AUDIT</span><span>' + esc(a.d.id) + " · " + esc(a.d.account) + " (" + esc(a.d.dealType) + " · " + fmtCurrency(a.m.acv) + ")</span></div>" +
+            '<p class="decision-reason">' + why + '</p></div><button type="button" class="btn-locate" data-locate="' + esc(a.d.uid) + '">Locate in Log ↓</button></li>';
+        }
+        for (var j = 0; j < heldList.length; j++) {
+          var h = heldList[j];
+          html +=
+            '<li class="decision-item decision-hold"><div class="decision-item-body">' +
+            '<div class="decision-badge-row"><span class="severity-pill pill-hold">HELD AT GATE · HOLD – RETURN TO SALES</span><span>' + esc(h.d.id) + " · " + esc(h.d.account) + " (" + esc(h.d.dealType) + " · " + fmtCurrency(h.m.acv) + " · " + fmtPct(h.m.disc) + " disc.)</span></div>" +
+            '<p class="decision-reason">Held at <strong>' + h.m.readiness + "% readiness</strong> (Status: " + esc(h.d.status) + ") — checks answered No: <strong>" + esc(h.m.missing.join(", ")) + '</strong>.</p></div><button type="button" class="btn-locate" data-locate="' + esc(h.d.uid) + '">Locate in Log ↓</button></li>';
+        }
+        html += "</ul>";
+        box.innerHTML = html;
+      }
+
+      function badgeFlag(m) {
+        return '<span class="computed-badge ' + (m.isAlert ? "flag-alert" : "flag-ok") + '">' + esc(m.flag) + "</span>";
+      }
+
+      function badgeRoute(m) {
+        var c = m.routing === "STOP – REVOKE & AUDIT" ? "route-stop" : m.routing === "HOLD – RETURN TO SALES" ? "route-hold" : m.routing === "FAST-TRACK (Pre-Approved)" ? "route-fast" : "route-finance";
+        return '<span class="computed-badge ' + c + '">' + esc(m.routing) + "</span>";
+      }
+
+      function cellNote(m) {
+        var h = '<span class="note-primary ' + (m.readiness === 100 ? "note-clean" : "note-action") + '">' + esc(m.note) + "</span>";
+        if (m.missing.length > 0) h += '<span class="note-missing-detail">Missing: ' + esc(m.missing.join(", ")) + "</span>";
+        else if (m.isAlert && m.disc > 20) h += '<span class="note-missing-detail">Discount ' + fmtPct(m.disc) + " &gt; 20% while Approved</span>";
+        return h;
+      }
+
+      function buildTable(map) {
+        var tbody = document.getElementById("gate-log-tbody");
+        if (deals.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="16" data-label="Queue Empty" style="text-align:center;padding:1.25rem;font-family:var(--font-mono);">Queue is empty. Click "+ Add Deal" or "Reset Sample Deals".</td></tr>';
+          return;
+        }
+        var html = "";
+        for (var i = 0; i < deals.length; i++) {
+          var d = deals[i];
+          var m = map[d.uid];
+          var rCls = m.isAlert ? "row-alert" : m.routing === "HOLD – RETURN TO SALES" ? "row-hold" : "";
+          var idEsc = esc(d.id);
+          html +=
+            '<tr data-uid="' + esc(d.uid) + '" id="row-' + esc(d.uid) + '" class="' + rCls + '">' +
+            '<td data-label="Deal ID"><input type="text" class="cell-input mono-input" data-field="id" value="' + idEsc + '" aria-label="Deal ID row ' + (i + 1) + '"></td>' +
+            '<td data-label="Account"><input type="text" class="cell-input" data-field="account" value="' + esc(d.account) + '" aria-label="Account for ' + idEsc + '"></td>' +
+            '<td data-label="Deal Type"><input type="text" class="cell-input" data-field="dealType" value="' + esc(d.dealType) + '" aria-label="Deal Type for ' + idEsc + '"></td>' +
+            '<td data-label="Proposed ACV ($)"><input type="number" step="1000" min="0" class="cell-input num-input" data-field="acv" value="' + esc(d.acv) + '" aria-label="Proposed ACV for ' + idEsc + '"></td>' +
+            '<td data-label="Requested Discount %"><input type="number" step="1" min="0" max="100" class="cell-input num-input" data-field="discount" value="' + esc(d.discount) + '" aria-label="Requested Discount percent for ' + idEsc + '"></td>';
+          for (var c = 0; c < CHECKS.length; c++) {
+            var k = CHECKS[c].key, lbl = CHECKS[c].label, v = d[k] === "Y" ? "Y" : "N";
+            html +=
+              '<td data-label="' + esc(lbl) + '" class="td-check" style="text-align:center;">' +
+              '<select class="check-select val-' + v + '" data-field="' + k + '" aria-label="' + esc(lbl) + " for " + idEsc + '">' +
+              '<option value="Y"' + (v === "Y" ? " selected" : "") + '>Y</option>' +
+              '<option value="N"' + (v === "N" ? " selected" : "") + '>N</option></select></td>';
+          }
+          var st = d.status;
+          html +=
+            '<td data-label="Approval Status"><select class="status-select status-' + esc(st) + '" data-field="status" aria-label="Approval Status for ' + idEsc + '">' +
+            '<option value="Pre-Approved"' + (st === "Pre-Approved" ? " selected" : "") + '>Pre-Approved</option>' +
+            '<option value="Pending"' + (st === "Pending" ? " selected" : "") + '>Pending</option>' +
+            '<option value="Approved"' + (st === "Approved" ? " selected" : "") + '>Approved</option></select></td>' +
+            '<td data-label="Readiness %" class="readiness-cell ' + (m.readiness === 100 ? "readiness-100" : "readiness-low") + '" data-comp="readiness">' + m.readiness + "%</td>" +
+            '<td data-label="Flag" data-comp="flag">' + badgeFlag(m) + "</td>" +
+            '<td data-label="Routing" data-comp="routing">' + badgeRoute(m) + "</td>" +
+            '<td data-label="Pushback Note" data-comp="note">' + cellNote(m) + "</td>" +
+            '<td data-label="Delete" class="td-actions"><button type="button" class="btn-delete-row" data-del="' + esc(d.uid) + '" aria-label="Delete ' + idEsc + '">Delete</button></td></tr>';
+        }
+        tbody.innerHTML = html;
+      }
+
+      function updateComputedCells(map) {
+        var tbody = document.getElementById("gate-log-tbody");
+        for (var i = 0; i < deals.length; i++) {
+          var d = deals[i], m = map[d.uid];
+          var tr = tbody.querySelector('tr[data-uid="' + d.uid + '"]');
+          if (!tr) continue;
+          tr.classList.remove("row-alert", "row-hold");
+          if (m.isAlert) tr.classList.add("row-alert");
+          else if (m.routing === "HOLD – RETURN TO SALES") tr.classList.add("row-hold");
+
+          var rTd = tr.querySelector('[data-comp="readiness"]');
+          if (rTd) {
+            rTd.textContent = m.readiness + "%";
+            rTd.className = "readiness-cell " + (m.readiness === 100 ? "readiness-100" : "readiness-low");
+          }
+          var fTd = tr.querySelector('[data-comp="flag"]');
+          if (fTd) fTd.innerHTML = badgeFlag(m);
+          var rtTd = tr.querySelector('[data-comp="routing"]');
+          if (rtTd) rtTd.innerHTML = badgeRoute(m);
+          var nTd = tr.querySelector('[data-comp="note"]');
+          if (nTd) nTd.innerHTML = cellNote(m);
+
+          for (var c = 0; c < CHECKS.length; c++) {
+            var k = CHECKS[c].key;
+            var sel = tr.querySelector('select[data-field="' + k + '"]');
+            if (sel) sel.className = "check-select val-" + d[k];
+          }
+          var stSel = tr.querySelector('select[data-field="status"]');
+          if (stSel) stSel.className = "status-select status-" + d.status;
+        }
+      }
+
+      function renderReport(total, clean, yieldPct, held, unauthorized, totalAcv, alerts, heldList, fastList, finList) {
+        var out = [];
+        out.push("DEAL DESK INTAKE GATE & SUBMISSION SCORECARD — GATE REPORT");
+        out.push("====================================================================");
+        out.push("KPI SUMMARY");
+        out.push("  TOTAL DEALS SUBMITTED         : " + total + " (" + fmtCurrency(totalAcv) + " Total ACV)");
+        out.push("  CLEAN FIRST-PASS              : " + clean);
+        out.push("  FIRST-PASS YIELD %            : " + yieldPct);
+        out.push("  HELD AT GATE                  : " + held);
+        out.push("  UNAUTHORIZED APPROVALS CAUGHT : " + unauthorized);
+        out.push("");
+        out.push("AUDIT ALERTS — STOP – REVOKE & AUDIT (" + alerts.length + ")");
+        if (alerts.length === 0) {
+          out.push("  None.");
+        } else {
+          for (var i = 0; i < alerts.length; i++) {
+            var a = alerts[i], reasons = [];
+            if (a.m.missing.length > 0) reasons.push("Missing checks: " + a.m.missing.join(", "));
+            if (a.m.disc > 20) reasons.push("Discount " + fmtPct(a.m.disc) + " > 20% threshold while Approved");
+            out.push("  * " + a.d.id + " (" + a.d.account + " · " + a.d.dealType + " · " + fmtCurrency(a.m.acv) + " · " + fmtPct(a.m.disc) + " disc.)");
+            out.push("    Readiness: " + a.m.readiness + "% | Flag: " + a.m.flag + " | Routing: " + a.m.routing);
+            out.push("    Reason: " + reasons.join("; "));
+          }
+        }
+        out.push("");
+        out.push("HELD AT GATE — HOLD – RETURN TO SALES (" + heldList.length + ")");
+        if (heldList.length === 0) {
+          out.push("  None.");
+        } else {
+          for (var j = 0; j < heldList.length; j++) {
+            var h = heldList[j];
+            out.push("  * " + h.d.id + " (" + h.d.account + " · " + h.d.dealType + " · " + fmtCurrency(h.m.acv) + " · " + fmtPct(h.m.disc) + " disc.)");
+            out.push("    Readiness: " + h.m.readiness + "% | Routing: " + h.m.routing + " | Note: " + h.m.note);
+            out.push("    Missing checks: " + h.m.missing.join(", "));
+          }
+        }
+        out.push("");
+        out.push("FAST-TRACKED DEALS — FAST-TRACK (Pre-Approved) (" + fastList.length + ")");
+        if (fastList.length === 0) {
+          out.push("  None.");
+        } else {
+          for (var k = 0; k < fastList.length; k++) {
+            var f = fastList[k];
+            out.push("  * " + f.d.id + " (" + f.d.account + " · " + f.d.dealType + " · " + fmtCurrency(f.m.acv) + " · " + fmtPct(f.m.disc) + " disc.) — 100% Readiness · " + f.m.routing);
+          }
+        }
+        if (finList.length > 0) {
+          out.push("");
+          out.push("ROUTED TO FINANCE — ROUTE TO DEAL DESK – FINANCE (" + finList.length + ")");
+          for (var n = 0; n < finList.length; n++) {
+            var fn = finList[n];
+            out.push("  * " + fn.d.id + " (" + fn.d.account + " · " + fn.d.dealType + " · " + fmtCurrency(fn.m.acv) + " · " + fmtPct(fn.m.disc) + " disc.) — 100% Readiness · " + fn.m.routing);
+          }
+        }
+        out.push("====================================================================");
+        out.push("Partition: Deal Desk Controls (S6-P05)");
+        out.push("Source: https://fractional-deal-desk-site.pages.dev/tools/intake-gate/");
+
+        var txt = out.join("\n");
+        document.getElementById("gate-report-text").textContent = txt;
+
+        var emailBtn = document.getElementById("btn-email-report");
+        if (emailBtn) {
+          emailBtn.setAttribute(
+            "href",
+            "mailto:?subject=" +
+              encodeURIComponent("Deal Desk Gate Report (" + unauthorized + " Alert, " + held + " Held, " + yieldPct + " Yield)") +
+              "&body=" +
+              encodeURIComponent(txt)
+          );
+        }
+      }
+
+      var tbodyEl = document.getElementById("gate-log-tbody");
+
+      function handleFieldUpdate(e) {
+        var t = e.target;
+        var field = t.getAttribute("data-field");
+        if (!field) return;
+        var tr = t.closest("tr");
+        if (!tr) return;
+        var uid = tr.getAttribute("data-uid");
+        for (var i = 0; i < deals.length; i++) {
+          if (deals[i].uid === uid) {
+            deals[i][field] = t.value;
+            break;
+          }
+        }
+        render(true);
+      }
+
+      tbodyEl.addEventListener("input", handleFieldUpdate);
+      tbodyEl.addEventListener("change", handleFieldUpdate);
+
+      tbodyEl.addEventListener("click", function (e) {
+        var delBtn = e.target.closest("[data-del]");
+        if (!delBtn) return;
+        var uid = delBtn.getAttribute("data-del");
+        deals = deals.filter(function (d) { return d.uid !== uid; });
+        render(false);
+      });
+
+      document.getElementById("decision-container").addEventListener("click", function (e) {
+        var locBtn = e.target.closest("[data-locate]");
+        if (!locBtn) return;
+        var uid = locBtn.getAttribute("data-locate");
+        var row = document.getElementById("row-" + uid);
+        if (row) {
+          row.scrollIntoView({ behavior: "smooth", block: "center" });
+          row.classList.add("row-highlight");
+          setTimeout(function () { row.classList.remove("row-highlight"); }, 1800);
+        }
+      });
+
+      document.getElementById("btn-add-deal").addEventListener("click", function () {
+        var code = "DEAL-" + nextDealNum++;
+        deals.push({
+          uid: "row-" + nextDealNum + "-" + Date.now(),
+          id: code, account: "Sample Corp New", dealType: "New Business", acv: 95000, discount: 18,
+          accountVerified: "Y", priorContractLinked: "Y", eligibilityConfirmed: "Y", skuMixValid: "Y", docsComplete: "N", status: "Pending"
+        });
+        render(false);
+      });
+
+      function resetAll() {
+        deals = cloneSample();
+        nextDealNum = 106;
+        render(false);
+      }
+
+      document.getElementById("btn-reset-top").addEventListener("click", resetAll);
+      document.getElementById("btn-reset-bottom").addEventListener("click", resetAll);
+
+      document.getElementById("btn-copy-report").addEventListener("click", function () {
+        var btn = this;
+        var txt = document.getElementById("gate-report-text").textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(txt).then(function () {
+            btn.textContent = "Copied Gate Report ✓";
+            setTimeout(function () { btn.textContent = "Copy Gate Report"; }, 2000);
+          });
+        } else {
+          var ta = document.createElement("textarea");
+          ta.value = txt;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          btn.textContent = "Copied Gate Report ✓";
+          setTimeout(function () { btn.textContent = "Copy Gate Report"; }, 2000);
+        }
+      });
+
+      resetAll();
+    })();
+  </script>
+</body>
+</html>
