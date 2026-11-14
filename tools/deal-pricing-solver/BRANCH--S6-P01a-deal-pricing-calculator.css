@@ -1,0 +1,88 @@
+/* ==========================================================================
+   S6-P01a-deal-pricing-calculator.css — styles for the Deal Pricing
+   Calculator on the S6-P01.a tool page (/tools/deal-pricing-solver/).
+   Every rule is scoped under .calc so it cannot disturb the shared site
+   styles (../../assets/styles.css — the token VALUES here track the shared
+   sheet; Nov 11, 2026 bank restyle: paper/ink/line/muted moved to the
+   institutional navy palette with it, while --accent keeps its functional
+   green — it marks positive results and pass flags, like the workbooks'
+   green output cells).
+   Loaded only by S6-P01a-deal-pricing-solver.html.
+   Companion files: S6-P01a-deal-pricing-calculator.js (the math + wiring).
+   Rule: any change is recorded in ../../CHANGELOG.md with the CODE-MAP
+   updated in the same change (Code Labeling System, Rule 3).
+   ========================================================================== */
+:root{
+    --paper:#F8F8F5; --ink:#0F1E38; --accent:#0E6B5C; --line:#D9DCE1; --muted:#5F6B7A;
+    --input:#FFF3B0; --outbg:#E4F0E6; --warn:#8A5A00; --warnbg:#FFF4D6; --bad:#8E2F2F; --badbg:#FBE9E9;
+    --s-8:8px; --s-12:12px; --s-16:16px; --s-24:24px; --s-32:32px;
+  }
+  *{box-sizing:border-box}
+    font:16px/1.5 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  header.top{border-bottom:1px solid var(--line);padding:14px 0;margin-bottom:8px}
+  header.top .brand{font-weight:700}
+  header.top .tag{float:right;color:var(--muted);font-size:14px}
+  h1{font-family:Georgia,"Times New Roman",serif;font-size:34px;line-height:1.15;margin:18px 0 6px}
+  h2{font-family:Georgia,serif;font-size:22px;margin:0 0 4px}
+  h3{font-size:16px;margin:0 0 6px}
+  .lede{font-size:18px;color:#333;max-width:65ch}
+  .small{color:var(--muted);font-size:14px}
+  .notice{background:#FFF8E1;border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:14px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 16px}
+  .tab{border:1px solid var(--ink);background:#fff;color:var(--ink);border-radius:999px;
+    padding:10px 18px;font-size:16px;cursor:pointer;min-height:48px}
+  .tab.active{background:var(--ink);color:#fff}
+  .frame{border:1px solid var(--line);border-radius:12px;background:#fff;padding:18px;margin-bottom:22px}
+  .block{border-top:1px solid var(--line);padding-top:16px;margin-top:18px}
+  .block:first-child{border-top:none;padding-top:0;margin-top:0}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:3px}
+  input[type=number],input[type=text],select{
+    width:100%;padding:9px 10px;font-size:16px;border:1px solid #B9B9B0;border-radius:6px;background:#fff;color:var(--ink)}
+  input.in{background:var(--input)}
+  select.in{background:var(--input)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.grid2{grid-template-columns:1fr}}
+  .out{background:var(--outbg);border-radius:6px;padding:9px 10px;font-variant-numeric:tabular-nums;min-height:42px}
+  .out b{font-size:17px}
+  .big{font-size:22px;font-weight:700}
+  table{width:100%;border-collapse:collapse;font-size:14.5px}
+  th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--muted);font-weight:600;font-size:13px}
+  td.num{font-variant-numeric:tabular-nums}
+  .scroll{overflow-x:auto}
+  .pos{color:var(--accent)} .neg{color:var(--bad)}
+  .flag{display:inline-block;border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700}
+  .flag.pass{background:var(--outbg);color:var(--accent)}
+  .flag.fail{background:var(--badbg);color:var(--bad)}
+  .flag.warn{background:var(--warnbg);color:var(--warn)}
+  .del{border:1px solid var(--line);background:#fff;color:var(--bad);border-radius:6px;
+    width:34px;height:34px;cursor:pointer;font-size:15px;line-height:1}
+  .del:hover{background:var(--badbg)}
+  .rule{border-top:1px solid var(--line);padding:10px 0}
+  footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:14px;margin-top:8px}
+  .kbd-note{font-size:13px;color:var(--muted)}
+
+  /* MOBILE PRESENTATION (Nov 10, 2026, Lucky's ruling: a mobile version and
+     a desktop version of every tool — one codebase, same numbers; desktop
+     untouched, everything here is inside the max-width query). Tables keep
+     their real columns inside their .scroll frames, the SKU name column
+     sticks while the numbers scroll, controls become full tap targets,
+     and a sticky totals bar (.calc-mobile-bar, fed by a page script that
+     only READS the calculator's own outputs) keeps the deal totals on
+     screen while a phone visitor scrolls the lines. */
+  @media (max-width:700px){
+    .calc table{min-width:660px}
+    .calc .scroll{box-shadow:inset -14px 0 14px -14px rgba(27,42,65,.45)}
+    .calc td:first-child,.calc th:first-child{position:sticky;left:0;background:#fff;z-index:1;
+      box-shadow:1px 0 0 var(--line);min-width:150px}
+    .calc input[type=number],.calc input[type=text],.calc select{min-height:44px}
+    .calc .del{width:44px;height:44px}
+    .calc-mobile-bar{position:sticky;bottom:0;z-index:5;background:var(--ink);color:#fff;
+      border-radius:8px;padding:10px 14px;margin-top:16px;font-size:15px;
+      display:flex;gap:16px;flex-wrap:wrap;align-items:baseline}
+    .calc-mobile-bar b{font-size:17px}
+    .calc-mobile-bar .lbl{color:#C9D4E2;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  }
+  @media (min-width:701px){ .calc-mobile-bar{display:none} }
