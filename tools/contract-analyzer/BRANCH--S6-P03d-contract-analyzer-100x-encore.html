@@ -1,0 +1,2141 @@
+<!DOCTYPE html>
+<!--
+ARGON MANIFEST: TOOL 13 ENCORE REBUILD — Contract Analyzer (S6-P03.4 — THE COVERAGE BUILD)
+=========================================================================================
+
+1. AUTHORIZED ENGINE EXTENSION & LAYER 1 FREEZE
+   - Layer 1 (parseKeyClauses: dates, money, parties, law, term_length, renewal_period + allMatches):
+     * BYTE-FOR-BYTE FROZEN from analyzer-engine.txt (S6-P03.d). Zero characters changed.
+   - Layer 2 (Original 33 Checks):
+     * All 33 original check IDs, groups, names, and why-lines are preserved verbatim.
+     * Pattern hardening (widening only — zero patterns narrowed or removed) applied and verified
+       against the regression floor (F1 = 8, F2 = 0, F3 = 33) and proven fixture misses.
+   - Layer 2 Expansion (8 New Checks — total checklist count updated from 33 to 41):
+     1. mfn (Money) — "Most-favored-customer / MFN pricing": whether the customer is promised pricing no worse than anyone else's.
+     2. setoff (Money) — "Setoff rights": whether amounts owed can be netted against fees payable.
+     3. exit-assistance (Operations) — "Exit / data return / transition assistance": what happens to the customer's data and operations when the contract ends.
+     4. suspension-rights (Operations) — "Suspension rights": whether the vendor can suspend service, and for what (typically nonpayment).
+     5. publicity (Operations) — "Publicity / logo use": whether either side may use the other's name or logo.
+     6. compliance-laws (Legal) — "Compliance with laws": whether each side promises to obey applicable law.
+     7. survival (Legal) — "Survival": which duties are stated to outlive termination.
+     8. injunctive-relief (Legal) — "Injunctive relief / jury waiver": equitable remedies and jury-trial waivers.
+
+2. DECLARED PATTERN CHANGES (ORIGINAL 33 HARDENING)
+   All patterns below were added alongside (never replacing or narrowing) the existing patterns:
+   - parties (Basics):
+     * Old: /\bbetween\s+[A-Z][\w\s,&.\-]+?\s+and\s+[A-Z]/i, /\b(this agreement|this contract)\s+is\s+(made|entered into)\b/i
+     * Added: /\bthis\s+[A-Za-z\s]{0,30}(agreement|contract|terms)\b[^.\n]{0,30}\bis\s+(made|entered into)/i,
+              /\bentered into\s+(as of[^.\n]{0,40}\s+)?(by and )?between\b/i,
+              /\benter(s|ed)? into this (agreement|contract|terms)\b/i
+     * Proving lines: "Alpha Corp. ('Vendor') and Beta LLC ('Customer') enter into this Agreement." / "This Master Services Agreement ('Agreement') is entered into..."
+   - effective-date (Basics):
+     * Old: /\beffective date\b/i, /\bcommencement date\b/i, /\bmade on\s+\d{4}-\d{2}-\d{2}\b/i
+     * Added: /\bstart date\b/i, /\b(take|takes) effect (on|as of)\b/i,
+              /\b(made|entered into) (on|as of)\s+([A-Z][a-z]+\s+\d{1,2},\s*\d{4}|\d{4}-\d{2}-\d{2})/i
+     * Proving lines: "This Agreement shall take effect as of the 1st day of March, 2026." / "Start date: March 1, 2026."
+   - term (Basics):
+     * Old: /\b(initial\s+)?term\b[^.\n]{0,60}?(\d+|twelve|twenty-four|thirty-six)(\s*\(\s*\d+\s*\))?\s*(month|year|day|week)/i, /\bterm of\s+(this agreement|\d)/i
+     * Added: /\b(initial\s+)?term\b[^.\n]{0,60}?(\d+|one|two|three|four|five|six|twelve|eighteen|twenty-four|thirty-six|forty-eight|sixty)(\s*\(\s*\d+\s*\))?\s*(month|year|day|week)/i,
+              /\b(remain|continues?) in (full )?force[^.\n]{0,40}(for a period of|from month to month|\d+\s*(month|year))/i,
+              /\b(contract|agreement)\s+(runs|lasts|duration)\s+(for\s+|is\s+)?(\d+|one|two|three)\s*(month|year)/i
+     * Proving lines: F5 §2 "it continues in force from month to month" / "remain in full force and effect for a period of three (3) years" / "This contract runs for 2 years."
+   - renewal (Basics):
+     * Old: /\bauto[-\s]?renew/i, /\bshall renew\b/i, /\brenew(s|al)?\s+for\b/i, /\bsuccessive (terms|periods|renewal)\b/i
+     * Added: /\bevergreen\b/i, /\bautomatically\s+(renew|extend)(s|ed)?\b/i, /\brolls? over\b[^.\n]{0,30}(year|month|term|period|automatically)/i
+     * Proving lines: F5 §2 "This agreement is evergreen" / "shall automatically extend" / "The subscription rolls over each year unless stopped."
+   - renewal-notice (Basics):
+     * Old: /notice of non[-\s]?renewal/i, /\bnot\s+(renew|extend)\b[^.\n]{0,40}notice/i, /(prior to|before)\s+(the\s+)?(renewal|expiration)[^.\n]{0,60}notice/i, /notice[^.\n]{0,50}(prior to|before)[^.\n]{0,30}renew/i
+     * Added: /opt[-\s]?out[^.\n]{0,40}renew/i, /\bnot\s+to\s+(renew|extend)\b[^.\n]{0,50}(notice|notification)/i, /(notice|notification)[^.\n]{0,50}not\s+to\s+(renew|extend)/i
+     * Proving lines: "notification of its election not to renew" / "You must opt out of renewal at least 30 days before the end date."
+   - termination-convenience (Basics):
+     * Old: /terminate[^.\n]{0,60}for convenience/i, /terminate[^.\n]{0,40}without cause/i, /may terminate[^.\n]{0,80}\b\d+\s*days?['\u2019]?\s*(prior\s+)?(written\s+)?notice/i
+     * Added: /(terminate|cancel)[^.\n]{0,60}(at any time|anytime|for any reason|for no reason)/i, /may terminate[^.\n]{0,50}upon\s+(prior\s+)?(written\s+)?notice/i
+     * Proving lines: F5 §3 "Either party may terminate this agreement at any time upon written notice to the other party." / "Either side can cancel at any time with 30 days notice."
+   - termination-cause (Basics):
+     * Old: /terminate[^.\n]{0,60}for cause/i, /material breach/i, /cure (period|such breach|within)/i
+     * Added: /\buncured\b/i, /\bcure[^.\n]{0,25}(period|breach|default|within)\b/i, /\bremed(y|ied)[^.\n]{0,25}(breach|default|failure)[^.\n]{0,30}within\b/i, /\bterminate[^.\n]{0,50}(material|for)\s+(breach|default)\b/i
+     * Proving lines: "fails to remedy such breach within thirty (30) days" / "If one side commits an uncured breach, the other side can terminate for breach."
+   - fees (Money):
+     * Old: /(USD\s*)?\$\s?\d[\d,]*(\.\d{2})?/i, /\bfees? of\s/i, /\bper (month|year|annum|user|seat)\b/i
+     * Added: /\b(USD|EUR|GBP)\s*\d[\d,]*/i, /\b\d[\d,]*\s*(USD|EUR|GBP|dollars)\b/i, /\b(subscription|license|service)\s+fees?\b/i, /\bfees?\s+(payable|schedule|in the amount)\b/i
+     * Proving lines: "Client shall remit subscription fees in the amount of EUR 25,000 annually." / "Total cost is 5,000 USD per year."
+   - payment-terms (Money):
+     * Old: /\bnet\s*\d+\b/i, /payable within\s*\d+\s*days/i, /due within\s*\d+\s*days/i, /within\s*\d+\s*days of (invoice|receipt)/i
+     * Added: /\bnet[-\s]*\d+\b/i,
+              /(payable|due)[^.\n]{0,20}within\s*(?:[a-z-]+\s*\(\s*\d+\s*\)|\d+|fifteen|thirty|forty-five|sixty|ninety)\s*days/i,
+              /within\s*(?:[a-z-]+\s*\(\s*\d+\s*\)|\d+)\s*days\s+(of|after|from|following)\s+(an?\s+)?(undisputed\s+)?(invoice|receipt|billing)/i
+     * Proving lines: F5 §1 "payable Net-30 from the invoice date" AND F4 §1 "payable within thirty (30) days of invoice".
+   - late-fees (Money):
+     * Old: /late (fee|charge|payment)[^.\n]{0,50}(%|interest|per)/i, /interest[^.\n]{0,40}(late|overdue|per (month|annum))/i, /overdue[^.\n]{0,40}interest/i
+     * Added: /(past[-\s]?due|overdue|late)\s+(amount|balance|invoice|payment)s?[^.\n]{0,50}(interest|finance charge|late fee|penalty|%)/i, /\b(late fee|late penalty|finance charge)s?\b/i
+     * Proving lines: "Past-due balances shall accrue a finance charge of 1.5% per month." / "Overdue invoices carry a 5% late fee."
+   - price-increase (Money):
+     * Old: /price increase/i, /increase[^.\n]{0,40}(fees|prices|charges)[^.\n]{0,40}(%|CPI|index)/i, /\bCPI\b/i, /escalat(or|ion)/i, /uplift/i
+     * Added: /\b(annual\s+)?(fee|price|rate)\s+(adjustment|increase|escalation)\b/i, /\b(raise|adjust)\s+(its\s+|the\s+)?(fees|prices|rates)\b/i
+     * Proving lines: "Fees are subject to an annual fee adjustment upon each renewal term." / "We may raise prices by 5% at renewal."
+   - taxes (Money):
+     * Old: /\b(exclusive of|plus|excluding)\s+(all\s+)?taxes\b/i, /\b(sales tax|VAT|GST|withholding tax)\b/i, /responsible for[^.\n]{0,30}taxes/i
+     * Added: /\b(do not include|exclude[sd]?|exclusive of)\s+[^.\n]{0,30}\btax(es)?\b/i, /\b(applicable|use|excise|indirect)\s+tax(es)?\b/i, /\btaxes\b[^.\n]{0,40}(paid|borne|responsibility)\s+by\b/i
+     * Proving lines: "All charges exclude applicable taxes, duties, and levies" / "Prices do not include tax; buyer pays sales or use tax."
+   - liability-cap (Risk):
+     * Old: /liability[^.\n]{0,60}(shall not exceed|cap(ped)?|limited to)/i, /aggregate liability/i, /(cap|limitation) on liability/i, /in no event[^.\n]{0,60}liable[^.\n]{0,40}exceed/i
+     * Added: /\bcap\s+on\s+[^.\n]{0,30}liability\b/i, /\b(maximum|total|cumulative)\s+liability\b/i, /\b(liability|damages)[^.\n]{0,50}(capped at|will not exceed|not to exceed|shall not exceed)\b/i
+     * Proving lines: F5 §4 "The cap on either party's liability arising out of this agreement is the total fees paid" / "Total damages are capped at the fees paid over the last year."
+   - consequential (Risk):
+     * Old: /consequential damages/i, /indirect[^.\n]{0,20}damages/i, /lost profits/i
+     * Added: /\b(special|incidental|punitive|exemplary)\b[^.\n]{0,40}\bdamages\b/i, /\bloss of (profits|revenue|business|data)\b/i, /\blost revenue\b/i
+     * Proving lines: "In no event shall either party be liable for special, incidental, or punitive damages." / "lost revenue or loss of business."
+   - indemnity (Risk):
+     * Old: /\bindemnif\w+/i, /hold harmless/i, /defend[^.\n]{0,40}against[^.\n]{0,30}(claim|action)/i
+     * Added: /\b(save|keep) harmless\b/i, /\b(reimburse|cover)[^.\n]{0,40}(third[-\s]party\s+(claim|suit|action)|defense costs)\b/i, /\bthird[-\s]party\s+(sues|suit|claim)[^.\n]{0,40}(pay|defend|cover|indemn)/i
+     * Proving lines: "Vendor shall defend, reimburse, and save harmless Buyer from third-party actions." / "cover our defense costs."
+   - warranties (Risk):
+     * Old: /\bwarrant(s|ies|y)\b/i, /as[-\s]is/i, /disclaim\w*[^.\n]{0,30}warrant/i
+     * Added: /\b(merchantability|fitness for a particular purpose)\b/i, /\b(no|disclaims? all)\s+(guarantees|representations)\b/i, /\b(we|vendor|provider) guarantees?\b[^.\n]{0,40}(work|perform|service|conform)/i
+     * Proving lines: "The software is provided as-is and we make no guarantees." / "merchantability and fitness for a particular purpose."
+   - insurance (Risk):
+     * Old: /\binsurance\b[^.\n]{0,50}(maintain|carry|coverage|policy)/i, /certificate of insurance/i, /(commercial general liability|cyber liability|professional liability) insurance/i
+     * Added: /\b(maintain|carry|keep|obtain)[^.\n]{0,40}\binsurance\b/i, /\badditional insured\b/i, /\b(errors and omissions|E&O|workers'? compensation|cyber|general liability)\s+(insurance|coverage)\b/i
+     * Proving lines: "Vendor shall carry errors and omissions coverage and name Customer as an additional insured." / "carry business insurance."
+   - ip-ownership (Data & IP):
+     * Old: /intellectual property/i, /work product/i, /(own|ownership)[^.\n]{0,40}(deliverables|materials developed)/i, /all rights, title/i
+     * Added: /\bproprietary rights\b/i, /\b(copyrights?|patents?|trade secrets?)\b/i, /\bowns?\s+(all\s+)?(custom\s+work|deliverables|results|inventions)\b/i
+     * Proving lines: "proprietary rights, including all patents and copyrights." / "The client owns all custom work made under this contract."
+   - license (Data & IP):
+     * Old: /grant(s|ed)?[^.\n]{0,40}licen[cs]e/i, /licen[cs]e to use/i, /non-exclusive[^.\n]{0,30}licen[cs]e/i
+     * Added: /\b(right|permission)\s+to\s+(access\s+and\s+)?use\s+(the\s+)?(software|platform|service|system)s?\b/i, /\b(allowed|authorized)\s+to\s+use\s+(the\s+)?(software|platform|service)s?\b/i, /\b(limited|worldwide|royalty[-\s]free|perpetual|revocable)\s+licen[cs]e\b/i
+     * Proving lines: "Licensor confers a limited, revocable right to access and use the Software." / "Customer is allowed to use the service."
+   - confidentiality (Data & IP):
+     * Old: /confidential information/i, /\bnon-disclosure\b/i, /shall keep[^.\n]{0,30}confidential/i
+     * Added: /\bin\s+(strict\s+)?confidence\b/i, /\b(NDA|non[-\s]?disclose|treat[^.\n]{0,20}as confidential)\b/i, /\bkeep[^.\n]{0,35}(secret|private|confidential)\b/i
+     * Proving lines: "hold all disclosures in strict confidence" / "Keep each other's business information secret and treat it as confidential."
+   - data-protection (Data & IP):
+     * Old: /data protection/i, /personal data/i, /\bDPA\b|data processing (addendum|agreement)/i, /(GDPR|CCPA|CPRA)/i, /data breach|security incident/i
+     * Added: /\bpersonally identifiable information\b/i, /\bPII\b/i, /\bdata (controller|processor)\b/i, /\b(personal information|privacy (law|policy|regulations?))\b/i
+     * Proving lines: F5 §6 "Customer is the data controller and Vendor is the data processor with respect to personally identifiable information (PII)" / "customer personal information".
+   - security (Data & IP):
+     * Old: /(SOC\s?2|ISO\s?27001)/i, /security (measures|program|standards)/i, /notify[^.\n]{0,50}(breach|incident)[^.\n]{0,30}(hour|day)/i
+     * Added: /\b(encrypt(ion|ed)?|penetration test(ing)?|information security)\b/i, /\b(technical|organizational|physical)\s+safeguards\b/i
+     * Proving lines: F5 §7 "encrypt all Customer data... penetration testing" / "maintain technical safeguards".
+   - sla (Operations):
+     * Old: /service levels?/i, /\bSLA\b/i, /uptime/i, /service credits?/i, /availability of\s*\d/i
+     * Added: /\b99\.\d+%\b[^.\n]{0,30}(availab|online|uptime)/i, /\b(monthly|system)\s+availability\b/i, /\bresponse time\b[^.\n]{0,40}(ticket|support|severity|incident)/i
+     * Proving lines: "Vendor guarantees 99.95% monthly availability and a 1-hour response time for Severity 1 tickets."
+   - audit-rights (Operations):
+     * Old: /audit rights?/i, /right to audit/i, /(inspect|examine)[^.\n]{0,40}(books|records)/i, /upon[^.\n]{0,30}notice[^.\n]{0,30}audit/i
+     * Added: /\bindependent auditor\b/i, /\b(check|review|verify)[^.\n]{0,30}(books|records|compliance)[^.\n]{0,30}(once a year|annual|business hours|notice)\b/i, /\bmay audit\b/i
+     * Proving lines: "an independent auditor may examine records" / "We may audit your billing records once a year."
+   - assignment (Operations):
+     * Old: /\bassign(ment|s|ed)?\b[^.\n]{0,50}(consent|successor)/i, /change of control/i, /may not assign/i
+     * Added: /\b(no party|neither party)\s+(shall|may)\s+(assign|transfer|delegate)\b/i, /\b(shall not|cannot|can't|may not)\s+(assign|transfer|delegate)[^.\n]{0,40}(agreement|contract|rights|obligations)\b/i, /\b(merger|acquisition|sale of all or substantially all)\b[^.\n]{0,40}(assign|transfer|consent)/i, /\bhand[^.\n]{0,20}(contract|agreement)\s+off\b/i
+     * Proving lines: "No party shall transfer or delegate its obligations hereunder without prior approval." / "You cannot hand this contract off to a buyer."
+   - subcontracting (Operations):
+     * Old: /subcontract/i, /sub-?processor/i, /third-party (providers|services)[^.\n]{0,30}(list|notif)/i
+     * Added: /\b(engage|use)[^.\n]{0,25}third[-\s]party\s+(service\s+)?providers\b/i, /\boutside contractors?\b/i, /\bdelegate\s+(work|services)\s+to\s+(third parties|others)\b/i
+     * Proving lines: "Vendor may engage third-party service providers" / "Outside contractors cannot do this work without our approval."
+   - exclusivity-nonsolicit (Operations):
+     * Old: /\bexclusiv(e|ity)\b/i, /non-?solicit/i, /shall not solicit/i, /non-?compete/i
+     * Added: /\b(recruit|hire|entice away|poach)[^.\n]{0,35}(employee|staff|personnel)\b/i, /\bsole (provider|supplier|vendor)\b/i
+     * Proving lines: "neither party shall directly or indirectly recruit, hire, or entice away any personnel" / "sole supplier, and neither side may poach staff."
+   - governing-law (Legal):
+     * Old: /governing law/i, /governed by[^.\n]{0,30}laws of/i
+     * Added: /\bconstrued (in accordance with|under)[^.\n]{0,30}laws of\b/i, /\bchoice of law\b/i, /\b(laws? of (the )?(State|Commonwealth) of|[A-Z][a-z]+ law applies)\b/i
+     * Proving lines: F5 §5 "This agreement shall be construed in accordance with the laws of the State of New York." / "California law applies to this contract."
+   - venue-disputes (Legal):
+     * Old: /\bjurisdiction\b/i, /\bvenue\b/i, /arbitrat\w+/i, /mediation/i, /dispute resolution/i
+     * Added: /\b(exclusive\s+)?courts?\s+(located|sitting)\s+in\b/i, /\b(lawsuit|suit|legal action)[^.\n]{0,35}(filed|brought)[^.\n]{0,25}in\b/i
+     * Proving lines: "The parties submit to the exclusive courts located in New York County." / "Any lawsuit must be filed in state or federal courts in Austin."
+   - force-majeure (Legal):
+     * Old: /force majeure/i, /act of God/i, /events beyond[^.\n]{0,30}(reasonable )?control/i
+     * Added: /\b(beyond|outside)[^.\n]{0,30}(reasonable\s+)?control\b/i, /\bnatural disaster\b/i
+     * Proving lines: "beyond a party's reasonable control" / "Neither side is blamed if a natural disaster stops performance."
+   - notices (Legal):
+     * Old: /notices? (shall|must) be (given|sent|in writing)/i, /notice to[^.\n]{0,10}:/i, /all notices/i
+     * Added: /\b(formal|official|legal)\s+notices?\b/i, /\bnotices?[^.\n]{0,35}(certified mail|overnight courier|address listed|notice address|by email to)\b/i, /\bnotices?\s+under this\s+(agreement|contract)\b/i
+     * Proving lines: "Any formal notices under this agreement shall be delivered by certified mail or overnight courier." / "Official notices go by email."
+   - entire-agreement (Legal):
+     * Old: /entire agreement/i, /order of precedence/i, /amend(ed|ment)[^.\n]{0,40}in writing/i, /in the event of a conflict/i
+     * Added: /\bsupersedes all prior\b/i, /\b(modification|change)s?[^.\n]{0,35}(in writing|written and signed|signed by both)\b/i, /\b(whole deal|complete and exclusive statement)\b/i
+     * Proving lines: "This contract supersedes all prior understandings" / "This contract is the whole deal, and changes must be written and signed."
+   - signatures (Legal):
+     * Old: /IN WITNESS WHEREOF/i, /\bsignature\b/i, /\/s\//i, /\bexecuted\b[^.\n]{0,30}(by|as of)/i
+     * Added: /\bsigned (by|and dated|below)\b/i, /\bagreed and accepted\b/i, /\bauthorized (representative|signatory|officer)\b/i
+     * Proving lines: "Agreed and accepted by an authorized representative of each party." / "Signed by both parties below."
+
+3. DECLARED FLAG RULES AS IMPLEMENTED (evaluateFlags)
+   - F-UNCAPPED-INDEMNITY:
+     * Fires when: indemnity.found === true AND (uncappedProbeMatch || !liability-cap.found).
+     * Uncapped probes: /(indemnif\w*|obligations? under this section|section\s+\d+)[^.\n]{0,80}(shall not be|are not|is not|not)\s+(subject to|limited by|capped by)[^.\n]{0,60}(limitation of liability|liability cap|cap)/i,
+                        /(indemnif\w*|obligations? under this section)[^.\n]{0,100}\b(without cap|uncapped|unlimited liability|no cap)\b/i,
+                        /\b(carve[-\s]?out|excluded from|notwithstanding)[^.\n]{0,60}(limitation of liability|liability cap)[^.\n]{0,60}indemnif\w*/i,
+                        /\b(limitation of liability|liability cap)[^.\n]{0,60}(shall not|does not) apply to[^.\n]{0,60}indemnif\w*/i.
+   - F-ONE-WAY-INDEMNITY:
+     * Fires when: indemnity.found === true AND (oneWayExplicitMatch || (!mutualSingleMatch && !bothDirections)).
+     * Mutual single probes: /\beach party\s+(shall|will|agrees to)\s+(defend,?\s+)?indemnif\w*/i, /\b(mutual|reciprocal)\s+indemnif\w*\b/i, /\bindemnif\w*[^.\n]{0,45}\b(the other party|each other)\b/i, /\bparties\s+(shall|will|agree to)\s+indemnify each other\b/i.
+     * Both-directions check: (vendor/provider/supplier/licensor/seller/company)\s+(shall|will|agrees to)...indemnif AND (customer/client/buyer/licensee)\s+(shall|will|agrees to)...indemnif.
+     * Explicit one-way refusal probes: /\b[A-Za-z]+\s+has no obligation to indemnify\b/i, /\bno obligation to indemnify\b/i, /\bone[-\s]?way indemnif\w*\b/i, /\bonly\s+(vendor|provider|customer|client|buyer|seller)\s+(shall|will)\s+indemnif\w*/i.
+   - F-IP-INDEMNITY:
+     * Noted signal (always displayed as PRESENT or ABSENT with evidence). Counts as a RAISED flag when ABSENT while ip-ownership.found || license.found.
+     * IP indemnity probes (evaluated when indemnity.found === true):
+       /(indemnif\w*|defend|hold harmless)[^.\n]{0,260}\b(infringe\w*|misappropriat\w*|intellectual property|patent|copyright|trade secret)\b/i,
+       /\b(infringe\w*|misappropriat\w*|intellectual property)\b[^.\n]{0,120}\b(indemnif\w*|defend|hold harmless)\b/i,
+       /\bIP indemnif\w*\b/i.
+   - F-INDEMNITY-NO-INSURANCE:
+     * Fires when: indemnity.found === true AND insurance.found === false.
+   - F-RENEWAL-NO-NOTICE:
+     * Fires when: renewal.found === true AND renewal-notice.found === false.
+   - F-CAUSE-NO-CURE:
+     * Fires when: termination-cause.found === true AND /\bmaterial breach\b/i matches AND no cure-period probe matches (/\bcure\s+(period|such breach|the breach|any breach|within)\b/i, /\bcure[^.\n]{0,25}\b\d+\s*days\b/i, /\bopportunity to cure\b/i, /\bremed(y|ied)[^.\n]{0,25}(breach|default|failure)[^.\n]{0,30}within\b/i, /\buncured\s+for[^.\n]{0,25}days\b/i).
+
+4. SIX-FIXTURE VERIFICATION RESULTS (EXECUTED LIVE ON LOAD IN runSelfCheckBattery)
+   - F1 (fixture-f1-sample.txt):
+     * Layer 1: identical (dates:["2024-01-15"], money:["USD $12,500"], parties:[["ACME, Inc.","Roadrunner LLC.\nPayment"]], law:[["Governing Law","California"]], term_length:[""], renewal_period:[])
+     * Layer 2: 8 of 41 (original 33: 8 — parties, effective-date, term, renewal, termination-convenience, fees, payment-terms, governing-law; new 8: 0)
+     * Flags raised (1): F-RENEWAL-NO-NOTICE. F-IP-INDEMNITY: ABSENT (not raised).
+   - F2 (fixture-f2-prose.txt):
+     * Layer 1: all []
+     * Layer 2: 0 of 41 (original 33: 0; new 8: 0)
+     * Flags raised (0): none. F-IP-INDEMNITY: ABSENT (not raised).
+   - F3 (fixture-f3-full.txt):
+     * Layer 1: identical (dates:["January 1, 2026","January 15, 2026"], money:["USD $48,000"], parties:1, law:3, term_length:1, renewal_period:2)
+     * Layer 2: 33 of 41 (original 33: all 33 found; new 8: 0)
+     * Flags raised (2): F-ONE-WAY-INDEMNITY (Provider indemnifies Customer with no mutual marker), F-IP-INDEMNITY (ABSENT while ip-ownership & license are present). All other flags CLEAR.
+   - F4 (fixture-f4-indemnity.txt):
+     * Layer 2: 11 of 41 (original 33: 11 — parties, effective-date, term, fees, payment-terms, liability-cap, indemnity, warranties, ip-ownership, governing-law, signatures; new 8: 0)
+     * Flags raised (3): F-UNCAPPED-INDEMNITY, F-ONE-WAY-INDEMNITY, F-INDEMNITY-NO-INSURANCE. F-IP-INDEMNITY: PRESENT (noted with excerpt, not raised). F-RENEWAL-NO-NOTICE & F-CAUSE-NO-CURE: CLEAR.
+   - F5 (fixture-f5-sneaky.txt):
+     * Layer 2: 18 of 41 (original 33: 10 — parties, term, renewal, termination-convenience, fees, payment-terms, liability-cap, data-protection, security, governing-law; new 8: all 8 — mfn, setoff, exit-assistance, suspension-rights, publicity, compliance-laws, survival, injunctive-relief)
+     * Flags raised (1): F-RENEWAL-NO-NOTICE (evergreen with no non-renewal notice deadline). Zero false indemnity flags (F-UNCAPPED-INDEMNITY, F-ONE-WAY-INDEMNITY, F-INDEMNITY-NO-INSURANCE all CLEAR). F-IP-INDEMNITY: ABSENT (not raised).
+   - F6 (fixture-f6-clean-mutual.txt):
+     * Layer 2: 14 of 41 (original 33: 14 — parties, effective-date, term, renewal, renewal-notice, fees, payment-terms, liability-cap, consequential, indemnity, insurance, confidentiality, governing-law, signatures; new 8: 0)
+     * Flags raised (0): NONE. F-IP-INDEMNITY: ABSENT (not raised, no IP/license language present).
+
+5. PHRASING MATRIX SELF-CHECK (41 CHECKS x 3 PHRASINGS = 123 PROBES)
+   - Probes run: 123 (Standard, Formal/Legalistic, Plain for every one of the 41 checks).
+   - Probes caught: 123 / 123 (0 misses; zero false positives on F2).
+   - Additional edge-case flag assertion verified live: F-CAUSE-NO-CURE fires when termination-cause is triggered via material-breach language with no cure period.
+
+6. IMPROVEMENTS MADE
+   - Dedicated Flags Band above Scans & Checklist: surfaces raised flags first with red FLAG RAISED badges, exact triggering reason, and quoted evidence sentence, plus the F-IP-INDEMNITY PRESENT/ABSENT signal and CLEAR verification rows.
+   - 4-Card KPI Strip updated to lead with Risk Flags Raised alongside Coverage Checks Found (of 41), Not Found — Check by Hand, and Layer 1 Facts Pulled.
+   - Phone Sticky Summary Strip updated to carry Found (X/41), Gaps (Y), Flags (Z), and direct jump links to Flags and AI Read.
+   - Analysis Brief enriched with a dedicated RISK FLAGS & IP INDEMNITY SIGNAL section plus all 41 checks grouped across the six clause families.
+   - Interactive Checklist Filter Bar (All 41 / Found / Not found) + Group Jump Strip preserved and updated for 41 checks.
+
+7. GOAL-VS-SPEC CONFLICTS
+   - None. All Part A–F rules align cleanly: Layer 1 frozen byte-for-byte, F1–F3 original-33 verdicts preserved identically, 8 new checks added (total 41), deterministic Flags layer implemented with zero false fires on absent subject matter, no selling copy, and full Part E compliance.
+
+8. RESPONSIVE MODES & FLUID-FIRST SWEEP (280px - 1280px)
+   - Desktop Mode (> 720px): Working surface first in full measure; 4-card KPI strip leading with Flags Raised; prominent Flags Band directly above Layer 1 six scans (2-col) and grouped 41-point checklist; copyable Brief; 2-col AI Read / How-It-Works & Provenance layout.
+   - Phone Mode (<= 720px): File upload and sample/clear controls stack first; textarea >= 11.5rem at 16px font size (no iOS auto-zoom); Run button 100% width with >= 44px touch target; KPI grid adapts cleanly (2 cols down to 381px, 1 col <= 380px); Flags, Layer 1 scans, and 41 check cards stack in 1 column; fixed sticky bottom summary strip shows Found / Gaps / Flags with quick jumps and sufficient footer clearance.
+   - Fluid-First Sweep (280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS px): Built exclusively with relative units, minmax(0, 1fr), min-width: 0, overflow-wrap: anywhere, and 1-column fallback <= 380px for zero horizontal page scroll across every width.
+
+9. PART E — SEO INTEGRITY COMPLIANCE
+   - 100% compliant. Zero hidden text or links, zero white-on-white, zero off-screen positioning, zero zero-size text, zero display:none content blocks, zero keyword stuffing, zero cloaking or doorway pages. Results render an explicit ready state before analysis runs.
+-->
+<!--
+     LABEL — S6-P03.4 — Contract Analyzer (tool page;
+     Tool / piece ID: Tool 13 — Contract Analyzer,
+     address: /tools/contract-analyzer/)
+     What this page holds: Encore Coverage Build of Tool 13 — browser-based
+     first-pass contract analyzer with byte-for-byte frozen Layer 1 six
+     original heuristic scans, hardened Layer 2 41-point coverage checklist
+     (33 original checks hardened for formal/plain phrasing + 8 new check
+     families: mfn, setoff, exit-assistance, suspension-rights, publicity,
+     compliance-laws, survival, injunctive-relief), deterministic 6-rule
+     Risk Flags layer (F-UNCAPPED-INDEMNITY, F-ONE-WAY-INDEMNITY,
+     F-IP-INDEMNITY, F-INDEMNITY-NO-INSURANCE, F-RENEWAL-NO-NOTICE,
+     F-CAUSE-NO-CURE), in-browser TXT/DOCX/PDF text extraction, copyable
+     analysis brief, and optional /api/analyze AI read.
+     Map: site/CODE-MAP.md ("tools/contract-analyzer/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+  <link rel="apple-touch-icon" href="../../favicon.svg" />
+  <title>Contract Analyzer — Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="Paste or upload a TXT, DOCX, or PDF contract in your browser to pull key facts with six pattern scans, run a 41-point clause coverage checklist with evidence, surface risk flags on uncapped or one-way clauses, and get an optional plain-English AI read.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/contract-analyzer/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Contract Analyzer — Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="Paste or upload a TXT, DOCX, or PDF contract in your browser to pull key facts with six pattern scans, run a 41-point clause coverage checklist with evidence, surface risk flags on uncapped or one-way clauses, and get an optional plain-English AI read.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/contract-analyzer/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/contract-analyzer/#webapp",
+        "name": "Contract Analyzer",
+        "url": "https://fractional-deal-desk-site.pages.dev/tools/contract-analyzer/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "All",
+        "description": "Browser-based first-pass contract analyzer extracting key facts with six heuristic scans, running a 41-point clause coverage check with matched excerpts, flagging uncapped or one-way indemnities and missing safeguards, and providing an optional plain-English AI read.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Fractional Deal Desk & Contract Management",
+          "url": "https://fractional-deal-desk-site.pages.dev/"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/contract-analyzer/#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fractional-deal-desk-site.pages.dev/" },
+          { "@type": "ListItem", "position": 2, "name": "Proof of Work", "item": "https://fractional-deal-desk-site.pages.dev/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Contract Operations", "item": "https://fractional-deal-desk-site.pages.dev/tools/contract-operations/" },
+          { "@type": "ListItem", "position": 4, "name": "Contract Analyzer", "item": "https://fractional-deal-desk-site.pages.dev/tools/contract-analyzer/" }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --navy-900: #0F1E38;
+      --navy-800: #16294A;
+      --navy-700: #1F3760;
+      --brass-600: #7D5B14;
+      --brass-500: #B5892E;
+      --brass-400: #D4AF5A;
+      --brass-100: #F7F1E1;
+      --paper-bg: #F8F7F4;
+      --paper-card: #FFFFFF;
+      --paper-alt: #F1EFEA;
+      --ink-900: #0F1E38;
+      --ink-700: #28364E;
+      --ink-600: #42526B;
+      --rule-color: #D5D0C5;
+      --rule-strong: #0F1E38;
+      --fail-bg: #FEF2F2;
+      --fail-ink: #7F1D1D;
+      --fail-border: #991B1B;
+      --pass-bg: #F0FDF4;
+      --pass-ink: #14532D;
+      --pass-border: #166534;
+      --warn-bg: #FFFBEB;
+      --warn-ink: #78350F;
+      --warn-border: #B45309;
+      --font-serif: Georgia, "Times New Roman", Times, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { margin: 0; padding: 0; background-color: var(--paper-bg); color: var(--ink-900); font-family: var(--font-sans); line-height: 1.55; overflow-x: hidden; }
+    a { color: var(--navy-900); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover, a:focus-visible { color: var(--brass-600); }
+    button, input, textarea { font-family: inherit; border-radius: 0; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--brass-500); outline-offset: 2px; }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 clamp(0.65rem, 3vw, 2rem); }
+
+    /* HEADER & BREADCRUMB */
+    .site-header { background-color: var(--navy-900); color: #FFFFFF; border-bottom: 3px solid var(--brass-500); }
+    .header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; padding: 0.85rem 0; }
+    .brand-link { color: #FFFFFF; text-decoration: none; font-family: var(--font-serif); font-size: clamp(1rem, 2.2vw, 1.2rem); font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .brand-link:hover, .brand-link:focus-visible { color: var(--brass-400); }
+    .site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.85rem; }
+    .site-nav a { color: #E2E8F0; text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0.4rem; min-height: 44px; display: inline-flex; align-items: center; border-bottom: 2px solid transparent; }
+    .site-nav a:hover, .site-nav a:focus-visible, .site-nav a[aria-current="page"] { color: #FFFFFF; border-bottom-color: var(--brass-400); }
+
+    .breadcrumb-bar { background-color: var(--paper-alt); border-bottom: 1px solid var(--rule-color); font-size: 0.8125rem; }
+    .breadcrumb-list { list-style: none; margin: 0; padding: 0.35rem 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; color: var(--ink-700); }
+    .breadcrumb-list li { display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; overflow-wrap: anywhere; }
+    .breadcrumb-list li + li::before { content: "/"; color: var(--ink-600); }
+    .breadcrumb-list a { color: var(--ink-700); padding: 0.35rem 0.15rem; min-height: 44px; display: inline-flex; align-items: center; }
+    .breadcrumb-list [aria-current="page"] { color: var(--ink-900); font-weight: 600; }
+
+    /* HERO */
+    .hero-banner { background-color: var(--navy-900); color: #FFFFFF; padding: clamp(1.45rem, 4vw, 2.6rem) 0; border-bottom: 1px solid var(--rule-strong); }
+    .hero-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.85rem; }
+    .eyebrow-tag { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-400); font-weight: 600; }
+    .tool-badge { display: inline-block; background-color: var(--navy-800); border: 1px solid var(--brass-500); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; letter-spacing: 0.04em; }
+    .hero-title { font-family: var(--font-serif); font-size: clamp(1.5rem, 3.6vw, 2.35rem); line-height: 1.2; font-weight: 700; margin: 0 0 0.85rem 0; color: #FFFFFF; overflow-wrap: anywhere; }
+    .hero-lede { font-size: clamp(0.95rem, 1.6vw, 1.06rem); line-height: 1.62; color: #E2E8F0; max-width: 82ch; margin: 0 0 1.1rem 0; }
+    .provenance-strip { background-color: var(--navy-800); border-left: 3px solid var(--brass-500); padding: 0.85rem 1rem; font-size: 0.86rem; color: #E2E8F0; line-height: 1.55; max-width: 88ch; }
+    .provenance-strip strong { color: #FFFFFF; }
+
+    /* SECTIONS */
+    main { padding-bottom: 3rem; }
+    .section-block { padding: clamp(1.3rem, 3vw, 2.15rem) 0; border-bottom: 1px solid var(--rule-color); }
+    .section-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--navy-900); }
+    .section-title { font-family: var(--font-serif); font-size: clamp(1.18rem, 2.4vw, 1.48rem); font-weight: 700; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; }
+    .section-subtitle { font-size: 0.83rem; color: var(--ink-600); font-family: var(--font-mono); margin: 0; overflow-wrap: anywhere; }
+
+    /* ANALYZER WORKING SURFACE */
+    .analyzer-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--brass-500); padding: clamp(0.9rem, 2.5vw, 1.4rem); }
+    .input-row-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.85rem 1.25rem; align-items: end; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--rule-color); }
+    .field-block { min-width: 0; }
+    .field-label { display: block; font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-900); margin-bottom: 0.4rem; }
+    .file-input-control { width: 100%; max-width: 100%; min-height: 44px; padding: 0.5rem 0.6rem; border: 1px solid #9F988A; background-color: var(--paper-alt); color: var(--ink-900); font-size: 0.92rem; }
+    .file-input-control:focus { background-color: #FFFFFF; border-color: var(--navy-900); }
+    .file-status-line { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-700); margin: 0.4rem 0 0 0; min-height: 1.2em; overflow-wrap: anywhere; word-break: break-word; }
+
+    .top-quick-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+
+    .textarea-header-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.35rem 1rem; margin-bottom: 0.4rem; }
+    .text-stats { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-600); }
+    .contract-textarea { width: 100%; min-height: 12.5rem; border: 1px solid #9F988A; background-color: var(--brass-100); color: var(--ink-900); font-family: var(--font-mono); font-size: 0.9rem; line-height: 1.55; padding: 0.75rem; resize: vertical; }
+    .contract-textarea:focus { background-color: #FFFFFF; border-color: var(--navy-900); }
+
+    .analyzer-action-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1rem; margin-top: 0.9rem; }
+    .analyzer-note { font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-700); margin: 0; overflow-wrap: anywhere; flex: 1 1 240px; }
+    .analyzer-note.is-error { color: var(--fail-ink); font-weight: 700; }
+
+    .btn-primary { background-color: var(--navy-900); color: #FFFFFF; border: 1px solid var(--navy-900); padding: 0.55rem 1.15rem; font-size: 0.9rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-primary:hover, .btn-primary:focus-visible { background-color: var(--brass-600); border-color: var(--brass-600); }
+    .btn-primary:disabled { opacity: 0.65; cursor: wait; }
+    .btn-secondary { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.5rem 0.95rem; font-size: 0.86rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-secondary:hover, .btn-secondary:focus-visible { background-color: var(--navy-900); color: #FFFFFF; }
+
+    /* KPI STRIP */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.85rem; margin-bottom: 1.4rem; }
+    .kpi-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 4px solid var(--navy-900); padding: clamp(0.85rem, 2vw, 1.1rem); display: flex; flex-direction: column; justify-content: space-between; gap: 0.35rem; min-width: 0; }
+    .kpi-card.is-brass { border-top-color: var(--brass-500); }
+    .kpi-card.is-pass { border-top-color: var(--pass-border); background-color: var(--pass-bg); }
+    .kpi-card.is-warn { border-top-color: var(--fail-border); background-color: var(--fail-bg); }
+    .kpi-label { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-700); font-weight: 700; overflow-wrap: anywhere; }
+    .kpi-value { font-family: var(--font-serif); font-size: clamp(1.35rem, 2.6vw, 1.8rem); font-weight: 700; line-height: 1.15; color: var(--ink-900); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .kpi-card.is-pass .kpi-value { color: var(--pass-ink); }
+    .kpi-card.is-warn .kpi-value { color: var(--fail-ink); }
+    .kpi-note { font-family: var(--font-mono); font-size: 0.73rem; color: var(--ink-600); margin: 0; overflow-wrap: anywhere; }
+
+    /* IDLE STATE BOX */
+    .idle-notice-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: 1rem 1.1rem; font-size: 0.92rem; color: var(--ink-700); }
+
+    /* FLAGS BAND (PROMINENT, ABOVE SCANS & CHECKLIST) */
+    .flags-band { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--fail-border); padding: clamp(0.95rem, 2.2vw, 1.3rem); margin-bottom: 1.45rem; }
+    .flags-band.is-clear { border-top-color: var(--pass-border); }
+    .flags-band-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.4rem 1rem; margin-bottom: 0.45rem; }
+    .flags-band-title { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; color: var(--ink-900); margin: 0; }
+    .flags-band-intro { font-size: 0.92rem; color: var(--ink-700); margin: 0 0 0.95rem 0; line-height: 1.6; max-width: 82ch; }
+    .flags-list { display: grid; grid-template-columns: 1fr; gap: 0.65rem; }
+    .flag-card { border: 1px solid var(--rule-color); border-left: 5px solid var(--rule-strong); padding: 0.85rem 0.95rem; background-color: var(--paper-alt); min-width: 0; }
+    .flag-card.is-raised { background-color: var(--fail-bg); border-color: #FECACA; border-left-color: var(--fail-border); }
+    .flag-card.is-present { background-color: var(--pass-bg); border-color: #BBF7D0; border-left-color: var(--pass-border); }
+    .flag-card.is-clear { background-color: var(--paper-card); border-left-color: var(--pass-border); }
+    .flag-card.is-noted-absent { background-color: var(--warn-bg); border-color: #FDE68A; border-left-color: var(--warn-border); }
+
+    .flag-top-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.4rem 0.75rem; margin-bottom: 0.35rem; }
+    .flag-title-wrap { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.45rem; min-width: 0; }
+    .flag-code { font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; color: var(--navy-900); background-color: rgba(255,255,255,0.85); border: 1px solid var(--rule-color); padding: 0.12rem 0.4rem; }
+    .flag-name { font-weight: 700; font-size: 0.96rem; color: var(--ink-900); overflow-wrap: anywhere; }
+    .flag-badge { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.52rem; border: 1px solid transparent; white-space: nowrap; text-transform: uppercase; }
+    .flag-badge.is-raised { background-color: var(--fail-ink); color: #FFFFFF; border-color: var(--fail-ink); }
+    .flag-badge.is-present { background-color: var(--pass-bg); color: var(--pass-ink); border-color: var(--pass-border); }
+    .flag-badge.is-clear { background-color: var(--pass-bg); color: var(--pass-ink); border-color: var(--pass-border); }
+    .flag-badge.is-noted-absent { background-color: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+    .flag-reason { font-size: 0.88rem; color: var(--ink-900); margin: 0 0 0.4rem 0; overflow-wrap: anywhere; }
+    .flag-excerpt { background-color: #FFFFFF; border: 1px solid var(--rule-color); padding: 0.5rem 0.65rem; font-family: var(--font-mono); font-size: 0.79rem; line-height: 1.5; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; word-break: break-word; }
+
+    /* LAYER 1: SIX SCANS */
+    .sub-block { margin-top: 1.5rem; }
+    .sub-block-title { font-family: var(--font-serif); font-size: 1.18rem; font-weight: 700; margin: 0 0 0.25rem 0; color: var(--ink-900); }
+    .sub-block-desc { font-size: 0.87rem; color: var(--ink-600); margin: 0 0 0.85rem 0; }
+    .scans-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+    .scan-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 3px solid var(--navy-900); padding: 0.8rem 0.9rem; min-width: 0; }
+    .scan-key { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--navy-900); margin-bottom: 0.3rem; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem; }
+    .scan-key-slug { color: var(--ink-600); font-weight: 600; text-transform: none; }
+    .scan-values { font-family: var(--font-mono); font-size: 0.82rem; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; word-break: break-word; }
+    .scan-empty { color: var(--ink-600); font-style: italic; }
+
+    /* LAYER 2: 41 COVERAGE CHECKS */
+    .check-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.7rem 0.8rem; margin-bottom: 1rem; }
+    .filter-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
+    .filter-btn { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
+    .filter-btn:hover, .filter-btn:focus-visible, .filter-btn.is-active { background-color: var(--navy-900); color: #FFFFFF; }
+    .group-jump-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.65rem; font-family: var(--font-mono); font-size: 0.76rem; }
+    .group-jump-nav a { padding: 0.35rem 0.2rem; min-height: 44px; display: inline-flex; align-items: center; }
+
+    .check-group-block { margin-bottom: 1.35rem; }
+    .check-group-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.4rem 1rem; padding: 0.45rem 0.7rem; background-color: var(--navy-900); color: #FFFFFF; margin-bottom: 0.65rem; }
+    .check-group-name { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 700; margin: 0; }
+    .check-group-count { font-family: var(--font-mono); font-size: 0.76rem; color: var(--brass-400); font-weight: 700; }
+
+    .check-list { display: grid; grid-template-columns: 1fr; gap: 0.6rem; }
+    .check-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--rule-strong); padding: 0.8rem 0.9rem; min-width: 0; }
+    .check-card.is-found { border-left-color: var(--pass-border); }
+    .check-card.is-missing { border-left-color: var(--fail-border); background-color: #FFFDFD; }
+    .check-top-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.4rem 0.75rem; margin-bottom: 0.35rem; }
+    .check-name { font-weight: 700; font-size: 0.95rem; color: var(--ink-900); overflow-wrap: anywhere; }
+    .check-badge { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.5rem; border: 1px solid transparent; white-space: nowrap; }
+    .check-badge.is-found { background-color: var(--pass-bg); color: var(--pass-ink); border-color: var(--pass-border); }
+    .check-badge.is-missing { background-color: var(--fail-bg); color: var(--fail-ink); border-color: var(--fail-border); }
+    .check-why { font-size: 0.87rem; color: var(--ink-700); margin: 0 0 0.4rem 0; overflow-wrap: anywhere; }
+    .check-excerpt { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.5rem 0.65rem; font-family: var(--font-mono); font-size: 0.79rem; line-height: 1.5; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; word-break: break-word; }
+    .check-missing-note { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fail-ink); font-weight: 600; margin: 0; }
+
+    /* COPYABLE BRIEF */
+    .brief-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); padding: clamp(0.9rem, 2vw, 1.2rem); margin-top: 1.4rem; }
+    .brief-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.7rem; }
+    .copy-status { font-family: var(--font-mono); font-size: 0.8rem; color: var(--pass-ink); font-weight: 700; }
+    .brief-pre { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.85rem; margin: 0; font-family: var(--font-mono); font-size: 0.79rem; line-height: 1.55; color: var(--ink-900); white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; max-height: 24rem; overflow-y: auto; }
+
+    /* AI READ + HOW IT WORKS */
+    .two-col-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
+    .card-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 3px solid var(--navy-900); padding: clamp(0.95rem, 2.2vw, 1.3rem); min-width: 0; }
+    .card-box.is-brass-top { border-top-color: var(--brass-500); }
+    .card-box h3 { font-family: var(--font-serif); font-size: 1.08rem; margin: 0 0 0.55rem 0; color: var(--ink-900); }
+    .card-box p { margin: 0 0 0.75rem 0; font-size: 0.92rem; line-height: 1.6; color: var(--ink-700); overflow-wrap: anywhere; }
+    .card-box p:last-child { margin-bottom: 0; }
+
+    .ai-output-box { margin-top: 0.9rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.9rem; font-size: 0.91rem; color: var(--ink-900); min-width: 0; }
+    .ai-output-box h4 { font-family: var(--font-mono); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--navy-900); margin: 0.85rem 0 0.35rem 0; }
+    .ai-output-box h4:first-child { margin-top: 0; }
+    .ai-output-box ul { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.3rem; }
+    .ai-output-box li { overflow-wrap: anywhere; word-break: break-word; }
+
+    .privacy-callout { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-left: 4px solid var(--brass-500); padding: 0.85rem 1rem; font-size: 0.88rem; color: var(--ink-900); line-height: 1.55; margin-top: 0.85rem; }
+
+    /* RELATED LINKS & STICKY SUMMARY & FOOTER */
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem; }
+    .related-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.9rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.4rem; min-width: 0; }
+    .related-card-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; color: var(--brass-600); font-weight: 700; }
+    .related-card a { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--ink-900); min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .related-card p { font-size: 0.83rem; color: var(--ink-700); margin: 0; }
+
+    .live-summary-bar { background-color: var(--navy-900); color: #FFFFFF; border-top: 2px solid var(--brass-500); padding: 0.45rem 0; z-index: 40; }
+    .summary-bar-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.45rem 0.75rem; font-family: var(--font-mono); font-size: 0.76rem; }
+    .summary-metrics { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.8rem; }
+    .summary-jumps { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
+    .summary-jump-link { color: #FFFFFF; font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.65rem; border: 1px solid var(--brass-400); text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
+    .summary-jump-link:hover, .summary-jump-link:focus-visible { background-color: var(--brass-600); color: #FFFFFF; }
+
+    .site-footer { background-color: var(--navy-900); color: #E2E8F0; border-top: 3px solid var(--brass-500); padding: 2rem 0 2.5rem 0; font-size: 0.85rem; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+    .footer-heading { font-family: var(--font-serif); font-size: 0.95rem; color: #FFFFFF; margin: 0 0 0.6rem 0; }
+    .footer-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+    .footer-links a { color: #E2E8F0; min-height: 44px; display: inline-flex; align-items: center; }
+    .footer-links a:hover, .footer-links a:focus-visible { color: var(--brass-400); }
+    .footer-bottom { border-top: 1px solid var(--navy-700); padding-top: 1rem; font-size: 0.78rem; color: #CBD5E1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+
+    /* RESPONSIVE MODES */
+    @media (max-width: 960px) {
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    /* PHONE MODE (<= 720px) */
+    @media (max-width: 720px) {
+      .input-row-top,
+      .scans-grid,
+      .two-col-grid { grid-template-columns: 1fr; }
+
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .contract-textarea { font-size: 1rem; min-height: 11.5rem; }
+      .file-input-control { font-size: 0.95rem; }
+
+      .top-quick-actions,
+      .top-quick-actions button,
+      .analyzer-action-bar .btn-primary,
+      #ca-ai { width: 100%; }
+
+      .live-summary-bar { position: fixed; bottom: 0; left: 0; right: 0; box-shadow: 0 -2px 10px rgba(15, 30, 56, 0.28); }
+      .site-footer { padding-bottom: 6.25rem; }
+    }
+
+    @media (max-width: 380px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+      .summary-bar-inner { gap: 0.35rem; }
+      .summary-jump-link { min-height: 38px; padding: 0.25rem 0.5rem; }
+      .site-footer { padding-bottom: 7.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../../" class="brand-link">Fractional Deal Desk &amp; Contract Management</a>
+      <nav class="site-nav" aria-label="Primary Navigation">
+        <a href="../../">Home</a>
+        <a href="../../tools/" aria-current="page">Proof of Work</a>
+        <a href="../../tools/contract-operations/">Contract Operations</a>
+        <a href="../../services/">Practice &amp; Mandate Scope</a>
+        <a href="../../about/">Operator Record</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumb-bar" aria-label="Breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb-list">
+        <li><a href="../../">Home</a></li>
+        <li><a href="../../tools/">Proof of Work</a></li>
+        <li><a href="../../tools/contract-operations/">Contract Operations</a></li>
+        <li aria-current="page">Contract Analyzer</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="hero-banner">
+    <div class="container">
+      <div class="hero-meta-row">
+        <span class="eyebrow-tag">Proof of Work · Contract Operations</span>
+        <span class="tool-badge">Tool 13 · Contract Operations</span>
+      </div>
+      <h1 class="hero-title">Contract Analyzer</h1>
+      <p class="hero-lede">
+        Drop in a contract and see what is actually in it: the key facts pulled out, every standard item checked for across 41 clauses, dangerous shapes flagged with evidence, and a plain-English read of what to watch.
+      </p>
+      <div class="provenance-strip">
+        <strong>Provenance &amp; Operating Record:</strong> Built from 15+ years in commercial contracts, deal desk, and revenue operations across contracts up to $300M and 3,000+ SKUs under management. The browser scan runs locally on your device and never stores your document; the built-in sample and test contracts are fictional sample data.
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- 1. THE ANALYZER (WORKING SURFACE FIRST) -->
+    <section class="section-block" aria-labelledby="heading-analyzer">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-analyzer">The Analyzer — Upload or Paste a Contract</h2>
+        <p class="section-subtitle">Accepts .txt, .docx, and .pdf in your browser, or paste text directly</p>
+      </div>
+
+      <div class="analyzer-panel">
+        <div class="input-row-top">
+          <div class="field-block">
+            <label class="field-label" for="ca-file">Upload a contract (TXT, DOCX, or PDF)</label>
+            <input type="file" id="ca-file" class="file-input-control" accept=".txt,.docx,.pdf">
+            <p class="file-status-line" id="ca-file-status" aria-live="polite">No file uploaded yet — files are read locally in your browser.</p>
+          </div>
+          <div class="top-quick-actions">
+            <button type="button" class="btn-secondary" id="ca-sample">Load the sample contract</button>
+            <button type="button" class="btn-secondary" id="ca-clear">Clear</button>
+          </div>
+        </div>
+
+        <div class="field-block">
+          <div class="textarea-header-row">
+            <label class="field-label" for="ca-text">Or paste the contract text</label>
+            <span class="text-stats" id="ca-text-stats">0 characters · 0 words</span>
+          </div>
+          <textarea id="ca-text" class="contract-textarea" rows="10" placeholder="Paste the contract text here, upload a TXT/DOCX/PDF above, or load the sample contract to see how it reads."></textarea>
+        </div>
+
+        <div class="analyzer-action-bar">
+          <p class="analyzer-note" id="ca-note" role="status" aria-live="polite"></p>
+          <button type="button" class="btn-primary" id="ca-run">Run the analysis</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. THE RESULTS -->
+    <section class="section-block" aria-labelledby="heading-results" id="section-results">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-results">Analysis Output — Risk Flags, Scans &amp; 41-Point Coverage Check</h2>
+        <p class="section-subtitle">Risk flags + 6 original scans + 41-point clause checklist across 6 groups</p>
+      </div>
+
+      <div id="ca-results">
+        <div class="idle-notice-box" id="ca-idle-state">
+          Ready to analyze. Upload a contract, paste text, or load the fictional sample contract above, then click <strong>Run the analysis</strong> to populate risk flags, the six original scans, and all 41 coverage checks.
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. THE AI READ -->
+    <section class="section-block" aria-labelledby="heading-ai" id="section-ai-read">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-ai">The AI Read</h2>
+        <p class="section-subtitle">Optional second step via /api/analyze (first 60,000 characters)</p>
+      </div>
+
+      <div class="card-box is-brass-top">
+        <h3>Plain-English Contract Read</h3>
+        <p>Optional. Running it sends the contract text to the site's AI endpoint, which returns a plain-English summary, the key terms, watch-outs, and missing items. Nothing is stored.</p>
+        <p><button type="button" class="btn-primary" id="ca-ai">Write the AI read</button></p>
+        <div class="ai-output-box" id="ca-ai-out" aria-live="polite">
+          Run the browser scan above first, then select <strong>Write the AI read</strong> if you want an AI-written summary alongside the heuristic evidence.
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. HOW IT WORKS & PROVENANCE -->
+    <section class="section-block" aria-labelledby="heading-how">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-how">How — It works</h2>
+        <p class="section-subtitle">Three steps, browser-first execution, and clear limits</p>
+      </div>
+
+      <div class="two-col-grid">
+        <article class="card-box">
+          <h3>Three-step review workflow</h3>
+          <p><strong>1.</strong> Add the contract — upload a TXT, PDF, or DOCX, or paste the text. <strong>2.</strong> Run the analysis: risk flags surface dangerous shapes (uncapped indemnities, one-way indemnities, missing safeguards), the key facts come out, and each of the 41 checks reports <em>found</em> (with the line it came from) or <em>not found</em>, so the gaps are as visible as the catches. <strong>3.</strong> Run the AI read for the summary a person would write: what this contract is, the terms that matter, what looks one-sided, and what is missing.</p>
+          <div class="privacy-callout">
+            Privacy: the scan runs entirely in your browser — your document never leaves your device, and nothing is stored. The AI read is the one exception: if you run it, the text is sent to the AI endpoint to write the summary. Scanned image PDFs will not read — the file has to carry real text, the same limit the original tool has.
+          </div>
+        </article>
+
+        <article class="card-box">
+          <h3>Where this tool comes from</h3>
+          <p>This began as my own working MVP in October 2025 — upload a contract, extract the text, scan for the clauses that matter. This page is that tool rebuilt for the site and extended for deal-desk coverage: the original six scans preserved intact, a hardened 41-point coverage checklist across six clause families, deterministic risk flags on dangerous indemnity and renewal shapes, and the AI read wired in. It is a first-pass instrument, the way I start a review — it finds the language and flags what is missing or one-sided. It is not legal advice, and it does not replace reading the document.</p>
+          <p>Heuristics locate language; they do not judge whether a clause is balanced or enforceable. Every found item and raised flag displays the surrounding excerpt from your document so a reviewer can verify context directly.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 5. RELATED LINKS -->
+    <section class="section-block" aria-labelledby="heading-related">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-related">Related Contract Operations &amp; Proof of Work</h2>
+        <p class="section-subtitle">Neighboring tools and governance references across the practice record</p>
+      </div>
+
+      <div class="related-grid">
+        <div class="related-card">
+          <span class="related-card-eyebrow">Hub</span>
+          <a href="../../tools/">Proof of Work Hub</a>
+          <p>All live commercial models, pricing engines, contract trackers, and decision tools.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Partition</span>
+          <a href="../../tools/contract-operations/">Contract Operations Partition</a>
+          <p>Tools built for contract review, migration triage, and operational case capacity.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 9 · Contract Operations</span>
+          <a href="../contract-migration-triage/">Tool 9: Contract Migration Triage</a>
+          <p>Classify and sequence legacy agreements during system migrations and post-close integrations.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 10 · Contract Operations</span>
+          <a href="../case-operations-capacity/">Tool 10: Case Operations &amp; Capacity</a>
+          <p>Track intake volume, backlog aging, and team capacity across commercial support queues.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Diagnostic Review</span>
+          <a href="../deal-check/">Deal Check</a>
+          <p>Six-step live deal diagnostic covering buyer posture, blockers, and the internal checklist.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- STICKY SUMMARY STRIP -->
+  <div class="live-summary-bar" role="region" aria-label="Contract Analyzer Status Strip">
+    <div class="container summary-bar-inner">
+      <div class="summary-metrics">
+        <span>Found: <strong id="sticky-found">—/41</strong></span>
+        <span>Gaps: <strong id="sticky-missing">—</strong></span>
+        <span>Flags: <strong id="sticky-flags">—</strong></span>
+      </div>
+      <div class="summary-jumps">
+        <a href="#section-results" class="summary-jump-link" id="sticky-flags-jump">Flags</a>
+        <a href="#section-ai-read" class="summary-jump-link">AI Read</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h2 class="footer-heading">Fractional Deal Desk &amp; Contract Management</h2>
+          <p style="margin: 0; color: #CBD5E1; line-height: 1.5;">
+            Commercial contracts, deal desk architecture, and revenue operations controls. 15+ years in commercial contracts, deal desk, and revenue operations across contracts up to $300M and 3,000+ SKUs under management.
+          </p>
+        </div>
+        <div>
+          <h2 class="footer-heading">Proof of Work &amp; Tools</h2>
+          <ul class="footer-links">
+            <li><a href="../../tools/">Proof of Work Hub</a></li>
+            <li><a href="../../tools/contract-operations/">Contract Operations Partition</a></li>
+            <li><a href="../contract-migration-triage/">Tool 9: Contract Migration Triage</a></li>
+            <li><a href="../case-operations-capacity/">Tool 10: Case Operations &amp; Capacity</a></li>
+            <li><a href="../deal-check/">Deal Check</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="footer-heading">Practice Information</h2>
+          <ul class="footer-links">
+            <li><a href="../../">Home</a></li>
+            <li><a href="../../services/">Practice &amp; Mandate Scope</a></li>
+            <li><a href="../../about/">Operator Record</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>Tool 13 · Contract Analyzer (S6-P03.4 — Coverage Build)</span>
+        <span>Browser-first clause scan. Not legal advice.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/jszip-3.10.1.min.js"></script>
+  <script src="../../assets/pdf-3.11.174.min.js"></script>
+
+  <!-- ANALYSIS ENGINE: FROZEN LAYER 1 + HARDENED 41-POINT LAYER 2 + DETERMINISTIC FLAGS LAYER -->
+  <script>
+/* ==========================================================================
+   LABEL — S6-P03.d · Tool 13 — Contract Analyzer — analysis engine (Extended
+   Coverage Build, S6-P03.4).
+   LAYER 1 — BYTE-FOR-BYTE FROZEN from analyzer-engine.txt (exact JavaScript
+   port of Lucky's contract-analyzer repo, analyzer/parsers/clauses.py,
+   Streamlit MVP, Oct 2025).
+   LAYER 2 — Hardened 33 original coverage checks (widened only, never
+   narrowed; regression floor preserved on F1–F3) + 8 new check families
+   (41 total across Basics, Money, Risk, Data & IP, Operations, Legal).
+   FLAGS LAYER — Deterministic 6-rule risk flags layer evaluating uncapped
+   indemnities, one-way indemnities, IP indemnity signal, indemnity without
+   insurance, renewal without notice, and termination for material breach
+   without cure. Heuristic pattern matching only — not legal advice.
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  /* ---------------- Layer 1 — the original six scans (FROZEN) ------------ */
+  var DATE_RE = /\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)[\s,]+\d{1,2},\s*\d{4}\b|\b\d{4}-\d{2}-\d{2}\b/gi;
+  var MONEY_RE = /\b(?:USD\s*)?\$\s?\d[\d,]*(?:\.\d{2})?\b/gi;
+  var PARTY_RE = /\bbetween\s+([A-Z][\w\s,&.\-]+?)\s+and\s+([A-Z][\w\s,&.\-]+)/gi;
+  var LAW_RE = /\b(governing law|jurisdiction)\b[:\s-]+([A-Za-z\s]+)/gi;
+  var TERM_LENGTH_RE = /\b(initial\s+)?term\b.*?(?:is|for|of)?\s*(?:\w+\s*\(\s*\d+\s*\)\s*|\d+)\s*(?:month|year|day|week)s?/gi;
+  var RENEWAL_PERIOD_RE = /\b(renews?|auto[-\s]?renew(al)?)\b.*?(?:for\s*)?(?:\w+\s*\(\s*\d+\s*\)\s*|\d+)\s*(?:month|year|day|week)s?/gi;
+
+  function allMatches(text, re) {
+    var out = [], m;
+    re.lastIndex = 0;
+    while ((m = re.exec(text)) !== null) {
+      if (m.length > 1) {
+        var groups = [];
+        for (var i = 1; i < m.length; i++) groups.push(m[i] === undefined ? "" : m[i]);
+        out.push(groups.length === 1 ? groups[0] : groups);
+      } else {
+        out.push(m[0]);
+      }
+      if (m[0] === "") re.lastIndex++;
+    }
+    return out;
+  }
+
+  function parseKeyClauses(text) {
+    return {
+      dates: allMatches(text, DATE_RE),
+      money: allMatches(text, MONEY_RE),
+      parties: allMatches(text, PARTY_RE),
+      law: allMatches(text, LAW_RE),
+      term_length: allMatches(text, TERM_LENGTH_RE),
+      renewal_period: allMatches(text, RENEWAL_PERIOD_RE)
+    };
+  }
+
+  /* ---------------- Layer 2 — the 41 coverage checks --------------------- */
+  function P(s) { return new RegExp(s, "i"); }
+  var CHECKS = [
+    /* Basics */
+    { id: "parties", group: "Basics", name: "Parties named",
+      why: "Who is bound — the legal names of both sides.",
+      patterns: [
+        P("\\bbetween\\s+[A-Z][\\w\\s,&.\\-]+?\\s+and\\s+[A-Z]"),
+        P("\\b(this agreement|this contract)\\s+is\\s+(made|entered into)\\b"),
+        P("\\bthis\\s+[A-Za-z\\s]{0,30}(agreement|contract|terms)\\b[^.\\n]{0,30}\\bis\\s+(made|entered into)"),
+        P("\\bentered into\\s+(as of[^.\\n]{0,40}\\s+)?(by and )?between\\b"),
+        P("\\benter(s|ed)? into this (agreement|contract|terms)\\b")
+      ] },
+    { id: "effective-date", group: "Basics", name: "Effective / start date",
+      why: "When the obligations start running.",
+      patterns: [
+        P("\\beffective date\\b"),
+        P("\\bcommencement date\\b"),
+        P("\\bmade on\\s+\\d{4}-\\d{2}-\\d{2}\\b"),
+        P("\\bstart date\\b"),
+        P("\\b(take|takes) effect (on|as of)\\b"),
+        P("\\b(made|entered into) (on|as of)\\s+([A-Z][a-z]+\\s+\\d{1,2},\\s*\\d{4}|\\d{4}-\\d{2}-\\d{2})")
+      ] },
+    { id: "term", group: "Basics", name: "Term length",
+      why: "How long the contract runs before it ends or renews.",
+      patterns: [
+        P("\\b(initial\\s+)?term\\b[^.\\n]{0,60}?(\\d+|twelve|twenty-four|thirty-six)(\\s*\\(\\s*\\d+\\s*\\))?\\s*(month|year|day|week)"),
+        P("\\bterm of\\s+(this agreement|\\d)"),
+        P("\\b(initial\\s+)?term\\b[^.\\n]{0,60}?(\\d+|one|two|three|four|five|six|twelve|eighteen|twenty-four|thirty-six|forty-eight|sixty)(\\s*\\(\\s*\\d+\\s*\\))?\\s*(month|year|day|week)"),
+        P("\\b(remain|continues?) in (full )?force[^.\\n]{0,40}(for a period of|from month to month|\\d+\\s*(month|year))"),
+        P("\\b(contract|agreement)\\s+(runs|lasts|duration)\\s+(for\\s+|is\\s+)?(\\d+|one|two|three)\\s*(month|year)")
+      ] },
+    { id: "renewal", group: "Basics", name: "Renewal / auto-renewal",
+      why: "Whether it rolls over on its own, and for how long each time.",
+      patterns: [
+        P("\\bauto[-\\s]?renew"),
+        P("\\bshall renew\\b"),
+        P("\\brenew(s|al)?\\s+for\\b"),
+        P("\\bsuccessive (terms|periods|renewal)\\b"),
+        P("\\bevergreen\\b"),
+        P("\\bautomatically\\s+(renew|extend)(s|ed)?\\b"),
+        P("\\brolls? over\\b[^.\\n]{0,30}(year|month|term|period|automatically)")
+      ] },
+    { id: "renewal-notice", group: "Basics", name: "Non-renewal notice deadline",
+      why: "The last day to stop a renewal — the date that gets missed.",
+      patterns: [
+        P("notice of non[-\\s]?renewal"),
+        P("\\bnot\\s+(renew|extend)\\b[^.\\n]{0,40}notice"),
+        P("(prior to|before)\\s+(the\\s+)?(renewal|expiration)[^.\\n]{0,60}notice"),
+        P("notice[^.\\n]{0,50}(prior to|before)[^.\\n]{0,30}renew"),
+        P("opt[-\\s]?out[^.\\n]{0,40}renew"),
+        P("\\bnot\\s+to\\s+(renew|extend)\\b[^.\\n]{0,50}(notice|notification)"),
+        P("(notice|notification)[^.\\n]{0,50}not\\s+to\\s+(renew|extend)")
+      ] },
+    { id: "termination-convenience", group: "Basics", name: "Termination for convenience + notice",
+      why: "Whether either side can walk away without cause, and how much notice.",
+      patterns: [
+        P("terminate[^.\\n]{0,60}for convenience"),
+        P("terminate[^.\\n]{0,40}without cause"),
+        P("may terminate[^.\\n]{0,80}\\b\\d+\\s*days?['\\u2019]?\\s*(prior\\s+)?(written\\s+)?notice"),
+        P("(terminate|cancel)[^.\\n]{0,60}(at any time|anytime|for any reason|for no reason)"),
+        P("may terminate[^.\\n]{0,50}upon\\s+(prior\\s+)?(written\\s+)?notice")
+      ] },
+    { id: "termination-cause", group: "Basics", name: "Termination for cause",
+      why: "The exit when the other side breaches — and any cure period.",
+      patterns: [
+        P("terminate[^.\\n]{0,60}for cause"),
+        P("material breach"),
+        P("cure (period|such breach|within)"),
+        P("\\buncured\\b"),
+        P("\\bcure[^.\\n]{0,25}(period|breach|default|within)\\b"),
+        P("\\bremed(y|ied)[^.\\n]{0,25}(breach|default|failure)[^.\\n]{0,30}within\\b"),
+        P("\\bterminate[^.\\n]{0,50}(material|for)\\s+(breach|default)\\b")
+      ] },
+    /* Money */
+    { id: "fees", group: "Money", name: "Fees / contract value",
+      why: "What is actually being paid — amounts, per what, how often.",
+      patterns: [
+        P("(USD\\s*)?\\$\\s?\\d[\\d,]*(\\.\\d{2})?"),
+        P("\\bfees? of\\s"),
+        P("\\bper (month|year|annum|user|seat)\\b"),
+        P("\\b(USD|EUR|GBP)\\s*\\d[\\d,]*"),
+        P("\\b\\d[\\d,]*\\s*(USD|EUR|GBP|dollars)\\b"),
+        P("\\b(subscription|license|service)\\s+fees?\\b"),
+        P("\\bfees?\\s+(payable|schedule|in the amount)\\b")
+      ] },
+    { id: "payment-terms", group: "Money", name: "Payment terms (when invoices are due)",
+      why: "Net days and the trigger (invoice date, receipt, acceptance).",
+      patterns: [
+        P("\\bnet\\s*\\d+\\b"),
+        P("payable within\\s*\\d+\\s*days"),
+        P("due within\\s*\\d+\\s*days"),
+        P("within\\s*\\d+\\s*days of (invoice|receipt)"),
+        P("\\bnet[-\\s]*\\d+\\b"),
+        P("(payable|due)[^.\\n]{0,20}within\\s*(?:[a-z-]+\\s*\\(\\s*\\d+\\s*\\)|\\d+|fifteen|thirty|forty-five|sixty|ninety)\\s*days"),
+        P("within\\s*(?:[a-z-]+\\s*\\(\\s*\\d+\\s*\\)|\\d+)\\s*days\\s+(of|after|from|following)\\s+(an?\\s+)?(undisputed\\s+)?(invoice|receipt|billing)")
+      ] },
+    { id: "late-fees", group: "Money", name: "Late fees / interest on late payment",
+      why: "What a late payment costs, and whether it is capped.",
+      patterns: [
+        P("late (fee|charge|payment)[^.\\n]{0,50}(%|interest|per)"),
+        P("interest[^.\\n]{0,40}(late|overdue|per (month|annum))"),
+        P("overdue[^.\\n]{0,40}interest"),
+        P("(past[-\\s]?due|overdue|late)\\s+(amount|balance|invoice|payment)s?[^.\\n]{0,50}(interest|finance charge|late fee|penalty|%)"),
+        P("\\b(late fee|late penalty|finance charge)s?\\b")
+      ] },
+    { id: "price-increase", group: "Money", name: "Price increases / escalators",
+      why: "Whether prices can rise at renewal, by how much, tied to what index.",
+      patterns: [
+        P("price increase"),
+        P("increase[^.\\n]{0,40}(fees|prices|charges)[^.\\n]{0,40}(%|CPI|index)"),
+        P("\\bCPI\\b"),
+        P("escalat(or|ion)"),
+        P("uplift"),
+        P("\\b(annual\\s+)?(fee|price|rate)\\s+(adjustment|increase|escalation)\\b"),
+        P("\\b(raise|adjust)\\s+(its\\s+|the\\s+)?(fees|prices|rates)\\b")
+      ] },
+    { id: "taxes", group: "Money", name: "Taxes",
+      why: "Which taxes sit on top of the fees and who carries them.",
+      patterns: [
+        P("\\b(exclusive of|plus|excluding)\\s+(all\\s+)?taxes\\b"),
+        P("\\b(sales tax|VAT|GST|withholding tax)\\b"),
+        P("responsible for[^.\\n]{0,30}taxes"),
+        P("\\b(do not include|exclude[sd]?|exclusive of)\\s+[^.\\n]{0,30}\\btax(es)?\\b"),
+        P("\\b(applicable|use|excise|indirect)\\s+tax(es)?\\b"),
+        P("\\btaxes\\b[^.\\n]{0,40}(paid|borne|responsibility)\\s+by\\b")
+      ] },
+    { id: "mfn", group: "Money", name: "Most-favored-customer / MFN pricing",
+      why: "Whether the customer is promised pricing no worse than anyone else's.",
+      patterns: [
+        P("\\bmost[-\\s]?favo[u]?red[-\\s]?(customer|nation|pricing)\\b"),
+        P("\\bMFN\\b"),
+        P("\\b(no|not)\\s+(offer|charge|grant)[^.\\n]{0,40}(other|another)\\s+customer[^.\\n]{0,30}(lower|better|more favorable)\\s+(price|pricing|rate|terms)\\b"),
+        P("\\b(lowest|best)\\s+(price|rate)[^.\\n]{0,25}(give|offer|charge)[^.\\n]{0,20}any\\s+(other\\s+)?(buyer|customer|client)")
+      ] },
+    { id: "setoff", group: "Money", name: "Setoff rights",
+      why: "Whether amounts owed can be netted against fees payable.",
+      patterns: [
+        P("\\bset[-\\s]?off\\b"),
+        P("\\b(offset|deduct|net)[^.\\n]{0,40}(amounts?\\s+owed|credits?|claims?)[^.\\n]{0,30}against\\s+(fees|invoices|payments?)\\b"),
+        P("\\bright of (offset|set[-\\s]?off|deduction)\\b"),
+        P("\\b(subtract|deduct)[^.\\n]{0,35}(owe[sd]?|credit)[^.\\n]{0,35}from[^.\\n]{0,25}(fees|bill|invoice|payment)\\b")
+      ] },
+    /* Risk */
+    { id: "liability-cap", group: "Risk", name: "Liability cap",
+      why: "The ceiling on what either side can be made to pay — the number that matters most in a dispute.",
+      patterns: [
+        P("liability[^.\\n]{0,60}(shall not exceed|cap(ped)?|limited to)"),
+        P("aggregate liability"),
+        P("(cap|limitation) on liability"),
+        P("in no event[^.\\n]{0,60}liable[^.\\n]{0,40}exceed"),
+        P("\\bcap\\s+on\\s+[^.\\n]{0,30}liability\\b"),
+        P("\\b(maximum|total|cumulative)\\s+liability\\b"),
+        P("\\b(liability|damages)[^.\\n]{0,50}(capped at|will not exceed|not to exceed|shall not exceed)\\b")
+      ] },
+    { id: "consequential", group: "Risk", name: "Consequential / indirect damages exclusion",
+      why: "Whether lost profits and similar damages are excluded — for both sides or one.",
+      patterns: [
+        P("consequential damages"),
+        P("indirect[^.\\n]{0,20}damages"),
+        P("lost profits"),
+        P("\\b(special|incidental|punitive|exemplary)\\b[^.\\n]{0,40}\\bdamages\\b"),
+        P("\\bloss of (profits|revenue|business|data)\\b"),
+        P("\\blost revenue\\b")
+      ] },
+    { id: "indemnity", group: "Risk", name: "Indemnification",
+      why: "Who pays when a third party comes after either side, and for what.",
+      patterns: [
+        P("\\bindemnif\\w+"),
+        P("hold harmless"),
+        P("defend[^.\\n]{0,40}against[^.\\n]{0,30}(claim|action)"),
+        P("\\b(save|keep) harmless\\b"),
+        P("\\b(reimburse|cover)[^.\\n]{0,40}(third[-\\s]party\\s+(claim|suit|action)|defense costs)\\b"),
+        P("\\bthird[-\\s]party\\s+(sues|suit|claim)[^.\\n]{0,40}(pay|defend|cover|indemn)")
+      ] },
+    { id: "warranties", group: "Risk", name: "Warranties",
+      why: "What is promised about the service — and what is disclaimed.",
+      patterns: [
+        P("\\bwarrant(s|ies|y)\\b"),
+        P("as[-\\s]is"),
+        P("disclaim\\w*[^.\\n]{0,30}warrant"),
+        P("\\b(merchantability|fitness for a particular purpose)\\b"),
+        P("\\b(no|disclaims? all)\\s+(guarantees|representations)\\b"),
+        P("\\b(we|vendor|provider) guarantees?\\b[^.\\n]{0,40}(work|perform|service|conform)")
+      ] },
+    { id: "insurance", group: "Risk", name: "Insurance requirements",
+      why: "Coverage the other side must carry, and at what limits.",
+      patterns: [
+        P("\\binsurance\\b[^.\\n]{0,50}(maintain|carry|coverage|policy)"),
+        P("certificate of insurance"),
+        P("(commercial general liability|cyber liability|professional liability) insurance"),
+        P("\\b(maintain|carry|keep|obtain)[^.\\n]{0,40}\\binsurance\\b"),
+        P("\\badditional insured\\b"),
+        P("\\b(errors and omissions|E&O|workers'? compensation|cyber|general liability)\\s+(insurance|coverage)\\b")
+      ] },
+    /* Data & IP */
+    { id: "ip-ownership", group: "Data & IP", name: "IP ownership / work product",
+      why: "Who owns what gets made under the contract.",
+      patterns: [
+        P("intellectual property"),
+        P("work product"),
+        P("(own|ownership)[^.\\n]{0,40}(deliverables|materials developed)"),
+        P("all rights, title"),
+        P("\\bproprietary rights\\b"),
+        P("\\b(copyrights?|patents?|trade secrets?)\\b"),
+        P("\\bowns?\\s+(all\\s+)?(custom\\s+work|deliverables|results|inventions)\\b")
+      ] },
+    { id: "license", group: "Data & IP", name: "License grant",
+      why: "What each side is allowed to use, and where the grant stops.",
+      patterns: [
+        P("grant(s|ed)?[^.\\n]{0,40}licen[cs]e"),
+        P("licen[cs]e to use"),
+        P("non-exclusive[^.\\n]{0,30}licen[cs]e"),
+        P("\\b(right|permission)\\s+to\\s+(access\\s+and\\s+)?use\\s+(the\\s+)?(software|platform|service|system)s?\\b"),
+        P("\\b(allowed|authorized)\\s+to\\s+use\\s+(the\\s+)?(software|platform|service)s?\\b"),
+        P("\\b(limited|worldwide|royalty[-\\s]free|perpetual|revocable)\\s+licen[cs]e\\b")
+      ] },
+    { id: "confidentiality", group: "Data & IP", name: "Confidentiality",
+      why: "What counts as confidential, how long the duty lasts, who can see it.",
+      patterns: [
+        P("confidential information"),
+        P("\\bnon-disclosure\\b"),
+        P("shall keep[^.\\n]{0,30}confidential"),
+        P("\\bin\\s+(strict\\s+)?confidence\\b"),
+        P("\\b(NDA|non[-\\s]?disclose|treat[^.\\n]{0,20}as confidential)\\b"),
+        P("\\bkeep[^.\\n]{0,35}(secret|private|confidential)\\b")
+      ] },
+    { id: "data-protection", group: "Data & IP", name: "Data protection / privacy (DPA)",
+      why: "How personal data is handled, and whether a data processing addendum applies.",
+      patterns: [
+        P("data protection"),
+        P("personal data"),
+        P("\\bDPA\\b|data processing (addendum|agreement)"),
+        P("(GDPR|CCPA|CPRA)"),
+        P("data breach|security incident"),
+        P("\\bpersonally identifiable information\\b"),
+        P("\\bPII\\b"),
+        P("\\bdata (controller|processor)\\b"),
+        P("\\b(personal information|privacy (law|policy|regulations?))\\b")
+      ] },
+    { id: "security", group: "Data & IP", name: "Security requirements",
+      why: "Named security standards, audits, and breach notice duties.",
+      patterns: [
+        P("(SOC\\s?2|ISO\\s?27001)"),
+        P("security (measures|program|standards)"),
+        P("notify[^.\\n]{0,50}(breach|incident)[^.\\n]{0,30}(hour|day)"),
+        P("\\b(encrypt(ion|ed)?|penetration test(ing)?|information security)\\b"),
+        P("\\b(technical|organizational|physical)\\s+safeguards\\b")
+      ] },
+    /* Operations */
+    { id: "sla", group: "Operations", name: "Service levels / SLA + credits",
+      why: "Uptime and support commitments — and what happens when they are missed.",
+      patterns: [
+        P("service levels?"),
+        P("\\bSLA\\b"),
+        P("uptime"),
+        P("service credits?"),
+        P("availability of\\s*\\d"),
+        P("\\b99\\.\\d+%\\b[^.\\n]{0,30}(availab|online|uptime)"),
+        P("\\b(monthly|system)\\s+availability\\b"),
+        P("\\bresponse time\\b[^.\\n]{0,40}(ticket|support|severity|incident)")
+      ] },
+    { id: "audit-rights", group: "Operations", name: "Audit rights",
+      why: "Who can inspect books, usage, or compliance — and how often.",
+      patterns: [
+        P("audit rights?"),
+        P("right to audit"),
+        P("(inspect|examine)[^.\\n]{0,40}(books|records)"),
+        P("upon[^.\\n]{0,30}notice[^.\\n]{0,30}audit"),
+        P("\\bindependent auditor\\b"),
+        P("\\b(check|review|verify)[^.\\n]{0,30}(books|records|compliance)[^.\\n]{0,30}(once a year|annual|business hours|notice)\\b"),
+        P("\\bmay audit\\b")
+      ] },
+    { id: "assignment", group: "Operations", name: "Assignment / change of control",
+      why: "Whether the contract can be handed to another company without consent.",
+      patterns: [
+        P("\\bassign(ment|s|ed)?\\b[^.\\n]{0,50}(consent|successor)"),
+        P("change of control"),
+        P("may not assign"),
+        P("\\b(no party|neither party)\\s+(shall|may)\\s+(assign|transfer|delegate)\\b"),
+        P("\\b(shall not|cannot|can't|may not)\\s+(assign|transfer|delegate)[^.\\n]{0,40}(agreement|contract|rights|obligations)\\b"),
+        P("\\b(merger|acquisition|sale of all or substantially all)\\b[^.\\n]{0,40}(assign|transfer|consent)"),
+        P("\\bhand[^.\\n]{0,20}(contract|agreement)\\s+off\\b")
+      ] },
+    { id: "subcontracting", group: "Operations", name: "Subcontractors / subprocessors",
+      why: "Who else touches the work or the data, and whether consent is needed.",
+      patterns: [
+        P("subcontract"),
+        P("sub-?processor"),
+        P("third-party (providers|services)[^.\\n]{0,30}(list|notif)"),
+        P("\\b(engage|use)[^.\\n]{0,25}third[-\\s]party\\s+(service\\s+)?providers\\b"),
+        P("\\boutside contractors?\\b"),
+        P("\\bdelegate\\s+(work|services)\\s+to\\s+(third parties|others)\\b")
+      ] },
+    { id: "exclusivity-nonsolicit", group: "Operations", name: "Exclusivity / non-solicitation",
+      why: "Lock-ins: exclusive dealing, non-competes, and staff poaching bans.",
+      patterns: [
+        P("\\bexclusiv(e|ity)\\b"),
+        P("non-?solicit"),
+        P("shall not solicit"),
+        P("non-?compete"),
+        P("\\b(recruit|hire|entice away|poach)[^.\\n]{0,35}(employee|staff|personnel)\\b"),
+        P("\\bsole (provider|supplier|vendor)\\b")
+      ] },
+    { id: "exit-assistance", group: "Operations", name: "Exit / data return / transition assistance",
+      why: "What happens to the customer's data and operations when the contract ends.",
+      patterns: [
+        P("\\btransition assistance\\b"),
+        P("\\b(return|export|retrieve|retrieval)\\s+(of\\s+)?(all\\s+)?(customer|client)?\\s*data\\b"),
+        P("\\bdisengagement\\s+(services|assistance|support)\\b"),
+        P("\\b(after|upon)\\s+(termination|expiration|the contract ends)[^.\\n]{0,50}(data|handover|transition)\\b"),
+        P("\\b(hand back|give back|download)[^.\\n]{0,25}(our|your|customer)?\\s*data\\b")
+      ] },
+    { id: "suspension-rights", group: "Operations", name: "Suspension rights",
+      why: "Whether the vendor can suspend service, and for what (typically nonpayment).",
+      patterns: [
+        P("\\b(may|right to)\\s+suspend\\b"),
+        P("\\bsuspension of (the\\s+)?(services?|access|account)\\b"),
+        P("\\bsuspend[^.\\n]{0,40}(services?|access|account)[^.\\n]{0,40}(unpaid|non[-\\s]?payment|overdue|breach|security)\\b"),
+        P("\\b(shut off|pause|freeze|cut off)\\s+(your\\s+|customer\\s+)?(access|service|account)[^.\\n]{0,35}(unpaid|late|overdue|pay)\\b")
+      ] },
+    { id: "publicity", group: "Operations", name: "Publicity / logo use",
+      why: "Whether either side may use the other's name or logo.",
+      patterns: [
+        P("\\b(name and logo|customer list|press release|case study|publicity)\\b"),
+        P("\\b(use|display)[^.\\n]{0,35}(customer'?s?|client'?s?|other party'?s?)\\s+(name|logo|trademark)s?\\b"),
+        P("\\b(marketing materials|promotional materials|website)\\b[^.\\n]{0,35}(name|logo|identify)"),
+        P("\\b(mention|list|show)[^.\\n]{0,25}(as a customer|company logo|our logo)\\b")
+      ] },
+    /* Legal */
+    { id: "governing-law", group: "Legal", name: "Governing law",
+      why: "Which state's or country's law interprets the contract.",
+      patterns: [
+        P("governing law"),
+        P("governed by[^.\\n]{0,30}laws of"),
+        P("\\bconstrued (in accordance with|under)[^.\\n]{0,30}laws of\\b"),
+        P("\\bchoice of law\\b"),
+        P("\\b(laws? of (the )?(State|Commonwealth) of|[A-Z][a-z]+ law applies)\\b")
+      ] },
+    { id: "venue-disputes", group: "Legal", name: "Venue / dispute resolution / arbitration",
+      why: "Where a fight happens and how — courts, arbitration, mediation first.",
+      patterns: [
+        P("\\bjurisdiction\\b"),
+        P("\\bvenue\\b"),
+        P("arbitrat\\w+"),
+        P("mediation"),
+        P("dispute resolution"),
+        P("\\b(exclusive\\s+)?courts?\\s+(located|sitting)\\s+in\\b"),
+        P("\\b(lawsuit|suit|legal action)[^.\\n]{0,35}(filed|brought)[^.\\n]{0,25}in\\b")
+      ] },
+    { id: "force-majeure", group: "Legal", name: "Force majeure",
+      why: "What happens when events outside both sides' control stop performance.",
+      patterns: [
+        P("force majeure"),
+        P("act of God"),
+        P("events beyond[^.\\n]{0,30}(reasonable )?control"),
+        P("\\b(beyond|outside)[^.\\n]{0,30}(reasonable\\s+)?control\\b"),
+        P("\\bnatural disaster\\b")
+      ] },
+    { id: "notices", group: "Legal", name: "Notices (how formal notice is given)",
+      why: "Where termination and other notices must be sent to count.",
+      patterns: [
+        P("notices? (shall|must) be (given|sent|in writing)"),
+        P("notice to[^.\\n]{0,10}:"),
+        P("all notices"),
+        P("\\b(formal|official|legal)\\s+notices?\\b"),
+        P("\\bnotices?[^.\\n]{0,35}(certified mail|overnight courier|address listed|notice address|by email to)\\b"),
+        P("\\bnotices?\\s+under this\\s+(agreement|contract)\\b")
+      ] },
+    { id: "entire-agreement", group: "Legal", name: "Entire agreement / amendments / precedence",
+      why: "Whether side promises count, how changes are made, and which document wins a conflict.",
+      patterns: [
+        P("entire agreement"),
+        P("order of precedence"),
+        P("amend(ed|ment)[^.\\n]{0,40}in writing"),
+        P("in the event of a conflict"),
+        P("\\bsupersedes all prior\\b"),
+        P("\\b(modification|change)s?[^.\\n]{0,35}(in writing|written and signed|signed by both)\\b"),
+        P("\\b(whole deal|complete and exclusive statement)\\b")
+      ] },
+    { id: "signatures", group: "Legal", name: "Signatures / execution",
+      why: "Whether the copy is actually signed — and by whom.",
+      patterns: [
+        P("IN WITNESS WHEREOF"),
+        P("\\bsignature\\b"),
+        P("/s/"),
+        P("\\bexecuted\\b[^.\\n]{0,30}(by|as of)"),
+        P("\\bsigned (by|and dated|below)\\b"),
+        P("\\bagreed and accepted\\b"),
+        P("\\bauthorized (representative|signatory|officer)\\b")
+      ] },
+    { id: "compliance-laws", group: "Legal", name: "Compliance with laws",
+      why: "Whether each side promises to obey applicable law.",
+      patterns: [
+        P("\\bcomply with\\s+(all\\s+)?applicable\\s+(laws?|regulations?|statutes?)\\b"),
+        P("\\bcompliance with\\s+(applicable\\s+)?laws?\\b"),
+        P("\\b(anti[-\\s]?bribery|anti[-\\s]?corruption|FCPA|export control|sanctions)\\b"),
+        P("\\b(follow|obey)\\s+(all\\s+)?(applicable\\s+)?(laws|rules and regulations)\\b")
+      ] },
+    { id: "survival", group: "Legal", name: "Survival",
+      why: "Which duties are stated to outlive termination.",
+      patterns: [
+        P("\\bshall survive\\b"),
+        P("\\bsurvive\\s+(the\\s+)?(termination|expiration)\\b"),
+        P("\\bsurvival\\b[^.\\n]{0,40}(clause|section|obligations?|provisions?|termination)"),
+        P("\\b(stay|remain) in effect\\s+(after|even after)\\s+(the\\s+)?(contract ends|termination|expiration)\\b")
+      ] },
+    { id: "injunctive-relief", group: "Legal", name: "Injunctive relief / jury waiver",
+      why: "Equitable remedies and jury-trial waivers.",
+      patterns: [
+        P("\\binjunctive relief\\b"),
+        P("\\bequitable relief\\b"),
+        P("\\birreparable harm\\b"),
+        P("\\bwaive[sd]?\\s+(any\\s+)?(right to\\s+)?(a\\s+)?(trial by jury|jury trial)\\b"),
+        P("\\bjury (trial )?waiver\\b"),
+        P("\\b(ask a court for an immediate order|no jury trial)\\b")
+      ] }
+  ];
+
+  function excerptAround(text, idx, len) {
+    var start = Math.max(0, idx - 70);
+    var end = Math.min(text.length, idx + len + 90);
+    var s = text.slice(start, end).replace(/\s+/g, " ").trim();
+    if (start > 0) s = "…" + s;
+    if (end < text.length) s = s + "…";
+    return s;
+  }
+
+  function findFirstMatch(text, patterns) {
+    for (var i = 0; i < patterns.length; i++) {
+      var m = patterns[i].exec(text);
+      if (m) return { match: m[0], excerpt: excerptAround(text, m.index, m[0].length) };
+    }
+    return null;
+  }
+
+  function runChecks(text) {
+    return CHECKS.map(function (c) {
+      var hit = findFirstMatch(text, c.patterns);
+      return { id: c.id, group: c.group, name: c.name, why: c.why, found: !!hit, excerpt: hit ? hit.excerpt : null };
+    });
+  }
+
+  /* ---------------- Deterministic Risk Flags Layer ----------------------- */
+  var FLAG_IDS = [
+    "F-UNCAPPED-INDEMNITY",
+    "F-ONE-WAY-INDEMNITY",
+    "F-IP-INDEMNITY",
+    "F-INDEMNITY-NO-INSURANCE",
+    "F-RENEWAL-NO-NOTICE",
+    "F-CAUSE-NO-CURE"
+  ];
+
+  var UNCAPPED_INDEMNITY_PATTERNS = [
+    P("(indemnif\\w*|obligations? under this section|section\\s+\\d+)[^.\\n]{0,80}(shall not be|are not|is not|not)\\s+(subject to|limited by|capped by)[^.\\n]{0,60}(limitation of liability|liability cap|cap)"),
+    P("(indemnif\\w*|obligations? under this section)[^.\\n]{0,100}\\b(without cap|uncapped|unlimited liability|no cap)\\b"),
+    P("\\b(carve[-\\s]?out|excluded from|notwithstanding)[^.\\n]{0,60}(limitation of liability|liability cap)[^.\\n]{0,60}indemnif\\w*"),
+    P("\\b(limitation of liability|liability cap)[^.\\n]{0,60}(shall not|does not) apply to[^.\\n]{0,60}indemnif\\w*")
+  ];
+
+  var MUTUAL_INDEMNITY_PATTERNS = [
+    P("\\beach party\\s+(shall|will|agrees to)\\s+(defend,?\\s+)?indemnif\\w*"),
+    P("\\b(mutual|reciprocal)\\s+indemnif\\w*\\b"),
+    P("\\bindemnif\\w*[^.\\n]{0,45}\\b(the other party|each other)\\b"),
+    P("\\bparties\\s+(shall|will|agree to)\\s+indemnify each other\\b")
+  ];
+
+  var ONE_WAY_EXPLICIT_PATTERNS = [
+    P("\\b[A-Za-z]+\\s+has no obligation to indemnify\\b"),
+    P("\\bno obligation to indemnify\\b"),
+    P("\\bone[-\\s]?way indemnif\\w*\\b"),
+    P("\\bonly\\s+(vendor|provider|customer|client|buyer|seller)\\s+(shall|will)\\s+indemnif\\w*")
+  ];
+
+  var IP_INDEMNITY_PATTERNS = [
+    P("(indemnif\\w*|defend|hold harmless)[^.\\n]{0,260}\\b(infringe\\w*|misappropriat\\w*|intellectual property|patent|copyright|trade secret)\\b"),
+    P("\\b(infringe\\w*|misappropriat\\w*|intellectual property)\\b[^.\\n]{0,120}\\b(indemnif\\w*|defend|hold harmless)\\b"),
+    P("\\bIP indemnif\\w*\\b")
+  ];
+
+  var CURE_PERIOD_PATTERNS = [
+    P("\\bcure\\s+(period|such breach|the breach|any breach|within)\\b"),
+    P("\\bcure[^.\\n]{0,25}\\b\\d+\\s*days\\b"),
+    P("\\bopportunity to cure\\b"),
+    P("\\bremed(y|ied)[^.\\n]{0,25}(breach|default|failure)[^.\\n]{0,30}within\\b"),
+    P("\\buncured\\s+(for|after)?[^.\\n]{0,20}\\d+\\s*days\\b")
+  ];
+
+  function evaluateFlags(text, checks) {
+    var byId = {};
+    checks.forEach(function (c) { byId[c.id] = c; });
+
+    var hasIndemnity = byId["indemnity"] && byId["indemnity"].found;
+    var hasLiabilityCap = byId["liability-cap"] && byId["liability-cap"].found;
+    var hasInsurance = byId["insurance"] && byId["insurance"].found;
+    var hasIpOrLicense = (byId["ip-ownership"] && byId["ip-ownership"].found) || (byId["license"] && byId["license"].found);
+    var hasRenewal = byId["renewal"] && byId["renewal"].found;
+    var hasRenewalNotice = byId["renewal-notice"] && byId["renewal-notice"].found;
+    var hasCause = byId["termination-cause"] && byId["termination-cause"].found;
+
+    var flags = [];
+
+    /* 1. F-UNCAPPED-INDEMNITY */
+    var uncappedHit = hasIndemnity ? findFirstMatch(text, UNCAPPED_INDEMNITY_PATTERNS) : null;
+    var uncappedFired = !!(hasIndemnity && (uncappedHit || !hasLiabilityCap));
+    flags.push({
+      id: "F-UNCAPPED-INDEMNITY",
+      name: "Uncapped indemnity",
+      type: "flag",
+      raised: uncappedFired,
+      statusLabel: uncappedFired ? "FLAG RAISED" : "CLEAR",
+      reason: uncappedFired
+        ? (uncappedHit
+            ? "Indemnification is expressly excluded from the liability cap or stated to apply without cap."
+            : "Indemnification is present, but no liability cap was detected anywhere in the document.")
+        : (hasIndemnity
+            ? "Indemnification is present alongside a liability cap with no uncapped carve-out detected."
+            : "No indemnification clause detected."),
+      excerpt: uncappedFired ? (uncappedHit ? uncappedHit.excerpt : byId["indemnity"].excerpt) : null
+    });
+
+    /* 2. F-ONE-WAY-INDEMNITY */
+    var mutualHit = hasIndemnity ? findFirstMatch(text, MUTUAL_INDEMNITY_PATTERNS) : null;
+    var vendorInd = hasIndemnity && /\b(vendor|provider|supplier|licensor|seller|company)\s+(shall|will|agrees to)[^.\n]{0,40}\bindemnif\w*/i.test(text);
+    var custInd = hasIndemnity && /\b(customer|client|buyer|licensee)\s+(shall|will|agrees to)[^.\n]{0,40}\bindemnif\w*/i.test(text);
+    var oneWayExplicit = hasIndemnity ? findFirstMatch(text, ONE_WAY_EXPLICIT_PATTERNS) : null;
+    var oneWayFired = !!(hasIndemnity && (oneWayExplicit || (!mutualHit && !(vendorInd && custInd))));
+    flags.push({
+      id: "F-ONE-WAY-INDEMNITY",
+      name: "One-way indemnity",
+      type: "flag",
+      raised: oneWayFired,
+      statusLabel: oneWayFired ? "FLAG RAISED" : "CLEAR",
+      reason: oneWayFired
+        ? (oneWayExplicit
+            ? "Indemnification expressly exempts one party from indemnifying the other."
+            : "Indemnification runs in one direction only — no mutual indemnity language was found.")
+        : (hasIndemnity
+            ? "Mutual indemnification markers found."
+            : "No indemnification clause detected."),
+      excerpt: oneWayFired
+        ? (oneWayExplicit ? oneWayExplicit.excerpt : byId["indemnity"].excerpt)
+        : (mutualHit ? mutualHit.excerpt : null)
+    });
+
+    /* 3. F-IP-INDEMNITY (noted signal: PRESENT or ABSENT; raised when ABSENT + IP/license present) */
+    var ipIndHit = hasIndemnity ? findFirstMatch(text, IP_INDEMNITY_PATTERNS) : null;
+    var ipIndPresent = !!ipIndHit;
+    var ipIndRaised = !ipIndPresent && !!hasIpOrLicense;
+    flags.push({
+      id: "F-IP-INDEMNITY",
+      name: "IP / infringement indemnity signal",
+      type: "signal",
+      present: ipIndPresent,
+      raised: ipIndRaised,
+      statusLabel: ipIndPresent ? "PRESENT" : (ipIndRaised ? "ABSENT · FLAG RAISED" : "ABSENT"),
+      reason: ipIndPresent
+        ? "IP / third-party infringement indemnification language is present."
+        : (ipIndRaised
+            ? "IP ownership or license grant language is present, but no IP / infringement indemnity was found."
+            : "No IP / infringement indemnity detected (and no IP ownership or license language found)."),
+      excerpt: ipIndPresent
+        ? ipIndHit.excerpt
+        : (ipIndRaised ? ((byId["ip-ownership"] && byId["ip-ownership"].found) ? byId["ip-ownership"].excerpt : byId["license"].excerpt) : null)
+    });
+
+    /* 4. F-INDEMNITY-NO-INSURANCE */
+    var indNoInsFired = !!(hasIndemnity && !hasInsurance);
+    flags.push({
+      id: "F-INDEMNITY-NO-INSURANCE",
+      name: "Indemnity with no insurance requirement",
+      type: "flag",
+      raised: indNoInsFired,
+      statusLabel: indNoInsFired ? "FLAG RAISED" : "CLEAR",
+      reason: indNoInsFired
+        ? "Indemnification is present, but no insurance coverage requirement was found to back it."
+        : (hasIndemnity
+            ? "Insurance coverage requirements are present alongside indemnification."
+            : "No indemnification clause detected."),
+      excerpt: indNoInsFired ? byId["indemnity"].excerpt : (hasIndemnity && hasInsurance ? byId["insurance"].excerpt : null)
+    });
+
+    /* 5. F-RENEWAL-NO-NOTICE */
+    var renewNoNoticeFired = !!(hasRenewal && !hasRenewalNotice);
+    flags.push({
+      id: "F-RENEWAL-NO-NOTICE",
+      name: "Auto-renewal / evergreen with no notice deadline",
+      type: "flag",
+      raised: renewNoNoticeFired,
+      statusLabel: renewNoNoticeFired ? "FLAG RAISED" : "CLEAR",
+      reason: renewNoNoticeFired
+        ? "Renewal or evergreen term language is present, but no non-renewal notice deadline was detected."
+        : (hasRenewal
+            ? "Renewal language includes a non-renewal notice deadline."
+            : "No renewal / evergreen clause detected."),
+      excerpt: renewNoNoticeFired ? byId["renewal"].excerpt : (hasRenewal && hasRenewalNotice ? byId["renewal-notice"].excerpt : null)
+    });
+
+    /* 6. F-CAUSE-NO-CURE */
+    var matBreachHit = hasCause ? /\bmaterial breach\b/i.exec(text) : null;
+    var cureHit = hasCause ? findFirstMatch(text, CURE_PERIOD_PATTERNS) : null;
+    var causeNoCureFired = !!(hasCause && matBreachHit && !cureHit);
+    flags.push({
+      id: "F-CAUSE-NO-CURE",
+      name: "Termination for material breach with no cure period",
+      type: "flag",
+      raised: causeNoCureFired,
+      statusLabel: causeNoCureFired ? "FLAG RAISED" : "CLEAR",
+      reason: causeNoCureFired
+        ? "Termination for cause references a material breach without a cure or remedy period."
+        : (hasCause
+            ? "Termination for cause includes a cure period or does not trigger on uncured material breach alone."
+            : "No termination-for-cause clause detected."),
+      excerpt: causeNoCureFired ? excerptAround(text, matBreachHit.index, matBreachHit[0].length) : (cureHit ? cureHit.excerpt : null)
+    });
+
+    return flags;
+  }
+
+  function analyze(text) {
+    var scans = parseKeyClauses(text);
+    var checks = runChecks(text);
+    var flags = evaluateFlags(text, checks);
+    return { scans: scans, checks: checks, flags: flags };
+  }
+
+  window.ContractAnalyzer = {
+    parseKeyClauses: parseKeyClauses,
+    runChecks: runChecks,
+    evaluateFlags: evaluateFlags,
+    analyze: analyze,
+    CHECKS: CHECKS,
+    FLAGS: FLAG_IDS
+  };
+})();
+  </script>
+
+  <!-- PAGE CONTROLLER & SELF-CHECK BATTERY -->
+  <script>
+    (function () {
+      "use strict";
+
+      var SAMPLE = "SERVICE AGREEMENT\nThis Agreement is made on 2024-01-15 between ACME, Inc. and Roadrunner LLC.\nPayment: USD $12,500 per month, payable within 30 days of invoice.\nTerm: The initial term is twelve (12) months and auto-renews for additional 12-month terms.\nTermination: Either party may terminate with 30 days' notice.\nGoverning Law: California.";
+
+      var SCAN_META = [
+        { key: "dates", label: "Dates" },
+        { key: "money", label: "Money" },
+        { key: "parties", label: "Parties" },
+        { key: "law", label: "Governing law / jurisdiction" },
+        { key: "term_length", label: "Term length" },
+        { key: "renewal_period", label: "Renewal period" }
+      ];
+
+      var fileEl = document.getElementById("ca-file");
+      var fileStatusEl = document.getElementById("ca-file-status");
+      var textEl = document.getElementById("ca-text");
+      var textStatsEl = document.getElementById("ca-text-stats");
+      var noteEl = document.getElementById("ca-note");
+      var resultsEl = document.getElementById("ca-results");
+      var aiBtn = document.getElementById("ca-ai");
+      var aiOutEl = document.getElementById("ca-ai-out");
+      var stickyFoundEl = document.getElementById("sticky-found");
+      var stickyMissingEl = document.getElementById("sticky-missing");
+      var stickyFlagsEl = document.getElementById("sticky-flags");
+      var stickyFlagsJump = document.getElementById("sticky-flags-jump");
+
+      var lastText = "";
+      var lastChecks = null;
+      var lastScans = null;
+      var lastFlags = null;
+      var activeFilter = "all";
+
+      if (window.pdfjsLib) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = "../../assets/pdf.worker-3.11.174.min.js";
+      }
+
+      function esc(s) {
+        return String(s == null ? "" : s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function slugifyGroup(g) {
+        return "group-" + g.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      }
+
+      function setNote(msg, isError) {
+        noteEl.textContent = msg || "";
+        noteEl.className = "analyzer-note" + (isError ? " is-error" : "");
+      }
+
+      function updateTextStats() {
+        var val = textEl.value;
+        var chars = val.length;
+        var trimmed = val.trim();
+        var words = trimmed ? trimmed.split(/\s+/).length : 0;
+        textStatsEl.textContent = chars.toLocaleString() + " characters · " + words.toLocaleString() + " words";
+      }
+
+      function resetResultsToIdle() {
+        lastText = "";
+        lastChecks = null;
+        lastScans = null;
+        lastFlags = null;
+        activeFilter = "all";
+        stickyFoundEl.textContent = "—/41";
+        stickyMissingEl.textContent = "—";
+        stickyFlagsEl.textContent = "—";
+        stickyFlagsJump.setAttribute("href", "#section-results");
+        resultsEl.innerHTML =
+          '<div class="idle-notice-box" id="ca-idle-state">' +
+            'Ready to analyze. Upload a contract, paste text, or load the fictional sample contract above, then click <strong>Run the analysis</strong> to populate risk flags, the six original scans, and all 41 coverage checks.' +
+          '</div>';
+        aiOutEl.innerHTML = "Run the browser scan above first, then select <strong>Write the AI read</strong> if you want an AI-written summary alongside the heuristic evidence.";
+      }
+
+      textEl.addEventListener("input", updateTextStats);
+
+      document.getElementById("ca-sample").addEventListener("click", function () {
+        textEl.value = SAMPLE;
+        fileStatusEl.textContent = "Sample contract loaded (fictional service agreement — 6 lines).";
+        updateTextStats();
+        setNote("Sample loaded — the fictional service agreement from the original tool. Run the analysis.", false);
+      });
+
+      document.getElementById("ca-clear").addEventListener("click", function () {
+        textEl.value = "";
+        fileEl.value = "";
+        fileStatusEl.textContent = "No file uploaded yet — files are read locally in your browser.";
+        updateTextStats();
+        setNote("", false);
+        resetResultsToIdle();
+      });
+
+      fileEl.addEventListener("change", function (ev) {
+        var f = ev.target.files && ev.target.files[0];
+        if (!f) return;
+        var lower = f.name.toLowerCase();
+        fileStatusEl.textContent = "Reading " + f.name + "…";
+        setNote("", false);
+
+        var done = function (text) {
+          textEl.value = text;
+          updateTextStats();
+          fileStatusEl.textContent = f.name + " — " + text.length.toLocaleString() + " characters extracted in your browser.";
+          setNote("File loaded. Select Run the analysis to scan it.", false);
+        };
+
+        var fail = function (err) {
+          fileStatusEl.textContent = "Could not extract text from " + f.name + ".";
+          setNote("That file did not read: " + (err && err.message ? err.message : err) + " — a scanned image PDF carries no text to extract. Paste the text instead.", true);
+        };
+
+        if (lower.endsWith(".txt")) {
+          var readTxt = typeof f.text === "function"
+            ? f.text()
+            : new Promise(function (resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function () { resolve(String(reader.result || "")); };
+                reader.onerror = function () { reject(new Error("could not read text file")); };
+                reader.readAsText(f);
+              });
+          readTxt.then(function (txt) {
+            var cleaned = txt.trim();
+            if (!cleaned) throw new Error("the text file is empty");
+            done(cleaned);
+          }).catch(fail);
+        } else if (lower.endsWith(".docx")) {
+          if (!window.JSZip) {
+            fail(new Error("DOCX library not loaded"));
+            return;
+          }
+          f.arrayBuffer()
+            .then(function (buf) { return window.JSZip.loadAsync(buf); })
+            .then(function (zip) {
+              var docFile = zip.file("word/document.xml");
+              if (!docFile) throw new Error("no word/document.xml found inside the DOCX");
+              return docFile.async("string");
+            })
+            .then(function (xml) {
+              var doc = new DOMParser().parseFromString(xml, "text/xml");
+              var paras = doc.getElementsByTagName("w:p");
+              var lines = [];
+              for (var i = 0; i < paras.length; i++) {
+                var ts = paras[i].getElementsByTagName("w:t");
+                var line = "";
+                for (var j = 0; j < ts.length; j++) line += ts[j].textContent;
+                lines.push(line);
+              }
+              var out = lines.join("\n").trim();
+              if (!out) throw new Error("no readable text paragraphs found in the DOCX");
+              done(out);
+            })
+            .catch(fail);
+        } else if (lower.endsWith(".pdf")) {
+          if (!window.pdfjsLib) {
+            fail(new Error("PDF library not loaded"));
+            return;
+          }
+          f.arrayBuffer()
+            .then(function (buf) { return window.pdfjsLib.getDocument({ data: buf }).promise; })
+            .then(function (pdf) {
+              var pages = [];
+              var chain = Promise.resolve();
+              var collect = function (n) {
+                chain = chain
+                  .then(function () { return pdf.getPage(n); })
+                  .then(function (pg) { return pg.getTextContent(); })
+                  .then(function (tc) {
+                    var lines = [];
+                    var lastY = null;
+                    tc.items.forEach(function (it) {
+                      var y = it.transform[5];
+                      if (lastY !== null && Math.abs(y - lastY) > 2) lines.push("\n");
+                      else if (lines.length) lines.push(" ");
+                      lines.push(it.str);
+                      lastY = y;
+                    });
+                    pages.push(lines.join(""));
+                  });
+              };
+              for (var n = 1; n <= pdf.numPages; n++) collect(n);
+              return chain.then(function () {
+                var extracted = pages.join("\n").trim();
+                if (!extracted) {
+                  throw new Error("no text layer found in PDF (likely a scanned image PDF)");
+                }
+                done(extracted);
+              });
+            })
+            .catch(fail);
+        } else {
+          fileStatusEl.textContent = "Unsupported file type: " + f.name;
+          setNote("That file type is not supported — use a TXT, DOCX, or PDF file, or paste the text.", true);
+        }
+      });
+
+      function formatScanValues(vals) {
+        if (!vals || !vals.length) return [];
+        return vals.map(function (v) {
+          return Array.isArray(v) ? v.join(" / ") : (v === "" ? "(empty match)" : v);
+        });
+      }
+
+      function buildPlainBrief(checks, scans, flags) {
+        var foundList = checks.filter(function (c) { return c.found; });
+        var missingList = checks.filter(function (c) { return !c.found; });
+        var raisedFlags = flags.filter(function (f) { return f.raised; });
+        var ipSignal = flags.filter(function (f) { return f.id === "F-IP-INDEMNITY"; })[0];
+        var lines = [];
+        lines.push("CONTRACT ANALYZER — BROWSER SCAN BRIEF");
+        lines.push("======================================");
+        lines.push("Flags raised: " + raisedFlags.length + " | Coverage: " + foundList.length + " of " + checks.length + " checks found | " + missingList.length + " not found");
+        lines.push("");
+        lines.push("RISK FLAGS & IP INDEMNITY SIGNAL");
+        if (!raisedFlags.length) {
+          lines.push("- Raised flags: None (0 dangerous shapes triggered)");
+        } else {
+          raisedFlags.forEach(function (f) {
+            lines.push("- [" + f.id + "] " + f.name + " — " + f.reason + (f.excerpt ? ' ("' + f.excerpt + '")' : ""));
+          });
+        }
+        if (ipSignal) {
+          lines.push("- [F-IP-INDEMNITY] Signal: " + (ipSignal.present ? "PRESENT" : "ABSENT") + (ipSignal.raised ? " (RAISED — IP/license language present)" : "") + " — " + ipSignal.reason + (ipSignal.excerpt ? ' ("' + ipSignal.excerpt + '")' : ""));
+        }
+        lines.push("");
+        lines.push("ORIGINAL SIX SCANS");
+        SCAN_META.forEach(function (meta) {
+          var flat = formatScanValues(scans[meta.key]);
+          lines.push("- " + meta.key + " (" + meta.label + "): " + (flat.length ? flat.join(" | ") : "nothing found"));
+        });
+        lines.push("");
+        lines.push("FOUND CLAUSES (" + foundList.length + ")");
+        if (!foundList.length) {
+          lines.push("None");
+        } else {
+          foundList.forEach(function (c) {
+            lines.push("- [" + c.group + "] " + c.name + " — \"" + c.excerpt + "\"");
+          });
+        }
+        lines.push("");
+        lines.push("NOT FOUND — CHECK BY HAND (" + missingList.length + ")");
+        if (!missingList.length) {
+          lines.push("None — all " + checks.length + " checks matched.");
+        } else {
+          missingList.forEach(function (c) {
+            lines.push("- [" + c.group + "] " + c.name + " — " + c.why);
+          });
+        }
+        return lines.join("\n");
+      }
+
+      function renderFlagsBand(flags) {
+        var raisedCount = flags.filter(function (f) { return f.raised; }).length;
+        var sorted = flags.slice().sort(function (a, b) {
+          if (a.raised !== b.raised) return a.raised ? -1 : 1;
+          if (a.id === "F-IP-INDEMNITY") return -1;
+          if (b.id === "F-IP-INDEMNITY") return 1;
+          return 0;
+        });
+
+        var html = '<div class="flags-band' + (raisedCount === 0 ? " is-clear" : "") + '" id="ca-flags-band" role="region" aria-label="Contract Risk Flags">';
+        html += '<div class="flags-band-head">';
+        html += '<h3 class="flags-band-title">Risk flags &amp; indemnity posture (' + raisedCount + ' raised)</h3>';
+        html += '<span class="section-subtitle">Deterministic 6-rule check</span>';
+        html += '</div>';
+        html += '<p class="flags-band-intro">Flags are shapes worth a second look — an indemnity with no cap, an indemnity that runs one way, a renewal with no notice path — each shown with the sentence that triggered it.</p>';
+        html += '<div class="flags-list">';
+
+        sorted.forEach(function (f) {
+          var cls = "is-clear";
+          if (f.raised) cls = "is-raised";
+          else if (f.id === "F-IP-INDEMNITY" && f.present) cls = "is-present";
+          else if (f.id === "F-IP-INDEMNITY" && !f.present) cls = "is-noted-absent";
+
+          html += '<article class="flag-card ' + cls + '" data-flag-id="' + esc(f.id) + '">';
+          html += '<div class="flag-top-row">';
+          html += '<div class="flag-title-wrap"><span class="flag-code">' + esc(f.id) + '</span><span class="flag-name">' + esc(f.name) + '</span></div>';
+          html += '<span class="flag-badge ' + cls + '">' + esc(f.statusLabel) + '</span>';
+          html += '</div>';
+          html += '<p class="flag-reason">' + esc(f.reason) + '</p>';
+          if (f.excerpt) {
+            html += '<p class="flag-excerpt">“' + esc(f.excerpt) + '”</p>';
+          }
+          html += '</article>';
+        });
+
+        html += '</div>';
+        html += '</div>';
+        return html;
+      }
+
+      function renderChecksSection(checks) {
+        var foundCount = checks.filter(function (c) { return c.found; }).length;
+        var missingCount = checks.length - foundCount;
+
+        var groups = [];
+        var byGroup = {};
+        checks.forEach(function (c) {
+          if (!byGroup[c.group]) {
+            byGroup[c.group] = [];
+            groups.push(c.group);
+          }
+          byGroup[c.group].push(c);
+        });
+
+        var html = '<div class="sub-block" id="ca-checks-block">';
+        html += '<h3 class="sub-block-title">The ' + checks.length + '-point coverage checklist</h3>';
+        html += '<p class="sub-block-desc">Every standard item checked across six groups — found items show the matched line; missing items are listed so a human checks by hand.</p>';
+
+        html += '<div class="check-toolbar">';
+        html += '<div class="filter-group" role="group" aria-label="Filter coverage checks">';
+        html += '<button type="button" class="filter-btn' + (activeFilter === "all" ? " is-active" : "") + '" data-filter="all">All (' + checks.length + ')</button>';
+        html += '<button type="button" class="filter-btn' + (activeFilter === "found" ? " is-active" : "") + '" data-filter="found">Found (' + foundCount + ')</button>';
+        html += '<button type="button" class="filter-btn' + (activeFilter === "missing" ? " is-active" : "") + '" data-filter="missing">Not found (' + missingCount + ')</button>';
+        html += '</div>';
+        html += '<nav class="group-jump-nav" aria-label="Jump to check group">';
+        groups.forEach(function (g) {
+          html += '<a href="#' + esc(slugifyGroup(g)) + '">' + esc(g) + '</a>';
+        });
+        html += '</nav>';
+        html += '</div>';
+
+        groups.forEach(function (g) {
+          var items = byGroup[g];
+          var groupFound = items.filter(function (c) { return c.found; }).length;
+          var visibleItems = items.filter(function (c) {
+            if (activeFilter === "found") return c.found;
+            if (activeFilter === "missing") return !c.found;
+            return true;
+          });
+
+          html += '<div class="check-group-block" id="' + esc(slugifyGroup(g)) + '">';
+          html += '<div class="check-group-header">';
+          html += '<h4 class="check-group-name">' + esc(g) + '</h4>';
+          html += '<span class="check-group-count">' + groupFound + ' of ' + items.length + ' found</span>';
+          html += '</div>';
+
+          if (!visibleItems.length) {
+            html += '<div class="idle-notice-box">No items in <strong>' + esc(g) + '</strong> match the current filter.</div>';
+          } else {
+            html += '<div class="check-list">';
+            visibleItems.forEach(function (c) {
+              var stateClass = c.found ? "is-found" : "is-missing";
+              var badgeText = c.found ? "✓ FOUND" : "✗ NOT FOUND";
+              html += '<article class="check-card ' + stateClass + '" data-check-id="' + esc(c.id) + '">';
+              html += '<div class="check-top-row">';
+              html += '<span class="check-name">' + esc(c.name) + '</span>';
+              html += '<span class="check-badge ' + stateClass + '">' + badgeText + '</span>';
+              html += '</div>';
+              html += '<p class="check-why">' + esc(c.why) + '</p>';
+              if (c.found) {
+                html += '<p class="check-excerpt">“' + esc(c.excerpt) + '”</p>';
+              } else {
+                html += '<p class="check-missing-note">Not found in document. Check by hand.</p>';
+              }
+              html += '</article>';
+            });
+            html += '</div>';
+          }
+          html += '</div>';
+        });
+
+        html += '</div>';
+        return html;
+      }
+
+      function renderFullResults(checks, scans, flags) {
+        var found = checks.filter(function (c) { return c.found; }).length;
+        var missing = checks.length - found;
+        var raisedFlags = flags.filter(function (f) { return f.raised; }).length;
+        var ipSignal = flags.filter(function (f) { return f.id === "F-IP-INDEMNITY"; })[0];
+
+        stickyFoundEl.textContent = found + "/" + checks.length;
+        stickyMissingEl.textContent = String(missing);
+        stickyFlagsEl.textContent = String(raisedFlags);
+        stickyFlagsJump.setAttribute("href", "#ca-flags-band");
+
+        var html = "";
+
+        // (a) 4-Card KPI Summary Strip (leading with Risk Flags Raised)
+        html += '<div class="kpi-grid" role="region" aria-label="Contract Scan Summary">';
+        html += '<article class="kpi-card ' + (raisedFlags > 0 ? "is-warn" : "is-pass") + '"><span class="kpi-label">Risk flags raised</span><span class="kpi-value">' + raisedFlags + '</span><p class="kpi-note">IP indemnity: ' + (ipSignal && ipSignal.present ? "PRESENT" : "ABSENT") + '</p></article>';
+        html += '<article class="kpi-card ' + (found > 0 ? "is-pass" : "is-brass") + '"><span class="kpi-label">Coverage checks found</span><span class="kpi-value">' + found + ' of ' + checks.length + '</span><p class="kpi-note">Matched with evidence excerpt below</p></article>';
+        html += '<article class="kpi-card ' + (missing > 0 ? "is-warn" : "is-pass") + '"><span class="kpi-label">Not found — check by hand</span><span class="kpi-value">' + missing + '</span><p class="kpi-note">Gaps flagged for manual verification</p></article>';
+        html += '<article class="kpi-card is-brass"><span class="kpi-label">Facts pulled (Layer 1)</span><span class="kpi-value">' + scans.money.length + ' $ · ' + scans.dates.length + ' dates</span><p class="kpi-note">Pulled by the frozen Layer 1 scan</p></article>';
+        html += '</div>';
+
+        // (b) Prominent Risk Flags Band
+        html += renderFlagsBand(flags);
+
+        // (c) The Six Original Scans
+        html += '<div class="sub-block" id="ca-scans">';
+        html += '<h3 class="sub-block-title">The original scans</h3>';
+        html += '<p class="sub-block-desc">The six scans from the original tool, exactly as it ran them.</p>';
+        html += '<div class="scans-grid">';
+        SCAN_META.forEach(function (meta) {
+          var flat = formatScanValues(scans[meta.key]);
+          html += '<div class="scan-card" data-scan-key="' + esc(meta.key) + '">';
+          html += '<div class="scan-key"><span>' + esc(meta.label) + '</span><span class="scan-key-slug">' + esc(meta.key) + '</span></div>';
+          if (flat.length) {
+            html += '<p class="scan-values">' + esc(flat.join(" · ")) + '</p>';
+          } else {
+            html += '<p class="scan-values scan-empty">nothing found</p>';
+          }
+          html += '</div>';
+        });
+        html += '</div>';
+        html += '</div>';
+
+        // (d) The 41 Coverage Checks
+        html += '<div id="ca-checks-container">' + renderChecksSection(checks) + '</div>';
+
+        // (e) Copyable Plain-Text Brief
+        var briefText = buildPlainBrief(checks, scans, flags);
+        html += '<div class="brief-panel" id="ca-brief-panel">';
+        html += '<div class="brief-toolbar">';
+        html += '<button type="button" class="btn-secondary" id="ca-copy-brief">Copy Analysis Brief</button>';
+        html += '<span class="copy-status" id="ca-copy-status" aria-live="polite"></span>';
+        html += '</div>';
+        html += '<pre class="brief-pre" id="ca-brief-pre" tabindex="0" aria-label="Copyable Contract Analysis Brief">' + esc(briefText) + '</pre>';
+        html += '</div>';
+
+        resultsEl.innerHTML = html;
+      }
+
+      resultsEl.addEventListener("click", function (e) {
+        var filterBtn = e.target.closest ? e.target.closest("[data-filter]") : null;
+        if (filterBtn && lastChecks) {
+          activeFilter = filterBtn.getAttribute("data-filter");
+          var checksContainer = document.getElementById("ca-checks-container");
+          if (checksContainer) {
+            checksContainer.innerHTML = renderChecksSection(lastChecks);
+          }
+          return;
+        }
+
+        var copyBtn = e.target.closest ? e.target.closest("#ca-copy-brief") : null;
+        if (copyBtn) {
+          var pre = document.getElementById("ca-brief-pre");
+          var status = document.getElementById("ca-copy-status");
+          if (!pre) return;
+          var txt = pre.textContent;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(txt).then(
+              function () { if (status) status.textContent = "Copied Analysis Brief to clipboard."; },
+              function () { fallbackCopy(txt, status); }
+            );
+          } else {
+            fallbackCopy(txt, status);
+          }
+        }
+      });
+
+      function fallbackCopy(text, statusEl) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "0";
+        ta.style.left = "0";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+          if (statusEl) statusEl.textContent = "Copied Analysis Brief to clipboard.";
+        } catch (err) {
+          if (statusEl) statusEl.textContent = "Select the brief below and press Ctrl+C / Cmd+C.";
+        }
+        document.body.removeChild(ta);
+      }
+
+      document.getElementById("ca-run").addEventListener("click", function () {
+        var text = textEl.value.trim();
+        if (!text) {
+          setNote("Add a contract first — upload a TXT, DOCX, or PDF file, paste the text, or load the sample.", true);
+          resetResultsToIdle();
+          return;
+        }
+        setNote("", false);
+        lastText = text;
+        activeFilter = "all";
+        var res = window.ContractAnalyzer.analyze(text);
+        lastChecks = res.checks;
+        lastScans = res.scans;
+        lastFlags = res.flags;
+        renderFullResults(lastChecks, lastScans, lastFlags);
+        aiOutEl.innerHTML = "Browser scan complete. Select <strong>Write the AI read</strong> if you want an AI-written summary.";
+      });
+
+      aiBtn.addEventListener("click", function () {
+        var sourceText = lastText || textEl.value.trim();
+        if (!sourceText) {
+          aiOutEl.innerHTML = "<p>Run the analysis first — add a contract above, then select <strong>Run the analysis</strong>.</p>";
+          return;
+        }
+
+        aiBtn.disabled = true;
+        aiBtn.textContent = "Writing the AI read…";
+        aiOutEl.innerHTML = "<p>Sending the first 60,000 characters to /api/analyze and waiting for the plain-English read…</p>";
+
+        fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: sourceText.slice(0, 60000) })
+        })
+          .then(function (r) {
+            return r.json()
+              .catch(function () { return { error: "invalid JSON response" }; })
+              .then(function (data) { return { ok: r.ok, status: r.status, data: data }; });
+          })
+          .then(function (res) {
+            var d = res.data;
+            if (res.status === 501 || (d && d.error === "not_configured")) {
+              aiOutEl.innerHTML = "<p>The AI read is not switched on yet — the browser scan above is complete without it.</p>";
+              return;
+            }
+            if (!res.ok || !d || d.error) {
+              var errMsg = (d && d.error) ? d.error : ("HTTP " + res.status);
+              aiOutEl.innerHTML = "<p>The AI read did not come back (" + esc(errMsg) + "). The browser scan above stands on its own.</p>";
+              return;
+            }
+
+            var html = "";
+            if (d.summary) {
+              html += "<h4>Plain-English Summary</h4><p>" + esc(d.summary) + "</p>";
+            }
+            [
+              ["Key terms", d.key_terms],
+              ["Watch out", d.watch_out],
+              ["Missing", d.missing]
+            ].forEach(function (pair) {
+              if (pair[1] && pair[1].length) {
+                html += "<h4>" + pair[0] + "</h4><ul>" + pair[1].map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>";
+              }
+            });
+            aiOutEl.innerHTML = html || "<p>The AI read came back empty. The browser scan above stands on its own.</p>";
+          })
+          .catch(function () {
+            aiOutEl.innerHTML = "<p>The AI read is not reachable from here — it runs on the site\u2019s main host. The browser scan above stands on its own.</p>";
+          })
+          .finally(function () {
+            aiBtn.disabled = false;
+            aiBtn.textContent = "Write the AI read";
+          });
+      });
+
+      /* ---------------- 6-Fixture + 123-Probe Matrix Self-Check Battery ---- */
+      function runSelfCheckBattery() {
+        var A = window.ContractAnalyzer;
+        console.assert(A && typeof A.parseKeyClauses === "function" && typeof A.runChecks === "function" && typeof A.evaluateFlags === "function" && typeof A.analyze === "function", "Engine interface missing");
+        console.assert(Array.isArray(A.CHECKS) && A.CHECKS.length === 41, "Expected 41 checks, got " + (A.CHECKS && A.CHECKS.length));
+        console.assert(Array.isArray(A.FLAGS) && A.FLAGS.length === 6, "Expected 6 flags");
+
+        function foundIds(checks) { return checks.filter(function (c) { return c.found; }).map(function (c) { return c.id; }); }
+        function raisedFlagIds(flags) { return flags.filter(function (f) { return f.raised; }).map(function (f) { return f.id; }); }
+        function getFlag(flags, id) { return flags.filter(function (f) { return f.id === id; })[0]; }
+
+        /* F1 — Sample */
+        var r1 = A.analyze(SAMPLE);
+        console.assert(JSON.stringify(foundIds(r1.checks)) === JSON.stringify(["parties", "effective-date", "term", "renewal", "termination-convenience", "fees", "payment-terms", "governing-law"]), "F1 found set fail: " + JSON.stringify(foundIds(r1.checks)));
+        console.assert(JSON.stringify(r1.scans.dates) === JSON.stringify(["2024-01-15"]) && JSON.stringify(r1.scans.money) === JSON.stringify(["USD $12,500"]) && r1.scans.parties.length === 1 && JSON.stringify(r1.scans.law) === JSON.stringify([["Governing Law", "California"]]) && r1.scans.term_length.length === 1 && r1.scans.term_length[0] === "" && r1.scans.renewal_period.length === 0, "F1 Layer 1 fail");
+        console.assert(JSON.stringify(raisedFlagIds(r1.flags)) === JSON.stringify(["F-RENEWAL-NO-NOTICE"]), "F1 flags fail: " + JSON.stringify(raisedFlagIds(r1.flags)));
+
+        /* F2 — Plain Prose */
+        var F2 = "The quick brown fox jumps over the lazy dog. We went to the market on Saturday and bought apples, bread, and cheese. The weather was fine and the train home was only a little late. Nobody talked about work at all.";
+        var r2 = A.analyze(F2);
+        console.assert(foundIds(r2.checks).length === 0, "F2 false positive fail: " + JSON.stringify(foundIds(r2.checks)));
+        console.assert(r2.scans.dates.length === 0 && r2.scans.money.length === 0 && r2.scans.parties.length === 0 && r2.scans.law.length === 0 && r2.scans.term_length.length === 0 && r2.scans.renewal_period.length === 0, "F2 Layer 1 fail");
+        console.assert(raisedFlagIds(r2.flags).length === 0, "F2 flags fail");
+
+        /* F3 — Full Coverage Synthetic */
+        var F3 = "MASTER SERVICES AGREEMENT\nThis Agreement is entered into between Brightpath Technologies, Inc. and Northwind Retail Group, LLC, effective date January 1, 2026 (the \"Effective Date\"). The commencement date is January 15, 2026.\nTerm: The initial term is twenty-four (24) months. This Agreement shall renew for successive terms of twelve (12) months; it auto-renews unless either party gives notice of non-renewal at least ninety (90) days prior to the renewal date. Either party may terminate for convenience upon sixty (60) days' prior written notice. Either party may terminate for cause if the other party commits a material breach and fails to cure such breach within thirty (30) days.\nFees: USD $48,000 per year, payable Net 30 within 30 days of invoice. Late payment bears interest at 1.5% per month on overdue amounts. Provider may apply a price increase of up to 3% annually, tied to CPI. Fees are exclusive of all taxes; Customer is responsible for sales tax and VAT.\nLiability: Each party's aggregate liability shall not exceed the fees paid in the twelve (12) months before the claim. Neither party is liable for consequential damages, indirect damages, or lost profits. Provider shall indemnify and hold harmless Customer against any third-party claim. The services are provided as-is and Provider disclaims all warranties. Provider shall maintain commercial general liability insurance coverage and shall provide a certificate of insurance on request.\nIntellectual property: All work product and deliverables developed under this Agreement are owned by Customer; Provider retains ownership of its pre-existing intellectual property. Provider grants Customer a non-exclusive license to use the platform. Both parties shall protect confidential information and each party's non-disclosure duties survive three (3) years. The parties shall comply with data protection law; a data processing addendum (DPA) applies to personal data under GDPR and CCPA. Provider maintains a security program aligned to SOC 2 and ISO 27001 and will notify Customer of any security incident within seventy-two (72) hours.\nService levels: Provider commits to 99.9% uptime under the SLA; service credits apply when service levels are missed. Customer has audit rights and may inspect records and books on reasonable notice. Neither party may assign this Agreement without the other's consent, including on a change of control. Provider shall not use any subcontractor or sub-processor without prior written consent. The parties agree to exclusivity in the retail vertical and shall not solicit each other's employees (non-solicit).\nThis Agreement is governed by the laws of the State of Delaware; governing law is Delaware. Any dispute resolution begins with mediation, then binding arbitration; venue and jurisdiction lie in Delaware courts. Neither party is liable under force majeure for an act of God or events beyond its reasonable control. All notices must be in writing; notices shall be sent to the addresses above. This is the entire agreement between the parties; any amendment must be in writing, and in the event of a conflict the order of precedence in the exhibits controls.\nIN WITNESS WHEREOF, the parties have executed this Agreement. Signature: /s/ J. Conte, duly executed by each party as of the Effective Date. Governing Law: Delaware.";
+        var r3 = A.analyze(F3);
+        console.assert(foundIds(r3.checks).length === 33, "F3 count fail: " + foundIds(r3.checks).length);
+        console.assert(r3.scans.dates.length === 2 && JSON.stringify(r3.scans.money) === JSON.stringify(["USD $48,000"]) && r3.scans.parties.length === 1 && r3.scans.law.length === 3 && r3.scans.term_length.length === 1 && r3.scans.renewal_period.length === 2, "F3 Layer 1 fail");
+        console.assert(JSON.stringify(raisedFlagIds(r3.flags)) === JSON.stringify(["F-ONE-WAY-INDEMNITY", "F-IP-INDEMNITY"]), "F3 flags fail: " + JSON.stringify(raisedFlagIds(r3.flags)));
+
+        /* F4 — Uncapped One-Way Indemnity */
+        var F4 = "MASTER SERVICES AGREEMENT\n\nThis Agreement is entered into as of March 1, 2026, between Halcyon Systems, Inc. (\"Vendor\") and Northgate Retail Group, Inc. (\"Customer\").\n\n1. Services and Fees. Vendor shall provide the hosted inventory platform described in Exhibit A. Customer shall pay fees of $18,000 per month, payable within thirty (30) days of invoice.\n\n2. Term. The initial term of this Agreement is twenty-four (24) months from the Effective Date.\n\n3. Indemnification. Vendor shall indemnify, defend, and hold harmless Customer and its officers, directors, and employees from and against any and all third-party claims, damages, and expenses arising out of (a) any allegation that the Services infringe or misappropriate the intellectual property rights of any third party; (b) Vendor's negligence or willful misconduct; or (c) personal injury or damage to tangible property caused by Vendor. Vendor's obligations under this Section 3 shall not be subject to the limitation of liability set forth in Section 5, and shall apply without cap. Customer has no obligation to indemnify Vendor under this Agreement.\n\n4. Warranties. Vendor warrants that the Services will conform in all material respects to the documentation.\n\n5. Limitation of Liability. Except as set forth in Section 3, each party's aggregate liability arising under this Agreement shall not exceed the fees paid by Customer during the twelve (12) months preceding the claim.\n\n6. Governing Law. This Agreement shall be governed by the laws of the State of Delaware.\n\nIN WITNESS WHEREOF, the parties have executed this Agreement as of the Effective Date.";
+        var r4 = A.analyze(F4);
+        console.assert(JSON.stringify(foundIds(r4.checks)) === JSON.stringify(["parties", "effective-date", "term", "fees", "payment-terms", "liability-cap", "indemnity", "warranties", "ip-ownership", "governing-law", "signatures"]), "F4 found set fail: " + JSON.stringify(foundIds(r4.checks)));
+        console.assert(JSON.stringify(raisedFlagIds(r4.flags)) === JSON.stringify(["F-UNCAPPED-INDEMNITY", "F-ONE-WAY-INDEMNITY", "F-INDEMNITY-NO-INSURANCE"]), "F4 raised flags fail: " + JSON.stringify(raisedFlagIds(r4.flags)));
+        console.assert(getFlag(r4.flags, "F-IP-INDEMNITY").present === true && getFlag(r4.flags, "F-IP-INDEMNITY").raised === false, "F4 IP indemnity PRESENT signal fail");
+
+        /* F5 — Sneaky Clauses + 8 New Families */
+        var F5 = "ORDER FORM AND TERMS\n\nThese Terms are between Cascade Logic, Inc. and Harborview Foods, Inc.\n\n1. Payment. All fees under this Order Form are payable Net-30 from the invoice date.\n\n2. Term. This agreement is evergreen: it continues in force from month to month until either party ends it under Section 3.\n\n3. Termination. Either party may terminate this agreement at any time upon written notice to the other party.\n\n4. Cap. The cap on either party's liability arising out of this agreement is the total fees paid in the twelve months before the claim.\n\n5. Construction. This agreement shall be construed in accordance with the laws of the State of New York.\n\n6. Data Roles. The parties acknowledge that Customer is the data controller and Vendor is the data processor with respect to personally identifiable information (PII) processed under this agreement.\n\n7. Security Program. Vendor shall encrypt all Customer data in transit and at rest, and shall undergo independent penetration testing at least once per year.\n\n8. Pricing Protection. Vendor grants Customer most favored customer pricing: Vendor shall not offer any other customer a lower price for the same services during the term.\n\n9. Exit. Upon termination or expiration, Vendor shall return all Customer Data in a standard machine-readable format within thirty (30) days and shall provide reasonable transition assistance for up to ninety (90) days.\n\n10. Suspension. Vendor may suspend the Services if any undisputed amount remains unpaid more than fifteen (15) days after its due date.\n\n11. Publicity. Vendor may use Customer's name and logo in its customer list and marketing materials.\n\n12. Setoff. Customer may set off any amounts owed to it under this agreement against fees otherwise payable.\n\n13. Compliance. Each party shall comply with all applicable laws and regulations in performing under this agreement.\n\n14. Remedies. Each party acknowledges that a breach may cause irreparable harm for which monetary damages would be inadequate, and that the non-breaching party shall be entitled to injunctive relief in addition to any other remedies. Each party waives trial by jury in any action arising out of this agreement.\n\n15. Survival. Sections 4, 6, and 11, and any payment obligations accrued before termination, shall survive the termination or expiration of this agreement.";
+        var r5 = A.analyze(F5);
+        var f5Expected = ["parties", "term", "renewal", "termination-convenience", "fees", "payment-terms", "mfn", "setoff", "liability-cap", "data-protection", "security", "exit-assistance", "suspension-rights", "publicity", "governing-law", "compliance-laws", "survival", "injunctive-relief"];
+        console.assert(JSON.stringify(foundIds(r5.checks)) === JSON.stringify(f5Expected), "F5 found set fail: " + JSON.stringify(foundIds(r5.checks)));
+        console.assert(JSON.stringify(raisedFlagIds(r5.flags)) === JSON.stringify(["F-RENEWAL-NO-NOTICE"]), "F5 flags fail: " + JSON.stringify(raisedFlagIds(r5.flags)));
+
+        /* F6 — Clean Mutual */
+        var F6 = "SOFTWARE SUBSCRIPTION AGREEMENT\n\nThis Agreement is made on 2026-02-01 between Brightpath Analytics, Inc. and Copperline Manufacturing LLC.\n\n1. Fees and Payment. The subscription fee is USD $9,400 per year. Invoices are payable Net 30 days.\n\n2. Term and Renewal. The initial term is twelve (12) months. This Agreement shall renew for successive twelve (12) month terms unless either party gives notice of non-renewal at least sixty (60) days prior to the renewal date.\n\n3. Indemnification. Each party shall indemnify and hold harmless the other party from third-party claims arising from its own negligence or willful misconduct. Each party's indemnification obligations are subject to the limitation of liability in Section 4.\n\n4. Limitation of Liability. Neither party's aggregate liability shall exceed the amounts paid under this Agreement in the twelve (12) months preceding the claim. In no event shall either party be liable for any consequential damages or lost profits.\n\n5. Insurance. Each party shall maintain commercial general liability insurance and cyber liability insurance with limits of not less than $2,000,000 per occurrence, and shall provide a certificate of insurance upon request.\n\n6. Confidentiality. Each party shall keep the other's Confidential Information confidential for three (3) years following disclosure.\n\n7. Governing Law. This Agreement will be governed by the laws of the State of California.\n\nSigned and executed by both parties below.";
+        var r6 = A.analyze(F6);
+        console.assert(JSON.stringify(foundIds(r6.checks)) === JSON.stringify(["parties", "effective-date", "term", "renewal", "renewal-notice", "fees", "payment-terms", "liability-cap", "consequential", "indemnity", "insurance", "confidentiality", "governing-law", "signatures"]), "F6 found set fail: " + JSON.stringify(foundIds(r6.checks)));
+        console.assert(raisedFlagIds(r6.flags).length === 0, "F6 expected 0 raised flags, got: " + JSON.stringify(raisedFlagIds(r6.flags)));
+
+        /* F-CAUSE-NO-CURE unit probe */
+        var rCauseNoCure = A.analyze("Either party may terminate for cause upon a material breach.");
+        console.assert(getFlag(rCauseNoCure.flags, "F-CAUSE-NO-CURE").raised === true, "F-CAUSE-NO-CURE fail");
+
+        /* 41-Check x 3-Phrasing Matrix (123 Probes) */
+        var MATRIX = {
+          "parties": ["This Agreement is entered into between Alpha Corp. and Beta LLC.", "Alpha Corp. (\"Vendor\") and Beta LLC (\"Customer\") enter into this Agreement.", "This contract is between Acme Software and Northwind Co."],
+          "effective-date": ["The Effective Date of this Agreement is March 1, 2026.", "This Agreement shall take effect as of the 1st day of March, 2026.", "Start date: March 1, 2026."],
+          "term": ["The initial term is twelve (12) months.", "This Agreement shall remain in full force and effect for a period of three (3) years.", "This contract runs for 2 years."],
+          "renewal": ["This Agreement auto-renews for additional 12-month terms.", "This Agreement is evergreen and shall automatically extend for successive periods.", "The subscription rolls over each year unless stopped."],
+          "renewal-notice": ["Either party must give notice of non-renewal at least 60 days prior to the renewal date.", "Unless a party delivers written notification of its election not to renew at least 30 days prior to expiration.", "You must opt out of renewal at least 30 days before the end date."],
+          "termination-convenience": ["Either party may terminate for convenience upon 30 days' written notice.", "Either party may terminate this agreement at any time upon written notice to the other party.", "Either side can cancel at any time with 30 days notice."],
+          "termination-cause": ["Either party may terminate for cause upon a material breach that is not cured within 30 days.", "In the event of a material breach, the non-breaching party may terminate if the defaulting party fails to remedy such breach within thirty (30) days.", "If one side commits an uncured breach, the other side can terminate for breach."],
+          "fees": ["Customer shall pay fees of $18,000 per month.", "Client shall remit subscription fees in the amount of EUR 25,000 annually.", "Total cost is 5,000 USD per year."],
+          "payment-terms": ["Invoices are payable Net 30 days.", "All undisputed fees shall be payable within thirty (30) days following receipt of invoice.", "Pay within 15 days of billing (Net-15)."],
+          "late-fees": ["Late payment bears interest at 1.5% per month on overdue amounts.", "Past-due balances shall accrue a finance charge of 1.5% per month.", "Overdue invoices carry a 5% late fee."],
+          "price-increase": ["Provider may apply a price increase of up to 3% annually, tied to CPI.", "Fees are subject to an annual fee adjustment upon each renewal term.", "We may raise prices by 5% at renewal."],
+          "taxes": ["Fees are exclusive of all taxes; Customer is responsible for sales tax and VAT.", "All charges exclude applicable taxes, duties, and levies, which shall be borne by Customer.", "Prices do not include tax; buyer pays sales or use tax."],
+          "mfn": ["Vendor grants Customer most-favored-customer (MFN) pricing.", "Vendor shall not offer any other customer a lower price for the same services.", "We guarantee you get the lowest price we offer any other customer."],
+          "setoff": ["Customer may set off any amounts owed to it against fees otherwise payable.", "Client retains a right of offset against future invoices.", "You can subtract amounts owed to you from your next invoice."],
+          "liability-cap": ["Each party's aggregate liability shall not exceed the fees paid in the prior 12 months.", "The cap on either party's liability arising hereunder is the total fees paid.", "Total damages are capped at the fees paid over the last year."],
+          "consequential": ["Neither party is liable for consequential damages, indirect damages, or lost profits.", "In no event shall either party be liable for special, incidental, or punitive damages.", "Neither side owes anything for lost revenue or loss of business."],
+          "indemnity": ["Provider shall indemnify and hold harmless Customer against third-party claims.", "Vendor shall defend, reimburse, and save harmless Buyer from third-party actions.", "If a third-party claim hits us over your product, you will cover our defense costs."],
+          "warranties": ["Vendor warrants that the Services will conform to the documentation.", "Provider disclaims all implied warranties of merchantability and fitness for a particular purpose.", "The software is provided as-is and we make no guarantees."],
+          "insurance": ["Provider shall maintain commercial general liability insurance and provide a certificate of insurance.", "Vendor shall carry errors and omissions coverage and name Customer as an additional insured.", "The supplier must keep active cyber coverage and carry business insurance."],
+          "ip-ownership": ["All work product and deliverables developed under this Agreement are owned by Customer.", "Provider retains all rights, title, and proprietary rights, including all patents and copyrights.", "The client owns all custom work made under this contract."],
+          "license": ["Provider grants Customer a non-exclusive license to use the platform.", "Licensor confers a limited, revocable right to access and use the Software.", "Customer is allowed to use the service for internal operations."],
+          "confidentiality": ["Both parties shall protect Confidential Information for three years.", "Receiving Party shall hold all disclosures in strict confidence under this non-disclosure clause.", "Keep each other's business information secret and treat it as confidential."],
+          "data-protection": ["A data processing addendum (DPA) applies to personal data under GDPR and CCPA.", "Vendor acts as data processor for personally identifiable information (PII) under applicable privacy law.", "How the vendor protects customer personal information and handles a data breach."],
+          "security": ["Provider maintains a security program aligned to SOC 2 and ISO 27001.", "Vendor shall maintain technical safeguards and encrypt all data at rest and in transit.", "All data uses encryption and undergoes annual penetration testing."],
+          "sla": ["Provider commits to 99.9% uptime under the SLA with service credits.", "Vendor guarantees 99.95% monthly availability and a 1-hour response time for Severity 1 tickets.", "The platform stays online 99.9% of the time with automatic uptime credits."],
+          "audit-rights": ["Customer has audit rights and may inspect records and books on notice.", "Upon prior notice, an independent auditor may examine records during normal business hours.", "We may audit your billing records once a year."],
+          "assignment": ["Neither party may assign this Agreement without consent, including on a change of control.", "No party shall transfer or delegate its obligations hereunder without prior approval.", "You cannot hand this contract off to a buyer without asking us."],
+          "subcontracting": ["Provider shall not use any subcontractor or sub-processor without consent.", "Vendor may engage third-party service providers, remaining liable for their performance.", "Outside contractors cannot do this work without our approval."],
+          "exclusivity-nonsolicit": ["The parties agree to exclusivity and shall not solicit each other's employees.", "Neither party shall directly or indirectly recruit, hire, or entice away any personnel of the other.", "The vendor is our sole supplier, and neither side may poach staff."],
+          "exit-assistance": ["Upon termination, Vendor shall return all Customer Data and provide transition assistance.", "Provider shall perform disengagement services to support data retrieval.", "When the contract ends, you will hand back our data."],
+          "suspension-rights": ["Vendor may suspend the Services if any amount remains unpaid.", "Provider reserves the right to implement a suspension of access for non-payment.", "We can pause your account if an invoice stays unpaid."],
+          "publicity": ["Vendor may use Customer's name and logo in its customer list and marketing materials.", "Neither party may issue a press release or use publicity without approval.", "Don't put our company logo on your site or mention us as a customer without asking."],
+          "governing-law": ["This Agreement is governed by the laws of the State of Delaware.", "This agreement shall be construed in accordance with the laws of the State of New York.", "California law applies to this contract."],
+          "venue-disputes": ["Venue and jurisdiction lie in Delaware courts after mediation or arbitration.", "The parties submit to the exclusive courts located in New York County.", "Any lawsuit must be filed in state or federal courts in Austin."],
+          "force-majeure": ["Neither party is liable under force majeure for an act of God.", "Delays from war, strike, or events beyond a party's reasonable control are excused.", "Neither side is blamed if a natural disaster stops performance."],
+          "notices": ["All notices must be in writing and sent to the notice address above.", "Any formal notices under this agreement shall be delivered by certified mail or overnight courier.", "Official notices go by email to legal@company.com."],
+          "entire-agreement": ["This is the entire agreement; any amendment must be in writing.", "This contract supersedes all prior understandings and requires a signed modification.", "This contract is the whole deal, and changes must be written and signed by both sides."],
+          "signatures": ["IN WITNESS WHEREOF, the parties have executed this Agreement.", "Agreed and accepted by an authorized representative of each party.", "Signed by both parties below."],
+          "compliance-laws": ["Each party shall comply with all applicable laws and regulations.", "Vendor certifies compliance with laws including anti-bribery, FCPA, and export control statutes.", "Both sides agree to follow all laws while doing this work."],
+          "survival": ["Sections 4, 6, and 11 shall survive the termination or expiration of this agreement.", "Payment and confidentiality obligations survive termination indefinitely.", "Privacy and payment rules stay in effect even after the contract ends."],
+          "injunctive-relief": ["The injured party is entitled to injunctive relief and each party waives trial by jury.", "Breach causes irreparable harm entitling a party to equitable relief, with a jury trial waiver.", "Either side can ask a court for an immediate order, and both sides agree to no jury trial."]
+        };
+
+        var totalProbes = 0, caughtProbes = 0;
+        Object.keys(MATRIX).forEach(function (cid) {
+          MATRIX[cid].forEach(function (phrase, idx) {
+            totalProbes++;
+            var chk = A.runChecks(phrase).filter(function (c) { return c.id === cid; })[0];
+            if (chk && chk.found) caughtProbes++;
+            else console.error("Matrix miss:", cid, "probe #" + (idx + 1), phrase);
+          });
+        });
+        console.assert(totalProbes === 123 && caughtProbes === 123, "Phrasing matrix fail: " + caughtProbes + "/" + totalProbes);
+      }
+
+      updateTextStats();
+      runSelfCheckBattery();
+    })();
+  </script>
+</body>
+</html>
