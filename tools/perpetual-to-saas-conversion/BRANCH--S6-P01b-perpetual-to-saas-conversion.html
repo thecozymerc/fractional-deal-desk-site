@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     LABEL — S6-P01.b — Perpetual-to-SaaS Conversion Calculator (tool page;
+     Tool / piece ID: Tool 2 — Perpetual-to-SaaS Conversion Calculator
+     address: /tools/perpetual-to-saas-conversion/)
+     What this page holds: the Conversion Calculator's write-up (from Draft
+     1.11, Part II — Draft 1.10 §6, verbatim) and the ACTUAL workbook
+     embedded below it: one sheet, its own numbers, its own formulas run by
+     the formula engine, its own line chart drawn from the same cells.
+     Formulas are never shown. Numbers: the workbook's own sample values.
+     Uses: ../../assets/styles.css + ../../assets/spreadsheet-tool.js +
+     ../../assets/formula-engine.js + this folder's data file (converted
+     from "Perpetual-to-SaaS Conversion Calculator — SAMPLE v5.xlsx" by
+     convert-workbook.py; v3 added one-time coupon credits and per-option
+     usage lines — the Tool 1 factors; v4 rebuilds the SaaS side around
+     seats and PUPM — list price per seat, discount, net PUPM, starting
+     seats and yearly seat growth — so the sheet shows the upsell case
+     (TCV growing with the rollout) next to the savings case; v5 makes
+     the option names editable — three name inputs, and every label that
+     names an option is a formula carrying the typed name).
+     Map: site/CODE-MAP.md ("tools/perpetual-to-saas-conversion/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="apple-touch-icon" href="../../favicon.svg" />
+<title>S6-P01.b — Perpetual-to-SaaS Conversion Calculator · Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="When a customer is deciding whether to stay on a perpetual license or move to subscription pricing, this calculator compares staying put with three SaaS.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/perpetual-to-saas-conversion/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="S6-P01.b — Perpetual-to-SaaS Conversion Calculator · Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="When a customer is deciding whether to stay on a perpetual license or move to subscription pricing, this calculator compares staying put with three SaaS.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/perpetual-to-saas-conversion/">
+<link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../services/">Services &amp; Pricing</a>
+      <a href="../../tools/">Proof of Work</a>
+      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section">
+    <p class="kicker">Proof of Work · Pricing Engines</p>
+    <h1>Perpetual-to-SaaS Conversion Calculator.</h1>
+    <p class="lede">When a customer is deciding whether to stay on a perpetual license or move to subscription pricing, this calculator compares staying put with three SaaS options, year by year. It shows both the cumulative break-even and the year when the annual run-rate crosses over, with a chart so the shape of the decision is visible.</p>
+    <p>Below is the actual workbook — its one sheet, with its chart. The names and data are samples where they need to be, but the mechanics are real: change an input, and the tool answers. The formulas stay under the hood. Each SaaS option is priced the real way — a list price per seat per month and a discount give the net PUPM; a starting seat count and a yearly growth rate grow the deal — and each option can also carry a one-time coupon credit and a usage line, priced per use or per token. You can rename each option, too — the sheet calls it by your name everywhere below. So the sheet shows both stories at once: what the conversion saves per seat, and why the total can grow as the rollout grows. A seats-by-year table sits under the cost table, so you can watch each option’s seats grow year by year — or hold flat, when its growth is set to zero — and a cost-per-seat line divides each option’s total by the seats it serves in the final year. In this sample, the third option stays flat while the first two grow.</p>
+
+    <div class="m-summary" id="m-summary"></div>
+
+    <div class="tool-frame">
+      <div id="wb-tool"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2><span class="no">Next</span> — Put this to work on a real decision.</h2>
+    <p><a class="btn" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book on my calendar</a></p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
+  </div>
+</footer>
+
+<script src="S6-P01b-perpetual-to-saas-conversion-data.js"></script>
+<script src="../../assets/formula-engine.js"></script>
+<script src="../../assets/spreadsheet-tool.js"></script>
+<script>
+  window.renderWorkbook(document.getElementById("wb-tool"),
+    window.CONVERSION_CALCULATOR_DATA);
+</script>
+<script>
+  /* Mobile summary strip (Nov 10, 2026): on phone widths this strip sits
+     above the sheet with the results first. It computes from the SAME
+     workbook data through the SAME formula engine the sheet itself uses,
+     and re-reads the sheet's inputs on every change — so its numbers are
+     the sheet's numbers, never a second implementation. */
+  (function () {
+    var box = document.getElementById("m-summary");
+    if (!box || !window.FormulaEngine || !window.CONVERSION_CALCULATOR_DATA) return;
+    var data = window.CONVERSION_CALCULATOR_DATA;
+    var cellsMap = {}, fmtByAddr = {};
+    data.sheets.forEach(function (sh) { sh.rows.forEach(function (r) { r.cells.forEach(function (c) {
+      if (c.t === "formula") cellsMap[c.a] = { kind: "formula", value: c.f };
+      else cellsMap[c.a] = { kind: "value", value: c.v };
+      if (c.fmt) fmtByAddr[c.a] = c.fmt;
+    }); }); });
+    var sheet = window.FormulaEngine.createSheet(cellsMap);
+    /* A cell that cannot compute shows "—" here, never $NaN: a formula doing
+       math on a text cell is an error value (#VALUE!), not a number.
+       (Nov 11, 2026 — Tool 4 typing fuzz; the sheet itself shows #VALUE!.) */
+    function money0(v) { return (typeof v === "number" && isFinite(v)) ? "$" + Math.round(v).toLocaleString("en-US") : "—"; }
+    function money2(v) { return (typeof v === "number" && isFinite(v)) ? "$" + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"; }
+    function render() {
+      var mRaw = sheet.get("B17") || 0;
+      var dRaw = sheet.get("B60") || 0;
+      var termY = Math.min(Math.max(mRaw, 0), 240) / 12 + Math.min(Math.max(dRaw, 0), 7300) / 365;
+      if (termY > 20) termY = 20;
+      var fullY = Math.min(Math.floor(termY + 1e-9), 20);
+      var stub = fullY >= 20 ? 0 : termY - fullY;
+      var h = Math.max(fullY + (stub > 0 ? 1 : 0), 1);
+      var trimN = function (x) { return String(Math.round(x * 10000) / 10000); };
+      var termText = (mRaw > 0 ? trimN(mRaw) + (mRaw === 1 ? " month" : " months") : "") + (mRaw > 0 && dRaw > 0 ? " + " : "") + (dRaw > 0 ? trimN(dRaw) + (dRaw === 1 ? " day" : " days") : "");
+      if (!termText) termText = "no term set";
+      var colL = "BCDEFGHIJKLMNOPQRSTU".charAt(h - 1);
+      var rows = [
+        ["Stay put", "B92", "B85", sheet.get("B26")],
+        [sheet.get("B23"), "B93", "B86", sheet.get(colL + "80")],
+        [sheet.get("B24"), "B100", "B87", sheet.get(colL + "81")],
+        [sheet.get("B25"), "B101", "B88", sheet.get(colL + "82")]
+      ];
+      var html = "<h3>At your term — " + termText + "</h3><table>";
+      rows.forEach(function (r) {
+        html += "<tr><td>" + r[0] + "<br><span class=\"sub\">" + r[3] + " seats in the final year</span></td>" +
+          "<td class=\"n\">" + money0(sheet.get(r[1])) + "<br><span class=\"sub\">" + money2(sheet.get(r[2])) + " / seat</span></td></tr>";
+      });
+      box.innerHTML = html + "</table>";
+    }
+    document.getElementById("wb-tool").addEventListener("input", function (e) {
+      var a = e.target.getAttribute && e.target.getAttribute("aria-label");
+      if (!a) return;
+      var raw = e.target.value;
+      if (e.target.type === "number") {
+        var v = parseFloat(raw);
+        sheet.set(a, isNaN(v) ? 0 : (fmtByAddr[a] === "pct" ? v / 100 : v));
+      } else { sheet.set(a, raw); }
+      render();
+    });
+    render();
+  })();
+</script>
+</body>
+</html>
