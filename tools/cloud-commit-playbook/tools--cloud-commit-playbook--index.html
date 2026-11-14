@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     LABEL — S6-P01.d — Cloud Commit & Usage Playbook (tool page;
+     Tool / piece ID: Tool 14 — Cloud Commit & Usage Playbook, address:
+     /tools/cloud-commit-playbook/)
+     What this page holds: the tool's write-up and the ACTUAL workbook
+     embedded below it — the Cloud Commit & Usage Playbook (SAMPLE):
+     3 tabs (Discount Matrix, Renewal Check, Commit & Usage), 87
+     cells, 25 of the workbook's own formulas run by the formula
+     engine: the matrix's band chain and discount routing (nested IF
+     + CHOOSE over the editable approver names), the renewal ratchet
+     and its counter-play discount, cross-sheet approval routing, and
+     the commit coverage / overage / unused-commitment math. Formulas
+     are never shown. Every non-formula cell is a live input — in the
+     real sheet, every non-formula cell is typeable, so the discount
+     matrix itself (thresholds and approver names) is editable and
+     every route in the workbook re-computes from it.
+     PROVENANCE (stated plainly, Lucky's rule): this workbook is an
+     ORIGINAL SAMPLE built November 2026 for this site, at Lucky's
+     order — a sample playbook built from the STRUCTURE of an
+     enterprise cloud deal-desk playbook (governance first, the
+     renewal gate second, the value levers third) and the public
+     mechanics of committed-use discounts (Google Cloud's published
+     CUD documentation; the FinOps Foundation's GCP commitment
+     playbook). It is not copied from any company's internal
+     playbook: no internal system, codename, KB text, real threshold,
+     figure or SKU is carried over. Every threshold, approver name
+     and figure is a generic sample value, labeled as such in the
+     file itself. The commit tab's mechanics are a simplified sample
+     model and say so on the tab.
+     Uses: ../../assets/styles.css + ../../assets/spreadsheet-tool.js +
+     ../../assets/formula-engine.js + this folder's data file
+     (converted from "Cloud Commit & Usage Playbook — SAMPLE.xlsx" by
+     convert-workbook.py, ALLINPUT mode). Verified cell-for-cell
+     against a LibreOffice recalculation: defaults plus seven
+     scenarios (a re-tiered matrix, a blocked renewal, a cheap ask,
+     an over-commit, a 100% commit rate, a zero renewal list, a 50%
+     ask) — zero differences in 25 compared formulas per scenario,
+     200 comparisons. Phone summary strip on this page only: it reads
+     the routing, the ratchet verdict, the counter-play discount and
+     the commit's effective discount from its own engine instance fed
+     by the same typed values. It repeats the workbook's own
+     numbers; it invents none.
+     Map: site/CODE-MAP.md ("tools/cloud-commit-playbook/").
+     Rule: any change here is recorded in site/CHANGELOG.md with the
+     CODE-MAP and this folder's LABEL.md updated in the same change
+     (Code Labeling System, Rule 3).
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="apple-touch-icon" href="../../favicon.svg" />
+<title>S6-P01.d — Cloud Commit & Usage Playbook · Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="A working sample playbook for cloud deals: a discount matrix with approval tiers you can re-tier live, a renewal check that refuses to shrink the TCV, and commit math with the waste showing.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/cloud-commit-playbook/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="S6-P01.d — Cloud Commit & Usage Playbook · Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="A working sample playbook for cloud deals: a discount matrix with approval tiers you can re-tier live, a renewal check that refuses to shrink the TCV, and commit math with the waste showing.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/cloud-commit-playbook/">
+<link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">Fractional Deal Desk &amp; Contract Management</span>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../services/">Services &amp; Pricing</a>
+      <a href="../../tools/">Proof of Work</a>
+      <a href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book a Call</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section">
+    <p class="kicker">Proof of Work · Pricing Engines</p>
+    <h1>Cloud Commit &amp; Usage Playbook.</h1>
+    <p class="lede">A playbook is not a document — it is the order decisions get made in. This one runs the way an enterprise cloud deal desk runs: <strong>governance first</strong> (a discount matrix that says who may approve what), <strong>the renewal gate second</strong> (no discount clears if it shrinks the renewal), and <strong>the value levers third</strong> (the commit, sized against real usage, with the waste showing). Three tabs, all of it live, all of it sample data.</p>
+    <p><strong>Directions:</strong> Start on the Discount Matrix tab. The matrix is not a picture — the thresholds and the approver names are inputs, so re-tier it (raise what Sales may approve, rename a tier) and every route in the workbook moves. Set a discount in the Route-a-discount block and the matrix names its approver. The Renewal Check tab takes the current TCV, the renewal's list value, and the discount being asked: it returns the renewal TCV, the verdict under the ratchet rule, and the deepest discount that would still grow the renewal — with the approver for that counter-play read back through the matrix. The Commit &amp; Usage tab sizes a spend-based commitment against expected usage: what the commitment covers, what bills at full price above it, what you save, and what you paid for and never used.</p>
+
+    <div class="m-summary" id="m-summary" aria-label="Playbook headline answers"></div>
+
+    <div class="tool-frame">
+      <div id="wb-tool"></div>
+    </div>
+
+    <h2>Inputs, logic, limits</h2>
+    <p>Inputs: the matrix's band thresholds and approver names, the discount asked, the current TCV and renewal list value, and the commit block (expected usage at list, the monthly commitment, the commit discount, the term in months). Logic: the band chain and the nested-IF routing are the workbook's own formulas; the ratchet verdict compares the discounted renewal TCV against the current TCV, and the counter-play discount is the exact depth at which the two are equal, capped at zero; the commit tab covers usage up to the list value the commitment buys at its discount, bills the rest at full price, and counts any commitment left unused as paid waste. Limits, stated plainly: the thresholds and approver names are sample values, not any company's approval policy; the commit mechanics are a simplified sample model of a spend-based commitment (real programs differ by product in eligibility, true-ups, and how discounts land); and nothing here is pricing, legal, or financial advice — it is a playbook's skeleton, made touchable.</p>
+  </section>
+
+  <section class="section">
+    <h2>Where this playbook comes from.</h2>
+    <p>This workbook is an <strong>original sample</strong>, built in November 2026 for this site. Its structure follows how enterprise cloud deal desks actually organize their playbooks — the pattern that falls out of the real thing: the approval rules sit in front of the plays, not inside them; the standard path is short and the exceptions carry the weight; and every play ends in a routing line, a named owner for the next step, rather than an explanation. The commit mechanics are the public ones — committed-use discounts are documented openly by the cloud providers (Google Cloud's published CUD documentation is the reference here) and by practitioner bodies like the FinOps Foundation. No internal system, codename, knowledge-base text, real threshold, figure, or SKU from any employer's playbook is in this file; what carried over is the grammar, which is the part worth showing.</p>
+    <p>Three choices in the build are deliberate. First, the matrix is the input: on most sites a discount matrix is a screenshot, and a screenshot cannot be argued with — here a visitor can re-tier it and watch the routes change, which is what a matrix is for. Second, the ratchet computes its own counter-play: a blocked renewal does not just say no, it prices the deepest discount that still grows the TCV and names who would approve it, which turns a refusal into a negotiation position. Third, the waste line: commitment tools usually show coverage and savings and stop; this one also shows the commitment dollars paid and never used, because that is the number that decides whether the commit was sized right.</p>
+  </section>
+
+  <section class="section">
+    <h2><span class="no">Next</span> — Put this to work on a real book of deals.</h2>
+    <p><a class="btn" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book on my calendar</a></p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
+  </div>
+</footer>
+
+<script src="S6-P01d-cloud-commit-playbook-data.js"></script>
+<script src="../../assets/formula-engine.js"></script>
+<script src="../../assets/spreadsheet-tool.js"></script>
+<script>
+  window.renderWorkbook(document.getElementById("wb-tool"),
+    window.CLOUD_COMMIT_PLAYBOOK_DATA);
+</script>
+<script>
+  /* Phone summary strip (this page only, same pattern as Tools 2 and
+     4–12): the playbook's answers sit one per tab, so the strip reads
+     the four headline answers — who approves the asked discount, the
+     ratchet's verdict, the counter-play discount, and the commit's
+     effective discount and unused dollars — from its own engine
+     instance fed by the same typed values, and shows them above the
+     tool. It only reads; it never writes back, and it invents no
+     measure the workbook does not carry. */
+  (function () {
+    var strip = document.getElementById("m-summary");
+    var data = window.CLOUD_COMMIT_PLAYBOOK_DATA;
+    if (!strip || !data || !window.FormulaEngine) return;
+    var overrides = {}; // sheetName -> { addr: rawValue }
+    function compute() {
+      var reg = {};
+      data.sheets.forEach(function (sh) {
+        var m = {};
+        sh.rows.forEach(function (r) { r.cells.forEach(function (c) {
+          m[c.a] = c.t === "formula" ? { kind: "formula", value: c.f } : { kind: "value", value: c.v };
+        }); });
+        var ov = overrides[sh.name] || {};
+        Object.keys(ov).forEach(function (a) { m[a] = { kind: "value", value: ov[a] }; });
+        reg[sh.name] = window.FormulaEngine.createSheet(m, { resolve: function (name, addr) {
+          var t = reg[name]; return t ? t.get(addr) : "#REF!";
+        } });
+      });
+      function txt(v) { return (typeof v === "string" && v !== "") ? v : "—"; }
+      function pct(v) { return (typeof v === "number" && isFinite(v)) ? (Math.round(v * 1000) / 10) + "%" : "—"; }
+      function money(v) { return (typeof v === "number" && isFinite(v)) ? "$" + Math.round(v).toLocaleString("en-US") : "—"; }
+      strip.innerHTML =
+        "<div><span>Asked discount — approved by</span><strong>" + txt(reg["Discount Matrix"].get("B13")) + "</strong></div>" +
+        "<div><span>Renewal check</span><strong>" + txt(reg["Renewal Check"].get("B10")) + "</strong></div>" +
+        "<div><span>Deepest discount that still grows it</span><strong>" + pct(reg["Renewal Check"].get("B11")) + "</strong></div>" +
+        "<div><span>Commit — effective discount</span><strong>" + pct(reg["Commit & Usage"].get("B14")) + "</strong></div>" +
+        "<div><span>Commitment paid, never used</span><strong>" + money(reg["Commit & Usage"].get("B16")) + "</strong></div>";
+    }
+    var panels = document.querySelectorAll("#wb-tool .wb-panel");
+    document.getElementById("wb-tool").addEventListener("input", function (e) {
+      var input = e.target;
+      if (!input.classList || !input.classList.contains("wb-input")) return;
+      var addr = input.getAttribute("aria-label");
+      var panel = input.closest ? input.closest(".wb-panel") : null;
+      var si = panel ? Array.prototype.indexOf.call(panels, panel) : -1;
+      if (!addr || si < 0) return;
+      var name = data.sheets[si].name;
+      var cell = null;
+      data.sheets[si].rows.forEach(function (r) { r.cells.forEach(function (c) { if (c.a === addr) cell = c; }); });
+      var raw = input.value;
+      var v;
+      if (cell && cell.fmt === "pct") { v = raw === "" ? "" : parseFloat(raw) / 100; }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && String(parseFloat(raw)) === raw.trim().replace(/,/g, "")) { v = parseFloat(raw); }
+      else if (raw !== "" && !isNaN(parseFloat(raw)) && cell && typeof cell.v === "number") { v = parseFloat(raw); }
+      else { v = raw; }
+      (overrides[name] = overrides[name] || {})[addr] = v;
+      compute();
+    });
+    compute();
+  })();
+</script>
+</body>
+</html>
