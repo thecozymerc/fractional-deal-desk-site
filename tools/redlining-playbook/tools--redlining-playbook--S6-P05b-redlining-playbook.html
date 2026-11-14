@@ -1,0 +1,2277 @@
+<!DOCTYPE html>
+<!-- ARGON MANIFEST:
+================================================================================
+TOOL 6 — REDLINING PLAYBOOK & CLAUSE FALLBACK MATRIX (S6-P05.2)
+================================================================================
+
+1. FRAME & DESIGN SYSTEM REFERENCE
+- Frame Input Note: The Tool 5 Intake Gate HTML file was not attached to this prompt window; per Addendum item 1 and Part B, the frame is built strictly from the Part B design tokens: deep navy (#0F1E38), restrained brass accent (#8A6924 on paper / #E5C478 on navy), off-white paper (#F7F5F0), pure white working surfaces (#FFFFFF), Georgia serif display headings, squared institutional geometry (0px radius), and 1px hairline rules (#D5D0C5).
+- Partition & Routing: Badge "Tool 6 · Deal Desk Controls", Eyebrow "Proof of Work · Deal Desk Controls", Breadcrumb "Home / Proof of Work / Deal Desk Controls / Redlining Playbook" linking the partition level to ../../tools/stories-and-sandboxes/ (and https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/ in JSON-LD). No deal-desk-controls URL invented.
+- Voice & Senior Anchors: Written in plain, senior, readable prose. Includes the exact senior anchors (15+ years in commercial contracts, deal desk, and revenue operations; contracts up to $300M; 3,000+ SKUs under management), labels all sample data fictional, omits all employer names and start-date claims, omits the retired "Story 2" framing, and contains zero sales pitch, prices, or book/buy buttons.
+
+2. MATH DECLARATION & SELF-CHECK AGAINST ANCHORS
+- Math Status: Unaltered workbook ground-truth model. The workbook formulas directly serve the Part A purpose (any single Tier 3 request immediately yields "STOP: Walk-Away Boundary" and "BLOCKED - Walk-Away Redline").
+  * Tier 0 -> 0 pts | Approver: "None (Standard)"
+  * Tier 1 -> 1 pt  | Approver: "Deal Desk (Fallback 1)"
+  * Tier 2 -> 3 pts | Approver: "ESCALATE: Finance / Legal"
+  * Tier 3 -> 10 pts| Approver: "STOP: Walk-Away Boundary"
+  * Overall Routing Decision by Highest Tier (max tier across CL-01..CL-08):
+    - Max Tier 0 -> "FAST-TRACK"
+    - Max Tier 1 -> "DEAL DESK APPROVABLE"
+    - Max Tier 2 -> "ESCALATION REQUIRED - Finance/Legal"
+    - Max Tier 3 -> "BLOCKED - Walk-Away Redline"
+
+- On-Load Sample State Self-Check (CL-01=1, CL-02=1, CL-03=0, CL-04=0, CL-05=1, CL-06=2, CL-07=0, CL-08=2):
+  * Per-Clause Risk Points (in clause order CL-01 to CL-08): 1, 1, 0, 0, 1, 3, 0, 3
+  * Total Redline Risk Score: 9
+  * Highest Tier Requested: 2
+  * Overall Routing Decision: "ESCALATION REQUIRED - Finance/Legal"
+  * Clauses Needing Escalation (count at Tier 2+): 2 (CL-06 Limitation of Liability, CL-08 Custom Domain / Provisioning)
+
+- Boundary Case Self-Check (Addendum #2 & Part F):
+  * Boundary 1 (All clauses at Tier 0):
+    - Per-clause points: 0, 0, 0, 0, 0, 0, 0, 0
+    - Total Redline Risk Score: 0
+    - Highest Tier Requested: 0
+    - Overall Routing Decision: "FAST-TRACK"
+    - Clauses Needing Escalation: 0
+  * Boundary 2 (Any single clause at Tier 3):
+    - Setting any single clause to Tier 3 (e.g., setting CL-06 Limitation of Liability to Tier 3 -> Total 16, or setting a single clause to Tier 3 with all others at Tier 0 -> Total 10) yields:
+    - Highest Tier Requested: 3
+    - Clause Approver: "STOP: Walk-Away Boundary"
+    - Overall Routing Decision: "BLOCKED - Walk-Away Redline"
+    - Needs a Decision Queue: Places the Tier 3 clause at the top of the queue ahead of any Tier 2 clauses.
+
+3. RESPONSIVE MODES DECLARATION
+- Desktop Mode (>= 1080px): Full working surface. The KPI strip spans a 4-column institutional grid at the top, followed immediately by the live "Needs a Decision" escalation table. Below that, Section 3 ("The Playbook Matrix") and Section 4 ("The Redline Scorer") sit side by side in a 2-column workspace so a negotiator can read all 8 clauses, their 4 fallback positions, and the Give-Get trade rules directly alongside the active tier controls.
+- Mobile / Phone Mode (<= 720px): Designed specifically for vertical handheld use with zero horizontal page scroll down to 320px. The KPI strip stacks cleanly with the Overall Routing Decision prominent; the Playbook Matrix reflows from a multi-column grid into stacked, labeled clause cards with a 4-tier breakdown; the Redline Scorer presents full-width 4-button segmented controls (min-height 46px >= 44px standard); and a sticky live summary bar rides the bottom of the viewport so the negotiator sees Total Score, Highest Tier, and Routing Verdict in real time as they tap tiers.
+
+4. PART E — SEO INTEGRITY COMPLIANCE
+- Explicit Confirmation: This page contains zero hidden text or links, zero white-on-white text, zero off-screen positioning, zero font-size:0 rules, and zero display:none content blocks. All text and controls are visibly rendered in the layout across all viewports. No keyword stuffing, cloaking, or doorway patterns exist.
+
+5. IMPROVEMENTS MADE (BEYOND BASE SPEC, INSIDE BOUNDS)
+- Synchronized Matrix-to-Scorer Highlighting: Selecting a tier in the Redline Scorer dynamically highlights the corresponding cell (T0, T1, T2, or T3) in the Playbook Matrix so the user can visually track where the deal sits across all 8 clauses at a glance.
+- One-Tap Boundary Preset Bar: Added quick-test state buttons above the scorer ("Restore Sample Deal", "Set All Tier 0 (Fast-Track)", and "Test Walk-Away: CL-06 Tier 3 (STOP)") so a visitor can experience the Part A proof moment ("set Limitation of Liability to Tier 3 and the page answers STOP") in a single tap or via individual clause buttons.
+- Actionable Give-Get Surfacing: Surfaced the verbatim Give-Get negotiation rule inside both the "Needs a Decision" escalation items and each clause row in the Redline Scorer so the negotiator sees what concession to demand in return right where they score the clause.
+- Persistent Sticky Live Verdict Bar: Engineered a bottom sticky bar that remains visible on phone viewports without using display:none on desktop (it acts as a clean footer ledger bar on wide screens and a sticky viewport HUD on mobile).
+
+6. GOAL-VS-SPEC CONFLICTS
+- None identified. Placing Section 3 (The Playbook Matrix) and Section 4 (The Redline Scorer) in a side-by-side desktop container preserves exact DOM section ordering (1 -> 2 -> 3 -> 4 -> 5) while fulfilling the desktop side-by-side requirement.
+================================================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="apple-touch-icon" href="../../favicon.svg" />
+  <title>Redlining Playbook &amp; Clause Fallback Matrix — Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="Working contract redlining playbook and clause fallback matrix governing eight commercial clauses across a four-tier fallback and risk-scoring system.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/redlining-playbook/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Redlining Playbook & Clause Fallback Matrix",
+        "url": "https://fractional-deal-desk-site.pages.dev/tools/redlining-playbook/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "All",
+        "description": "Interactive contract redlining playbook and clause fallback matrix scoring eight standard commercial clauses across four governed fallback tiers (Tier 0 Standard through Tier 3 Walk-Away Boundary)."
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://fractional-deal-desk-site.pages.dev/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Proof of Work",
+            "item": "https://fractional-deal-desk-site.pages.dev/tools/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Deal Desk Controls",
+            "item": "https://fractional-deal-desk-site.pages.dev/tools/stories-and-sandboxes/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Redlining Playbook",
+            "item": "https://fractional-deal-desk-site.pages.dev/tools/redlining-playbook/"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --navy: #0F1E38;
+      --navy-mid: #172B4D;
+      --navy-light: #EBF0F7;
+      --brass: #8A6924;
+      --brass-bright: #E5C478;
+      --brass-rule: #C5A059;
+      --paper: #F7F5F0;
+      --surface: #FFFFFF;
+      --surface-alt: #F0EDE6;
+      --ink: #121824;
+      --ink-muted: #465061;
+      --rule: #D5D0C5;
+      --rule-strong: #B8B1A2;
+
+      /* Tier Semantic Tokens (WCAG AA >= 4.5:1 verified) */
+      --t0-bg: #EBF5EC;
+      --t0-border: #84B888;
+      --t0-ink: #194A1D;
+
+      --t1-bg: #EBF0F7;
+      --t1-border: #7F9BC2;
+      --t1-ink: #0F1E38;
+
+      --t2-bg: #FFF3E0;
+      --t2-border: #D99B4E;
+      --t2-ink: #6E3E00;
+
+      --t3-bg: #FDECEC;
+      --t3-border: #C96A6A;
+      --t3-ink: #7D1212;
+      --t3-solid: #8B1A1A;
+
+      --font-serif: Georgia, 'Times New Roman', Times, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--paper);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    a {
+      color: var(--navy);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: var(--brass);
+    }
+
+    /* Institutional Header Frame */
+    .site-header {
+      background-color: var(--navy);
+      color: #FFFFFF;
+      border-bottom: 3px solid var(--brass-rule);
+    }
+
+    .header-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand-link {
+      color: #FFFFFF;
+      text-decoration: none;
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-height: 44px;
+    }
+
+    .brand-link:hover,
+    .brand-link:focus-visible {
+      color: var(--brass-bright);
+    }
+
+    .brand-mark {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background-color: var(--brass-bright);
+      border: 1px solid #FFFFFF;
+    }
+
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.25rem;
+      align-items: center;
+    }
+
+    .site-nav a {
+      color: #E6ECF5;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.5rem 0.25rem;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      border-bottom: 2px solid transparent;
+    }
+
+    .site-nav a:hover,
+    .site-nav a:focus-visible,
+    .site-nav a[aria-current="page"] {
+      color: var(--brass-bright);
+      border-bottom-color: var(--brass-bright);
+    }
+
+    /* Breadcrumb Bar */
+    .breadcrumb-bar {
+      background-color: var(--surface-alt);
+      border-bottom: 1px solid var(--rule);
+      font-size: 0.8125rem;
+    }
+
+    .breadcrumb-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0.6rem 1.25rem;
+    }
+
+    .breadcrumb-list {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--ink-muted);
+    }
+
+    .breadcrumb-list li {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .breadcrumb-list a {
+      color: var(--navy);
+      text-decoration: underline;
+      padding: 0.25rem 0;
+    }
+
+    .breadcrumb-sep {
+      color: var(--ink-muted);
+      user-select: none;
+    }
+
+    /* Hero / Masthead */
+    .masthead {
+      background-color: var(--navy);
+      color: #FFFFFF;
+      border-bottom: 1px solid var(--rule-strong);
+      padding: 2rem 1.25rem 2.25rem;
+    }
+
+    .masthead-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    .masthead-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .tool-badge {
+      display: inline-block;
+      background-color: var(--navy-mid);
+      color: var(--brass-bright);
+      border: 1px solid var(--brass-rule);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.25rem 0.6rem;
+    }
+
+    .eyebrow {
+      color: #D0D9E8;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .masthead h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.65rem, 3vw, 2.35rem);
+      font-weight: 700;
+      line-height: 1.2;
+      color: #FFFFFF;
+      margin-bottom: 1rem;
+      max-width: 42ch;
+    }
+
+    .lede {
+      font-size: 1.0625rem;
+      line-height: 1.6;
+      color: #E8EEF7;
+      max-width: 78ch;
+      margin-bottom: 1.25rem;
+    }
+
+    .provenance-box {
+      background-color: var(--navy-mid);
+      border-left: 3px solid var(--brass-bright);
+      padding: 0.85rem 1rem;
+      font-size: 0.875rem;
+      line-height: 1.55;
+      color: #DCE4F0;
+      max-width: 88ch;
+    }
+
+    .provenance-box strong {
+      color: #FFFFFF;
+    }
+
+    /* Main Container */
+    .main-container {
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+      flex: 1;
+    }
+
+    /* Directions Block */
+    .directions-panel {
+      background-color: var(--surface);
+      border: 1px solid var(--rule-strong);
+      border-top: 3px solid var(--navy);
+      padding: 1.15rem 1.25rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .directions-title {
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 0.4rem;
+    }
+
+    .directions-copy {
+      font-size: 0.9375rem;
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    /* Section Styling */
+    .tool-section {
+      margin-bottom: 2rem;
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.5rem 1rem;
+      border-bottom: 2px solid var(--navy);
+      padding-bottom: 0.45rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-header h2 {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -0.01em;
+    }
+
+    .section-subtitle {
+      font-size: 0.8125rem;
+      color: var(--ink-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* 1. KPI Strip */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .kpi-card {
+      background-color: var(--surface);
+      border: 1px solid var(--rule-strong);
+      padding: 1rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-top: 4px solid var(--navy);
+    }
+
+    .kpi-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      margin-bottom: 0.45rem;
+    }
+
+    .kpi-value {
+      font-family: var(--font-mono);
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.15;
+      word-break: break-word;
+    }
+
+    .kpi-value.kpi-verdict {
+      font-size: 1.125rem;
+      padding: 0.35rem 0.55rem;
+      border: 1px solid transparent;
+      margin-top: 0.15rem;
+    }
+
+    .kpi-sub {
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      margin-top: 0.45rem;
+    }
+
+    /* Routing Verdict State Classes */
+    .verdict-t0 {
+      background-color: var(--t0-bg);
+      border-color: var(--t0-border);
+      color: var(--t0-ink);
+    }
+
+    .verdict-t1 {
+      background-color: var(--t1-bg);
+      border-color: var(--t1-border);
+      color: var(--t1-ink);
+    }
+
+    .verdict-t2 {
+      background-color: var(--t2-bg);
+      border-color: var(--t2-border);
+      color: var(--t2-ink);
+    }
+
+    .verdict-t3 {
+      background-color: var(--t3-solid);
+      border-color: var(--t3-ink);
+      color: #FFFFFF;
+    }
+
+    /* 2. Needs a Decision */
+    .decision-container {
+      background-color: var(--surface);
+      border: 1px solid var(--rule-strong);
+    }
+
+    .decision-list {
+      list-style: none;
+      divide-y: 1px solid var(--rule);
+    }
+
+    .decision-item {
+      padding: 1rem 1.15rem;
+      border-bottom: 1px solid var(--rule);
+      display: grid;
+      grid-template-columns: 1.2fr 1.4fr 1.2fr 1.6fr;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .decision-item:last-child {
+      border-bottom: none;
+    }
+
+    .decision-item.is-tier-3 {
+      background-color: var(--t3-bg);
+      border-left: 5px solid var(--t3-solid);
+    }
+
+    .decision-item.is-tier-2 {
+      background-color: var(--t2-bg);
+      border-left: 5px solid var(--brass);
+    }
+
+    .decision-clause-title {
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 0.95rem;
+    }
+
+    .decision-tier-pill {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      margin-top: 0.25rem;
+      border: 1px solid currentColor;
+    }
+
+    .pill-t3 {
+      background-color: var(--t3-solid);
+      color: #FFFFFF;
+      border-color: var(--t3-solid);
+    }
+
+    .pill-t2 {
+      background-color: #FFFFFF;
+      color: var(--t2-ink);
+      border-color: var(--t2-border);
+    }
+
+    .decision-field-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .decision-field-val {
+      font-size: 0.875rem;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .decision-approver {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .approver-t3 {
+      color: var(--t3-ink);
+    }
+
+    .approver-t2 {
+      color: var(--t2-ink);
+    }
+
+    .decision-empty {
+      padding: 1.15rem;
+      background-color: var(--t0-bg);
+      border-left: 5px solid var(--t0-ink);
+      color: var(--t0-ink);
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }
+
+    /* Desktop Side-by-Side Workspace for Sections 3 and 4 */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 1.5rem;
+      align-items: start;
+      margin-bottom: 2rem;
+    }
+
+    .workspace-grid .tool-section {
+      margin-bottom: 0;
+    }
+
+    /* 3. The Playbook Matrix */
+    .matrix-wrapper {
+      background-color: var(--surface);
+      border: 1px solid var(--rule-strong);
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+    }
+
+    .matrix-table th,
+    .matrix-table td {
+      border: 1px solid var(--rule);
+      padding: 0.6rem 0.65rem;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .matrix-table thead th {
+      background-color: var(--navy);
+      color: #FFFFFF;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .matrix-clause-cell {
+      font-weight: 700;
+      color: var(--navy);
+      background-color: var(--surface-alt);
+      width: 16%;
+    }
+
+    .matrix-clause-code {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      margin-bottom: 0.15rem;
+    }
+
+    .matrix-tier-cell {
+      width: 16%;
+      transition: background-color 0.12s ease;
+    }
+
+    .matrix-tier-label {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--ink-muted);
+      margin-bottom: 0.2rem;
+      padding: 0.05rem 0.3rem;
+      border: 1px solid var(--rule);
+      background-color: var(--paper);
+    }
+
+    .matrix-giveget-cell {
+      width: 20%;
+      background-color: #FAF8F3;
+      color: var(--ink);
+      font-size: 0.78rem;
+    }
+
+    /* Active cell highlight inside Matrix synced to Scorer */
+    .matrix-tier-cell.active-t0 {
+      background-color: var(--t0-bg);
+      box-shadow: inset 0 0 0 2px var(--t0-ink);
+      font-weight: 600;
+    }
+
+    .matrix-tier-cell.active-t1 {
+      background-color: var(--t1-bg);
+      box-shadow: inset 0 0 0 2px var(--navy);
+      font-weight: 600;
+    }
+
+    .matrix-tier-cell.active-t2 {
+      background-color: var(--t2-bg);
+      box-shadow: inset 0 0 0 2px var(--t2-ink);
+      font-weight: 600;
+    }
+
+    .matrix-tier-cell.active-t3 {
+      background-color: var(--t3-bg);
+      box-shadow: inset 0 0 0 2px var(--t3-solid);
+      font-weight: 700;
+      color: var(--t3-ink);
+    }
+
+    /* 4. The Redline Scorer */
+    .scorer-toolbar {
+      background-color: var(--surface-alt);
+      border: 1px solid var(--rule-strong);
+      border-bottom: none;
+      padding: 0.75rem 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .scorer-toolbar-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .preset-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .btn-preset {
+      background-color: var(--surface);
+      color: var(--navy);
+      border: 1px solid var(--navy);
+      font-family: var(--font-sans);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.45rem 0.7rem;
+      min-height: 44px;
+      cursor: pointer;
+    }
+
+    .btn-preset:hover,
+    .btn-preset:focus-visible {
+      background-color: var(--navy);
+      color: #FFFFFF;
+    }
+
+    .btn-preset.btn-preset-danger {
+      border-color: var(--t3-solid);
+      color: var(--t3-ink);
+      background-color: var(--t3-bg);
+    }
+
+    .btn-preset.btn-preset-danger:hover,
+    .btn-preset.btn-preset-danger:focus-visible {
+      background-color: var(--t3-solid);
+      color: #FFFFFF;
+    }
+
+    .scorer-list {
+      background-color: var(--surface);
+      border: 1px solid var(--rule-strong);
+    }
+
+    .scorer-row {
+      padding: 0.95rem 1rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .scorer-row:last-child {
+      border-bottom: none;
+    }
+
+    .scorer-row.row-tier-3 {
+      background-color: var(--t3-bg);
+    }
+
+    .scorer-row.row-tier-2 {
+      background-color: #FFFDF9;
+    }
+
+    .scorer-row-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.65rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .scorer-clause-heading {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .scorer-clause-id {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      margin-right: 0.35rem;
+    }
+
+    .scorer-points-badge {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border: 1px solid var(--rule-strong);
+      background-color: var(--surface-alt);
+      color: var(--navy);
+    }
+
+    /* One-Tap Segmented Tier Control */
+    .tier-segmented {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.35rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .tier-btn {
+      appearance: none;
+      background-color: var(--paper);
+      color: var(--ink);
+      border: 1px solid var(--rule-strong);
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      min-height: 46px;
+      padding: 0.35rem 0.25rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.2;
+      transition: background-color 0.1s ease, border-color 0.1s ease;
+    }
+
+    .tier-btn span.tier-pts-hint {
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: var(--ink-muted);
+    }
+
+    .tier-btn:hover,
+    .tier-btn:focus-visible {
+      border-color: var(--navy);
+      outline: 2px solid var(--navy);
+      outline-offset: -2px;
+    }
+
+    .tier-btn[aria-pressed="true"].btn-t0 {
+      background-color: var(--t0-ink);
+      color: #FFFFFF;
+      border-color: var(--t0-ink);
+    }
+
+    .tier-btn[aria-pressed="true"].btn-t1 {
+      background-color: var(--navy);
+      color: #FFFFFF;
+      border-color: var(--navy);
+    }
+
+    .tier-btn[aria-pressed="true"].btn-t2 {
+      background-color: var(--t2-ink);
+      color: #FFFFFF;
+      border-color: var(--t2-ink);
+    }
+
+    .tier-btn[aria-pressed="true"].btn-t3 {
+      background-color: var(--t3-solid);
+      color: #FFFFFF;
+      border-color: var(--t3-solid);
+    }
+
+    .tier-btn[aria-pressed="true"] span.tier-pts-hint {
+      color: #F0F4F8;
+    }
+
+    .scorer-live-readout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem 0.85rem;
+      background-color: var(--surface-alt);
+      border: 1px solid var(--rule);
+      padding: 0.6rem 0.75rem;
+      font-size: 0.8125rem;
+    }
+
+    .readout-item-label {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-muted);
+      margin-bottom: 0.1rem;
+    }
+
+    .readout-item-val {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .readout-giveget {
+      grid-column: 1 / -1;
+      border-top: 1px solid var(--rule);
+      padding-top: 0.4rem;
+      margin-top: 0.1rem;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+    }
+
+    .readout-giveget strong {
+      color: var(--navy);
+    }
+
+    /* 5. The Redline Brief */
+    .brief-panel {
+      background-color: var(--surface);
+      border: 1px solid var(--rule-strong);
+      padding: 1.25rem;
+    }
+
+    .brief-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .brief-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    .btn-primary {
+      background-color: var(--navy);
+      color: #FFFFFF;
+      border: 1px solid var(--navy);
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.6rem 1.15rem;
+      min-height: 44px;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background-color: var(--navy-mid);
+      color: var(--brass-bright);
+    }
+
+    .btn-secondary {
+      background-color: var(--surface);
+      color: var(--navy);
+      border: 1px solid var(--navy);
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.6rem 1.15rem;
+      min-height: 44px;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover,
+    .btn-secondary:focus-visible {
+      background-color: var(--surface-alt);
+    }
+
+    .copy-status {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--t0-ink);
+    }
+
+    .brief-pre {
+      background-color: var(--paper);
+      border: 1px solid var(--rule-strong);
+      padding: 1rem 1.15rem;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.65;
+      color: var(--ink);
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-x: auto;
+    }
+
+    /* Related Tools & Internal Links Section */
+    .related-nav-section {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid var(--navy);
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1rem;
+      margin-top: 0.85rem;
+    }
+
+    .related-card {
+      background-color: var(--surface);
+      border: 1px solid var(--rule-strong);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .related-card-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .related-card a {
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .related-card p {
+      font-size: 0.8125rem;
+      color: var(--ink-muted);
+      margin-top: 0.35rem;
+    }
+
+    /* Sticky Live Summary Bar (Rides Phone Viewport; Persistent Ledger Bar on Desktop) */
+    .sticky-summary-strip {
+      position: sticky;
+      bottom: 0;
+      z-index: 40;
+      background-color: var(--navy);
+      color: #FFFFFF;
+      border-top: 2px solid var(--brass-rule);
+      padding: 0.6rem 1.25rem;
+      box-shadow: 0 -2px 10px rgba(15, 30, 56, 0.18);
+    }
+
+    .sticky-summary-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+    }
+
+    .sticky-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.65rem 1.25rem;
+    }
+
+    .sticky-metric-item span.sticky-lbl {
+      color: #B8C7DC;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      margin-right: 0.3rem;
+    }
+
+    .sticky-metric-item strong {
+      color: #FFFFFF;
+      font-weight: 700;
+    }
+
+    .sticky-verdict-badge {
+      padding: 0.2rem 0.55rem;
+      font-weight: 700;
+      font-size: 0.78rem;
+      border: 1px solid var(--brass-bright);
+      background-color: var(--navy-mid);
+      color: var(--brass-bright);
+    }
+
+    .sticky-verdict-badge.sticky-stop {
+      background-color: var(--t3-solid);
+      color: #FFFFFF;
+      border-color: #FFFFFF;
+    }
+
+    /* Footer */
+    .site-footer {
+      background-color: var(--navy);
+      color: #D0D9E8;
+      border-top: 1px solid var(--rule-strong);
+      padding: 2rem 1.25rem;
+      font-size: 0.8125rem;
+    }
+
+    .footer-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1.25rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.25rem;
+    }
+
+    .footer-links a {
+      color: #E6ECF5;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1120px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .masthead {
+        padding: 1.5rem 1rem 1.75rem;
+      }
+
+      .main-container {
+        padding: 1.15rem 0.9rem 2.5rem;
+      }
+
+      .kpi-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+
+      /* Put Overall Routing Decision visually prominent in mobile stack */
+      .kpi-card-verdict {
+        order: -1;
+      }
+
+      .decision-item {
+        grid-template-columns: 1fr;
+        gap: 0.65rem;
+      }
+
+      /* Reflow Playbook Matrix table into stacked, labeled cards on phone mode */
+      .matrix-table,
+      .matrix-table thead,
+      .matrix-table tbody,
+      .matrix-table tr,
+      .matrix-table th,
+      .matrix-table td {
+        display: block;
+        width: 100%;
+      }
+
+      .matrix-table thead tr {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        background-color: var(--navy);
+        padding: 0.5rem 0.65rem;
+      }
+
+      .matrix-table thead th {
+        display: inline;
+        width: auto;
+        border: none;
+        padding: 0;
+        font-size: 0.68rem;
+      }
+
+      .matrix-table thead th::after {
+        content: " · ";
+        color: var(--brass-bright);
+      }
+
+      .matrix-table thead th:last-child::after {
+        content: "";
+      }
+
+      .matrix-table tbody tr {
+        border-bottom: 3px solid var(--navy);
+        padding: 0.5rem 0;
+      }
+
+      .matrix-clause-cell,
+      .matrix-tier-cell,
+      .matrix-giveget-cell {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid var(--rule);
+        padding: 0.55rem 0.75rem;
+      }
+
+      .matrix-giveget-cell {
+        border-bottom: none;
+      }
+
+      .scorer-live-readout {
+        grid-template-columns: 1fr;
+      }
+
+      .sticky-summary-strip {
+        padding: 0.55rem 0.9rem;
+      }
+
+      .sticky-summary-inner {
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../" class="brand-link">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Fractional Deal Desk &amp; Contract Management</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary Navigation">
+        <a href="../../">Home</a>
+        <a href="../../tools/">Proof of Work</a>
+        <a href="../../tools/stories-and-sandboxes/">Deal Desk Controls</a>
+        <a href="../../tools/contract-operations/">Contract Operations</a>
+        <a href="../../tools/intake-gate/">Tool 5 Intake Gate</a>
+        <a href="../../tools/redlining-playbook/" aria-current="page">Tool 6 Playbook</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumb-bar" aria-label="Breadcrumb">
+    <div class="breadcrumb-inner">
+      <ol class="breadcrumb-list">
+        <li><a href="../../">Home</a><span class="breadcrumb-sep" aria-hidden="true">/</span></li>
+        <li><a href="../../tools/">Proof of Work</a><span class="breadcrumb-sep" aria-hidden="true">/</span></li>
+        <li><a href="../../tools/stories-and-sandboxes/">Deal Desk Controls</a><span class="breadcrumb-sep" aria-hidden="true">/</span></li>
+        <li aria-current="page">Redlining Playbook</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="masthead">
+    <div class="masthead-inner">
+      <div class="masthead-meta">
+        <span class="tool-badge">Tool 6 · Deal Desk Controls</span>
+        <span class="eyebrow">Proof of Work · Deal Desk Controls</span>
+      </div>
+      <h1>Redlining Playbook &amp; Clause Fallback Matrix</h1>
+      <p class="lede">
+        This page is a working contract redlining playbook: eight commercial clauses, four governed fallback positions each, scored live so a negotiator can evaluate counterparty redlines mid-deal against pre-set boundaries instead of improvising concessions in the room.
+      </p>
+      <p class="provenance-box">
+        <strong>Practice Record &amp; Provenance:</strong> Built from 15+ years in commercial contracts, deal desk, and revenue operations; contracts up to $300M; 3,000+ SKUs under management. All sample negotiation data on this page is fictional and provided to demonstrate live clause fallback governance.
+      </p>
+    </div>
+  </section>
+
+  <main class="main-container">
+
+    <aside class="directions-panel" aria-label="How this playbook works">
+      <h2 class="directions-title">How the Playbook &amp; Scorer Work</h2>
+      <p class="directions-copy">For each of the eight clauses, set the tier the other side is asking for: Tier 0 is the standard position, Tier 1 the Deal Desk fallback, Tier 2 an escalation position, Tier 3 the walk-away boundary. The scorer adds up the risk points — 0, 1, 3, or 10 per clause depending on tier — names the approver each clause now needs, and routes the deal: low-risk redlines fast-track, mid-range redlines stay Deal Desk approvable, and anything touching the walk-away boundary is blocked. Read the playbook matrix alongside to see what each tier gives and gets.</p>
+    </aside>
+
+    <!-- 1. KPIs -->
+    <section class="tool-section" aria-labelledby="heading-kpis">
+      <div class="section-header">
+        <h2 id="heading-kpis">KPIs</h2>
+        <span class="section-subtitle">Live Deal Routing &amp; Concession Risk Posture</span>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-label">Total Redline Risk Score</span>
+          <div class="kpi-value" id="kpi-total-score">9</div>
+          <span class="kpi-sub">Sum of points across 8 clauses (0, 1, 3, or 10 per clause)</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Highest Tier Requested</span>
+          <div class="kpi-value" id="kpi-highest-tier">2</div>
+          <span class="kpi-sub" id="kpi-highest-tier-label">Tier 2 (Escalation Position)</span>
+        </div>
+        <div class="kpi-card kpi-card-verdict">
+          <span class="kpi-label">Overall Routing Decision</span>
+          <div class="kpi-value kpi-verdict verdict-t2" id="kpi-routing-decision" role="status" aria-live="polite">ESCALATION REQUIRED - Finance/Legal</div>
+          <span class="kpi-sub">Governed by the highest requested tier across the contract</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Clauses Needing Escalation</span>
+          <div class="kpi-value" id="kpi-escalation-count">2</div>
+          <span class="kpi-sub" id="kpi-escalation-list">Count at Tier 2+ (CL-06, CL-08)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Needs a Decision -->
+    <section class="tool-section" aria-labelledby="heading-needs-decision">
+      <div class="section-header">
+        <h2 id="heading-needs-decision">Needs a Decision</h2>
+        <span class="section-subtitle">Clauses at Tier 2 or Tier 3 — Sorted Worst First (Tier 3 Walk-Away First)</span>
+      </div>
+      <div class="decision-container" id="decision-queue" aria-live="polite">
+        <ul class="decision-list">
+          <li class="decision-item is-tier-2">
+            <div>
+              <div class="decision-clause-title">CL-06 Limitation of Liability</div>
+              <span class="decision-tier-pill pill-t2">Tier 2 · 3 Risk Pts</span>
+            </div>
+            <div>
+              <span class="decision-field-label">Position Text Requested</span>
+              <div class="decision-field-val">2x-3x ACV super-cap (Legal)</div>
+            </div>
+            <div>
+              <span class="decision-field-label">Required Approver</span>
+              <div class="decision-field-val decision-approver approver-t2">ESCALATE: Finance / Legal</div>
+            </div>
+            <div>
+              <span class="decision-field-label">Why &amp; Give-Get Rule</span>
+              <div class="decision-field-val">Align super-caps with insurance limits.</div>
+            </div>
+          </li>
+          <li class="decision-item is-tier-2">
+            <div>
+              <div class="decision-clause-title">CL-08 Custom Domain / Provisioning</div>
+              <span class="decision-tier-pill pill-t2">Tier 2 · 3 Risk Pts</span>
+            </div>
+            <div>
+              <span class="decision-field-label">Position Text Requested</span>
+              <div class="decision-field-val">Custom workaround (Prod/Eng + DD)</div>
+            </div>
+            <div>
+              <span class="decision-field-label">Required Approver</span>
+              <div class="decision-field-val decision-approver approver-t2">ESCALATE: Finance / Legal</div>
+            </div>
+            <div>
+              <span class="decision-field-label">Why &amp; Give-Get Rule</span>
+              <div class="decision-field-val">Require written technical sign-off first.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Workspace Grid: 3. The Playbook Matrix & 4. The Redline Scorer Side-by-Side on Desktop -->
+    <div class="workspace-grid">
+
+      <!-- 3. The Playbook Matrix -->
+      <section class="tool-section" aria-labelledby="heading-matrix">
+        <div class="section-header">
+          <h2 id="heading-matrix">The Playbook Matrix</h2>
+          <span class="section-subtitle">Static Governance Reference · Active Tier Highlighted</span>
+        </div>
+        <div class="matrix-wrapper">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th scope="col">Clause</th>
+                <th scope="col">T0: Standard (0 pts)</th>
+                <th scope="col">T1: Deal Desk (1 pt)</th>
+                <th scope="col">T2: Escalate (3 pts)</th>
+                <th scope="col">T3: Walk-Away (10 pts)</th>
+                <th scope="col">Why &amp; Give-Get</th>
+              </tr>
+            </thead>
+            <tbody id="matrix-tbody">
+              <tr data-clause-row="CL-01">
+                <td class="matrix-clause-cell"><span class="matrix-clause-code">CL-01</span>Payment Terms</td>
+                <td class="matrix-tier-cell" data-matrix-tier="0"><span class="matrix-tier-label">T0</span><div>Net 30</div></td>
+                <td class="matrix-tier-cell active-t1" data-matrix-tier="1"><span class="matrix-tier-label">T1</span><div>Net 45 (ACV &gt;= $50k)</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="2"><span class="matrix-tier-label">T2</span><div>Net 60 (Finance sign-off)</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="3"><span class="matrix-tier-label">T3</span><div>Net 90+ or pay-when-paid</div></td>
+                <td class="matrix-giveget-cell"><span class="matrix-tier-label">Give-Get</span><div>Trade Net 45 for annual upfront billing.</div></td>
+              </tr>
+              <tr data-clause-row="CL-02">
+                <td class="matrix-clause-cell"><span class="matrix-clause-code">CL-02</span>Renewal Uplift Cap</td>
+                <td class="matrix-tier-cell" data-matrix-tier="0"><span class="matrix-tier-label">T0</span><div>Uncapped or 10%</div></td>
+                <td class="matrix-tier-cell active-t1" data-matrix-tier="1"><span class="matrix-tier-label">T1</span><div>7% annual cap</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="2"><span class="matrix-tier-label">T2</span><div>5% or CPI cap (Finance)</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="3"><span class="matrix-tier-label">T3</span><div>0% freeze without multi-year commit</div></td>
+                <td class="matrix-giveget-cell"><span class="matrix-tier-label">Give-Get</span><div>Trade 5-7% cap for locked multi-year term.</div></td>
+              </tr>
+              <tr data-clause-row="CL-03">
+                <td class="matrix-clause-cell"><span class="matrix-clause-code">CL-03</span>Auto-Renewal Notice</td>
+                <td class="matrix-tier-cell active-t0" data-matrix-tier="0"><span class="matrix-tier-label">T0</span><div>Auto-renews; 60d</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="1"><span class="matrix-tier-label">T1</span><div>Auto-renews; 30d</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="2"><span class="matrix-tier-label">T2</span><div>Mutual written renewal</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="3"><span class="matrix-tier-label">T3</span><div>Unilateral extension at old price</div></td>
+                <td class="matrix-giveget-cell"><span class="matrix-tier-label">Give-Get</span><div>If removing auto-renew, require 90d quote lock.</div></td>
+              </tr>
+              <tr data-clause-row="CL-04">
+                <td class="matrix-clause-cell"><span class="matrix-clause-code">CL-04</span>Termination for Convenience</td>
+                <td class="matrix-tier-cell active-t0" data-matrix-tier="0"><span class="matrix-tier-label">T0</span><div>No TFC</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="1"><span class="matrix-tier-label">T1</span><div>No TFC; milestone ramp</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="2"><span class="matrix-tier-label">T2</span><div>TFC only w/ 100% commit fee</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="3"><span class="matrix-tier-label">T3</span><div>Unilateral TFC w/ pro-rata refund</div></td>
+                <td class="matrix-giveget-cell"><span class="matrix-tier-label">Give-Get</span><div>Never grant TFC without 100% fee protection.</div></td>
+              </tr>
+              <tr data-clause-row="CL-05">
+                <td class="matrix-clause-cell"><span class="matrix-clause-code">CL-05</span>SLA Credits</td>
+                <td class="matrix-tier-cell" data-matrix-tier="0"><span class="matrix-tier-label">T0</span><div>99.9%; 10% credit cap</div></td>
+                <td class="matrix-tier-cell active-t1" data-matrix-tier="1"><span class="matrix-tier-label">T1</span><div>15% monthly credit cap</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="2"><span class="matrix-tier-label">T2</span><div>Termination after 3 mos &lt;99%</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="3"><span class="matrix-tier-label">T3</span><div>Uncapped cash refunds/damages</div></td>
+                <td class="matrix-giveget-cell"><span class="matrix-tier-label">Give-Get</span><div>Credits apply to future invoices only.</div></td>
+              </tr>
+              <tr data-clause-row="CL-06">
+                <td class="matrix-clause-cell"><span class="matrix-clause-code">CL-06</span>Limitation of Liability</td>
+                <td class="matrix-tier-cell" data-matrix-tier="0"><span class="matrix-tier-label">T0</span><div>12 mos fees</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="1"><span class="matrix-tier-label">T1</span><div>24 mos fees (ACV &gt;= $100k)</div></td>
+                <td class="matrix-tier-cell active-t2" data-matrix-tier="2"><span class="matrix-tier-label">T2</span><div>2x-3x ACV super-cap (Legal)</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="3"><span class="matrix-tier-label">T3</span><div>Uncapped general liability</div></td>
+                <td class="matrix-giveget-cell"><span class="matrix-tier-label">Give-Get</span><div>Align super-caps with insurance limits.</div></td>
+              </tr>
+              <tr data-clause-row="CL-07">
+                <td class="matrix-clause-cell"><span class="matrix-clause-code">CL-07</span>Invoice Dispute Window</td>
+                <td class="matrix-tier-cell active-t0" data-matrix-tier="0"><span class="matrix-tier-label">T0</span><div>15 days</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="1"><span class="matrix-tier-label">T1</span><div>30 days</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="2"><span class="matrix-tier-label">T2</span><div>45 days; undisputed paid on time</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="3"><span class="matrix-tier-label">T3</span><div>Withholding full invoice</div></td>
+                <td class="matrix-giveget-cell"><span class="matrix-tier-label">Give-Get</span><div>Require payment of undisputed balance.</div></td>
+              </tr>
+              <tr data-clause-row="CL-08">
+                <td class="matrix-clause-cell"><span class="matrix-clause-code">CL-08</span>Custom Domain / Provisioning</td>
+                <td class="matrix-tier-cell" data-matrix-tier="0"><span class="matrix-tier-label">T0</span><div>Standard domain</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="1"><span class="matrix-tier-label">T1</span><div>Pre-approved runbook</div></td>
+                <td class="matrix-tier-cell active-t2" data-matrix-tier="2"><span class="matrix-tier-label">T2</span><div>Custom workaround (Prod/Eng + DD)</div></td>
+                <td class="matrix-tier-cell" data-matrix-tier="3"><span class="matrix-tier-label">T3</span><div>Custom commit without Eng sign-off</div></td>
+                <td class="matrix-giveget-cell"><span class="matrix-tier-label">Give-Get</span><div>Require written technical sign-off first.</div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 4. The Redline Scorer -->
+      <section class="tool-section" aria-labelledby="heading-scorer">
+        <div class="section-header">
+          <h2 id="heading-scorer">The Redline Scorer</h2>
+          <span class="section-subtitle">One Tap Per Clause · Requested Tier (0–3)</span>
+        </div>
+
+        <div class="scorer-toolbar" aria-label="Quick scenario presets">
+          <span class="scorer-toolbar-label">Quick States:</span>
+          <div class="preset-group">
+            <button type="button" class="btn-preset" id="btn-preset-sample">Sample Deal (Default)</button>
+            <button type="button" class="btn-preset" id="btn-preset-t0">All Tier 0 (Fast-Track)</button>
+            <button type="button" class="btn-preset btn-preset-danger" id="btn-preset-lol-t3">Set CL-06 LoL to Tier 3 (STOP)</button>
+          </div>
+        </div>
+
+        <div class="scorer-list" id="scorer-list">
+          <!-- CL-01 -->
+          <div class="scorer-row row-tier-1" data-scorer-clause="CL-01">
+            <div class="scorer-row-top">
+              <div class="scorer-clause-heading"><span class="scorer-clause-id">CL-01</span>Payment Terms</div>
+              <span class="scorer-points-badge" id="pts-CL-01">1 Risk Pt</span>
+            </div>
+            <div class="tier-segmented" role="group" aria-label="CL-01 Payment Terms Requested Tier">
+              <button type="button" class="tier-btn btn-t0" data-clause="CL-01" data-tier="0" aria-pressed="false"><span>Tier 0</span><span class="tier-pts-hint">0 pts</span></button>
+              <button type="button" class="tier-btn btn-t1" data-clause="CL-01" data-tier="1" aria-pressed="true"><span>Tier 1</span><span class="tier-pts-hint">1 pt</span></button>
+              <button type="button" class="tier-btn btn-t2" data-clause="CL-01" data-tier="2" aria-pressed="false"><span>Tier 2</span><span class="tier-pts-hint">3 pts</span></button>
+              <button type="button" class="tier-btn btn-t3" data-clause="CL-01" data-tier="3" aria-pressed="false"><span>Tier 3</span><span class="tier-pts-hint">10 pts</span></button>
+            </div>
+            <div class="scorer-live-readout">
+              <div>
+                <span class="readout-item-label">Requested Position</span>
+                <div class="readout-item-val" id="pos-CL-01">Net 45 (ACV &gt;= $50k)</div>
+              </div>
+              <div>
+                <span class="readout-item-label">Required Approver</span>
+                <div class="readout-item-val" id="app-CL-01">Deal Desk (Fallback 1)</div>
+              </div>
+              <div class="readout-giveget"><strong>Give-Get:</strong> Trade Net 45 for annual upfront billing.</div>
+            </div>
+          </div>
+
+          <!-- CL-02 -->
+          <div class="scorer-row row-tier-1" data-scorer-clause="CL-02">
+            <div class="scorer-row-top">
+              <div class="scorer-clause-heading"><span class="scorer-clause-id">CL-02</span>Renewal Uplift Cap</div>
+              <span class="scorer-points-badge" id="pts-CL-02">1 Risk Pt</span>
+            </div>
+            <div class="tier-segmented" role="group" aria-label="CL-02 Renewal Uplift Cap Requested Tier">
+              <button type="button" class="tier-btn btn-t0" data-clause="CL-02" data-tier="0" aria-pressed="false"><span>Tier 0</span><span class="tier-pts-hint">0 pts</span></button>
+              <button type="button" class="tier-btn btn-t1" data-clause="CL-02" data-tier="1" aria-pressed="true"><span>Tier 1</span><span class="tier-pts-hint">1 pt</span></button>
+              <button type="button" class="tier-btn btn-t2" data-clause="CL-02" data-tier="2" aria-pressed="false"><span>Tier 2</span><span class="tier-pts-hint">3 pts</span></button>
+              <button type="button" class="tier-btn btn-t3" data-clause="CL-02" data-tier="3" aria-pressed="false"><span>Tier 3</span><span class="tier-pts-hint">10 pts</span></button>
+            </div>
+            <div class="scorer-live-readout">
+              <div>
+                <span class="readout-item-label">Requested Position</span>
+                <div class="readout-item-val" id="pos-CL-02">7% annual cap</div>
+              </div>
+              <div>
+                <span class="readout-item-label">Required Approver</span>
+                <div class="readout-item-val" id="app-CL-02">Deal Desk (Fallback 1)</div>
+              </div>
+              <div class="readout-giveget"><strong>Give-Get:</strong> Trade 5-7% cap for locked multi-year term.</div>
+            </div>
+          </div>
+
+          <!-- CL-03 -->
+          <div class="scorer-row row-tier-0" data-scorer-clause="CL-03">
+            <div class="scorer-row-top">
+              <div class="scorer-clause-heading"><span class="scorer-clause-id">CL-03</span>Auto-Renewal Notice</div>
+              <span class="scorer-points-badge" id="pts-CL-03">0 Risk Pts</span>
+            </div>
+            <div class="tier-segmented" role="group" aria-label="CL-03 Auto-Renewal Notice Requested Tier">
+              <button type="button" class="tier-btn btn-t0" data-clause="CL-03" data-tier="0" aria-pressed="true"><span>Tier 0</span><span class="tier-pts-hint">0 pts</span></button>
+              <button type="button" class="tier-btn btn-t1" data-clause="CL-03" data-tier="1" aria-pressed="false"><span>Tier 1</span><span class="tier-pts-hint">1 pt</span></button>
+              <button type="button" class="tier-btn btn-t2" data-clause="CL-03" data-tier="2" aria-pressed="false"><span>Tier 2</span><span class="tier-pts-hint">3 pts</span></button>
+              <button type="button" class="tier-btn btn-t3" data-clause="CL-03" data-tier="3" aria-pressed="false"><span>Tier 3</span><span class="tier-pts-hint">10 pts</span></button>
+            </div>
+            <div class="scorer-live-readout">
+              <div>
+                <span class="readout-item-label">Requested Position</span>
+                <div class="readout-item-val" id="pos-CL-03">Auto-renews; 60d</div>
+              </div>
+              <div>
+                <span class="readout-item-label">Required Approver</span>
+                <div class="readout-item-val" id="app-CL-03">None (Standard)</div>
+              </div>
+              <div class="readout-giveget"><strong>Give-Get:</strong> If removing auto-renew, require 90d quote lock.</div>
+            </div>
+          </div>
+
+          <!-- CL-04 -->
+          <div class="scorer-row row-tier-0" data-scorer-clause="CL-04">
+            <div class="scorer-row-top">
+              <div class="scorer-clause-heading"><span class="scorer-clause-id">CL-04</span>Termination for Convenience</div>
+              <span class="scorer-points-badge" id="pts-CL-04">0 Risk Pts</span>
+            </div>
+            <div class="tier-segmented" role="group" aria-label="CL-04 Termination for Convenience Requested Tier">
+              <button type="button" class="tier-btn btn-t0" data-clause="CL-04" data-tier="0" aria-pressed="true"><span>Tier 0</span><span class="tier-pts-hint">0 pts</span></button>
+              <button type="button" class="tier-btn btn-t1" data-clause="CL-04" data-tier="1" aria-pressed="false"><span>Tier 1</span><span class="tier-pts-hint">1 pt</span></button>
+              <button type="button" class="tier-btn btn-t2" data-clause="CL-04" data-tier="2" aria-pressed="false"><span>Tier 2</span><span class="tier-pts-hint">3 pts</span></button>
+              <button type="button" class="tier-btn btn-t3" data-clause="CL-04" data-tier="3" aria-pressed="false"><span>Tier 3</span><span class="tier-pts-hint">10 pts</span></button>
+            </div>
+            <div class="scorer-live-readout">
+              <div>
+                <span class="readout-item-label">Requested Position</span>
+                <div class="readout-item-val" id="pos-CL-04">No TFC</div>
+              </div>
+              <div>
+                <span class="readout-item-label">Required Approver</span>
+                <div class="readout-item-val" id="app-CL-04">None (Standard)</div>
+              </div>
+              <div class="readout-giveget"><strong>Give-Get:</strong> Never grant TFC without 100% fee protection.</div>
+            </div>
+          </div>
+
+          <!-- CL-05 -->
+          <div class="scorer-row row-tier-1" data-scorer-clause="CL-05">
+            <div class="scorer-row-top">
+              <div class="scorer-clause-heading"><span class="scorer-clause-id">CL-05</span>SLA Credits</div>
+              <span class="scorer-points-badge" id="pts-CL-05">1 Risk Pt</span>
+            </div>
+            <div class="tier-segmented" role="group" aria-label="CL-05 SLA Credits Requested Tier">
+              <button type="button" class="tier-btn btn-t0" data-clause="CL-05" data-tier="0" aria-pressed="false"><span>Tier 0</span><span class="tier-pts-hint">0 pts</span></button>
+              <button type="button" class="tier-btn btn-t1" data-clause="CL-05" data-tier="1" aria-pressed="true"><span>Tier 1</span><span class="tier-pts-hint">1 pt</span></button>
+              <button type="button" class="tier-btn btn-t2" data-clause="CL-05" data-tier="2" aria-pressed="false"><span>Tier 2</span><span class="tier-pts-hint">3 pts</span></button>
+              <button type="button" class="tier-btn btn-t3" data-clause="CL-05" data-tier="3" aria-pressed="false"><span>Tier 3</span><span class="tier-pts-hint">10 pts</span></button>
+            </div>
+            <div class="scorer-live-readout">
+              <div>
+                <span class="readout-item-label">Requested Position</span>
+                <div class="readout-item-val" id="pos-CL-05">15% monthly credit cap</div>
+              </div>
+              <div>
+                <span class="readout-item-label">Required Approver</span>
+                <div class="readout-item-val" id="app-CL-05">Deal Desk (Fallback 1)</div>
+              </div>
+              <div class="readout-giveget"><strong>Give-Get:</strong> Credits apply to future invoices only.</div>
+            </div>
+          </div>
+
+          <!-- CL-06 -->
+          <div class="scorer-row row-tier-2" data-scorer-clause="CL-06">
+            <div class="scorer-row-top">
+              <div class="scorer-clause-heading"><span class="scorer-clause-id">CL-06</span>Limitation of Liability</div>
+              <span class="scorer-points-badge" id="pts-CL-06">3 Risk Pts</span>
+            </div>
+            <div class="tier-segmented" role="group" aria-label="CL-06 Limitation of Liability Requested Tier">
+              <button type="button" class="tier-btn btn-t0" data-clause="CL-06" data-tier="0" aria-pressed="false"><span>Tier 0</span><span class="tier-pts-hint">0 pts</span></button>
+              <button type="button" class="tier-btn btn-t1" data-clause="CL-06" data-tier="1" aria-pressed="false"><span>Tier 1</span><span class="tier-pts-hint">1 pt</span></button>
+              <button type="button" class="tier-btn btn-t2" data-clause="CL-06" data-tier="2" aria-pressed="true"><span>Tier 2</span><span class="tier-pts-hint">3 pts</span></button>
+              <button type="button" class="tier-btn btn-t3" data-clause="CL-06" data-tier="3" aria-pressed="false"><span>Tier 3</span><span class="tier-pts-hint">10 pts</span></button>
+            </div>
+            <div class="scorer-live-readout">
+              <div>
+                <span class="readout-item-label">Requested Position</span>
+                <div class="readout-item-val" id="pos-CL-06">2x-3x ACV super-cap (Legal)</div>
+              </div>
+              <div>
+                <span class="readout-item-label">Required Approver</span>
+                <div class="readout-item-val" id="app-CL-06">ESCALATE: Finance / Legal</div>
+              </div>
+              <div class="readout-giveget"><strong>Give-Get:</strong> Align super-caps with insurance limits.</div>
+            </div>
+          </div>
+
+          <!-- CL-07 -->
+          <div class="scorer-row row-tier-0" data-scorer-clause="CL-07">
+            <div class="scorer-row-top">
+              <div class="scorer-clause-heading"><span class="scorer-clause-id">CL-07</span>Invoice Dispute Window</div>
+              <span class="scorer-points-badge" id="pts-CL-07">0 Risk Pts</span>
+            </div>
+            <div class="tier-segmented" role="group" aria-label="CL-07 Invoice Dispute Window Requested Tier">
+              <button type="button" class="tier-btn btn-t0" data-clause="CL-07" data-tier="0" aria-pressed="true"><span>Tier 0</span><span class="tier-pts-hint">0 pts</span></button>
+              <button type="button" class="tier-btn btn-t1" data-clause="CL-07" data-tier="1" aria-pressed="false"><span>Tier 1</span><span class="tier-pts-hint">1 pt</span></button>
+              <button type="button" class="tier-btn btn-t2" data-clause="CL-07" data-tier="2" aria-pressed="false"><span>Tier 2</span><span class="tier-pts-hint">3 pts</span></button>
+              <button type="button" class="tier-btn btn-t3" data-clause="CL-07" data-tier="3" aria-pressed="false"><span>Tier 3</span><span class="tier-pts-hint">10 pts</span></button>
+            </div>
+            <div class="scorer-live-readout">
+              <div>
+                <span class="readout-item-label">Requested Position</span>
+                <div class="readout-item-val" id="pos-CL-07">15 days</div>
+              </div>
+              <div>
+                <span class="readout-item-label">Required Approver</span>
+                <div class="readout-item-val" id="app-CL-07">None (Standard)</div>
+              </div>
+              <div class="readout-giveget"><strong>Give-Get:</strong> Require payment of undisputed balance.</div>
+            </div>
+          </div>
+
+          <!-- CL-08 -->
+          <div class="scorer-row row-tier-2" data-scorer-clause="CL-08">
+            <div class="scorer-row-top">
+              <div class="scorer-clause-heading"><span class="scorer-clause-id">CL-08</span>Custom Domain / Provisioning</div>
+              <span class="scorer-points-badge" id="pts-CL-08">3 Risk Pts</span>
+            </div>
+            <div class="tier-segmented" role="group" aria-label="CL-08 Custom Domain / Provisioning Requested Tier">
+              <button type="button" class="tier-btn btn-t0" data-clause="CL-08" data-tier="0" aria-pressed="false"><span>Tier 0</span><span class="tier-pts-hint">0 pts</span></button>
+              <button type="button" class="tier-btn btn-t1" data-clause="CL-08" data-tier="1" aria-pressed="false"><span>Tier 1</span><span class="tier-pts-hint">1 pt</span></button>
+              <button type="button" class="tier-btn btn-t2" data-clause="CL-08" data-tier="2" aria-pressed="true"><span>Tier 2</span><span class="tier-pts-hint">3 pts</span></button>
+              <button type="button" class="tier-btn btn-t3" data-clause="CL-08" data-tier="3" aria-pressed="false"><span>Tier 3</span><span class="tier-pts-hint">10 pts</span></button>
+            </div>
+            <div class="scorer-live-readout">
+              <div>
+                <span class="readout-item-label">Requested Position</span>
+                <div class="readout-item-val" id="pos-CL-08">Custom workaround (Prod/Eng + DD)</div>
+              </div>
+              <div>
+                <span class="readout-item-label">Required Approver</span>
+                <div class="readout-item-val" id="app-CL-08">ESCALATE: Finance / Legal</div>
+              </div>
+              <div class="readout-giveget"><strong>Give-Get:</strong> Require written technical sign-off first.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- 5. The Redline Brief -->
+    <section class="tool-section" aria-labelledby="heading-brief">
+      <div class="section-header">
+        <h2 id="heading-brief">The Redline Brief</h2>
+        <span class="section-subtitle">Plain-Text Deal Routing Record</span>
+      </div>
+      <div class="brief-panel">
+        <div class="brief-actions">
+          <div class="brief-btn-group">
+            <button type="button" class="btn-primary" id="btn-copy-brief">Copy Redline Brief</button>
+            <button type="button" class="btn-secondary" id="btn-reset-sample">Reset to Sample Deal</button>
+          </div>
+          <span class="copy-status" id="copy-feedback" aria-live="polite">Ready to copy</span>
+        </div>
+        <pre class="brief-pre" id="redline-brief-output">REDLINE BRIEF — CONTRACT FALLBACK &amp; ROUTING SUMMARY
+------------------------------------------------------------------------
+CL-01 Payment Terms | Requested: Tier 1 (Net 45 (ACV &gt;= $50k)) | Approver: Deal Desk (Fallback 1) | Risk Points: 1
+CL-02 Renewal Uplift Cap | Requested: Tier 1 (7% annual cap) | Approver: Deal Desk (Fallback 1) | Risk Points: 1
+CL-03 Auto-Renewal Notice | Requested: Tier 0 (Auto-renews; 60d) | Approver: None (Standard) | Risk Points: 0
+CL-04 Termination for Convenience | Requested: Tier 0 (No TFC) | Approver: None (Standard) | Risk Points: 0
+CL-05 SLA Credits | Requested: Tier 1 (15% monthly credit cap) | Approver: Deal Desk (Fallback 1) | Risk Points: 1
+CL-06 Limitation of Liability | Requested: Tier 2 (2x-3x ACV super-cap (Legal)) | Approver: ESCALATE: Finance / Legal | Risk Points: 3
+CL-07 Invoice Dispute Window | Requested: Tier 0 (15 days) | Approver: None (Standard) | Risk Points: 0
+CL-08 Custom Domain / Provisioning | Requested: Tier 2 (Custom workaround (Prod/Eng + DD)) | Approver: ESCALATE: Finance / Legal | Risk Points: 3
+------------------------------------------------------------------------
+Total Redline Risk Score: 9
+Highest Tier Requested: Tier 2
+Overall Routing Decision: ESCALATION REQUIRED - Finance/Legal</pre>
+      </div>
+    </section>
+
+    <!-- Descriptive Internal Navigation Links (Part D) -->
+    <nav class="related-nav-section" aria-labelledby="heading-related-links">
+      <div class="section-header">
+        <h2 id="heading-related-links">Related Deal Desk &amp; Contract Controls</h2>
+        <span class="section-subtitle">Practice Architecture &amp; Adjacent Tools</span>
+      </div>
+      <div class="related-grid">
+        <div class="related-card">
+          <div>
+            <div class="related-card-eyebrow">Hub</div>
+            <a href="../../tools/">Proof of Work Hub</a>
+            <p>Complete index of working deal desk, pricing, and contract governance tools.</p>
+          </div>
+        </div>
+        <div class="related-card">
+          <div>
+            <div class="related-card-eyebrow">Partition</div>
+            <a href="../../tools/stories-and-sandboxes/">Deal Desk Controls Partition</a>
+            <p>Deal desk intake, concession boundaries, and commercial approval routing controls.</p>
+          </div>
+        </div>
+        <div class="related-card">
+          <div>
+            <div class="related-card-eyebrow">Tool 5 · Deal Desk Controls</div>
+            <a href="../../tools/intake-gate/">Tool 5 Deal Desk Intake Gate</a>
+            <p>Upfront deal qualification and completeness gate before contract drafting begins.</p>
+          </div>
+        </div>
+        <div class="related-card">
+          <div>
+            <div class="related-card-eyebrow">Tool 13 · Contract Operations</div>
+            <a href="../../tools/contract-analyzer/">Tool 13 Contract Analyzer</a>
+            <p>Clause-level risk extraction and commercial obligation review across agreements.</p>
+          </div>
+        </div>
+        <div class="related-card">
+          <div>
+            <div class="related-card-eyebrow">Partition</div>
+            <a href="../../tools/contract-operations/">Contract Operations Partition</a>
+            <p>Post-signature obligation tracking, renewal governance, and agreement repositories.</p>
+          </div>
+        </div>
+        <div class="related-card">
+          <div>
+            <div class="related-card-eyebrow">Practice Overview</div>
+            <a href="../../services/">Fractional Deal Desk &amp; Contract Management Practice</a>
+            <p>Scope of fractional deal desk architecture, commercial playbooks, and revenue operations.</p>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+  </main>
+
+  <!-- Sticky Summary Strip (Rides Phone Screen; Persistent Live Bar on Desktop) -->
+  <div class="sticky-summary-strip" role="region" aria-label="Live Redline Routing Summary">
+    <div class="sticky-summary-inner">
+      <div class="sticky-metrics">
+        <div class="sticky-metric-item"><span class="sticky-lbl">Total Score:</span><strong id="sticky-total-score">9</strong></div>
+        <div class="sticky-metric-item"><span class="sticky-lbl">Highest Tier:</span><strong id="sticky-highest-tier">2</strong></div>
+        <div class="sticky-metric-item"><span class="sticky-lbl">Escalations (T2+):</span><strong id="sticky-escalation-count">2</strong></div>
+      </div>
+      <div class="sticky-verdict-badge" id="sticky-routing-verdict">ESCALATION REQUIRED - Finance/Legal</div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <strong>Fractional Deal Desk &amp; Contract Management</strong> — Commercial Contract Playbooks, Deal Desk Controls &amp; Revenue Operations.
+      </div>
+      <div class="footer-links">
+        <a href="../../">Home</a>
+        <a href="../../tools/">Proof of Work</a>
+        <a href="../../tools/stories-and-sandboxes/">Deal Desk Controls</a>
+        <a href="../../tools/contract-operations/">Contract Operations</a>
+        <a href="../../tools/intake-gate/">Tool 5 Intake Gate</a>
+        <a href="../../tools/contract-analyzer/">Tool 13 Contract Analyzer</a>
+        <a href="../../about/">About</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // Verbatim Clause Data & Workbook Rules
+      var CLAUSES = [
+        {
+          id: 'CL-01',
+          name: 'Payment Terms',
+          positions: [
+            'Net 30',
+            'Net 45 (ACV >= $50k)',
+            'Net 60 (Finance sign-off)',
+            'Net 90+ or pay-when-paid'
+          ],
+          giveGet: 'Trade Net 45 for annual upfront billing.'
+        },
+        {
+          id: 'CL-02',
+          name: 'Renewal Uplift Cap',
+          positions: [
+            'Uncapped or 10%',
+            '7% annual cap',
+            '5% or CPI cap (Finance)',
+            '0% freeze without multi-year commit'
+          ],
+          giveGet: 'Trade 5-7% cap for locked multi-year term.'
+        },
+        {
+          id: 'CL-03',
+          name: 'Auto-Renewal Notice',
+          positions: [
+            'Auto-renews; 60d',
+            'Auto-renews; 30d',
+            'Mutual written renewal',
+            'Unilateral extension at old price'
+          ],
+          giveGet: 'If removing auto-renew, require 90d quote lock.'
+        },
+        {
+          id: 'CL-04',
+          name: 'Termination for Convenience',
+          positions: [
+            'No TFC',
+            'No TFC; milestone ramp',
+            'TFC only w/ 100% commit fee',
+            'Unilateral TFC w/ pro-rata refund'
+          ],
+          giveGet: 'Never grant TFC without 100% fee protection.'
+        },
+        {
+          id: 'CL-05',
+          name: 'SLA Credits',
+          positions: [
+            '99.9%; 10% credit cap',
+            '15% monthly credit cap',
+            'Termination after 3 mos <99%',
+            'Uncapped cash refunds/damages'
+          ],
+          giveGet: 'Credits apply to future invoices only.'
+        },
+        {
+          id: 'CL-06',
+          name: 'Limitation of Liability',
+          positions: [
+            '12 mos fees',
+            '24 mos fees (ACV >= $100k)',
+            '2x-3x ACV super-cap (Legal)',
+            'Uncapped general liability'
+          ],
+          giveGet: 'Align super-caps with insurance limits.'
+        },
+        {
+          id: 'CL-07',
+          name: 'Invoice Dispute Window',
+          positions: [
+            '15 days',
+            '30 days',
+            '45 days; undisputed paid on time',
+            'Withholding full invoice'
+          ],
+          giveGet: 'Require payment of undisputed balance.'
+        },
+        {
+          id: 'CL-08',
+          name: 'Custom Domain / Provisioning',
+          positions: [
+            'Standard domain',
+            'Pre-approved runbook',
+            'Custom workaround (Prod/Eng + DD)',
+            'Custom commit without Eng sign-off'
+          ],
+          giveGet: 'Require written technical sign-off first.'
+        }
+      ];
+
+      var APPROVER_BY_TIER = {
+        0: 'None (Standard)',
+        1: 'Deal Desk (Fallback 1)',
+        2: 'ESCALATE: Finance / Legal',
+        3: 'STOP: Walk-Away Boundary'
+      };
+
+      var POINTS_BY_TIER = {
+        0: 0,
+        1: 1,
+        2: 3,
+        3: 10
+      };
+
+      var ROUTING_BY_MAX_TIER = {
+        0: 'FAST-TRACK',
+        1: 'DEAL DESK APPROVABLE',
+        2: 'ESCALATION REQUIRED - Finance/Legal',
+        3: 'BLOCKED - Walk-Away Redline'
+      };
+
+      var TIER_DESCRIPTIONS = {
+        0: 'Tier 0 (Standard Position)',
+        1: 'Tier 1 (Deal Desk Fallback)',
+        2: 'Tier 2 (Escalation Position)',
+        3: 'Tier 3 (Walk-Away Boundary)'
+      };
+
+      // Sample Requested Tiers on load: CL-01=1, CL-02=1, CL-03=0, CL-04=0, CL-05=1, CL-06=2, CL-07=0, CL-08=2
+      var SAMPLE_TIERS = {
+        'CL-01': 1,
+        'CL-02': 1,
+        'CL-03': 0,
+        'CL-04': 0,
+        'CL-05': 1,
+        'CL-06': 2,
+        'CL-07': 0,
+        'CL-08': 2
+      };
+
+      var currentTiers = {
+        'CL-01': 1,
+        'CL-02': 1,
+        'CL-03': 0,
+        'CL-04': 0,
+        'CL-05': 1,
+        'CL-06': 2,
+        'CL-07': 0,
+        'CL-08': 2
+      };
+
+      function sanitizeTier(val) {
+        var n = parseInt(val, 10);
+        if (isNaN(n) || n < 0) return 0;
+        if (n > 3) return 3;
+        return n;
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function computeModel() {
+        var totalScore = 0;
+        var highestTier = 0;
+        var escalations = [];
+        var clauseResults = [];
+
+        for (var i = 0; i < CLAUSES.length; i++) {
+          var c = CLAUSES[i];
+          var tier = sanitizeTier(currentTiers[c.id]);
+          var pts = POINTS_BY_TIER[tier];
+          var approver = APPROVER_BY_TIER[tier];
+          var posText = c.positions[tier];
+
+          totalScore += pts;
+          if (tier > highestTier) {
+            highestTier = tier;
+          }
+
+          var item = {
+            id: c.id,
+            name: c.name,
+            tier: tier,
+            points: pts,
+            approver: approver,
+            positionText: posText,
+            giveGet: c.giveGet
+          };
+
+          clauseResults.push(item);
+
+          if (tier >= 2) {
+            escalations.push(item);
+          }
+        }
+
+        // Sort Needs a Decision worst first (Tier 3 first, then Tier 2, preserving clause order within same tier)
+        escalations.sort(function (a, b) {
+          if (b.tier !== a.tier) {
+            return b.tier - a.tier;
+          }
+          return a.id.localeCompare(b.id);
+        });
+
+        var routingDecision = ROUTING_BY_MAX_TIER[highestTier];
+
+        return {
+          totalScore: totalScore,
+          highestTier: highestTier,
+          routingDecision: routingDecision,
+          escalations: escalations,
+          clauseResults: clauseResults
+        };
+      }
+
+      function renderAll() {
+        var model = computeModel();
+
+        // 1. Update KPI Strip
+        var elTotalScore = document.getElementById('kpi-total-score');
+        var elHighestTier = document.getElementById('kpi-highest-tier');
+        var elHighestTierLabel = document.getElementById('kpi-highest-tier-label');
+        var elRoutingDecision = document.getElementById('kpi-routing-decision');
+        var elEscalationCount = document.getElementById('kpi-escalation-count');
+        var elEscalationList = document.getElementById('kpi-escalation-list');
+
+        elTotalScore.textContent = String(model.totalScore);
+        elHighestTier.textContent = String(model.highestTier);
+        elHighestTierLabel.textContent = TIER_DESCRIPTIONS[model.highestTier];
+        elRoutingDecision.textContent = model.routingDecision;
+        elRoutingDecision.className = 'kpi-value kpi-verdict verdict-t' + model.highestTier;
+
+        elEscalationCount.textContent = String(model.escalations.length);
+        if (model.escalations.length === 0) {
+          elEscalationList.textContent = 'Count at Tier 2+ (None)';
+        } else {
+          var escIds = [];
+          for (var e = 0; e < model.escalations.length; e++) {
+            escIds.push(model.escalations[e].id);
+          }
+          elEscalationList.textContent = 'Count at Tier 2+ (' + escIds.join(', ') + ')';
+        }
+
+        // 2. Update Needs a Decision Queue
+        var elDecisionQueue = document.getElementById('decision-queue');
+        if (model.escalations.length === 0) {
+          elDecisionQueue.innerHTML =
+            '<div class="decision-empty">0 clauses at Tier 2 or Tier 3. All eight clauses are within Standard (Tier 0) or Deal Desk Fallback (Tier 1) authority — no outside escalation required.</div>';
+        } else {
+          var listHtml = '<ul class="decision-list">';
+          for (var j = 0; j < model.escalations.length; j++) {
+            var esc = model.escalations[j];
+            var isT3 = esc.tier === 3;
+            var itemClass = isT3 ? 'decision-item is-tier-3' : 'decision-item is-tier-2';
+            var pillClass = isT3 ? 'decision-tier-pill pill-t3' : 'decision-tier-pill pill-t2';
+            var appClass = isT3 ? 'decision-field-val decision-approver approver-t3' : 'decision-field-val decision-approver approver-t2';
+
+            listHtml +=
+              '<li class="' + itemClass + '">' +
+                '<div>' +
+                  '<div class="decision-clause-title">' + escapeHtml(esc.id + ' ' + esc.name) + '</div>' +
+                  '<span class="' + pillClass + '">Tier ' + esc.tier + ' · ' + esc.points + ' Risk Pts</span>' +
+                '</div>' +
+                '<div>' +
+                  '<span class="decision-field-label">Position Text Requested</span>' +
+                  '<div class="decision-field-val">' + escapeHtml(esc.positionText) + '</div>' +
+                '</div>' +
+                '<div>' +
+                  '<span class="decision-field-label">Required Approver</span>' +
+                  '<div class="' + appClass + '">' + escapeHtml(esc.approver) + '</div>' +
+                '</div>' +
+                '<div>' +
+                  '<span class="decision-field-label">Why &amp; Give-Get Rule</span>' +
+                  '<div class="decision-field-val">' + escapeHtml(esc.giveGet) + '</div>' +
+                '</div>' +
+              '</li>';
+          }
+          listHtml += '</ul>';
+          elDecisionQueue.innerHTML = listHtml;
+        }
+
+        // 3 & 4. Update Playbook Matrix Active Highlights & Scorer Rows
+        for (var k = 0; k < model.clauseResults.length; k++) {
+          var res = model.clauseResults[k];
+
+          // Update Scorer row
+          var scorerRow = document.querySelector('[data-scorer-clause="' + res.id + '"]');
+          if (scorerRow) {
+            scorerRow.className = 'scorer-row row-tier-' + res.tier;
+            var buttons = scorerRow.querySelectorAll('.tier-btn');
+            for (var b = 0; b < buttons.length; b++) {
+              var btnTier = sanitizeTier(buttons[b].getAttribute('data-tier'));
+              buttons[b].setAttribute('aria-pressed', btnTier === res.tier ? 'true' : 'false');
+            }
+          }
+
+          var elPts = document.getElementById('pts-' + res.id);
+          if (elPts) {
+            elPts.textContent = res.points + (res.points === 1 ? ' Risk Pt' : ' Risk Pts');
+          }
+
+          var elPos = document.getElementById('pos-' + res.id);
+          if (elPos) {
+            elPos.textContent = res.positionText;
+          }
+
+          var elApp = document.getElementById('app-' + res.id);
+          if (elApp) {
+            elApp.textContent = res.approver;
+          }
+
+          // Update Matrix Row active cell
+          var matrixRow = document.querySelector('[data-clause-row="' + res.id + '"]');
+          if (matrixRow) {
+            var cells = matrixRow.querySelectorAll('.matrix-tier-cell');
+            for (var m = 0; m < cells.length; m++) {
+              var cellTier = sanitizeTier(cells[m].getAttribute('data-matrix-tier'));
+              cells[m].className = 'matrix-tier-cell' + (cellTier === res.tier ? ' active-t' + res.tier : '');
+            }
+          }
+        }
+
+        // 5. Update Redline Brief Plain Text Output
+        var briefLines = [
+          'REDLINE BRIEF — CONTRACT FALLBACK & ROUTING SUMMARY',
+          '------------------------------------------------------------------------'
+        ];
+        for (var r = 0; r < model.clauseResults.length; r++) {
+          var cr = model.clauseResults[r];
+          briefLines.push(
+            cr.id + ' ' + cr.name +
+            ' | Requested: Tier ' + cr.tier + ' (' + cr.positionText + ')' +
+            ' | Approver: ' + cr.approver +
+            ' | Risk Points: ' + cr.points
+          );
+        }
+        briefLines.push('------------------------------------------------------------------------');
+        briefLines.push('Total Redline Risk Score: ' + model.totalScore);
+        briefLines.push('Highest Tier Requested: Tier ' + model.highestTier);
+        briefLines.push('Overall Routing Decision: ' + model.routingDecision);
+
+        var elBrief = document.getElementById('redline-brief-output');
+        if (elBrief) {
+          elBrief.textContent = briefLines.join('\n');
+        }
+
+        // 6. Update Sticky Summary Strip
+        var elStickyScore = document.getElementById('sticky-total-score');
+        var elStickyTier = document.getElementById('sticky-highest-tier');
+        var elStickyEsc = document.getElementById('sticky-escalation-count');
+        var elStickyVerdict = document.getElementById('sticky-routing-verdict');
+
+        if (elStickyScore) elStickyScore.textContent = String(model.totalScore);
+        if (elStickyTier) elStickyTier.textContent = String(model.highestTier);
+        if (elStickyEsc) elStickyEsc.textContent = String(model.escalations.length);
+        if (elStickyVerdict) {
+          elStickyVerdict.textContent = model.routingDecision;
+          elStickyVerdict.className = model.highestTier === 3
+            ? 'sticky-verdict-badge sticky-stop'
+            : 'sticky-verdict-badge';
+        }
+      }
+
+      // Event Delegation for Segmented Tier Buttons
+      var scorerList = document.getElementById('scorer-list');
+      if (scorerList) {
+        scorerList.addEventListener('click', function (evt) {
+          var btn = evt.target.closest('.tier-btn');
+          if (!btn) return;
+          var clauseId = btn.getAttribute('data-clause');
+          var tierVal = sanitizeTier(btn.getAttribute('data-tier'));
+          if (clauseId && currentTiers.hasOwnProperty(clauseId)) {
+            currentTiers[clauseId] = tierVal;
+            renderAll();
+          }
+        });
+      }
+
+      function restoreSampleDeal() {
+        for (var key in SAMPLE_TIERS) {
+          if (SAMPLE_TIERS.hasOwnProperty(key)) {
+            currentTiers[key] = SAMPLE_TIERS[key];
+          }
+        }
+        renderAll();
+      }
+
+      // Preset & Reset Buttons
+      var btnPresetSample = document.getElementById('btn-preset-sample');
+      if (btnPresetSample) {
+        btnPresetSample.addEventListener('click', restoreSampleDeal);
+      }
+
+      var btnResetSample = document.getElementById('btn-reset-sample');
+      if (btnResetSample) {
+        btnResetSample.addEventListener('click', function () {
+          restoreSampleDeal();
+          var feedback = document.getElementById('copy-feedback');
+          if (feedback) feedback.textContent = 'Sample restored';
+        });
+      }
+
+      var btnPresetT0 = document.getElementById('btn-preset-t0');
+      if (btnPresetT0) {
+        btnPresetT0.addEventListener('click', function () {
+          for (var i = 0; i < CLAUSES.length; i++) {
+            currentTiers[CLAUSES[i].id] = 0;
+          }
+          renderAll();
+        });
+      }
+
+      var btnPresetLolT3 = document.getElementById('btn-preset-lol-t3');
+      if (btnPresetLolT3) {
+        btnPresetLolT3.addEventListener('click', function () {
+          currentTiers['CL-06'] = 3;
+          renderAll();
+        });
+      }
+
+      // Copy Redline Brief Button
+      var btnCopyBrief = document.getElementById('btn-copy-brief');
+      if (btnCopyBrief) {
+        btnCopyBrief.addEventListener('click', function () {
+          var elBrief = document.getElementById('redline-brief-output');
+          var feedback = document.getElementById('copy-feedback');
+          if (!elBrief) return;
+          var textToCopy = elBrief.textContent;
+
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(textToCopy).then(function () {
+              if (feedback) feedback.textContent = 'Copied Redline Brief to clipboard';
+            }).catch(function () {
+              fallbackCopy(textToCopy, feedback);
+            });
+          } else {
+            fallbackCopy(textToCopy, feedback);
+          }
+        });
+      }
+
+      function fallbackCopy(text, feedbackEl) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.top = '0';
+        ta.style.left = '0';
+        ta.style.width = '1px';
+        ta.style.height = '1px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          if (feedbackEl) feedbackEl.textContent = 'Copied Redline Brief to clipboard';
+        } catch (err) {
+          if (feedbackEl) feedbackEl.textContent = 'Select text below to copy';
+        }
+        document.body.removeChild(ta);
+      }
+
+      // Initialize on load
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
