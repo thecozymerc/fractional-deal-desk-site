@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<!--
+ARGON MANIFEST: TOOL 10 FULL REBUILD — Case Operations & Capacity (S6-P03.3)
+===========================================================================
+
+1. SELF-CHECK AGAINST GROUND-TRUTH ANCHORS (WORKBOOK LOGIC + BOUNDARY CASES)
+   - Math / Logic Alterations vs. Source Workbook:
+     * None. Zero alterations were made to the workbook's formulas.
+     * Age / Resolution (days), per case: IF Status === "Closed" and Closed date is present -> (Closed - Opened) in whole UTC calendar days; ELSE -> (TODAY - Opened) in whole UTC calendar days, where TODAY is the visitor's local calendar date (preserving Excel's TODAY() behavior). If a row is marked Closed with no Closed date yet entered, it falls back to the TODAY rule rather than erroring.
+     * SLA Flag, per case: IF Age > SLA Target -> "BREACH"; ELSE -> "Within SLA" (strictly greater; exact equality is "Within SLA", as in CASE-1009).
+     * Dashboard counts: Total = visible row count; Open / In Progress / Escalated / Closed = exact Status counts; Backlog = count of rows where Status !== "Closed" (carries the workbook's correction matching the by-region table); SLA Breaches = count of "BREACH" rows; Avg age / resolution = ROUND(AVERAGE(Age), 1).
+     * By Region (AMER West, AMER East, AMER Central, EMEA, APAC): Backlog = non-Closed rows in region; Escalated = "Escalated" rows in region; Breaches = "BREACH" rows in region.
+     * Capacity Simulator: Current Backlog linked live from Dashboard Backlog. Effective Capacity = (Analysts * CasesPerAnalyst) / ((1 - ComplexShare) + ComplexShare * Multiplier) (guarded to 0 if blended factor <= 0). Net Cleared = Effective - Intake. Days to Clear = IF Net <= 0 -> "Backlog grows at these settings — no clear date"; ELSE ROUNDUP(Backlog / Net, 0) using 1e-9 epsilon to avoid IEEE-754 floating-point false ceil (e.g. 18 / (9.6 - 6) = 5, not 6). Projection day d (0..30) = MAX(0, Backlog - Net * d).
+     * Corrective — One Data Cell (Workbook Governs): The initial prompt's EXACT SAMPLE DATA text contained a transcription error on CASE-1027 (listing Region = "AMER West"). The supplied workbook (Case Register cell B28) is ground truth with Region = "EMEA". One data cell was corrected (CASE-1027 region changed from "AMER West" to "EMEA") with zero other changes to data, math, copy, or design. Because CASE-1027 is Closed (2026-10-05 to 2026-10-16, age 11 > 5 = BREACH), Backlog by Region is unchanged and Breaches by Region at 2026-11-11 become AMER West = 5 and EMEA = 4 (matching the workbook's Backlog & SLA Dashboard).
+
+   - Fixed Anchors (true on any calendar date):
+     * Total = 30 · Open = 8 · In Progress = 8 · Escalated = 2 · Closed = 12 · Backlog = 18.
+     * Backlog by Region: AMER West = 4, AMER East = 7, AMER Central = 1, EMEA = 1, APAC = 5 (sum = 18).
+     * Escalated by Region: AMER West = 1, AMER East = 1, AMER Central = 0, EMEA = 0, APAC = 0 (sum = 2).
+     * Simulator at Sample Inputs (Intake 6, Analysts 4, Cases/Analyst 3, Complex Share 25%, Multiplier 2.0, Backlog 18): Effective Capacity = 9.6 /day · Net Cleared = +3.6 /day · Days to Clear = 5 · Projection: Day 0 = 18, Day 5 = 0, Day 30 = 0.
+
+   - Date-Pinned Anchors (verified deterministically at reference date 2026-11-11; live UI runs against visitor's TODAY):
+     * SLA Breaches = 27 · Avg age / resolution = 31.6 days.
+     * Breaches by Region (corrected with CASE-1027 = EMEA): AMER West = 5, AMER East = 10, AMER Central = 1, EMEA = 4, APAC = 7 (sum = 27).
+     * Live Calendar Rule: On the live page, open/in-progress/escalated cases age against the visitor's local calendar date (TODAY), so breach counts and average age move automatically with the calendar just as in Excel.
+
+   - Five Boundary Cases + Combination Battery Verified (via console.assert battery on load):
+     * Boundary (1) — CASE-1001 Closed on 2026-11-11: Backlog = 17, Closed = 13, Simulator Backlog = 17, Days to Clear = ROUNDUP(17 / 3.6) = 5.
+     * Boundary (2) — Intake raised to 12: Effective = 9.6, Net = -2.4, Days to Clear = "Backlog grows at these settings — no clear date", Projection Day 30 = 90.
+     * Boundary (3) — Analysts raised to 8: Effective = 19.2, Net = +13.2, Days to Clear = 2.
+     * Boundary (4) — Complex-Case Share set to 0%: Effective = 12.0, Net = +6.0, Days to Clear = 3.
+     * Boundary (5) — CASE-1003 SLA Target raised 2 -> 100 (at 2026-11-11): CASE-1003 age 66 <= 100 -> "Within SLA", SLA Breaches = 26.
+     * Combination Battery — Zero analysts (Effective 0.0, Net -6.0, grows-message, zero NaN), Closed row without Closed date (uses TODAY fallback), row add/delete down to 0 rows, and Reset to Sample verified with zero NaN and zero stale counts.
+
+2. IMPROVEMENTS MADE:
+   - Single-Surface Live Reconciliation: Replaced the 4-tab spreadsheet embed with an integrated single-page workspace where editing a row in the Case Register updates the top KPI Strip, Backlog & SLA Dashboard, Regional table, linked Capacity Simulator Backlog, 30-Day Projection, and Queue Brief simultaneously in one view.
+   - IEEE-754 Precision Guard on ROUNDUP: Added 1e-9 epsilon tolerance on positive ROUNDUP(Backlog / Net, 0) so exact integer ratios like 18 / (9.6 - 6) resolve cleanly to 5 instead of floating-point 6.
+   - One-Tap Boundary Test Scenarios: Added scenario buttons ("Sample State", "Close CASE-1001 (Today)", "Intake 12 (Overflow)", "Boost to 8 Analysts", "0% Complex Share", "Raise CASE-1003 SLA to 100d") alongside full inline row editing, adding, removing, and resetting.
+   - Visual 30-Day Projection Strip + Table: Rendered all 31 projection days (Day 0 to Day 30) in a compact two-column split table with proportional capacity bars so both backlog drain and overflow growth are immediately legible.
+   - Row-Level Breach Alerting & Copyable Queue Brief: Highlighted BREACH rows with a left crimson border and compiled a plain-text Queue Brief with one-click clipboard copy and textarea fallback.
+
+3. RESPONSIVE MODES & FLUID-FIRST SWEEP (280px - 1280px):
+   - Desktop Mode (> 720px): 6-card KPI Strip in a 3x2 grid; full 11-column + Action Case Register table inside a contained `.table-scroll-wrap`; side-by-side Dashboard Status Summary and Backlog by Region table; side-by-side Capacity Simulator inputs/verdict and 30-Day Backlog Projection (split Days 0-15 / Days 16-30); 2-column Queue Brief and Inputs/Logic/Limits layout.
+   - Phone Mode (<= 720px): KPI Strip stacks in 2 columns (1 column <= 360px) with Backlog (`order: -2`) and SLA Breaches (`order: -1`) pinned first; the 11-column Case Register reflows via pure CSS into stacked per-case cards with labeled 2-column fields (1 column <= 360px), >= 44px touch targets, and 16px inputs; Backlog by Region table reflows into stacked region cards; 30-Day Projection stacks inside a contained panel; a fixed bottom Sticky Summary Strip tracks Backlog, SLA Breaches, and Days to Clear with a jump link to the Capacity Simulator.
+   - Fluid-First Sweep (280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS px): Built strictly with `minmax(0, 1fr)`, `clamp()`, relative units, `overflow-wrap: anywhere`, and contained wrappers for zero horizontal page scroll across every width on the ladder.
+
+4. PART E — SEO INTEGRITY COMPLIANCE & GOAL-VS-SPEC NOTES:
+   - Part E Compliance: 100% compliant. Zero `display: none` content blocks, zero hidden text or links, zero white-on-white, zero off-screen positioning, zero zero-size text, zero keyword stuffing, zero cloaking or doorway pages. Screen-reader-only `.sr-only` clipping is used solely on mobile visually-rearranged `thead` headers where visible `data-label` headers appear on each card field.
+   - Standing No-Selling Compliance: Removed the superseded page's "Next — Put this to work" booking section and calendar CTA; no pricing, no pitch copy, and no booking buttons appear anywhere. Deal Check is included solely as a plain descriptive link among related Proof of Work links (`../deal-check/`).
+-->
+<!--
+     LABEL — S6-P03.3 — Case Operations Triage Tool + Capacity Simulator (tool page;
+     Tool / piece ID: Tool 10 — Case Operations & Capacity, version TOOL 10.1,
+     address: /tools/case-operations-capacity/)
+     What this page holds: the Argon full rebuild (Nov 13, 2026) of
+     Tool 10 — a 30-case register (the workbook's eleven columns;
+     Region / Queue / Case Type / Priority / Status as selects;
+     Age / Resolution and SLA Flag computed live), a Backlog & SLA
+     Dashboard that recounts the register (status counts, backlog,
+     breaches, average age, by-region table), a Capacity Simulator
+     whose backlog is linked live from the dashboard (effective
+     capacity, net cleared, days to clear, 30-day projection), and
+     a copyable Queue Brief. Self-contained: no external data file,
+     no formula engine.
+     MATH PROVENANCE: the workbook's logic, UNALTERED (Argon
+     manifest) — Age = IF Closed then Closed minus Opened ELSE
+     TODAY() minus Opened (visitor's local date, the workbook's
+     own TODAY() behavior); Flag = BREACH when Age > SLA Target;
+     Backlog = every case not Closed (the workbook's corrected
+     KPI); Effective = Analysts x CasesPerDay / ((1 minus Share)
+     + Share x Multiplier); Days = ROUNDUP(Backlog / Net), or the
+     workbook's grows-message when Net <= 0. Workbook: "Case
+     Operations Triage Tool — SAMPLE.xlsx" (EQUIVALENT sample
+     built Oct 2026 to pair with the portfolio document "Case
+     Operations Snapshot — Backlog & SLA Risk"; the Capacity
+     Simulator is a planning model built for this website —
+     provenance stated on the page).
+     CORRECTIVE (Nov 13, 2026): CASE-1027 Region — the rebuild
+     prompt carried "AMER West"; the workbook (Case Register B28)
+     says "EMEA". Argon's manifest flagged the discrepancy; a
+     corrective Argon run changed the one cell, workbook
+     governing. Derived effect: reference-date (2026-11-11)
+     breaches by region AMER West 5, EMEA 4; total breaches 27
+     and backlog unchanged (the case is Closed).
+     VERIFICATION (Muse, Nov 13, 2026): independent DOM battery
+     at the frozen reference date — 75/75 checks (all 270 sample
+     fields cell-for-cell vs the workbook, dashboard and region
+     anchors, simulator anchors, all five preset boundary cases,
+     zero-analyst sweep, brief, reset), zero page errors;
+     standing-law scan clean; width ladder 280-1280 zero
+     overflow; screenshots both modes.
+     SUPERSEDES the first-generation workbook-embed build (retired
+     data.js pattern); that build is archived in
+     tool10-build/original-live-copy-2026-11-13/ and on the GitHub
+     branch tool-10-iterations. Map: site/CODE-MAP.md
+     ("tools/case-operations-capacity/"). Rule: any change here
+     is recorded in site/CHANGELOG.md with the CODE-MAP and this
+     folder's LABEL.md updated in the same change (Code Labeling
+     System, Rule 3).
+     -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+  <link rel="apple-touch-icon" href="../../favicon.svg" />
+  <title>Case Operations &amp; Capacity — Fractional Deal Desk &amp; Contract Management</title>
+  <meta name="description" content="Run case queues off a live 30-case register whose Backlog and SLA Dashboard recalculates counts, aging, and regional breaches alongside a 30-day capacity simulator.">
+  <link rel="canonical" href="https://fractional-deal-desk-site.pages.dev/tools/case-operations-capacity/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Case Operations &amp; Capacity — Fractional Deal Desk &amp; Contract Management">
+  <meta property="og:description" content="Run case queues off a live 30-case register whose Backlog and SLA Dashboard recalculates counts, aging, and regional breaches alongside a 30-day capacity simulator.">
+  <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/case-operations-capacity/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/case-operations-capacity/#webapp",
+        "name": "Case Operations & Capacity",
+        "url": "https://fractional-deal-desk-site.pages.dev/tools/case-operations-capacity/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "All",
+        "description": "Interactive 30-case operations register linked live to a Backlog and SLA Dashboard and a 30-day Capacity Simulator.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Fractional Deal Desk & Contract Management",
+          "url": "https://fractional-deal-desk-site.pages.dev/"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://fractional-deal-desk-site.pages.dev/tools/case-operations-capacity/#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fractional-deal-desk-site.pages.dev/" },
+          { "@type": "ListItem", "position": 2, "name": "Proof of Work", "item": "https://fractional-deal-desk-site.pages.dev/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Contract Operations", "item": "https://fractional-deal-desk-site.pages.dev/tools/contract-operations/" },
+          { "@type": "ListItem", "position": 4, "name": "Case Operations & Capacity", "item": "https://fractional-deal-desk-site.pages.dev/tools/case-operations-capacity/" }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --navy-900: #0F1E38;
+      --navy-800: #16294A;
+      --navy-700: #1F3760;
+      --brass-600: #8A661B;
+      --brass-500: #B5892E;
+      --brass-400: #D4AF5A;
+      --brass-100: #F7F1E1;
+      --paper-bg: #F8F7F4;
+      --paper-card: #FFFFFF;
+      --paper-alt: #F1EFEA;
+      --ink-900: #0F1E38;
+      --ink-700: #28364E;
+      --ink-600: #42526B;
+      --rule-color: #D5D0C5;
+      --rule-strong: #0F1E38;
+      --fail-bg: #FEF2F2;
+      --fail-ink: #7F1D1D;
+      --fail-border: #991B1B;
+      --pass-bg: #F0FDF4;
+      --pass-ink: #14532D;
+      --pass-border: #166534;
+      --monitor-bg: #F1EFEA;
+      --monitor-ink: #28364E;
+      --monitor-border: #42526B;
+      --font-serif: Georgia, "Times New Roman", Times, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { margin: 0; padding: 0; background-color: var(--paper-bg); color: var(--ink-900); font-family: var(--font-sans); line-height: 1.55; overflow-x: hidden; }
+    a { color: var(--navy-900); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover, a:focus-visible { color: var(--brass-600); }
+    button, input, select { font-family: inherit; border-radius: 0; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--brass-500); outline-offset: 2px; }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 clamp(0.75rem, 3vw, 2rem); }
+
+    /* HEADER & BREADCRUMB */
+    .site-header { background-color: var(--navy-900); color: #FFFFFF; border-bottom: 3px solid var(--brass-500); }
+    .header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; padding: 0.85rem 0; }
+    .brand-link { color: #FFFFFF; text-decoration: none; font-family: var(--font-serif); font-size: clamp(1rem, 2.2vw, 1.2rem); font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .brand-link:hover, .brand-link:focus-visible { color: var(--brass-400); }
+    .site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.85rem; }
+    .site-nav a { color: #E2E8F0; text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0.4rem; min-height: 44px; display: inline-flex; align-items: center; border-bottom: 2px solid transparent; }
+    .site-nav a:hover, .site-nav a:focus-visible, .site-nav a[aria-current="page"] { color: #FFFFFF; border-bottom-color: var(--brass-400); }
+
+    .breadcrumb-bar { background-color: var(--paper-alt); border-bottom: 1px solid var(--rule-color); font-size: 0.8125rem; }
+    .breadcrumb-list { list-style: none; margin: 0; padding: 0.5rem 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; color: var(--ink-700); }
+    .breadcrumb-list li { display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; overflow-wrap: anywhere; }
+    .breadcrumb-list li + li::before { content: "/"; color: var(--ink-600); }
+    .breadcrumb-list a { color: var(--ink-700); padding: 0.35rem 0.15rem; min-height: 36px; display: inline-flex; align-items: center; }
+    .breadcrumb-list [aria-current="page"] { color: var(--ink-900); font-weight: 600; }
+
+    /* HERO */
+    .hero-banner { background-color: var(--navy-900); color: #FFFFFF; padding: clamp(1.5rem, 4vw, 2.75rem) 0; border-bottom: 1px solid var(--rule-strong); }
+    .hero-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.85rem; }
+    .eyebrow-tag { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass-400); font-weight: 600; }
+    .tool-badge { display: inline-block; background-color: var(--navy-800); border: 1px solid var(--brass-500); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; letter-spacing: 0.04em; }
+    .hero-title { font-family: var(--font-serif); font-size: clamp(1.55rem, 3.6vw, 2.35rem); line-height: 1.2; font-weight: 700; margin: 0 0 0.9rem 0; color: #FFFFFF; overflow-wrap: anywhere; }
+    .hero-lede { font-size: clamp(0.95rem, 1.6vw, 1.06rem); line-height: 1.62; color: #E2E8F0; max-width: 82ch; margin: 0 0 1.15rem 0; }
+    .provenance-strip { background-color: var(--navy-800); border-left: 3px solid var(--brass-500); padding: 0.85rem 1rem; font-size: 0.86rem; color: #E2E8F0; line-height: 1.55; max-width: 86ch; }
+    .provenance-strip strong { color: #FFFFFF; }
+
+    /* SECTIONS */
+    main { padding-bottom: 3rem; }
+    .section-block { padding: clamp(1.35rem, 3vw, 2.25rem) 0; border-bottom: 1px solid var(--rule-color); }
+    .section-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--navy-900); }
+    .section-title { font-family: var(--font-serif); font-size: clamp(1.2rem, 2.4vw, 1.5rem); font-weight: 700; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; }
+    .section-subtitle { font-size: 0.85rem; color: var(--ink-600); font-family: var(--font-mono); margin: 0; overflow-wrap: anywhere; }
+
+    /* 1. KPI STRIP */
+    .kpi-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.9rem; }
+    .kpi-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 4px solid var(--navy-900); padding: clamp(0.85rem, 2vw, 1.15rem); display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+    .kpi-card.is-alert { border-top-color: var(--fail-border); background-color: var(--fail-bg); }
+    .kpi-card.is-clear { border-top-color: var(--pass-border); background-color: var(--pass-bg); }
+    .kpi-card.is-brass { border-top-color: var(--brass-500); }
+    .kpi-label { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-700); font-weight: 700; overflow-wrap: anywhere; }
+    .kpi-value { font-family: var(--font-serif); font-size: clamp(1.55rem, 2.8vw, 2.1rem); font-weight: 700; line-height: 1.15; color: var(--ink-900); overflow-wrap: anywhere; }
+    .kpi-value.is-text-verdict { font-size: clamp(1rem, 1.7vw, 1.15rem); line-height: 1.3; font-family: var(--font-sans); }
+    .kpi-card.is-alert .kpi-value { color: var(--fail-ink); }
+    .kpi-card.is-clear .kpi-value { color: var(--pass-ink); }
+    .kpi-note { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-600); margin: 0; overflow-wrap: anywhere; }
+
+    .correction-callout { margin-top: 0.9rem; background-color: var(--brass-100); border: 1px solid var(--brass-500); border-left: 4px solid var(--brass-600); padding: 0.75rem 1rem; font-size: 0.87rem; color: var(--ink-900); line-height: 1.5; }
+    .correction-callout strong { font-family: var(--font-mono); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--brass-600); margin-right: 0.4rem; }
+
+    /* DIRECTIONS & CONTROLS */
+    .directions-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--brass-500); padding: 0.9rem 1.1rem; margin-bottom: 1rem; font-size: 0.925rem; color: var(--ink-900); }
+    .directions-label { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brass-600); font-weight: 700; display: block; margin-bottom: 0.25rem; }
+    .directions-text { margin: 0; }
+
+    .control-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.65rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.75rem; margin-bottom: 1rem; }
+    .preset-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; }
+    .preset-group-label { font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: var(--ink-700); margin-right: 0.2rem; }
+    .btn-preset { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.45rem 0.7rem; font-size: 0.8rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
+    .btn-preset:hover, .btn-preset:focus-visible, .btn-preset.is-active { background-color: var(--navy-900); color: #FFFFFF; border-color: var(--navy-900); }
+    .action-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+    .btn-primary { background-color: var(--navy-900); color: #FFFFFF; border: 1px solid var(--navy-900); padding: 0.5rem 0.95rem; font-size: 0.84rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
+    .btn-primary:hover, .btn-primary:focus-visible { background-color: var(--brass-600); border-color: var(--brass-600); }
+    .btn-secondary { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.5rem 0.95rem; font-size: 0.84rem; font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
+    .btn-secondary:hover, .btn-secondary:focus-visible { background-color: var(--navy-900); color: #FFFFFF; }
+    .btn-remove { background-color: var(--paper-card); color: var(--fail-ink); border: 1px solid var(--fail-border); padding: 0.4rem 0.65rem; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; width: 100%; }
+    .btn-remove:hover, .btn-remove:focus-visible { background-color: var(--fail-ink); color: #FFFFFF; }
+
+    /* 2. CASE REGISTER TABLE */
+    .table-scroll-wrap { width: 100%; max-width: 100%; overflow-x: auto; border: 1px solid var(--rule-strong); background-color: var(--paper-card); -webkit-overflow-scrolling: touch; }
+    .register-table { width: 100%; border-collapse: collapse; table-layout: auto; font-size: 0.82rem; }
+    .register-table thead th { background-color: var(--navy-900); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; text-align: left; padding: 0.65rem 0.5rem; border-right: 1px solid var(--navy-700); white-space: nowrap; }
+    .register-table thead th:last-child { border-right: 0; }
+    .register-table tbody tr { border-bottom: 1px solid var(--rule-color); background-color: var(--paper-card); }
+    .register-table tbody tr:nth-child(even) { background-color: #FAF9F6; }
+    .register-table tbody tr.row-is-breach { background-color: #FFF9F9; }
+    .register-table tbody tr.row-is-breach td:first-child { box-shadow: inset 4px 0 0 var(--fail-border); }
+    .register-table tbody td { padding: 0.4rem 0.38rem; border-right: 1px solid var(--rule-color); vertical-align: middle; }
+    .register-table tbody td:last-child { border-right: 0; }
+
+    .cell-input, .cell-select { width: 100%; border: 1px solid #B6B0A3; background-color: #FFFFFF; color: var(--ink-900); padding: 0.35rem 0.4rem; font-size: 0.8125rem; min-height: 38px; line-height: 1.3; }
+    .cell-input:focus, .cell-select:focus { border-color: var(--navy-900); background-color: var(--brass-100); outline: 2px solid var(--brass-500); outline-offset: -1px; }
+    .cell-input.is-mono { font-family: var(--font-mono); }
+
+    .col-id { min-width: 96px; }
+    .col-region { min-width: 122px; }
+    .col-queue { min-width: 124px; }
+    .col-type { min-width: 152px; }
+    .col-priority { min-width: 118px; }
+    .col-status { min-width: 114px; }
+    .col-date { min-width: 128px; }
+    .col-target { min-width: 82px; }
+    .col-age { min-width: 78px; }
+    .col-flag { min-width: 102px; }
+    .col-action { min-width: 78px; }
+
+    .computed-age { display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 38px; font-family: var(--font-mono); font-weight: 700; font-size: 0.84rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); color: var(--ink-900); padding: 0.25rem 0.4rem; }
+    .flag-pill { display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 38px; padding: 0.25rem 0.5rem; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; border: 1px solid transparent; text-align: center; }
+    .flag-pill.is-breach { background-color: var(--fail-bg); color: var(--fail-ink); border-color: var(--fail-border); }
+    .flag-pill.is-within { background-color: var(--pass-bg); color: var(--pass-ink); border-color: var(--pass-border); }
+    .empty-row-cell { text-align: center; padding: 1.5rem 1rem !important; font-family: var(--font-mono); color: var(--ink-600); }
+
+    /* 3. BACKLOG & SLA DASHBOARD */
+    .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 1.25rem; align-items: start; }
+    .dash-card { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--navy-900); padding: clamp(0.9rem, 2vw, 1.25rem); min-width: 0; }
+    .dash-card-title { font-family: var(--font-serif); font-size: 1.12rem; font-weight: 700; margin: 0 0 0.75rem 0; color: var(--ink-900); }
+    .stat-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .stat-table tr { border-bottom: 1px solid var(--rule-color); }
+    .stat-table tr:last-child { border-bottom: 0; }
+    .stat-table th { text-align: left; font-weight: 600; color: var(--ink-700); padding: 0.5rem 0.4rem 0.5rem 0; }
+    .stat-table td { text-align: right; font-family: var(--font-mono); font-weight: 700; color: var(--ink-900); padding: 0.5rem 0; }
+    .stat-table tr.row-highlight th { color: var(--ink-900); font-weight: 700; }
+    .stat-table tr.row-highlight td { color: var(--navy-900); font-size: 0.98rem; }
+    .stat-table tr.row-breach-highlight td { color: var(--fail-ink); }
+
+    .region-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    .region-table thead th { background-color: var(--navy-900); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; text-align: left; padding: 0.6rem 0.65rem; border-right: 1px solid var(--navy-700); }
+    .region-table thead th:not(:first-child) { text-align: right; }
+    .region-table thead th:last-child { border-right: 0; }
+    .region-table tbody tr { border-bottom: 1px solid var(--rule-color); }
+    .region-table tbody tr:nth-child(even) { background-color: #FAF9F6; }
+    .region-table tbody td { padding: 0.55rem 0.65rem; border-right: 1px solid var(--rule-color); color: var(--ink-900); }
+    .region-table tbody td:not(:first-child) { text-align: right; font-family: var(--font-mono); font-weight: 700; }
+    .region-table tbody td:last-child { border-right: 0; }
+    .region-table tfoot td { background-color: var(--paper-alt); font-family: var(--font-mono); font-weight: 700; padding: 0.55rem 0.65rem; border-top: 2px solid var(--rule-strong); border-right: 1px solid var(--rule-color); }
+    .region-table tfoot td:not(:first-child) { text-align: right; }
+    .region-table tfoot td:first-child { font-family: var(--font-sans); text-align: left; }
+    .region-table tfoot td:last-child { border-right: 0; }
+
+    /* 4. CAPACITY SIMULATOR */
+    .sim-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 1.25rem; align-items: start; }
+    .sim-card { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--brass-500); padding: clamp(0.9rem, 2vw, 1.25rem); min-width: 0; }
+    .sim-linked-row { background-color: var(--paper-alt); border: 1px solid var(--rule-strong); padding: 0.75rem 0.9rem; margin-bottom: 0.9rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+    .sim-linked-label { font-size: 0.86rem; font-weight: 700; color: var(--ink-900); }
+    .sim-linked-sub { display: block; font-family: var(--font-mono); font-size: 0.73rem; font-weight: 400; color: var(--ink-600); }
+    .sim-linked-val { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 700; color: var(--navy-900); white-space: nowrap; }
+
+    .sim-inputs-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+    .sim-field { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(88px, 0.65fr); gap: 0.65rem; align-items: center; }
+    .sim-field label { font-size: 0.87rem; font-weight: 600; color: var(--ink-900); }
+    .sim-field label span { display: block; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 400; color: var(--ink-600); }
+    .sim-input { width: 100%; min-height: 44px; border: 1px solid var(--rule-strong); background-color: var(--brass-100); color: var(--ink-900); font-family: var(--font-mono); font-size: 0.95rem; font-weight: 700; padding: 0.4rem 0.55rem; text-align: right; }
+    .sim-input:focus { background-color: #FFFFFF; outline: 2px solid var(--brass-500); outline-offset: -1px; }
+
+    .sim-outputs-box { border-top: 2px solid var(--navy-900); padding-top: 0.9rem; display: flex; flex-direction: column; gap: 0.55rem; }
+    .sim-out-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.35rem 0.75rem; padding: 0.45rem 0.6rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); }
+    .sim-out-label { font-size: 0.85rem; font-weight: 600; color: var(--ink-700); }
+    .sim-out-val { font-family: var(--font-mono); font-size: 0.98rem; font-weight: 700; color: var(--ink-900); }
+    .sim-verdict-box { padding: 0.75rem 0.85rem; border: 1px solid var(--pass-border); background-color: var(--pass-bg); color: var(--pass-ink); }
+    .sim-verdict-box.is-growing { border-color: var(--fail-border); background-color: var(--fail-bg); color: var(--fail-ink); }
+    .sim-verdict-title { display: block; font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 0.2rem; }
+    .sim-verdict-val { font-family: var(--font-serif); font-size: 1.15rem; font-weight: 700; overflow-wrap: anywhere; }
+
+    /* 30-DAY PROJECTION */
+    .proj-card { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--navy-900); padding: clamp(0.9rem, 2vw, 1.25rem); min-width: 0; }
+    .proj-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem; }
+    .proj-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .proj-table thead th { background-color: var(--navy-900); color: #FFFFFF; font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; padding: 0.45rem 0.5rem; text-align: left; border-right: 1px solid var(--navy-700); }
+    .proj-table thead th:nth-child(2) { text-align: right; }
+    .proj-table thead th:last-child { border-right: 0; }
+    .proj-table tbody tr { border-bottom: 1px solid var(--rule-color); }
+    .proj-table tbody tr:nth-child(even) { background-color: #FAF9F6; }
+    .proj-table tbody td { padding: 0.3rem 0.5rem; font-family: var(--font-mono); }
+    .proj-table tbody td:nth-child(2) { text-align: right; font-weight: 700; }
+    .proj-bar-track { width: 100%; min-width: 48px; height: 10px; background-color: var(--paper-alt); border: 1px solid var(--rule-color); }
+    .proj-bar-fill { height: 100%; background-color: var(--navy-900); transition: width 0.15s ease; }
+    .proj-bar-fill.is-growing { background-color: var(--fail-border); }
+
+    /* 5. QUEUE BRIEF & INPUTS/LOGIC/LIMITS */
+    .brief-layout { display: grid; grid-template-columns: 1.35fr 1fr; gap: 1.25rem; align-items: start; }
+    .brief-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); padding: clamp(0.9rem, 2vw, 1.25rem); min-width: 0; }
+    .brief-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .copy-status { font-family: var(--font-mono); font-size: 0.8rem; color: var(--pass-ink); font-weight: 700; }
+    .brief-pre { background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.9rem; margin: 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; color: var(--ink-900); white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+
+    .limits-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-top: 3px solid var(--navy-900); padding: clamp(0.9rem, 2vw, 1.25rem); font-size: 0.89rem; color: var(--ink-700); min-width: 0; }
+    .limits-card h3 { font-family: var(--font-serif); font-size: 1.08rem; margin: 0 0 0.6rem 0; color: var(--ink-900); }
+    .limits-card p { margin: 0 0 0.7rem 0; line-height: 1.55; }
+    .limits-card p:last-child { margin-bottom: 0; }
+    .limits-list { margin: 0.5rem 0 0 0; padding-left: 1.1rem; color: var(--ink-900); font-family: var(--font-mono); font-size: 0.77rem; display: flex; flex-direction: column; gap: 0.35rem; }
+
+    /* 6. EXPLAINER ESSAY */
+    .prose-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+    .prose-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: clamp(0.95rem, 2vw, 1.3rem); min-width: 0; }
+    .prose-card h3 { font-family: var(--font-serif); font-size: 1.06rem; margin: 0 0 0.55rem 0; color: var(--ink-900); }
+    .prose-card p { margin: 0; font-size: 0.93rem; line-height: 1.62; color: var(--ink-700); }
+
+    /* RELATED LINKS & STICKY SUMMARY & FOOTER */
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem; }
+    .related-card { background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.9rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.4rem; min-width: 0; }
+    .related-card-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; color: var(--brass-600); font-weight: 700; }
+    .related-card a { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--ink-900); min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+    .related-card p { font-size: 0.83rem; color: var(--ink-700); margin: 0; }
+
+    .live-summary-bar { background-color: var(--navy-900); color: #FFFFFF; border-top: 2px solid var(--brass-500); padding: 0.55rem 0; z-index: 40; }
+    .summary-bar-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.45rem 1rem; font-family: var(--font-mono); font-size: 0.78rem; }
+    .summary-metrics { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.9rem; }
+    .summary-alert { color: #FCA5A5; font-weight: 700; }
+    .summary-clear { color: #86EFAC; font-weight: 700; }
+    .summary-jump-link { color: #FFFFFF; font-size: 0.78rem; font-weight: 600; padding: 0.35rem 0.65rem; border: 1px solid var(--brass-400); text-decoration: none; min-height: 36px; display: inline-flex; align-items: center; }
+
+    .site-footer { background-color: var(--navy-900); color: #E2E8F0; border-top: 3px solid var(--brass-500); padding: 2rem 0 4.5rem 0; font-size: 0.85rem; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+    .footer-heading { font-family: var(--font-serif); font-size: 0.95rem; color: #FFFFFF; margin: 0 0 0.6rem 0; }
+    .footer-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+    .footer-links a { color: #E2E8F0; min-height: 38px; display: inline-flex; align-items: center; }
+    .footer-links a:hover, .footer-links a:focus-visible { color: var(--brass-400); }
+    .footer-bottom { border-top: 1px solid var(--navy-700); padding-top: 1rem; font-size: 0.78rem; color: #CBD5E1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+
+    /* PHONE MODE (<= 720px): ZERO display:none — pure CSS card reflow */
+    @media (max-width: 720px) {
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-card.kpi-backlog-card { order: -2; }
+      .kpi-card.kpi-breach-card { order: -1; }
+
+      .dashboard-grid,
+      .sim-grid,
+      .proj-columns,
+      .brief-layout,
+      .prose-grid { grid-template-columns: 1fr; }
+
+      .sim-field { grid-template-columns: 1fr; gap: 0.3rem; }
+      .sim-input { text-align: left; font-size: 1rem; }
+
+      .register-wrap-outer { overflow-x: visible; border: 0; background-color: transparent; }
+      .register-table,
+      .register-table tbody,
+      .region-table,
+      .region-table tbody,
+      .region-table tfoot { display: block; width: 100%; }
+
+      .register-table thead,
+      .region-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .register-table tbody tr {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+        padding: 0.9rem;
+        margin-bottom: 0.9rem;
+        border: 1px solid var(--rule-strong);
+        border-left: 4px solid var(--navy-900);
+        background-color: var(--paper-card);
+      }
+      .register-table tbody tr.row-is-breach {
+        border-left-color: var(--fail-border);
+        background-color: #FFF9F9;
+      }
+      .register-table tbody tr.row-is-breach td:first-child { box-shadow: none; }
+
+      .register-table tbody td {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        padding: 0;
+        border-right: 0;
+      }
+      .register-table tbody td.mobile-span-2 { grid-column: 1 / -1; }
+      .register-table tbody td::before {
+        content: attr(data-label);
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ink-700);
+        margin-bottom: 0.25rem;
+      }
+      .register-table tbody td.empty-row-cell { grid-column: 1 / -1; }
+      .register-table tbody td.empty-row-cell::before { content: none; }
+
+      .cell-input, .cell-select, .computed-age, .flag-pill {
+        min-height: 44px;
+        font-size: 1rem;
+      }
+
+      /* Region table cards on phone */
+      .region-table tbody tr,
+      .region-table tfoot tr {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.5rem;
+        padding: 0.75rem;
+        margin-bottom: 0.65rem;
+        border: 1px solid var(--rule-color);
+        border-left: 3px solid var(--navy-900);
+        background-color: var(--paper-card);
+      }
+      .region-table tfoot tr {
+        border: 1px solid var(--rule-strong);
+        border-left: 4px solid var(--brass-500);
+        background-color: var(--paper-alt);
+      }
+      .region-table tbody td,
+      .region-table tfoot td {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        padding: 0;
+        border-right: 0;
+        border-top: 0;
+        text-align: left !important;
+      }
+      .region-table tbody td:first-child,
+      .region-table tfoot td:first-child {
+        grid-column: 1 / -1;
+        font-weight: 700;
+        border-bottom: 1px solid var(--rule-color);
+        padding-bottom: 0.3rem;
+        margin-bottom: 0.15rem;
+      }
+      .region-table tbody td:not(:first-child)::before,
+      .region-table tfoot td:not(:first-child)::before {
+        content: attr(data-label);
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--ink-600);
+        margin-bottom: 0.1rem;
+      }
+
+      .live-summary-bar { position: fixed; bottom: 0; left: 0; right: 0; box-shadow: 0 -2px 10px rgba(15, 30, 56, 0.25); }
+    }
+
+    @media (max-width: 360px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+      .register-table tbody tr { grid-template-columns: 1fr; }
+      .region-table tbody tr,
+      .region-table tfoot tr { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../../" class="brand-link">Fractional Deal Desk &amp; Contract Management</a>
+      <nav class="site-nav" aria-label="Primary Navigation">
+        <a href="../../">Home</a>
+        <a href="../../tools/" aria-current="page">Proof of Work</a>
+        <a href="../../tools/contract-operations/">Contract Operations</a>
+        <a href="../../services/">Practice &amp; Mandate Scope</a>
+        <a href="../../about/">Operator Record</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumb-bar" aria-label="Breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb-list">
+        <li><a href="../../">Home</a></li>
+        <li><a href="../../tools/">Proof of Work</a></li>
+        <li><a href="../../tools/contract-operations/">Contract Operations</a></li>
+        <li aria-current="page">Case Operations &amp; Capacity</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="hero-banner">
+    <div class="container">
+      <div class="hero-meta-row">
+        <span class="eyebrow-tag">Proof of Work · Contract Operations</span>
+        <span class="tool-badge">Tool 10 · Contract Operations</span>
+      </div>
+      <h1 class="hero-title">Case Operations &amp; Capacity</h1>
+      <p class="hero-lede">
+        A case queue fails quietly: cases age past their SLA targets, escalations pile up in one region, and the backlog number everyone quotes stops matching the register it came from. This tool is the control sheet for that queue — a 30-case register, a dashboard that recounts it live, and a capacity simulator that shows what intake and staffing do to the backlog next. Every case, date and figure in it is sample data.
+      </p>
+      <div class="provenance-strip">
+        <strong>Provenance &amp; Operating Record:</strong> Built from 15+ years in commercial contracts, deal desk, and revenue operations across contracts up to $300M and 3,000+ SKUs under management. This workbook is an equivalent sample built in October 2026 to pair with the portfolio document <em>Case Operations Snapshot — Backlog &amp; SLA Risk</em> — the original workbook was not in Drive. The Capacity Simulator is a planning model built for this website; nothing in it is measured data. Open cases age against the visitor's current date (<code>TODAY()</code>), so breach counts and average age move with the calendar just as the spreadsheet's own formulas behave. All cases, dates, and figures below are fictional sample data.
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- 1. KPI STRIP (THE ANSWERS, UP TOP) -->
+    <section class="section-block" aria-labelledby="heading-kpi-strip">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-kpi-strip">Queue &amp; Capacity Headlines</h2>
+        <p class="section-subtitle">Live counts reconciled from the Case Register and Capacity Simulator below</p>
+      </div>
+
+      <div class="kpi-grid" role="region" aria-label="Queue Headline KPIs" aria-live="polite">
+        <article class="kpi-card">
+          <span class="kpi-label">Total Cases</span>
+          <span class="kpi-value" id="kpi-total">30</span>
+          <p class="kpi-note">All rows in Case Register</p>
+        </article>
+        <article class="kpi-card kpi-backlog-card is-brass">
+          <span class="kpi-label">Backlog</span>
+          <span class="kpi-value" id="kpi-backlog">18</span>
+          <p class="kpi-note">Every case not Closed (linked to simulator)</p>
+        </article>
+        <article class="kpi-card kpi-breach-card is-alert" id="kpi-breach-card">
+          <span class="kpi-label">SLA Breaches</span>
+          <span class="kpi-value" id="kpi-breaches">—</span>
+          <p class="kpi-note" id="kpi-breach-note">Age &gt; SLA Target (live TODAY)</p>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-label">Effective Capacity (cases/day)</span>
+          <span class="kpi-value" id="kpi-capacity">9.6</span>
+          <p class="kpi-note">Complexity-adjusted daily throughput</p>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-label">Net Cleared per Day</span>
+          <span class="kpi-value" id="kpi-net">+3.6</span>
+          <p class="kpi-note">Effective capacity minus daily intake</p>
+        </article>
+        <article class="kpi-card is-clear" id="kpi-clear-card">
+          <span class="kpi-label">Days to Clear Backlog</span>
+          <span class="kpi-value" id="kpi-clear">5</span>
+          <p class="kpi-note" id="kpi-clear-note">ROUNDUP(Backlog / Net, 0)</p>
+        </article>
+      </div>
+
+      <div class="correction-callout" role="note">
+        <strong>Dashboard Correction Note:</strong> The Backlog KPI counts every case not Closed (18 of the 30 sample cases), matching the by-region table underneath it. An earlier version of the formula counted a narrower set and the two disagreed; this website-build copy reconciles them.
+      </div>
+    </section>
+
+    <!-- 2. THE CASE REGISTER (WORKING LAYER) -->
+    <section class="section-block" aria-labelledby="heading-register" id="section-register">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-register">Case Register</h2>
+        <p class="section-subtitle">11 columns · Open cases age against TODAY() · Add, edit, or remove rows</p>
+      </div>
+
+      <div class="directions-box">
+        <span class="directions-label">Directions</span>
+        <p class="directions-text">Add or edit cases in the Case Register and read age, BREACH flags, totals, the corrected backlog, and regional breakdowns on the Backlog &amp; SLA Dashboard, which recalculates from the register. Open cases age against today's date; closed cases measure Opened to Closed. On the Capacity Simulator, set intake, analyst count, throughput, complex-case share, and the complexity multiplier; read effective capacity, net clearance, days to clear, and the 30-day projection. The simulator's current backlog is linked live from the dashboard, so the projection starts from the queue as the register currently stands.</p>
+      </div>
+
+      <div class="control-bar" role="region" aria-label="Register and Simulator Test Scenarios">
+        <div class="preset-group">
+          <span class="preset-group-label">Test Scenarios:</span>
+          <button type="button" class="btn-preset is-active" id="preset-sample" data-preset="sample">Sample State (Backlog 18)</button>
+          <button type="button" class="btn-preset" id="preset-close-1001" data-preset="close-1001">Close CASE-1001 (Today)</button>
+          <button type="button" class="btn-preset" id="preset-intake-12" data-preset="intake-12">Intake 12 (Overflow)</button>
+          <button type="button" class="btn-preset" id="preset-analysts-8" data-preset="analysts-8">Boost to 8 Analysts</button>
+          <button type="button" class="btn-preset" id="preset-complex-0" data-preset="complex-0">0% Complex Share</button>
+          <button type="button" class="btn-preset" id="preset-sla-1003" data-preset="sla-1003">Raise CASE-1003 SLA to 100d</button>
+        </div>
+        <div class="action-group">
+          <button type="button" class="btn-primary" id="btn-add-case">+ Add Case Row</button>
+          <button type="button" class="btn-secondary" id="btn-reset-all">Reset to Sample</button>
+        </div>
+      </div>
+
+      <div class="table-scroll-wrap register-wrap-outer">
+        <table class="register-table" id="register-table" aria-label="Case Register">
+          <thead>
+            <tr>
+              <th scope="col" class="col-id">Case ID</th>
+              <th scope="col" class="col-region">Region</th>
+              <th scope="col" class="col-queue">Queue</th>
+              <th scope="col" class="col-type">Case Type</th>
+              <th scope="col" class="col-priority">Priority</th>
+              <th scope="col" class="col-status">Status</th>
+              <th scope="col" class="col-date">Opened</th>
+              <th scope="col" class="col-date">Closed</th>
+              <th scope="col" class="col-target">SLA Target (days)</th>
+              <th scope="col" class="col-age">Age / Resolution (days)</th>
+              <th scope="col" class="col-flag">SLA Flag</th>
+              <th scope="col" class="col-action">Action</th>
+            </tr>
+          </thead>
+          <tbody id="register-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. BACKLOG & SLA DASHBOARD (LIVE FROM REGISTER) -->
+    <section class="section-block" aria-labelledby="heading-dashboard" id="section-dashboard">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-dashboard">Backlog &amp; SLA Dashboard</h2>
+        <p class="section-subtitle">Recalculated live from every row in the Case Register above</p>
+      </div>
+
+      <div class="dashboard-grid">
+        <article class="dash-card" aria-labelledby="heading-dash-counts">
+          <h3 class="dash-card-title" id="heading-dash-counts">Queue Totals &amp; Aging</h3>
+          <table class="stat-table" aria-label="Queue Status Counts and Aging">
+            <tbody>
+              <tr>
+                <th scope="row">Total cases</th>
+                <td id="dash-total">30</td>
+              </tr>
+              <tr>
+                <th scope="row">Open</th>
+                <td id="dash-open">8</td>
+              </tr>
+              <tr>
+                <th scope="row">In Progress</th>
+                <td id="dash-inprogress">8</td>
+              </tr>
+              <tr>
+                <th scope="row">Escalated</th>
+                <td id="dash-escalated">2</td>
+              </tr>
+              <tr>
+                <th scope="row">Closed</th>
+                <td id="dash-closed">12</td>
+              </tr>
+              <tr class="row-highlight">
+                <th scope="row">Backlog (Open + In Progress + Escalated)</th>
+                <td id="dash-backlog">18</td>
+              </tr>
+              <tr class="row-highlight row-breach-highlight">
+                <th scope="row">SLA breaches</th>
+                <td id="dash-breaches">—</td>
+              </tr>
+              <tr>
+                <th scope="row">Avg age / resolution (days)</th>
+                <td id="dash-avgage">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+
+        <article class="dash-card" aria-labelledby="heading-dash-regions">
+          <h3 class="dash-card-title" id="heading-dash-regions">Backlog by Region</h3>
+          <div class="table-scroll-wrap" style="border-color: var(--rule-color);">
+            <table class="region-table" aria-label="Backlog by Region">
+              <thead>
+                <tr>
+                  <th scope="col">Region</th>
+                  <th scope="col">Backlog</th>
+                  <th scope="col">Escalated</th>
+                  <th scope="col">Breaches</th>
+                </tr>
+              </thead>
+              <tbody id="region-tbody"></tbody>
+              <tfoot id="region-tfoot"></tfoot>
+            </table>
+          </div>
+          <p style="margin: 0.65rem 0 0 0; font-family: var(--font-mono); font-size: 0.77rem; color: var(--ink-600);">
+            Reconciliation check: Regional Backlog sum equals Dashboard Backlog; Regional Escalated sum equals Escalated; Regional Breaches sum equals SLA Breaches.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. CAPACITY SIMULATOR -->
+    <section class="section-block" aria-labelledby="heading-simulator" id="section-simulator">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-simulator">Capacity Simulator</h2>
+        <p class="section-subtitle">Planning model · Current Backlog linked live from the Dashboard</p>
+      </div>
+
+      <div class="sim-grid">
+        <article class="sim-card" aria-labelledby="heading-sim-inputs">
+          <h3 class="dash-card-title" id="heading-sim-inputs">Intake, Staffing &amp; Verdict</h3>
+
+          <div class="sim-linked-row">
+            <div class="sim-linked-label">
+              Current Backlog (cases not Closed)
+              <span class="sim-linked-sub">Linked live from Backlog &amp; SLA Dashboard (read-only)</span>
+            </div>
+            <div class="sim-linked-val" id="sim-linked-backlog">18</div>
+          </div>
+
+          <div class="sim-inputs-list">
+            <div class="sim-field">
+              <label for="sim-intake">
+                Daily New Cases (intake/day)
+                <span>Constant daily arrival assumption</span>
+              </label>
+              <input type="number" class="sim-input" id="sim-intake" min="0" step="0.5" value="6">
+            </div>
+            <div class="sim-field">
+              <label for="sim-analysts">
+                Analysts on the queue
+                <span>Headcount staffed on this queue</span>
+              </label>
+              <input type="number" class="sim-input" id="sim-analysts" min="0" step="1" value="4">
+            </div>
+            <div class="sim-field">
+              <label for="sim-rate">
+                Cases per Analyst per Day
+                <span>Standard case throughput</span>
+              </label>
+              <input type="number" class="sim-input" id="sim-rate" min="0" step="0.5" value="3">
+            </div>
+            <div class="sim-field">
+              <label for="sim-complex-pct">
+                Complex-Case Share (%)
+                <span>Share of intake requiring extra handling (0–100)</span>
+              </label>
+              <input type="number" class="sim-input" id="sim-complex-pct" min="0" max="100" step="1" value="25">
+            </div>
+            <div class="sim-field">
+              <label for="sim-multiplier">
+                Complex-Case Handling Multiplier
+                <span>Time multiple vs. a standard case (e.g. 2.0)</span>
+              </label>
+              <input type="number" class="sim-input" id="sim-multiplier" min="0.1" step="0.1" value="2">
+            </div>
+          </div>
+
+          <div class="sim-outputs-box" aria-live="polite">
+            <div class="sim-out-row">
+              <span class="sim-out-label">Effective Capacity (cases/day)</span>
+              <span class="sim-out-val" id="sim-out-effective">9.6</span>
+            </div>
+            <div class="sim-out-row">
+              <span class="sim-out-label">Net Cleared per Day (capacity &minus; intake)</span>
+              <span class="sim-out-val" id="sim-out-net">+3.6</span>
+            </div>
+            <div class="sim-verdict-box" id="sim-verdict-box">
+              <span class="sim-verdict-title">Days to Clear Current Backlog</span>
+              <span class="sim-verdict-val" id="sim-out-days">5</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="proj-card" aria-labelledby="heading-sim-projection">
+          <h3 class="dash-card-title" id="heading-sim-projection">30-Day Backlog Projection (Days 0&ndash;30)</h3>
+          <p style="margin: 0 0 0.75rem 0; font-size: 0.85rem; color: var(--ink-700);">
+            Each day computes <code>MAX(0, Backlog &minus; Net Cleared &times; Day)</code> starting from the linked register backlog.
+          </p>
+          <div class="proj-columns">
+            <div class="table-scroll-wrap" style="border-color: var(--rule-color);">
+              <table class="proj-table" aria-label="30-Day Backlog Projection Days 0 to 15">
+                <thead>
+                  <tr>
+                    <th scope="col">Day</th>
+                    <th scope="col">Backlog</th>
+                    <th scope="col">Level</th>
+                  </tr>
+                </thead>
+                <tbody id="proj-tbody-left"></tbody>
+              </table>
+            </div>
+            <div class="table-scroll-wrap" style="border-color: var(--rule-color);">
+              <table class="proj-table" aria-label="30-Day Backlog Projection Days 16 to 30">
+                <thead>
+                  <tr>
+                    <th scope="col">Day</th>
+                    <th scope="col">Backlog</th>
+                    <th scope="col">Level</th>
+                  </tr>
+                </thead>
+                <tbody id="proj-tbody-right"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 5. THE QUEUE BRIEF & INPUTS / LOGIC / LIMITS -->
+    <section class="section-block" aria-labelledby="heading-brief" id="section-brief">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-brief">The Queue Brief</h2>
+        <p class="section-subtitle">Copyable plain-text queue summary: counts, regional breakdown, and capacity verdict</p>
+      </div>
+
+      <div class="brief-layout">
+        <div class="brief-panel">
+          <div class="brief-toolbar">
+            <button type="button" class="btn-primary" id="btn-copy-brief">Copy Queue Brief</button>
+            <span class="copy-status" id="copy-feedback" aria-live="polite"></span>
+          </div>
+          <pre class="brief-pre" id="queue-brief-text" tabindex="0" aria-label="Copyable Queue Brief"></pre>
+        </div>
+
+        <aside class="limits-card" aria-label="Inputs, logic, limits">
+          <h3>Inputs, logic, limits</h3>
+          <p><strong>Register &amp; Dashboard:</strong> Inputs are the register's columns — Region, Queue, Case Type, Priority, Status, Opened and Closed dates, and an SLA Target in days. Age and SLA Flag (BREACH when age exceeds the target) are formulas; the dashboard counts statuses, computes the backlog as every case not Closed, counts BREACH flags, averages age, and breaks backlog, escalations, and breaches down by region.</p>
+          <p><strong>Capacity Simulator:</strong> Inputs: current backlog (linked live from this workbook's dashboard), daily intake, analyst count, cases per analyst per day, complex-case share, and a complex-case handling multiplier. Logic: effective capacity = analysts &times; cases/day, divided by the blended handling factor ((1 &minus; complex share) + complex share &times; multiplier); net cleared = capacity &minus; intake; days to clear = backlog / net, rounded up; the projection subtracts net per day and floors at zero. Limits: a simple linear planning model — it assumes intake and capacity stay constant and treats complexity only through the share &times; multiplier assumption, both of which the visitor sets. It plans staffing; it does not measure the live queue.</p>
+          <ul class="limits-list">
+            <li>Age: IF Closed &rarr; Closed &minus; Opened; ELSE TODAY &minus; Opened</li>
+            <li>SLA Flag: IF Age &gt; SLA Target &rarr; BREACH; ELSE Within SLA</li>
+            <li>Backlog: COUNTIF Status &lt;&gt; "Closed" (matches Region sum)</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 6. EXPLAINER SECTION -->
+    <section class="section-block" aria-labelledby="heading-explainer">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-explainer">Why a queue's numbers have to reconcile</h2>
+        <p class="section-subtitle">Control mechanics for case backlogs and capacity planning</p>
+      </div>
+
+      <div class="prose-grid">
+        <article class="prose-card">
+          <h3>Counts that reconcile across every view</h3>
+          <p>The questions a queue owner actually gets asked — how big is the backlog really, where is it breaching, which region carries the escalations — cannot be answered by scrolling a case list. They are answered by counts that reconcile: the backlog on the dashboard equals the sum of the by-region table underneath it, and both equal a hand count of the register. That reconciliation is not a nicety. An earlier version of this workbook's backlog formula counted a narrower set than its own region table did, and the two disagreed; a figure two parts of the same workbook compute differently is worse than no figure, because it gets quoted with confidence.</p>
+        </article>
+        <article class="prose-card">
+          <h3>What happens next when intake meets capacity</h3>
+          <p>The simulator answers what happens next. Intake and capacity are the only two levers a queue owner has, and the model makes their trade-off visible before it is lived: at the sample settings the queue clears a few more cases a day than it takes in and the backlog drains in days; push intake past effective capacity and the same sheet says, in words, that the backlog grows and there is no clear date. The model is deliberately simple — constant intake, constant capacity, complexity as one blended factor — and says so on its face, because a planning model that hides its assumptions produces confident staffing decisions on arithmetic nobody checked.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 7. RELATED PROOF OF WORK LINKS -->
+    <section class="section-block" aria-labelledby="heading-related">
+      <div class="section-header">
+        <h2 class="section-title" id="heading-related">Related Contract Operations &amp; Proof of Work</h2>
+        <p class="section-subtitle">Inspect neighboring tools and governance partitions across the practice record</p>
+      </div>
+
+      <div class="related-grid">
+        <div class="related-card">
+          <span class="related-card-eyebrow">Hub</span>
+          <a href="../../tools/">Proof of Work Hub</a>
+          <p>Explore the full set of working commercial models, contract playbooks, and operational trackers.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Partition</span>
+          <a href="../../tools/contract-operations/">Contract Operations Partition</a>
+          <p>Tools built for contract migrations, metadata triage, case queues, and post-signature operations.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 9 · Contract Operations</span>
+          <a href="../contract-migration-triage/">Tool 9: Contract Migration &amp; Triage Tracker</a>
+          <p>Track contract system migrations with a live Risk Flag, approval routing matrix, RACI, and exception log.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Tool 13 · Contract Operations</span>
+          <a href="../contract-analyzer/">Tool 13: Contract Analyzer</a>
+          <p>Inspect clause-level commercial risk checks and standard-vs-non-standard contract review logic.</p>
+        </div>
+        <div class="related-card">
+          <span class="related-card-eyebrow">Diagnostic Review</span>
+          <a href="../deal-check/">Deal Check</a>
+          <p>Overview of the structured review format used to audit live deals, backlogs, and commercial controls.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- STICKY SUMMARY STRIP -->
+  <div class="live-summary-bar" role="region" aria-label="Live Queue Summary Strip">
+    <div class="container summary-bar-inner">
+      <div class="summary-metrics">
+        <span>Backlog: <strong id="sticky-backlog">18</strong></span>
+        <span>Breaches: <strong id="sticky-breaches" class="summary-alert">—</strong></span>
+        <span>Clear: <strong id="sticky-clear" class="summary-clear">5d</strong></span>
+      </div>
+      <a href="#section-simulator" class="summary-jump-link">Simulator &amp; Brief</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h2 class="footer-heading">Fractional Deal Desk &amp; Contract Management</h2>
+          <p style="margin: 0; color: #CBD5E1; line-height: 1.5;">
+            Commercial contracts, deal desk architecture, and revenue operations controls. 15+ years of operating experience across contracts up to $300M and 3,000+ SKUs under management.
+          </p>
+        </div>
+        <div>
+          <h2 class="footer-heading">Proof of Work &amp; Tools</h2>
+          <ul class="footer-links">
+            <li><a href="../../tools/">Proof of Work Hub</a></li>
+            <li><a href="../../tools/contract-operations/">Contract Operations Partition</a></li>
+            <li><a href="../contract-migration-triage/">Tool 9: Contract Migration &amp; Triage Tracker</a></li>
+            <li><a href="../contract-analyzer/">Tool 13: Contract Analyzer</a></li>
+            <li><a href="../deal-check/">Deal Check</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="footer-heading">Practice Information</h2>
+          <ul class="footer-links">
+            <li><a href="../../">Home</a></li>
+            <li><a href="../../services/">Practice &amp; Mandate Scope</a></li>
+            <li><a href="../../about/">Operator Record</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>Tool 10 · Case Operations &amp; Capacity (S6-P03.3)</span>
+        <span>All cases, dates, and figures on this page are fictional sample data.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var REGIONS = ["AMER West", "AMER East", "AMER Central", "EMEA", "APAC"];
+      var QUEUES = ["Contract Ops", "Deal Support", "Renewals", "Billing", "Technical"];
+      var CASE_TYPES = [
+        "Contract Amendment",
+        "Deal Review",
+        "Onboarding",
+        "Pricing Exception",
+        "Billing Dispute",
+        "Renewal"
+      ];
+      var PRIORITIES = ["P1 - Critical", "P2 - High", "P3 - Normal", "P4 - Low"];
+      var STATUSES = ["Open", "In Progress", "Escalated", "Closed"];
+      var GROWS_MESSAGE = "Backlog grows at these settings \u2014 no clear date";
+
+      var INITIAL_SIM = {
+        intake: 6,
+        analysts: 4,
+        casesPerAnalyst: 3,
+        complexSharePct: 25,
+        multiplier: 2
+      };
+
+      var INITIAL_CASES = [
+        { caseId: "CASE-1001", region: "AMER East", queue: "Contract Ops", caseType: "Contract Amendment", priority: "P3 - Normal", status: "Open", opened: "2026-10-11", closed: "", slaTarget: 10 },
+        { caseId: "CASE-1002", region: "EMEA", queue: "Deal Support", caseType: "Deal Review", priority: "P1 - Critical", status: "Closed", opened: "2026-09-07", closed: "2026-09-17", slaTarget: 2 },
+        { caseId: "CASE-1003", region: "APAC", queue: "Contract Ops", caseType: "Onboarding", priority: "P1 - Critical", status: "Open", opened: "2026-09-06", closed: "", slaTarget: 2 },
+        { caseId: "CASE-1004", region: "EMEA", queue: "Renewals", caseType: "Pricing Exception", priority: "P4 - Low", status: "Closed", opened: "2026-10-12", closed: "2026-10-16", slaTarget: 15 },
+        { caseId: "CASE-1005", region: "EMEA", queue: "Billing", caseType: "Pricing Exception", priority: "P2 - High", status: "Closed", opened: "2026-09-01", closed: "2026-09-13", slaTarget: 5 },
+        { caseId: "CASE-1006", region: "AMER West", queue: "Deal Support", caseType: "Billing Dispute", priority: "P3 - Normal", status: "Open", opened: "2026-09-10", closed: "", slaTarget: 10 },
+        { caseId: "CASE-1007", region: "APAC", queue: "Billing", caseType: "Deal Review", priority: "P3 - Normal", status: "In Progress", opened: "2026-09-07", closed: "", slaTarget: 10 },
+        { caseId: "CASE-1008", region: "AMER West", queue: "Renewals", caseType: "Pricing Exception", priority: "P4 - Low", status: "Escalated", opened: "2026-09-30", closed: "", slaTarget: 15 },
+        { caseId: "CASE-1009", region: "AMER East", queue: "Deal Support", caseType: "Deal Review", priority: "P3 - Normal", status: "Closed", opened: "2026-10-11", closed: "2026-10-21", slaTarget: 10 },
+        { caseId: "CASE-1010", region: "AMER West", queue: "Contract Ops", caseType: "Deal Review", priority: "P3 - Normal", status: "Open", opened: "2026-10-13", closed: "", slaTarget: 10 },
+        { caseId: "CASE-1011", region: "AMER East", queue: "Billing", caseType: "Pricing Exception", priority: "P3 - Normal", status: "In Progress", opened: "2026-09-25", closed: "", slaTarget: 10 },
+        { caseId: "CASE-1012", region: "AMER East", queue: "Renewals", caseType: "Onboarding", priority: "P1 - Critical", status: "Closed", opened: "2026-09-14", closed: "2026-09-24", slaTarget: 2 },
+        { caseId: "CASE-1013", region: "AMER Central", queue: "Renewals", caseType: "Contract Amendment", priority: "P4 - Low", status: "Open", opened: "2026-09-16", closed: "", slaTarget: 15 },
+        { caseId: "CASE-1014", region: "AMER East", queue: "Deal Support", caseType: "Pricing Exception", priority: "P1 - Critical", status: "In Progress", opened: "2026-10-14", closed: "", slaTarget: 2 },
+        { caseId: "CASE-1015", region: "APAC", queue: "Billing", caseType: "Contract Amendment", priority: "P2 - High", status: "In Progress", opened: "2026-09-26", closed: "", slaTarget: 5 },
+        { caseId: "CASE-1016", region: "AMER East", queue: "Billing", caseType: "Contract Amendment", priority: "P4 - Low", status: "In Progress", opened: "2026-10-12", closed: "", slaTarget: 15 },
+        { caseId: "CASE-1017", region: "APAC", queue: "Technical", caseType: "Renewal", priority: "P3 - Normal", status: "Closed", opened: "2026-09-16", closed: "2026-09-28", slaTarget: 10 },
+        { caseId: "CASE-1018", region: "APAC", queue: "Technical", caseType: "Deal Review", priority: "P2 - High", status: "In Progress", opened: "2026-09-26", closed: "", slaTarget: 5 },
+        { caseId: "CASE-1019", region: "AMER East", queue: "Technical", caseType: "Renewal", priority: "P2 - High", status: "Closed", opened: "2026-09-04", closed: "2026-09-15", slaTarget: 5 },
+        { caseId: "CASE-1020", region: "APAC", queue: "Billing", caseType: "Renewal", priority: "P4 - Low", status: "In Progress", opened: "2026-09-05", closed: "", slaTarget: 15 },
+        { caseId: "CASE-1021", region: "APAC", queue: "Billing", caseType: "Onboarding", priority: "P1 - Critical", status: "Closed", opened: "2026-09-01", closed: "2026-09-12", slaTarget: 2 },
+        { caseId: "CASE-1022", region: "AMER East", queue: "Technical", caseType: "Deal Review", priority: "P4 - Low", status: "Open", opened: "2026-09-22", closed: "", slaTarget: 15 },
+        { caseId: "CASE-1023", region: "AMER West", queue: "Billing", caseType: "Onboarding", priority: "P2 - High", status: "Closed", opened: "2026-09-17", closed: "2026-09-26", slaTarget: 5 },
+        { caseId: "CASE-1024", region: "AMER East", queue: "Renewals", caseType: "Renewal", priority: "P2 - High", status: "Closed", opened: "2026-10-03", closed: "2026-10-09", slaTarget: 5 },
+        { caseId: "CASE-1025", region: "AMER West", queue: "Billing", caseType: "Pricing Exception", priority: "P4 - Low", status: "Closed", opened: "2026-09-01", closed: "2026-09-02", slaTarget: 15 },
+        { caseId: "CASE-1026", region: "AMER West", queue: "Technical", caseType: "Deal Review", priority: "P1 - Critical", status: "Open", opened: "2026-09-16", closed: "", slaTarget: 2 },
+        { caseId: "CASE-1027", region: "EMEA", queue: "Renewals", caseType: "Contract Amendment", priority: "P2 - High", status: "Closed", opened: "2026-10-05", closed: "2026-10-16", slaTarget: 5 },
+        { caseId: "CASE-1028", region: "AMER East", queue: "Renewals", caseType: "Onboarding", priority: "P4 - Low", status: "Escalated", opened: "2026-09-17", closed: "", slaTarget: 15 },
+        { caseId: "CASE-1029", region: "EMEA", queue: "Billing", caseType: "Billing Dispute", priority: "P3 - Normal", status: "Open", opened: "2026-10-15", closed: "", slaTarget: 10 },
+        { caseId: "CASE-1030", region: "AMER East", queue: "Deal Support", caseType: "Pricing Exception", priority: "P2 - High", status: "In Progress", opened: "2026-10-04", closed: "", slaTarget: 5 }
+      ];
+
+      function cloneCases(src) {
+        return src.map(function (c) { return Object.assign({}, c); });
+      }
+
+      function cloneSim(src) {
+        return Object.assign({}, src);
+      }
+
+      function parseIsoDayNumber(iso) {
+        if (!iso || typeof iso !== "string") return null;
+        var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim());
+        if (!m) return null;
+        var y = parseInt(m[1], 10);
+        var mo = parseInt(m[2], 10);
+        var d = parseInt(m[3], 10);
+        var ms = Date.UTC(y, mo - 1, d);
+        var dt = new Date(ms);
+        if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) return null;
+        return Math.floor(ms / 86400000);
+      }
+
+      function getTodayIsoLocal() {
+        var now = new Date();
+        var y = now.getFullYear();
+        var m = String(now.getMonth() + 1).padStart(2, "0");
+        var d = String(now.getDate()).padStart(2, "0");
+        return y + "-" + m + "-" + d;
+      }
+
+      function computeCaseAge(c, todayIso) {
+        var openedDay = parseIsoDayNumber(c.opened);
+        if (openedDay === null) return 0;
+        var endDay = null;
+        if (c.status === "Closed") {
+          endDay = parseIsoDayNumber(c.closed);
+        }
+        if (endDay === null) {
+          endDay = parseIsoDayNumber(todayIso);
+        }
+        if (endDay === null) return 0;
+        return endDay - openedDay;
+      }
+
+      function safeNum(val, fallback) {
+        var n = typeof val === "number" ? val : parseFloat(val);
+        return isFinite(n) ? n : fallback;
+      }
+
+      function formatOneDecimal(n) {
+        var rounded = Math.round(n * 10) / 10;
+        if (Object.is(rounded, -0)) rounded = 0;
+        return rounded.toFixed(1);
+      }
+
+      function formatSignedOneDecimal(n) {
+        var rounded = Math.round(n * 10) / 10;
+        if (Object.is(rounded, -0)) rounded = 0;
+        if (rounded > 0) return "+" + rounded.toFixed(1);
+        return rounded.toFixed(1);
+      }
+
+      function formatProjValue(n) {
+        var clamped = Math.max(0, n);
+        var rounded = Math.round(clamped * 10) / 10;
+        if (Math.abs(rounded - Math.round(rounded)) < 1e-9) {
+          return String(Math.round(rounded));
+        }
+        return rounded.toFixed(1);
+      }
+
+      function evaluateQueue(cases, sim, todayIso) {
+        var total = cases.length;
+        var open = 0;
+        var inProgress = 0;
+        var escalated = 0;
+        var closed = 0;
+        var backlog = 0;
+        var breaches = 0;
+        var sumAge = 0;
+
+        var byRegion = {};
+        for (var rIdx = 0; rIdx < REGIONS.length; rIdx++) {
+          byRegion[REGIONS[rIdx]] = { backlog: 0, escalated: 0, breaches: 0 };
+        }
+
+        var rowResults = [];
+        for (var i = 0; i < cases.length; i++) {
+          var c = cases[i];
+          var age = computeCaseAge(c, todayIso);
+          var target = Math.max(0, safeNum(c.slaTarget, 0));
+          var flag = age > target ? "BREACH" : "Within SLA";
+
+          sumAge += age;
+
+          if (c.status === "Open") open++;
+          else if (c.status === "In Progress") inProgress++;
+          else if (c.status === "Escalated") escalated++;
+          else if (c.status === "Closed") closed++;
+
+          var isBacklog = c.status !== "Closed";
+          if (isBacklog) backlog++;
+          if (flag === "BREACH") breaches++;
+
+          if (byRegion[c.region]) {
+            if (isBacklog) byRegion[c.region].backlog++;
+            if (c.status === "Escalated") byRegion[c.region].escalated++;
+            if (flag === "BREACH") byRegion[c.region].breaches++;
+          }
+
+          rowResults.push({ age: age, flag: flag });
+        }
+
+        var avgAge = total > 0 ? Math.round((sumAge / total) * 10) / 10 : 0;
+
+        // Capacity Simulator
+        var intake = Math.max(0, safeNum(sim.intake, 0));
+        var analysts = Math.max(0, safeNum(sim.analysts, 0));
+        var casesPerAnalyst = Math.max(0, safeNum(sim.casesPerAnalyst, 0));
+        var complexShare = Math.min(1, Math.max(0, safeNum(sim.complexSharePct, 0) / 100));
+        var multiplier = Math.max(0, safeNum(sim.multiplier, 1));
+
+        var blendedFactor = (1 - complexShare) + complexShare * multiplier;
+        var effectiveCapacity = (blendedFactor > 0 && isFinite(blendedFactor))
+          ? (analysts * casesPerAnalyst) / blendedFactor
+          : 0;
+        var netCleared = effectiveCapacity - intake;
+        if (Math.abs(netCleared) < 1e-12) netCleared = 0;
+
+        var daysToClear;
+        var isGrowing = netCleared <= 0;
+        if (isGrowing) {
+          daysToClear = GROWS_MESSAGE;
+        } else {
+          daysToClear = backlog === 0 ? 0 : Math.ceil((backlog / netCleared) - 1e-9);
+        }
+
+        var projection = [];
+        var maxProj = Math.max(backlog, 1);
+        for (var d = 0; d <= 30; d++) {
+          var val = Math.max(0, backlog - netCleared * d);
+          if (val > maxProj) maxProj = val;
+          projection.push({ day: d, value: val });
+        }
+
+        return {
+          todayIso: todayIso,
+          rows: rowResults,
+          total: total,
+          open: open,
+          inProgress: inProgress,
+          escalated: escalated,
+          closed: closed,
+          backlog: backlog,
+          breaches: breaches,
+          avgAge: avgAge,
+          byRegion: byRegion,
+          sim: {
+            backlog: backlog,
+            intake: intake,
+            analysts: analysts,
+            casesPerAnalyst: casesPerAnalyst,
+            complexSharePct: complexShare * 100,
+            multiplier: multiplier,
+            effectiveCapacity: effectiveCapacity,
+            netCleared: netCleared,
+            isGrowing: isGrowing,
+            daysToClear: daysToClear,
+            projection: projection,
+            maxProj: maxProj
+          }
+        };
+      }
+
+      var stateCases = cloneCases(INITIAL_CASES);
+      var stateSim = cloneSim(INITIAL_SIM);
+
+      var registerTbody = document.getElementById("register-tbody");
+      var regionTbody = document.getElementById("region-tbody");
+      var regionTfoot = document.getElementById("region-tfoot");
+      var projLeft = document.getElementById("proj-tbody-left");
+      var projRight = document.getElementById("proj-tbody-right");
+      var briefPre = document.getElementById("queue-brief-text");
+      var copyFeedback = document.getElementById("copy-feedback");
+
+      var simIntakeInput = document.getElementById("sim-intake");
+      var simAnalystsInput = document.getElementById("sim-analysts");
+      var simRateInput = document.getElementById("sim-rate");
+      var simComplexInput = document.getElementById("sim-complex-pct");
+      var simMultInput = document.getElementById("sim-multiplier");
+
+      function escapeAttr(str) {
+        return String(str == null ? "" : str)
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function escapeHtml(str) {
+        return String(str == null ? "" : str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function buildSelect(options, current, idx, field, label) {
+        var html = '<select class="cell-select" data-idx="' + idx + '" data-field="' + field + '" aria-label="' + escapeAttr(label) + '">';
+        for (var i = 0; i < options.length; i++) {
+          var opt = options[i];
+          var sel = current === opt ? " selected" : "";
+          html += '<option value="' + escapeAttr(opt) + '"' + sel + '>' + escapeHtml(opt) + '</option>';
+        }
+        html += '</select>';
+        return html;
+      }
+
+      function renderRegisterTable(evalData) {
+        if (stateCases.length === 0) {
+          registerTbody.innerHTML =
+            '<tr><td colspan="12" class="empty-row-cell">No cases in register. Click "+ Add Case Row" or "Reset to Sample" to continue.</td></tr>';
+          return;
+        }
+
+        var html = "";
+        for (var i = 0; i < stateCases.length; i++) {
+          var c = stateCases[i];
+          var res = evalData.rows[i];
+          var rowLabel = c.caseId || ("Row " + (i + 1));
+          var isBreach = res.flag === "BREACH";
+          var trClass = isBreach ? "row-is-breach" : "";
+          var flagClass = isBreach ? "is-breach" : "is-within";
+
+          html +=
+            '<tr class="' + trClass + '" data-row-idx="' + i + '">' +
+              '<td data-label="Case ID"><input type="text" class="cell-input is-mono" data-idx="' + i + '" data-field="caseId" value="' + escapeAttr(c.caseId) + '" placeholder="CASE-1031" aria-label="' + escapeAttr(rowLabel + ' Case ID') + '"></td>' +
+              '<td data-label="Region">' + buildSelect(REGIONS, c.region, i, "region", rowLabel + " Region") + '</td>' +
+              '<td data-label="Queue">' + buildSelect(QUEUES, c.queue, i, "queue", rowLabel + " Queue") + '</td>' +
+              '<td data-label="Case Type">' + buildSelect(CASE_TYPES, c.caseType, i, "caseType", rowLabel + " Case Type") + '</td>' +
+              '<td data-label="Priority">' + buildSelect(PRIORITIES, c.priority, i, "priority", rowLabel + " Priority") + '</td>' +
+              '<td data-label="Status">' + buildSelect(STATUSES, c.status, i, "status", rowLabel + " Status") + '</td>' +
+              '<td data-label="Opened"><input type="date" class="cell-input is-mono" data-idx="' + i + '" data-field="opened" value="' + escapeAttr(c.opened) + '" aria-label="' + escapeAttr(rowLabel + ' Opened Date') + '"></td>' +
+              '<td data-label="Closed"><input type="date" class="cell-input is-mono" data-idx="' + i + '" data-field="closed" value="' + escapeAttr(c.closed) + '" aria-label="' + escapeAttr(rowLabel + ' Closed Date') + '"></td>' +
+              '<td data-label="SLA Target (days)"><input type="number" min="0" step="1" class="cell-input is-mono" data-idx="' + i + '" data-field="slaTarget" value="' + escapeAttr(c.slaTarget) + '" aria-label="' + escapeAttr(rowLabel + ' SLA Target Days') + '"></td>' +
+              '<td data-label="Age / Resolution (days)"><span class="computed-age" id="age-cell-' + i + '" aria-label="' + escapeAttr(rowLabel + ' Age ' + res.age + ' days') + '">' + res.age + '</span></td>' +
+              '<td data-label="SLA Flag"><span class="flag-pill ' + flagClass + '" id="flag-cell-' + i + '" aria-label="' + escapeAttr(rowLabel + ' SLA Flag ' + res.flag) + '">' + res.flag + '</span></td>' +
+              '<td data-label="Action" class="mobile-span-2"><button type="button" class="btn-remove" data-action="remove" data-idx="' + i + '" aria-label="' + escapeAttr('Remove ' + rowLabel) + '">Remove</button></td>' +
+            '</tr>';
+        }
+        registerTbody.innerHTML = html;
+      }
+
+      function updateRowComputedCells(evalData) {
+        for (var i = 0; i < stateCases.length; i++) {
+          var c = stateCases[i];
+          var res = evalData.rows[i];
+          var rowLabel = c.caseId || ("Row " + (i + 1));
+          var tr = registerTbody.querySelector('tr[data-row-idx="' + i + '"]');
+          var ageEl = document.getElementById("age-cell-" + i);
+          var flagEl = document.getElementById("flag-cell-" + i);
+          var isBreach = res.flag === "BREACH";
+          if (tr) tr.className = isBreach ? "row-is-breach" : "";
+          if (ageEl) {
+            ageEl.textContent = String(res.age);
+            ageEl.setAttribute("aria-label", rowLabel + " Age " + res.age + " days");
+          }
+          if (flagEl) {
+            flagEl.textContent = res.flag;
+            flagEl.className = "flag-pill " + (isBreach ? "is-breach" : "is-within");
+            flagEl.setAttribute("aria-label", rowLabel + " SLA Flag " + res.flag);
+          }
+        }
+      }
+
+      function renderProjectionRows(tbody, items, maxProj, isGrowing) {
+        var html = "";
+        for (var i = 0; i < items.length; i++) {
+          var item = items[i];
+          var pct = maxProj > 0 ? Math.min(100, Math.round((item.value / maxProj) * 100)) : 0;
+          var barClass = isGrowing ? "proj-bar-fill is-growing" : "proj-bar-fill";
+          html +=
+            '<tr>' +
+              '<td>Day ' + item.day + '</td>' +
+              '<td>' + formatProjValue(item.value) + '</td>' +
+              '<td><div class="proj-bar-track" aria-hidden="true"><div class="' + barClass + '" style="width: ' + pct + '%;"></div></div></td>' +
+            '</tr>';
+        }
+        tbody.innerHTML = html;
+      }
+
+      function syncPresetButtons() {
+        var todayIso = getTodayIsoLocal();
+        var defaultSim = stateSim.intake === 6 && stateSim.analysts === 4 && stateSim.casesPerAnalyst === 3 && stateSim.complexSharePct === 25 && stateSim.multiplier === 2;
+        var casesMatchBase = stateCases.length === INITIAL_CASES.length;
+
+        function sameRowExcept(idx, skipField) {
+          var a = stateCases[idx];
+          var b = INITIAL_CASES[idx];
+          return a.caseId === b.caseId && a.region === b.region && a.queue === b.queue &&
+            a.caseType === b.caseType && a.priority === b.priority && a.opened === b.opened &&
+            (skipField === "status" || a.status === b.status) &&
+            (skipField === "closed" || a.closed === b.closed) &&
+            (skipField === "slaTarget" || Number(a.slaTarget) === b.slaTarget);
+        }
+
+        var allBaseExact = casesMatchBase && stateCases.every(function (_, idx) { return sameRowExcept(idx, null); });
+        var isSample = allBaseExact && defaultSim;
+
+        var isClose1001 = casesMatchBase && defaultSim &&
+          stateCases[0].caseId === INITIAL_CASES[0].caseId &&
+          stateCases[0].status === "Closed" && stateCases[0].closed === todayIso &&
+          Number(stateCases[0].slaTarget) === INITIAL_CASES[0].slaTarget &&
+          stateCases.slice(1).every(function (_, idx) { return sameRowExcept(idx + 1, null); });
+
+        var isIntake12 = allBaseExact && stateSim.intake === 12 && stateSim.analysts === 4 && stateSim.casesPerAnalyst === 3 && stateSim.complexSharePct === 25 && stateSim.multiplier === 2;
+        var isAnalysts8 = allBaseExact && stateSim.intake === 6 && stateSim.analysts === 8 && stateSim.casesPerAnalyst === 3 && stateSim.complexSharePct === 25 && stateSim.multiplier === 2;
+        var isComplex0 = allBaseExact && stateSim.intake === 6 && stateSim.analysts === 4 && stateSim.casesPerAnalyst === 3 && stateSim.complexSharePct === 0 && stateSim.multiplier === 2;
+        var isSla1003 = casesMatchBase && defaultSim &&
+          Number(stateCases[2].slaTarget) === 100 &&
+          stateCases[2].status === INITIAL_CASES[2].status &&
+          stateCases.every(function (_, idx) { return idx === 2 ? true : sameRowExcept(idx, null); });
+
+        document.getElementById("preset-sample").classList.toggle("is-active", isSample);
+        document.getElementById("preset-close-1001").classList.toggle("is-active", isClose1001);
+        document.getElementById("preset-intake-12").classList.toggle("is-active", isIntake12);
+        document.getElementById("preset-analysts-8").classList.toggle("is-active", isAnalysts8);
+        document.getElementById("preset-complex-0").classList.toggle("is-active", isComplex0);
+        document.getElementById("preset-sla-1003").classList.toggle("is-active", isSla1003);
+      }
+
+      function renderOutputs(evalData) {
+        var s = evalData.sim;
+
+        // Top KPI Strip
+        document.getElementById("kpi-total").textContent = String(evalData.total);
+        document.getElementById("kpi-backlog").textContent = String(evalData.backlog);
+        document.getElementById("kpi-breaches").textContent = String(evalData.breaches);
+
+        var breachCard = document.getElementById("kpi-breach-card");
+        var breachNote = document.getElementById("kpi-breach-note");
+        if (evalData.breaches > 0) {
+          breachCard.className = "kpi-card kpi-breach-card is-alert";
+          breachNote.textContent = "Age > SLA Target (as of " + evalData.todayIso + ")";
+        } else {
+          breachCard.className = "kpi-card kpi-breach-card is-clear";
+          breachNote.textContent = "0 SLA breaches (as of " + evalData.todayIso + ")";
+        }
+
+        document.getElementById("kpi-capacity").textContent = formatOneDecimal(s.effectiveCapacity);
+        document.getElementById("kpi-net").textContent = formatSignedOneDecimal(s.netCleared);
+
+        var kpiClearEl = document.getElementById("kpi-clear");
+        var kpiClearCard = document.getElementById("kpi-clear-card");
+        var kpiClearNote = document.getElementById("kpi-clear-note");
+        if (s.isGrowing) {
+          kpiClearEl.textContent = s.daysToClear;
+          kpiClearEl.className = "kpi-value is-text-verdict";
+          kpiClearCard.className = "kpi-card is-alert";
+          kpiClearNote.textContent = "Net cleared <= 0";
+        } else {
+          kpiClearEl.textContent = String(s.daysToClear);
+          kpiClearEl.className = "kpi-value";
+          kpiClearCard.className = "kpi-card is-clear";
+          kpiClearNote.textContent = "ROUNDUP(Backlog / Net, 0)";
+        }
+
+        // Sticky phone summary strip
+        document.getElementById("sticky-backlog").textContent = String(evalData.backlog);
+        var stickyBr = document.getElementById("sticky-breaches");
+        stickyBr.textContent = String(evalData.breaches);
+        stickyBr.className = evalData.breaches > 0 ? "summary-alert" : "summary-clear";
+        var stickyCl = document.getElementById("sticky-clear");
+        stickyCl.textContent = s.isGrowing ? "Grows" : (s.daysToClear + "d");
+        stickyCl.className = s.isGrowing ? "summary-alert" : "summary-clear";
+
+        // Dashboard Counts
+        document.getElementById("dash-total").textContent = String(evalData.total);
+        document.getElementById("dash-open").textContent = String(evalData.open);
+        document.getElementById("dash-inprogress").textContent = String(evalData.inProgress);
+        document.getElementById("dash-escalated").textContent = String(evalData.escalated);
+        document.getElementById("dash-closed").textContent = String(evalData.closed);
+        document.getElementById("dash-backlog").textContent = String(evalData.backlog);
+        document.getElementById("dash-breaches").textContent = String(evalData.breaches);
+        document.getElementById("dash-avgage").textContent = evalData.avgAge.toFixed(1);
+
+        // Region Table
+        var rHtml = "";
+        var sumBacklog = 0, sumEsc = 0, sumBr = 0;
+        for (var i = 0; i < REGIONS.length; i++) {
+          var regName = REGIONS[i];
+          var regData = evalData.byRegion[regName];
+          sumBacklog += regData.backlog;
+          sumEsc += regData.escalated;
+          sumBr += regData.breaches;
+          rHtml +=
+            '<tr>' +
+              '<td data-label="Region">' + escapeHtml(regName) + '</td>' +
+              '<td data-label="Backlog">' + regData.backlog + '</td>' +
+              '<td data-label="Escalated">' + regData.escalated + '</td>' +
+              '<td data-label="Breaches">' + regData.breaches + '</td>' +
+            '</tr>';
+        }
+        regionTbody.innerHTML = rHtml;
+        regionTfoot.innerHTML =
+          '<tr>' +
+            '<td data-label="Region">Total (Reconciled)</td>' +
+            '<td data-label="Backlog">' + sumBacklog + '</td>' +
+            '<td data-label="Escalated">' + sumEsc + '</td>' +
+            '<td data-label="Breaches">' + sumBr + '</td>' +
+          '</tr>';
+
+        // Simulator Linked Backlog & Outputs
+        document.getElementById("sim-linked-backlog").textContent = String(s.backlog);
+        document.getElementById("sim-out-effective").textContent = formatOneDecimal(s.effectiveCapacity);
+        document.getElementById("sim-out-net").textContent = formatSignedOneDecimal(s.netCleared);
+        document.getElementById("sim-out-days").textContent = String(s.daysToClear);
+        document.getElementById("sim-verdict-box").className = s.isGrowing ? "sim-verdict-box is-growing" : "sim-verdict-box";
+
+        // 30-Day Projection
+        renderProjectionRows(projLeft, s.projection.slice(0, 16), s.maxProj, s.isGrowing);
+        renderProjectionRows(projRight, s.projection.slice(16, 31), s.maxProj, s.isGrowing);
+
+        // Queue Brief (plain lines, no sales line)
+        var lines = [];
+        lines.push("CASE OPERATIONS & CAPACITY QUEUE BRIEF (As of " + evalData.todayIso + ")");
+        lines.push("===============================================================");
+        lines.push(
+          "Headline Counts: Total " + evalData.total +
+          " | Backlog (not Closed) " + evalData.backlog +
+          " (Open " + evalData.open + ", In Progress " + evalData.inProgress + ", Escalated " + evalData.escalated + ")" +
+          " | Closed " + evalData.closed
+        );
+        lines.push(
+          "SLA & Aging: SLA Breaches " + evalData.breaches +
+          " | Avg Age / Resolution " + evalData.avgAge.toFixed(1) + " days"
+        );
+        lines.push("");
+        lines.push("BACKLOG BY REGION");
+        for (var j = 0; j < REGIONS.length; j++) {
+          var rKey = REGIONS[j];
+          var rd = evalData.byRegion[rKey];
+          lines.push(
+            "- " + rKey + ": Backlog " + rd.backlog +
+            " | Escalated " + rd.escalated +
+            " | Breaches " + rd.breaches
+          );
+        }
+        lines.push("");
+        lines.push("CAPACITY VERDICT");
+        lines.push(
+          "Assumptions: Linked Backlog " + s.backlog +
+          " | Intake " + s.intake + "/day" +
+          " | Analysts " + s.analysts +
+          " | Standard Rate " + s.casesPerAnalyst + "/day" +
+          " | Complex Share " + Math.round(s.complexSharePct) + "%" +
+          " | Multiplier " + formatOneDecimal(s.multiplier) + "x"
+        );
+        lines.push(
+          "Throughput: Effective Capacity " + formatOneDecimal(s.effectiveCapacity) + " cases/day" +
+          " | Net Cleared " + formatSignedOneDecimal(s.netCleared) + " cases/day"
+        );
+        lines.push("Days to Clear Current Backlog: " + s.daysToClear);
+        lines.push(
+          "30-Day Projection: Day 0 = " + formatProjValue(s.projection[0].value) +
+          " | Day 5 = " + formatProjValue(s.projection[5].value) +
+          " | Day 15 = " + formatProjValue(s.projection[15].value) +
+          " | Day 30 = " + formatProjValue(s.projection[30].value)
+        );
+        briefPre.textContent = lines.join("\n");
+
+        syncPresetButtons();
+      }
+
+      function syncSimInputsFromState() {
+        simIntakeInput.value = stateSim.intake;
+        simAnalystsInput.value = stateSim.analysts;
+        simRateInput.value = stateSim.casesPerAnalyst;
+        simComplexInput.value = stateSim.complexSharePct;
+        simMultInput.value = stateSim.multiplier;
+      }
+
+      function fullRender() {
+        var evalData = evaluateQueue(stateCases, stateSim, getTodayIsoLocal());
+        renderRegisterTable(evalData);
+        renderOutputs(evalData);
+      }
+
+      function softRender() {
+        var evalData = evaluateQueue(stateCases, stateSim, getTodayIsoLocal());
+        updateRowComputedCells(evalData);
+        renderOutputs(evalData);
+      }
+
+      function applyPreset(name) {
+        stateCases = cloneCases(INITIAL_CASES);
+        stateSim = cloneSim(INITIAL_SIM);
+        var todayIso = getTodayIsoLocal();
+
+        if (name === "close-1001") {
+          stateCases[0].status = "Closed";
+          stateCases[0].closed = todayIso;
+        } else if (name === "intake-12") {
+          stateSim.intake = 12;
+        } else if (name === "analysts-8") {
+          stateSim.analysts = 8;
+        } else if (name === "complex-0") {
+          stateSim.complexSharePct = 0;
+        } else if (name === "sla-1003") {
+          stateCases[2].slaTarget = 100;
+        }
+
+        copyFeedback.textContent = "";
+        syncSimInputsFromState();
+        fullRender();
+      }
+
+      function handleRegisterChange(e) {
+        var el = e.target;
+        var idxAttr = el.getAttribute("data-idx");
+        var field = el.getAttribute("data-field");
+        if (idxAttr === null || !field) return;
+        var idx = parseInt(idxAttr, 10);
+        if (!stateCases[idx]) return;
+
+        if (field === "slaTarget") {
+          stateCases[idx][field] = el.value === "" ? 0 : safeNum(el.value, 0);
+        } else {
+          stateCases[idx][field] = el.value;
+        }
+        copyFeedback.textContent = "";
+        softRender();
+      }
+
+      registerTbody.addEventListener("input", handleRegisterChange);
+      registerTbody.addEventListener("change", handleRegisterChange);
+
+      registerTbody.addEventListener("click", function (e) {
+        var btn = e.target.closest ? e.target.closest('button[data-action="remove"]') : null;
+        if (!btn) return;
+        var idx = parseInt(btn.getAttribute("data-idx"), 10);
+        if (isNaN(idx) || idx < 0 || idx >= stateCases.length) return;
+        stateCases.splice(idx, 1);
+        copyFeedback.textContent = "";
+        fullRender();
+      });
+
+      function handleSimChange() {
+        stateSim.intake = Math.max(0, safeNum(simIntakeInput.value, 0));
+        stateSim.analysts = Math.max(0, safeNum(simAnalystsInput.value, 0));
+        stateSim.casesPerAnalyst = Math.max(0, safeNum(simRateInput.value, 0));
+        stateSim.complexSharePct = Math.min(100, Math.max(0, safeNum(simComplexInput.value, 0)));
+        stateSim.multiplier = Math.max(0, safeNum(simMultInput.value, 0));
+        copyFeedback.textContent = "";
+        softRender();
+      }
+
+      [simIntakeInput, simAnalystsInput, simRateInput, simComplexInput, simMultInput].forEach(function (inp) {
+        inp.addEventListener("input", handleSimChange);
+        inp.addEventListener("change", handleSimChange);
+      });
+
+      document.getElementById("btn-add-case").addEventListener("click", function () {
+        var nextNum = 1001 + stateCases.length;
+        stateCases.push({
+          caseId: "CASE-" + nextNum,
+          region: "AMER East",
+          queue: "Contract Ops",
+          caseType: "Deal Review",
+          priority: "P3 - Normal",
+          status: "Open",
+          opened: getTodayIsoLocal(),
+          closed: "",
+          slaTarget: 10
+        });
+        copyFeedback.textContent = "";
+        fullRender();
+        var newIdx = stateCases.length - 1;
+        var firstInput = registerTbody.querySelector('tr[data-row-idx="' + newIdx + '"] input');
+        if (firstInput) firstInput.focus();
+      });
+
+      document.getElementById("btn-reset-all").addEventListener("click", function () {
+        applyPreset("sample");
+        copyFeedback.textContent = "Register and simulator reset to 30-case sample state.";
+      });
+
+      var presetButtons = document.querySelectorAll("[data-preset]");
+      for (var p = 0; p < presetButtons.length; p++) {
+        presetButtons[p].addEventListener("click", function (e) {
+          applyPreset(e.currentTarget.getAttribute("data-preset"));
+        });
+      }
+
+      document.getElementById("btn-copy-brief").addEventListener("click", function () {
+        var textToCopy = briefPre.textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(textToCopy).then(
+            function () { copyFeedback.textContent = "Copied Queue Brief to clipboard."; },
+            function () { fallbackCopy(textToCopy); }
+          );
+        } else {
+          fallbackCopy(textToCopy);
+        }
+      });
+
+      function fallbackCopy(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "0";
+        ta.style.left = "0";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+          copyFeedback.textContent = "Copied Queue Brief to clipboard.";
+        } catch (err) {
+          copyFeedback.textContent = "Select the brief text below and press Ctrl+C / Cmd+C.";
+        }
+        document.body.removeChild(ta);
+      }
+
+      function runVerificationBattery() {
+        var REF_DATE = "2026-11-11";
+
+        // 1. Sample state at reference date 2026-11-11
+        var s0 = evaluateQueue(cloneCases(INITIAL_CASES), cloneSim(INITIAL_SIM), REF_DATE);
+        console.assert(s0.total === 30 && s0.open === 8 && s0.inProgress === 8 && s0.escalated === 2 && s0.closed === 12 && s0.backlog === 18, "Fixed counts fail");
+        console.assert(s0.byRegion["AMER West"].backlog === 4 && s0.byRegion["AMER East"].backlog === 7 && s0.byRegion["AMER Central"].backlog === 1 && s0.byRegion["EMEA"].backlog === 1 && s0.byRegion["APAC"].backlog === 5, "Region backlog fail");
+        console.assert(s0.byRegion["AMER West"].escalated === 1 && s0.byRegion["AMER East"].escalated === 1 && s0.byRegion["AMER Central"].escalated === 0 && s0.byRegion["EMEA"].escalated === 0 && s0.byRegion["APAC"].escalated === 0, "Region escalated fail");
+        console.assert(s0.breaches === 27 && s0.avgAge === 31.6, "Ref-date breaches/avgAge fail");
+        console.assert(s0.byRegion["AMER West"].breaches === 5 && s0.byRegion["AMER East"].breaches === 10 && s0.byRegion["AMER Central"].breaches === 1 && s0.byRegion["EMEA"].breaches === 4 && s0.byRegion["APAC"].breaches === 7, "Ref-date region breaches fail");
+        console.assert(formatOneDecimal(s0.sim.effectiveCapacity) === "9.6" && formatSignedOneDecimal(s0.sim.netCleared) === "+3.6" && s0.sim.daysToClear === 5, "Sim sample fail");
+        console.assert(formatProjValue(s0.sim.projection[0].value) === "18" && formatProjValue(s0.sim.projection[5].value) === "0" && formatProjValue(s0.sim.projection[30].value) === "0", "Sim projection sample fail");
+
+        // 2. Boundary (1): CASE-1001 closed on reference date
+        var b1Cases = cloneCases(INITIAL_CASES);
+        b1Cases[0].status = "Closed";
+        b1Cases[0].closed = REF_DATE;
+        var b1 = evaluateQueue(b1Cases, cloneSim(INITIAL_SIM), REF_DATE);
+        console.assert(b1.backlog === 17 && b1.closed === 13 && b1.sim.backlog === 17 && b1.sim.daysToClear === 5, "Boundary 1 fail");
+
+        // 3. Boundary (2): Intake raised to 12
+        var b2Sim = cloneSim(INITIAL_SIM);
+        b2Sim.intake = 12;
+        var b2 = evaluateQueue(cloneCases(INITIAL_CASES), b2Sim, REF_DATE);
+        console.assert(formatSignedOneDecimal(b2.sim.netCleared) === "-2.4" && b2.sim.daysToClear === GROWS_MESSAGE && formatProjValue(b2.sim.projection[30].value) === "90", "Boundary 2 fail");
+
+        // 4. Boundary (3): Analysts raised to 8
+        var b3Sim = cloneSim(INITIAL_SIM);
+        b3Sim.analysts = 8;
+        var b3 = evaluateQueue(cloneCases(INITIAL_CASES), b3Sim, REF_DATE);
+        console.assert(formatOneDecimal(b3.sim.effectiveCapacity) === "19.2" && formatSignedOneDecimal(b3.sim.netCleared) === "+13.2" && b3.sim.daysToClear === 2, "Boundary 3 fail");
+
+        // 5. Boundary (4): Complex-Case Share set to 0%
+        var b4Sim = cloneSim(INITIAL_SIM);
+        b4Sim.complexSharePct = 0;
+        var b4 = evaluateQueue(cloneCases(INITIAL_CASES), b4Sim, REF_DATE);
+        console.assert(formatOneDecimal(b4.sim.effectiveCapacity) === "12.0" && formatSignedOneDecimal(b4.sim.netCleared) === "+6.0" && b4.sim.daysToClear === 3, "Boundary 4 fail");
+
+        // 6. Boundary (5): CASE-1003 SLA Target raised 2 -> 100
+        var b5Cases = cloneCases(INITIAL_CASES);
+        b5Cases[2].slaTarget = 100;
+        var b5 = evaluateQueue(b5Cases, cloneSim(INITIAL_SIM), REF_DATE);
+        console.assert(b5.rows[2].flag === "Within SLA" && b5.breaches === 26, "Boundary 5 fail");
+
+        // 7. Edge cases: Zero analysts, Closed without Closed date, Empty register (0 rows)
+        var zSim = cloneSim(INITIAL_SIM);
+        zSim.analysts = 0;
+        var z0 = evaluateQueue(cloneCases(INITIAL_CASES), zSim, REF_DATE);
+        console.assert(formatOneDecimal(z0.sim.effectiveCapacity) === "0.0" && z0.sim.daysToClear === GROWS_MESSAGE && !isNaN(z0.sim.netCleared), "Zero analysts fail");
+
+        var noCloseCases = cloneCases(INITIAL_CASES);
+        noCloseCases[0].status = "Closed";
+        noCloseCases[0].closed = "";
+        var nc = evaluateQueue(noCloseCases, cloneSim(INITIAL_SIM), REF_DATE);
+        console.assert(nc.rows[0].age === 31 && !isNaN(nc.avgAge), "Closed-without-date fallback fail");
+
+        var empty = evaluateQueue([], cloneSim(INITIAL_SIM), REF_DATE);
+        console.assert(empty.total === 0 && empty.backlog === 0 && empty.breaches === 0 && empty.avgAge === 0 && empty.sim.daysToClear === 0, "Empty register fail");
+      }
+
+      syncSimInputsFromState();
+      fullRender();
+      runVerificationBattery();
+    })();
+  </script>
+</body>
+</html>
