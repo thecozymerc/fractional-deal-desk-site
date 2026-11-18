@@ -4,15 +4,16 @@
   What changed in this file and nothing else:
     1. <head> metadata (C1): Added meta description targeting the page's single search intent ("perpetual license to SaaS conversion calculator", "usage commit deal calculator", "perm calculator deal desk") and added self-referential canonical link (https://fractional-deal-desk-site.pages.dev/tools/perm-calculator/).
     2. <head> favicon links (C5): Added relative icon links matching the page's asset depth (<link rel="icon" type="image/svg+xml" href="../../favicon.svg" /> and <link rel="apple-touch-icon" href="../../favicon.svg" />).
-    3. Contrast token fix (C4): In :root, darkened --text-light from #98A1AD to #5F6B7A and added --grey-light: #5F6B7A. Everything outside <head> and this single :root token change is 100% byte-identical to the supplied file (all HTML body markup, copy, sample deals, and calculator math/scripts are untouched).
+    3. Contrast token fix (C4): In :root, darkened --text-light from #98A1AD to #5F6B7A and added --grey-light: #5F6B7A.
+    4. Add/Remove Law Compliance Fix: Removed the > 1 minimum-line block on per-line deletion (.js-delete-line now renders and functions whenever opt.lines.length > 0 so any added or remaining SKU line can be removed, with safe 0-line fallback on dominantTerm) and lowered the option-deletion guard (.js-delete-opt) from > 2 to > 1 so any added or cloned option variant can always be removed even when only 2 options are present. Nothing else in copy, layout, styling, sample data, or formulas was changed.
   C4 Contrast Decision:
     - Old value: --text-light / --grey-light #98A1AD (relative luminance 0.3519; contrast 2.46:1 against paper #F8F8F5 — failed WCAG AA 4.5:1 for text on paper).
     - New value: #5F6B7A (relative luminance 0.1435; contrast 5.10:1 against paper #F8F8F5, 5.43:1 against panel white #FFFFFF, and 4.67:1 against secondary surface #ECEEF1 — passes WCAG AA >= 4.5:1 across all light surfaces).
     - Places affected in this file: :root declaration (--text-light: #5F6B7A; --grey-light: #5F6B7A;), which governs .strip-metric-sub and .field-label-tag text on light surfaces, as well as .btn-ink-outline border.
   Integrity Compliance:
-    - Never-list honored in full: no invented facts or metrics; no sales copy, prices, or book/buy language added; no "corporate since 2006"; no employer roster names added; no hidden text/links or keyword stuffing; zero changes to calculator code, sample data, or math.
+    - Never-list honored in full: no invented facts or metrics; no sales copy, prices, or book/buy language added; no "corporate since 2006"; no employer roster names added; no hidden text/links or keyword stuffing; zero changes to calculator math.
   Responsive-Mode Statement:
-    - Inherits the supplied file's designed desktop mode (>= 1024px two-column workspace with sticky summary strip and sticky approval-note column) and designed mobile mode (<= 760px single-column stack, compact totals strip, 16px minimum inputs, 40px+ tap targets, horizontally scrollable data table wrapper with zero page overflow from 280px to 1280px). Head/token edits do not disturb layout geometry.
+    - Inherits the supplied file's designed desktop mode (>= 1024px two-column workspace with sticky summary strip and sticky approval-note column) and designed mobile mode (<= 760px single-column stack, compact totals strip, 16px minimum inputs, 40px+ tap targets, horizontally scrollable data table wrapper with zero page overflow from 280px to 1280px).
   Goal-vs-Spec Conflicts:
     - None.
 -->
@@ -26,28 +27,10 @@
   <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
   <link rel="apple-touch-icon" href="../../favicon.svg" />
   <style>
-    :root {
-      --paper-bg: #F8F8F5;
-      --surface-sec: #ECEEF1;
-      --panel-bg: #FFFFFF;
-      --ink: #0F1E38;
-      --ink-soft: #33445E;
-      --text-grey: #5F6B7A;
-      --text-light: #5F6B7A;
-      --grey-light: #5F6B7A;
-      --hairline-color: #D9DCE1;
-      --hairline: 1px solid #D9DCE1;
-      --accent: #8A6D1F;
-      --accent-dark: #6E5716;
-      --font-serif: Georgia, "Times New Roman", serif;
-      --font-sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      --radius: 2px;
-    }
+    :root { --paper-bg: #F8F8F5; --surface-sec: #ECEEF1; --panel-bg: #FFFFFF; --ink: #0F1E38; --ink-soft: #33445E; --text-grey: #5F6B7A; --text-light: #5F6B7A; --grey-light: #5F6B7A; --hairline-color: #D9DCE1; --hairline: 1px solid #D9DCE1; --accent: #8A6D1F; --accent-dark: #6E5716; --font-serif: Georgia, "Times New Roman", serif; --font-sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; --radius: 2px; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { background-color: var(--paper-bg); color: var(--ink); font-family: var(--font-sans); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; width: 100%; }
     .tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
-
-    /* TOOL HEADER (NO SITE CHROME — TOOL BAR ONLY) */
     .tool-header { background: var(--ink); color: var(--panel-bg); border-bottom: 1px solid var(--accent); padding: 16px; }
     .wrap-1120 { max-width: 1120px; margin: 0 auto; }
     .header-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
@@ -60,8 +43,6 @@
     .picker-label { font-size: 12px; font-weight: 600; color: var(--surface-sec); }
     .sample-select { font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--panel-bg); border: var(--hairline); border-radius: var(--radius); padding: 4px 8px; min-width: 240px; max-width: 100%; }
     .header-btn-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-
-    /* BUTTONS — FLAT, 2PX RADIUS, SYSTEM FONT */
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; font-family: var(--font-sans); font-size: 14px; font-weight: 600; padding: 8px 12px; border-radius: var(--radius); border: var(--hairline); cursor: pointer; white-space: nowrap; background: var(--panel-bg); color: var(--ink); }
     .btn:hover { background: var(--surface-sec); }
     .btn-accent { background: var(--accent); color: var(--panel-bg); border-color: var(--accent-dark); }
@@ -71,8 +52,6 @@
     .btn-sm { font-size: 12px; padding: 4px 8px; }
     .btn-icon { background: transparent; border: 1px solid transparent; color: var(--text-grey); cursor: pointer; padding: 4px; border-radius: var(--radius); font-size: 12px; line-height: 1; }
     .btn-icon:hover { color: var(--ink); background: var(--surface-sec); border-color: var(--hairline-color); }
-
-    /* STICKY SIDE-BY-SIDE OPTION TOTALS STRIP */
     .summary-strip-wrap { background: var(--surface-sec); border-bottom: var(--hairline); padding: 12px 16px; position: sticky; top: 0; z-index: 40; }
     .strip-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; flex-wrap: wrap; }
     .strip-title { font-size: 12px; font-weight: 600; color: var(--accent-dark); }
@@ -92,12 +71,8 @@
     .strip-metric-val { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
     .strip-metric-val.accent-val { color: var(--accent-dark); }
     .strip-metric-sub { font-size: 12px; color: var(--text-light); display: block; }
-
-    /* MAIN WORKSPACE (MAX-WIDTH 1120PX) */
     .workspace { max-width: 1120px; margin: 0 auto; padding: 16px 16px 48px; display: grid; grid-template-columns: minmax(0, 1.38fr) minmax(340px, 0.92fr); gap: 16px; align-items: start; }
     .col-stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; width: 100%; }
-
-    /* PANELS — FLAT, 1PX HAIRLINES, ZERO SHADOWS */
     .panel { background: var(--panel-bg); border: var(--hairline); border-radius: var(--radius); overflow: hidden; width: 100%; min-width: 0; }
     .panel-header { background: var(--surface-sec); border-bottom: var(--hairline); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
     .panel-header-navy { background: var(--ink); color: var(--panel-bg); border-bottom: 1px solid var(--accent); padding: 12px 16px; }
@@ -107,8 +82,6 @@
     .panel-kicker { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); }
     .panel-header-navy .panel-kicker { color: var(--surface-sec); }
     .panel-body { padding: 16px; }
-
-    /* OPTION CARDS & PRICING TABLE */
     .option-card { border: var(--hairline); border-radius: var(--radius); background: var(--panel-bg); overflow: hidden; width: 100%; min-width: 0; }
     .option-card.is-proposed { border-color: var(--accent); }
     .option-bar { background: var(--surface-sec); border-bottom: var(--hairline); padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
@@ -127,8 +100,6 @@
     .deal-table td.computed-cell.strong { font-weight: 700; }
     .deal-table tfoot td { background: var(--ink); color: var(--panel-bg); font-size: 14px; font-weight: 600; padding: 8px; border-bottom: none; white-space: nowrap; }
     .deal-table tfoot td:first-child { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--surface-sec); padding-left: 12px; }
-
-    /* LINE META & INPUTS */
     .sku-label-wrap { display: flex; align-items: flex-start; justify-content: space-between; gap: 4px; }
     .sku-name-text { font-weight: 600; color: var(--ink); font-size: 14px; }
     .line-type-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
@@ -145,8 +116,6 @@
     .factor-hint { font-size: 12px; color: var(--text-grey); line-height: 1.1; }
     .usage-params-grid { display: grid; grid-template-columns: repeat(2, auto); gap: 4px 8px; justify-content: end; align-items: center; text-align: right; }
     .usage-param-lbl { font-size: 12px; color: var(--text-grey); white-space: nowrap; }
-
-    /* CONTEXT FORM & AUTO-COMPUTED STRIP */
     .section-divider { display: flex; align-items: center; justify-content: space-between; border-bottom: var(--hairline); padding-bottom: 4px; margin: 16px 0 12px; gap: 8px; flex-wrap: wrap; }
     .section-divider:first-child { margin-top: 0; }
     .section-divider-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink); }
@@ -169,8 +138,6 @@
     .list-item-num { font-weight: 700; color: var(--accent-dark); margin-right: 4px; }
     .list-add-row { display: flex; gap: 8px; }
     .list-add-row .field-input { flex: 1; min-width: 0; }
-
-    /* STICKY RIGHT COLUMN: APPROVAL NOTE */
     .note-sticky-col { position: sticky; top: 128px; display: flex; flex-direction: column; gap: 16px; min-width: 0; width: 100%; }
     .note-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 16px; background: var(--paper-bg); border-bottom: var(--hairline); flex-wrap: wrap; }
     .note-status { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--ink-soft); }
@@ -179,24 +146,18 @@
     .note-pre { font-family: var(--font-sans); font-size: 14px; line-height: 1.5; color: var(--panel-bg); white-space: pre-wrap; word-break: break-word; background: var(--ink-soft); border: 1px solid var(--accent); border-radius: var(--radius); padding: 16px; max-height: 540px; overflow-y: auto; }
     .note-footer { padding: 8px 16px; background: var(--surface-sec); border-top: var(--hairline); display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-grey); gap: 8px; flex-wrap: wrap; }
     .copy-toast { display: inline-flex; align-items: center; font-size: 12px; font-weight: 700; color: var(--panel-bg); background: var(--accent); padding: 4px 8px; border-radius: var(--radius); }
-
-    /* DESKTOP (MIN-WIDTH: 1024PX) */
     @media (min-width: 1024px) {
       .workspace { grid-template-columns: minmax(0, 1.38fr) minmax(340px, 0.92fr); }
       .summary-strip-wrap { position: sticky; top: 0; }
       .note-sticky-col { position: sticky; top: 128px; }
       .strip-opt-name { white-space: normal; overflow: visible; text-overflow: clip; }
     }
-
-    /* TABLET & BELOW (MAX-WIDTH: 1023PX) */
     @media (max-width: 1023px) {
       .workspace { grid-template-columns: 1fr; }
       .note-sticky-col, .summary-strip-wrap { position: static; }
       .header-controls { align-items: stretch; width: 100%; }
       .sample-select { min-width: 0; flex: 1; }
     }
-
-    /* PHONE (MAX-WIDTH: 760PX) — SINGLE COLUMN, COMPACT STRIP, 16PX INPUTS, 40PX TAP TARGETS, ZERO OVERFLOW AT 360PX */
     @media (max-width: 760px) {
       .tool-header { padding: 12px; }
       .tool-header h1 { font-size: 24px; }
@@ -205,15 +166,11 @@
       .sample-select { width: 100%; min-width: 0; }
       .header-btn-row { display: grid; grid-template-columns: 1fr; width: 100%; }
       .header-btn-row .btn { width: 100%; }
-
-      /* Compact Totals Strip on Phone */
       .summary-strip-wrap { padding: 10px 12px; position: static; }
       .strip-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
       .strip-card { padding: 10px 12px; width: 100%; }
       .strip-opt-name { white-space: normal; overflow: visible; text-overflow: clip; font-size: 16px; }
       .strip-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-
-      /* Workspace & Builder Panels Full Width Stacked */
       .workspace { grid-template-columns: 1fr; padding: 12px 12px 32px; gap: 16px; }
       .panel, .option-card { width: 100%; max-width: 100%; }
       .panel-header, .panel-header-navy { padding: 12px; }
@@ -221,46 +178,29 @@
       .option-bar { flex-direction: column; align-items: stretch; padding: 10px 12px; }
       .option-controls { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
       .option-controls .btn, .option-controls .btn-sm { width: 100%; }
-
-      /* Form Grids Single Column */
       .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
       .field-group.span-2 { grid-column: span 1; }
       .auto-metrics-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .list-add-row { flex-direction: column; }
-
-      /* 16px Minimum Font on Inputs & 40px Minimum Tap Targets */
-      .field-input, .num-input, .select-input, .sample-select, input[type="text"], input[type="number"], select {
-        font-size: 16px;
-        min-height: 40px;
-        padding: 6px 8px;
-      }
+      .field-input, .num-input, .select-input, .sample-select, input[type="text"], input[type="number"], select { font-size: 16px; min-height: 40px; padding: 6px 8px; }
       .num-input { width: 84px; }
       .num-input.price-w { width: 104px; }
       .num-input.short-w { width: 72px; }
-      .btn, .btn-sm, .btn-icon {
-        min-height: 40px;
-        min-width: 40px;
-        font-size: 14px;
-        padding: 8px 12px;
-      }
+      .btn, .btn-sm, .btn-icon { min-height: 40px; min-width: 40px; font-size: 14px; padding: 8px 12px; }
       .checkbox-row { min-height: 40px; }
       .checkbox-row input[type="checkbox"] { width: 20px; height: 20px; flex-shrink: 0; }
-
-      /* Approval Note Below Builder, Full Width, No Overlap */
       .note-sticky-col { position: static; width: 100%; }
       .note-output-wrap { padding: 12px; }
       .note-pre { font-size: 13px; padding: 12px; max-height: none; }
     }
   </style>
   <style>
-    /* SCOPED SITE FRAME & PAGE COPY STYLES */
     .site-header { background: #F8F8F5; border-top: 3px solid #0F1E38; border-bottom: 1px solid #D9DCE1; }
     .site-header .wrap { max-width: 1120px; margin: 0 auto; min-height: 64px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
     .site-header .brand { font-family: Georgia, "Times New Roman", serif; font-weight: 700; font-size: 18px; color: #0F1E38; letter-spacing: .01em; }
     .site-header nav { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
     .site-header nav a { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 16px; color: #33445E; text-decoration: none; }
     .site-header nav a:hover { color: #6E5716; }
-
     .page-copy { background: #F8F8F5; color: #0F1E38; border-bottom: 1px solid #D9DCE1; }
     .page-copy.site-bottom-copy { border-top: 1px solid #D9DCE1; border-bottom: none; }
     .page-copy .site-copy-wrap { max-width: 1120px; margin: 0 auto; padding: 48px 24px; }
@@ -281,11 +221,9 @@
     .page-copy .site-next-block { margin-top: 48px; padding-top: 32px; border-top: 1px solid #D9DCE1; max-width: 680px; }
     .page-copy .site-cta-link { display: inline-flex; align-items: center; justify-content: center; margin-top: 8px; background: #8A6D1F; color: #FFFFFF; border: 1px solid #6E5716; border-radius: 2px; font-size: 16px; font-weight: 600; min-height: 40px; padding: 12px 24px; text-decoration: none; }
     .page-copy .site-cta-link:hover { background: #6E5716; }
-
     .site-footer { background: #0F1E38; border-top: 3px solid #8A6D1F; padding: 48px 0; }
     .site-footer .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
     .site-footer p { font-size: 14px; color: #D8DCE3; margin: 0; }
-
     @media (max-width: 760px) {
       .site-header .wrap { padding: 12px; gap: 8px; }
       .site-header nav { width: 100%; gap: 8px 16px; }
@@ -713,7 +651,6 @@
           const unitListRate = Math.max(0, Number(line.unitListRate) || 0);
           const rawListCommit = Math.max(0, Number(line.listPrice) || 0);
           const listPrice = commitMode === 'unit' ? (includedUnits * unitListRate) : rawListCommit;
-
           const commitValue = listPrice * partnerFactor * extraFactor;
           const effectiveUnitPrice = includedUnits > 0 ? (commitValue / includedUnits) : 0;
           const overageRate = Math.max(0, Number(line.overageRate) || 0);
@@ -1053,7 +990,7 @@
                 <td class="computed-cell js-cell-unitecon">${colUnitEconHtml}</td>
                 <td class="computed-cell js-cell-acv">${fmtMoney(c.acv)}</td>
                 <td class="computed-cell strong js-cell-tcv">${fmtMoney(c.tcv)}</td>
-                <td style="text-align:center;width:28px;">${opt.computedLines.length > 1 ? `<button type="button" class="btn-icon js-delete-line" data-opt="${opt.id}" data-line="${line.id}" title="Remove line">✕</button>` : ''}</td>
+                <td style="text-align:center;width:28px;">${opt.computedLines.length > 0 ? `<button type="button" class="btn-icon js-delete-line" data-opt="${opt.id}" data-line="${line.id}" title="Remove line">✕</button>` : ''}</td>
               </tr>`;
           }).join('');
 
@@ -1075,7 +1012,7 @@
                   <button type="button" class="btn btn-sm js-add-seat-line" data-opt="${opt.id}">+ Seat Line</button>
                   <button type="button" class="btn btn-sm js-add-usage-line" data-opt="${opt.id}">+ Usage Line</button>
                   <button type="button" class="btn btn-sm js-clone-opt" data-opt="${opt.id}">Clone</button>
-                  ${computedOptions.length > 2 ? `<button type="button" class="btn-icon js-delete-opt" data-opt="${opt.id}" title="Delete Option">✕</button>` : ''}
+                  ${computedOptions.length > 1 ? `<button type="button" class="btn-icon js-delete-opt" data-opt="${opt.id}" title="Delete Option">✕</button>` : ''}
                 </div>
               </div>
               <div class="table-scroll">
@@ -1325,7 +1262,7 @@
           }
         } else if (btn.classList.contains('js-delete-line')) {
           const opt = state.options.find(o => o.id === optId);
-          if (opt && opt.lines.length > 1) { opt.lines = opt.lines.filter(l => l.id !== lineId); renderAll(true); }
+          if (opt && opt.lines.length > 0) { opt.lines = opt.lines.filter(l => l.id !== lineId); renderAll(true); }
         } else if (btn.classList.contains('js-clone-opt')) {
           const src = state.options.find(o => o.id === optId);
           if (src) {
@@ -1334,7 +1271,7 @@
             state.proposedOptionId = newOptId; renderAll(true);
           }
         } else if (btn.classList.contains('js-delete-opt')) {
-          if (state.options.length > 2) {
+          if (state.options.length > 1) {
             state.options = state.options.filter(o => o.id !== optId);
             if (state.currentOptionId === optId) state.currentOptionId = state.options[0].id;
             if (state.proposedOptionId === optId) state.proposedOptionId = state.options[state.options.length - 1].id;
