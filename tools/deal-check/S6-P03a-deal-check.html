@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LABEL — S6-P03.1 — The Deal Check (address /tools/deal-check/). Built Nov 11, 2026 on Lucky's build-the-rest order, following 00-master/SITEMAP-TABLE.md and this page's PAGE.md (06-section-06-proof-of-work/04-s6-p03-contract-operations/s6-p03-1-the-deal-check/PAGE.md): all six steps shown on the page; the checklist download is email-gated (PAGE.md rule: the gate must work before publish and the download call to action must never point at nothing). Copy: Draft 1.11 Part II verbatim. Gate: the on-page form posts the email to Lucky's Google Form "The Deal Check — Checklist Download" (form 1o_YCJ2zkQyOPUL4Fp-AMh6bWALytI0BDHXnLTX6Bd6c, entry.697224427) and only then reveals the PDF link — verified end to end Nov 11, 2026 (test submission recorded). The PDF is the source checklist (The Deal Check - Sample Checklist.docx, converted). Map: site/CODE-MAP.md. Rule: any change here is recorded in site/CHANGELOG.md with the CODE-MAP and this folder's LABEL.md updated in the same change (Code Labeling System, Rule 3). -->
+<!-- LABEL — S6-P03.1 — The Deal Check (address /tools/deal-check/). Built Nov 11, 2026 on Lucky's build-the-rest order, following 00-master/SITEMAP-TABLE.md and this page's PAGE.md (06-section-06-proof-of-work/04-s6-p03-contract-operations/s6-p03-1-the-deal-check/PAGE.md): all six steps shown on the page; the checklist download is email-gated (PAGE.md rule: the gate must work before publish and the download call to action must never point at nothing). Copy: Draft 1.11 Part II verbatim. Gate: the on-page form posts the email to Lucky's Google Form "The Deal Check — Checklist Download" (form 1o_YCJ2zkQyOPUL4Fp-AMh6bWALytI0BDHXnLTX6Bd6c, entry.697224427) and only then reveals the PDF link — verified end to end Nov 11, 2026 (test submission recorded). GATE REMOVED Nov 18, 2026 on Lucky’s order — the download is now a plain button, no email field, no form post; the gated page is archived in the build log (deal-check-email-gate-archive-2026-11-18) and the Google Form still exists but the page no longer posts to it. The PDF is the source checklist (The Deal Check - Sample Checklist.docx, converted). Map: site/CODE-MAP.md. Rule: any change here is recorded in site/CHANGELOG.md with the CODE-MAP and this folder's LABEL.md updated in the same change (Code Labeling System, Rule 3). -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -60,13 +60,9 @@
 
   <section class="section">
     <h2><span class="no">Download</span> — Take the six steps with you.</h2>
-    <p>Download the checklist — take the six steps with you and run them on the deal in front of you. Leave your email and the PDF opens right here; the email goes to my form, and that is the only place it goes.</p>
-    <form id="dc-gate">
-      <p><label>Email address<br><input type="email" id="dc-email" required autocomplete="email" style="min-height:48px;font-size:16px;width:100%;max-width:420px"></label></p>
-      <p><button class="btn" type="submit">Get the checklist</button></p>
-    </form>
-    <p id="dc-done" hidden>Thank you — here is the checklist: <a href="deal-check-checklist.pdf"><strong>Download The Deal Check (PDF)</strong></a>. Run it on the deal in front of you.</p>
-    <p id="dc-err" hidden>That email did not go through. Check the address and try again.</p>
+    <p>Download the checklist — take the six steps with you and run them on the deal in front of you. Click the button and the PDF opens right here — no email, no form.</p>
+    <p><a class="btn" href="deal-check-checklist.pdf">Download The Deal Check (PDF)</a></p>
+    <p>Run it on the deal in front of you.</p>
   </section>
 
   <section class="section">
@@ -79,26 +75,8 @@
   <div class="wrap">
     <p>Fractional Deal Desk, Contract Management &amp; Quote-to-Cash Builds.</p>
   </div>
+    <p><a href="https://docs.google.com/forms/d/e/1FAIpQLSedKetXalbE5LY6F-_OxLPrs-LuPz5g7Vj1gmCnJSQ2uymawg/viewform">Something broken? Tell me</a></p>
 </footer>
 
-<script>
-document.getElementById("dc-gate").addEventListener("submit", function (ev) {
-  ev.preventDefault();
-  var email = document.getElementById("dc-email").value.trim();
-  if (!email) return;
-  var body = new URLSearchParams();
-  body.set("entry.697224427", email);
-  fetch("https://docs.google.com/forms/d/e/1FAIpQLSe_GblBlJASds8Iht8Z5LzgerzOvwSTqliT94UTv-HFpg8KJA/formResponse", {
-    method: "POST", mode: "no-cors",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString()
-  }).then(function () {
-    document.getElementById("dc-gate").hidden = true;
-    document.getElementById("dc-done").hidden = false;
-  }).catch(function () {
-    document.getElementById("dc-err").hidden = false;
-  });
-});
-</script>
 </body>
 </html>
