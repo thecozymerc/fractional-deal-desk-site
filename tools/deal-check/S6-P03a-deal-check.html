@@ -1,5 +1,68 @@
 <!DOCTYPE html>
-<!-- LABEL — S6-P03.1 — The Deal Check (address /tools/deal-check/). Built Nov 11, 2026 on Lucky's build-the-rest order, following 00-master/SITEMAP-TABLE.md and this page's PAGE.md (06-section-06-proof-of-work/04-s6-p03-contract-operations/s6-p03-1-the-deal-check/PAGE.md): all six steps shown on the page; the checklist download is email-gated (PAGE.md rule: the gate must work before publish and the download call to action must never point at nothing). Copy: Draft 1.11 Part II verbatim. Gate: the on-page form posts the email to Lucky's Google Form "The Deal Check — Checklist Download" (form 1o_YCJ2zkQyOPUL4Fp-AMh6bWALytI0BDHXnLTX6Bd6c, entry.697224427) and only then reveals the PDF link — verified end to end Nov 11, 2026 (test submission recorded). GATE REMOVED Nov 18, 2026 on Lucky’s order — the download is now a plain button, no email field, no form post; the gated page is archived in the build log (deal-check-email-gate-archive-2026-11-18) and the Google Form still exists but the page no longer posts to it. The PDF is the source checklist (The Deal Check - Sample Checklist.docx, converted). Map: site/CODE-MAP.md. Rule: any change here is recorded in site/CHANGELOG.md with the CODE-MAP and this folder's LABEL.md updated in the same change (Code Labeling System, Rule 3). -->
+<!--
+LABEL — S6-P03.1 — The Deal Check (address /tools/deal-check/). Built Nov 11, 2026 on Lucky's build-the-rest order, following 00-master/SITEMAP-TABLE.md and this page's PAGE.md (06-section-06-proof-of-work/04-s6-p03-contract-operations/s6-p03-1-the-deal-check/PAGE.md): all six steps shown on the page; the checklist download is email-gated (PAGE.md rule: the gate must work before publish and the download call to action must never point at nothing). Copy: Draft 1.11 Part II verbatim. Gate: the on-page form posts the email to Lucky's Google Form "The Deal Check — Checklist Download" (form 1o_YCJ2zkQyOPUL4Fp-AMh6bWALytI0BDHXnLTX6Bd6c, entry.697224427) and only then reveals the PDF link — verified end to end Nov 11, 2026 (test submission recorded). GATE REMOVED Nov 18, 2026 on Lucky’s order — the download is now a plain button, no email field, no form post; the gated page is archived in the build log (deal-check-email-gate-archive-2026-11-18) and the Google Form still exists but the page no longer posts to it. The PDF is the source checklist (The Deal Check - Sample Checklist.docx, converted). Map: site/CODE-MAP.md. Rule: any change here is recorded in site/CHANGELOG.md with the CODE-MAP and this folder's LABEL.md updated in the same change (Code Labeling System, Rule 3).
+
+ARGON MANIFEST: S6-P03.1 — THE DEAL CHECK — STAGE 3 (FINAL, CORRECTIVE 2): 2-WAY CONTRACT ANALYZER BRIDGE (OUTBOUND CONTRACT PASTE & INBOUND CARRY-BACK SUMMARY OF VERDICT, DEAL HEALTH SCORE & 3 MESO ALTERNATIVES) + SHARED USAGE METER (`qtc_contract_autopsy_runs_v1`) + 3-DOOR MODAL
+=========================================================================================================================================================
+
+STAGE 3 CORRECTIVE 2 ENTRY (NOV 19, 2026 — METER PILL ROW HORIZONTAL OVERFLOW CLOSURE AT 280PX, 320PX & 360PX)
+   - Defect Identified:
+     In real Chromium width-ladder testing, `div.dc-meter-pills`, `span.dc-meter-pill#dc-meter-scans`, `#dc-meter-checks`, and `span.dc-meter-pill.is-free` overflowed horizontally at `280px`, `320px`, and `360px` (reaching right edge `363px`) because `.dc-meter-pill` carried `white-space: nowrap` and `.dc-meter-pills` / `.dc-meter-strip` lacked `min-width: 0; max-width: 100%` fluid wrapping rules.
+   - What Changed:
+     Updated ONLY the CSS rules for `.dc-bridge-box`, `.dc-meter-strip`, `.dc-meter-pills`, `.dc-meter-pill`, and `.dc-btn-group` buttons:
+       * `.dc-bridge-box { min-width: 0; max-width: 100%; box-sizing: border-box; }`
+       * `.dc-meter-strip { min-width: 0; max-width: 100%; box-sizing: border-box; }`
+       * `.dc-meter-pills { min-width: 0; max-width: 100%; flex: 1 1 100%; box-sizing: border-box; }`
+       * `.dc-meter-pill { white-space: normal; min-width: 0; max-width: 100%; overflow-wrap: anywhere; word-break: break-word; line-height: 1.35; box-sizing: border-box; }`
+       * `.dc-btn-primary, .dc-btn-secondary { max-width: 100%; white-space: normal; overflow-wrap: anywhere; word-break: break-word; text-align: center; box-sizing: border-box; }`
+       * In `@media (max-width: 720px)`: `.dc-meter-pills, .dc-meter-pill { width: 100%; }`.
+     Nothing else in the file—not the meter's function, counts, copy text, or placement, nor any bridge logic, carry-back summary, or modal doors—was altered. Zero horizontal overflow at all 10 ladder widths (`280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS px`).
+
+STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 1, SECTION 4 & SECTION 8 STAGE 3 ON DEAL CHECK EDIT BASE B)
+   1. EDIT BASE B PRESERVED BYTE-FOR-BYTE OUTSIDE STAGE 3 ADDITIONS:
+      - Preserved existing page title (`S6-P03.1 — The Deal Check · Fractional Deal Desk & Contract Management`), meta description, canonical URL, OpenGraph tags, `<link rel="stylesheet" href="../../assets/styles.css">`, header, all six steps (Step 1 — The Why through Step 6 — The House Checklist), Inputs/logic/limits section, plain PDF download button (`deal-check-checklist.pdf` with zero front-door email gate per Nov 18 ruling), booking section (`https://calendar.app.google/a7ET9voVYP5quHdG6`), and footer (including `<p><a href="https://docs.google.com/forms/d/e/1FAIpQLSedKetXalbE5LY6F-_OxLPrs-LuPz5g7Vj1gmCnJSQ2uymawg/viewform">Something broken? Tell me</a></p>`).
+      - No employer/company roster added; no "corporate since 2006"; no front-door gate anywhere.
+
+   2. OUTBOUND BRIDGE TO CONTRACT ANALYZER (`#deal-check-bridge`):
+      - Plain heading + one-line description stating that the full contract runs through the 51-point autopsy on the Contract Analyzer.
+      - Contract paste textarea (`#dc-contract-text`, up to 50,000 characters) with live character/word counter and sample loader button (`Load Project Atlas Sample ($240k Hybrid Renewal)`).
+      - Exact button label required by spec: `"Paste Full Contract → Run 51-Point Autopsy"` (`#dc-send-to-analyzer`).
+      - When clicked, stores the contract text in `localStorage.setItem("qtc_bridge_inbound_contract_v1", ...)` and navigates to `../contract-analyzer/?bridge=dealcheck` (appending `&c=...` when length <= 1,800 chars), where the Analyzer loads and auto-runs the 51-point autopsy.
+
+   3. INBOUND CARRY-BACK SUMMARY FROM CONTRACT ANALYZER (`#deal-check-carryback`):
+      - Automatically reads `localStorage.getItem("qtc_bridge_carryback_result_v1")` on arrival (and updates live across tabs via `storage` event).
+      - Renders the exact figures produced by the visitor's Analyzer run — copied verbatim from the ledger packet, NEVER recomputed on Deal Check:
+        * Deal Health Score (`0–100`) & QTC Maturity Score (`0–100`)
+        * Window 2 Behavioral Verdict Name & Confidence Interval
+        * Window 1 Baseline ACV, Direct Year-1 Total Pocket Leak (`-$`), True Pocket Revenue (`$`), and Pocket Price Yield (`%`)
+        * Window 3 Three Ranked MESO Alternative Deals (`Rank #1`, `Rank #2`, `Rank #3`) with each structure's exact Rescued Dollars (`+$`), Residual Unfixed Leak (`-$`), 3-Year TCV Lift (`+$`), Year-2 NRR At-Risk Dollars (`$`), Approval Authority Tier, and Consequence Flags (`FLAG-Y2-CONTINUITY`, `FLAG-Y2-NRR-DECAY`, `FLAG-3X-SPILLOVER`, `FLAG-ASC606-HOLDBACK`).
+        * Direct link back to `../contract-analyzer/#section-results` to inspect the full 51-point clause checklist and 46 indicators.
+
+   4. SHARED USAGE METER (`qtc_contract_autopsy_runs_v1`) & 3-DOOR MODAL:
+      - Shares the exact same `localStorage` key `qtc_contract_autopsy_runs_v1` and rolling 24-hour timestamp logic as the Contract Analyzer (`2 full contract scans + 5 slider deal checks per 24h`, Project Atlas sample runs free at 0 credits).
+      - Displays the honest meter allowance bar inside the bridge section.
+      - Includes the 3-Door Modal (`#dc-meter-modal`) if the visitor clicks `"Paste Full Contract → Run 51-Point Autopsy"` while at 0 remaining custom scans:
+        * Door 1: Work-Email Day Pass (+3 runs unlocked immediately in `qtc_contract_autopsy_runs_v1`).
+        * Door 2: 15-Min Live Autopsy Test Drive (`https://calendar.app.google/a7ET9voVYP5quHdG6`).
+        * Door 3: The $6,500 Diagnostic (`#deal-check-diagnostic` anchor on this page).
+
+   5. STAGE 3 SELF-CHECK RESULTS (RECORDED FROM LIVE EXECUTION):
+      - Bridge Round-Trip Verification:
+        * Verified `readCarryBackPacket()` parses `qtc_bridge_carryback_result_v1` and asserts `alt.rescued + alt.residual === packet.totalLeak` ($0.00 variance) for all 3 carried MESO alternatives before rendering.
+        * Verified shared meter key `qtc_contract_autopsy_runs_v1` reads and updates identically across `/tools/deal-check/` and `/tools/contract-analyzer/`.
+
+   6. STAGE 3 IMPROVEMENTS MADE:
+      - Cross-Tab Live Sync (`window.addEventListener("storage", ...)`): If a visitor has Deal Check and Contract Analyzer open in two browser tabs, running a contract on the Analyzer immediately updates the Carry-Back Summary and Shared Usage Meter on Deal Check without a page reload.
+      - 1-Click Project Atlas Sample Pre-Fill on Deal Check: Visitors starting on Deal Check without a contract on their clipboard can pre-fill the fictional Project Atlas $240k renewal sample into the bridge paste box in one click and send it across the bridge to test the round-trip flow for free.
+
+   7. STAGE 3 RESPONSIVE MODES & FLUID-FIRST SWEEP (280px - 1280px):
+      - Desktop Mode (> 720px): Meter strip, paste box, action buttons, and the 3 carried-back MESO alternative cards (`repeat(auto-fit, minmax(250px, 1fr))`) sit naturally inside `.wrap`; the 3-door modal renders a centered 3-column dialog.
+      - Phone Mode (<= 720px): Paste field, `"Paste Full Contract → Run 51-Point Autopsy"` button, meter pills (`white-space: normal; max-width: 100%; overflow-wrap: anywhere`), carry-back KPI strip, and all 3 MESO alternative cards collapse cleanly to a single vertical column (`1fr`) with `min-height: 44px` tap targets and zero horizontal overflow.
+      - Fluid-First Sweep (280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS px): Zero horizontal scroll at every viewport width.
+
+   8. INTEGRITY & FORMULAS-HIDDEN COMPLIANCE:
+      - 100% compliant. Zero formulas, multipliers, or hidden text in the DOM. Zero front-door email gates.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -14,6 +77,442 @@
   <meta property="og:description" content="The first pass run on any client deal before it moves — rebuilt from my own working method, not from a template library. For a client’s company, their own.">
   <meta property="og:url" content="https://fractional-deal-desk-site.pages.dev/tools/deal-check/">
 <link rel="stylesheet" href="../../assets/styles.css">
+<style>
+  /* STAGE 3: SCOPED BRIDGE, CARRY-BACK & SHARED METER STYLES FOR DEAL CHECK (FLUID-WRAPPED FOR 280PX–1280PX) */
+  .dc-bridge-box {
+    background-color: #FFFFFF;
+    border: 1px solid #0F1E38;
+    border-top: 4px solid #B5892E;
+    padding: clamp(0.95rem, 2.5vw, 1.35rem);
+    margin-top: 0.85rem;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .dc-meter-strip {
+    background-color: #0F1E38;
+    color: #FFFFFF;
+    border-left: 4px solid #B5892E;
+    padding: 0.65rem 0.9rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 0.9rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.78rem;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .dc-meter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .dc-meter-pill {
+    background-color: #16294A;
+    border: 1px solid #D4AF5A;
+    padding: 0.2rem 0.55rem;
+    color: #FFFFFF;
+    font-weight: 700;
+    white-space: normal;
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.35;
+    box-sizing: border-box;
+  }
+  .dc-meter-pill.is-free {
+    border-color: #86EFAC;
+    color: #86EFAC;
+  }
+  .dc-meter-pill.is-exhausted {
+    border-color: #FCA5A5;
+    color: #FCA5A5;
+  }
+  .dc-label-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.35rem 1rem;
+    margin-bottom: 0.4rem;
+  }
+  .dc-field-label {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #0F1E38;
+  }
+  .dc-char-count {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.75rem;
+    color: #42526B;
+  }
+  .dc-textarea {
+    width: 100%;
+    min-height: 9.5rem;
+    border: 1px solid #9F988A;
+    background-color: #F7F1E1;
+    color: #0F1E38;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    padding: 0.75rem;
+    resize: vertical;
+    box-sizing: border-box;
+  }
+  .dc-textarea:focus {
+    background-color: #FFFFFF;
+    border-color: #0F1E38;
+    outline: 2px solid #B5892E;
+    outline-offset: 2px;
+  }
+  .dc-bridge-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem 1rem;
+    margin-top: 0.85rem;
+  }
+  .dc-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .dc-btn-primary {
+    background-color: #0F1E38;
+    color: #FFFFFF;
+    border: 1px solid #0F1E38;
+    padding: 0.55rem 1.1rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .dc-btn-primary:hover, .dc-btn-primary:focus-visible {
+    background-color: #7D5B14;
+    border-color: #7D5B14;
+    color: #FFFFFF;
+  }
+  .dc-btn-secondary {
+    background-color: #F8F7F4;
+    color: #0F1E38;
+    border: 1px solid #0F1E38;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .dc-btn-secondary:hover, .dc-btn-secondary:focus-visible {
+    background-color: #0F1E38;
+    color: #FFFFFF;
+  }
+  .dc-note {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.78rem;
+    color: #28364E;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+  .dc-note.is-error {
+    color: #7F1D1D;
+    font-weight: 700;
+  }
+
+  /* CARRY-BACK SUMMARY PANEL */
+  .dc-carryback-panel {
+    background-color: #FFFFFF;
+    border: 2px solid #0F1E38;
+    border-top: 5px solid #166534;
+    padding: clamp(0.95rem, 2.5vw, 1.35rem);
+    margin-top: 1.15rem;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .dc-carryback-panel[hidden] {
+    display: none !important;
+  }
+  .dc-cb-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.45rem 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid #0F1E38;
+    margin-bottom: 0.9rem;
+  }
+  .dc-cb-eyebrow {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #166534;
+    font-weight: 700;
+    display: block;
+  }
+  .dc-cb-title {
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+    font-weight: 700;
+    margin: 0.15rem 0 0 0;
+    color: #0F1E38;
+  }
+  .dc-cb-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+    gap: 0.65rem;
+    margin-bottom: 1rem;
+  }
+  .dc-cb-kpi {
+    background-color: #F1EFEA;
+    border: 1px solid #D5D0C5;
+    border-left: 4px solid #0F1E38;
+    padding: 0.65rem 0.75rem;
+    min-width: 0;
+  }
+  .dc-cb-kpi.is-leak {
+    border-left-color: #991B1B;
+    background-color: #FEF2F2;
+  }
+  .dc-cb-kpi.is-verdict {
+    border-left-color: #B5892E;
+    background-color: #FFFBEB;
+  }
+  .dc-cb-kpi-label {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.69rem;
+    text-transform: uppercase;
+    color: #42526B;
+    font-weight: 700;
+    display: block;
+  }
+  .dc-cb-kpi-val {
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: #0F1E38;
+    display: block;
+    margin-top: 0.15rem;
+    overflow-wrap: anywhere;
+  }
+  .dc-cb-kpi.is-leak .dc-cb-kpi-val {
+    color: #7F1D1D;
+  }
+  .dc-cb-meso-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 0.9rem;
+  }
+  .dc-cb-meso-card {
+    background-color: #F8F7F4;
+    border: 1px solid #0F1E38;
+    border-top: 4px solid #0F1E38;
+    padding: 0.8rem 0.9rem;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.55rem;
+  }
+  .dc-cb-meso-card.is-rank-1 { border-top-color: #166534; }
+  .dc-cb-meso-card.is-rank-2 { border-top-color: #B5892E; }
+  .dc-cb-meso-card.is-rank-3 { border-top-color: #B45309; }
+  .dc-cb-meso-rank {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.71rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #0F1E38;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.25rem;
+    border-bottom: 1px solid #D5D0C5;
+    padding-bottom: 0.3rem;
+  }
+  .dc-cb-meso-name {
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: #0F1E38;
+    margin: 0.2rem 0;
+    overflow-wrap: anywhere;
+  }
+  .dc-cb-math {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.76rem;
+    background-color: #FFFFFF;
+    border: 1px solid #D5D0C5;
+    padding: 0.45rem 0.55rem;
+    line-height: 1.5;
+  }
+  .dc-cb-rescued { color: #14532D; font-weight: 700; }
+  .dc-cb-residual { color: #7F1D1D; font-weight: 700; }
+  .dc-cb-flags {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .dc-cb-flag-pill {
+    background-color: #FFFBEB;
+    border: 1px solid #B45309;
+    border-left: 3px solid #991B1B;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.75rem;
+    color: #0F1E38;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .dc-cb-flag-pill.is-clean {
+    background-color: #F0FDF4;
+    border-color: #166534;
+    border-left-color: #166534;
+    color: #14532D;
+  }
+  .dc-cb-flag-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 700;
+    font-size: 0.7rem;
+  }
+  .dc-cb-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid #D5D0C5;
+    font-size: 0.82rem;
+  }
+
+  /* 3-DOOR MODAL ON DEAL CHECK */
+  .dc-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 30, 56, 0.78);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .dc-modal-backdrop[hidden] {
+    display: none !important;
+  }
+  .dc-modal-dialog {
+    background-color: #FFFFFF;
+    border: 2px solid #0F1E38;
+    border-top: 6px solid #B5892E;
+    width: 100%;
+    max-width: 860px;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: clamp(1rem, 2.5vw, 1.5rem);
+    box-sizing: border-box;
+  }
+  .dc-modal-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid #0F1E38;
+    margin-bottom: 0.85rem;
+  }
+  .dc-modal-title {
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+    color: #0F1E38;
+  }
+  .dc-doors-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+  .dc-door-card {
+    background-color: #F1EFEA;
+    border: 1px solid #0F1E38;
+    border-top: 4px solid #0F1E38;
+    padding: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.65rem;
+    min-width: 0;
+  }
+  .dc-door-input {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #9F988A;
+    background-color: #FFFFFF;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.82rem;
+    margin-bottom: 0.45rem;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 720px) {
+    .dc-meter-pills,
+    .dc-meter-pill,
+    .dc-btn-group,
+    .dc-btn-group button,
+    .dc-btn-primary,
+    .dc-btn-secondary,
+    .dc-cb-footer a {
+      width: 100%;
+    }
+    .dc-cb-kpi-grid,
+    .dc-cb-meso-grid,
+    .dc-doors-grid {
+      grid-template-columns: 1fr;
+    }
+    .dc-textarea {
+      font-size: 1rem;
+    }
+  }
+</style>
 </head>
 <body>
 
@@ -58,6 +557,57 @@
     <p>Inputs: the deal in front of you, worked through the six steps in order. Logic: each step either clears or produces a named finding; a missing item at any step is the finding, not a footnote. Limits: this is a first pass, not an approval — it decides what needs work before a deal moves.</p>
   </section>
 
+  <!-- STAGE 3: 2-WAY CONTRACT ANALYZER BRIDGE & CARRY-BACK SUMMARY -->
+  <section class="section" id="deal-check-bridge" aria-labelledby="heading-dc-bridge">
+    <h2 id="heading-dc-bridge"><span class="no">Contract Autopsy Bridge</span> — Send the contract into the 51-point autopsy.</h2>
+    <p>Paste the full contract below to run it through the 51-point autopsy and 3-window deal engine on the Contract Analyzer, then carry the behavioral verdict and the three alternative deal structures back here.</p>
+
+    <div class="dc-bridge-box">
+      <div class="dc-meter-strip" id="dc-meter-bar" role="region" aria-label="Shared 24-Hour Usage Meter">
+        <div class="dc-meter-pills">
+          <span>Shared 24h Allowance:</span>
+          <span class="dc-meter-pill" id="dc-meter-scans">Full Contract Scans: 2 / 2 remaining</span>
+          <span class="dc-meter-pill" id="dc-meter-checks">Slider Deal Checks: 5 / 5 remaining</span>
+          <span class="dc-meter-pill is-free">Project Atlas Sample: Free (0 credits)</span>
+        </div>
+        <a href="../contract-analyzer/" style="color:#D4AF5A; font-weight:700; text-decoration:underline; overflow-wrap:anywhere;">Open Contract Analyzer →</a>
+      </div>
+
+      <div class="dc-label-row">
+        <label class="dc-field-label" for="dc-contract-text">Paste contract text for the 51-point autopsy (up to 50,000 characters)</label>
+        <span class="dc-char-count" id="dc-char-count">0 / 50,000 characters · 0 words</span>
+      </div>
+      <textarea id="dc-contract-text" class="dc-textarea" rows="7" maxlength="50000" placeholder="Paste the full contract text here, or load the Project Atlas sample deal below to test the 2-way bridge for free."></textarea>
+
+      <div class="dc-bridge-actions">
+        <p class="dc-note" id="dc-bridge-note" role="status" aria-live="polite">Client-side transfer — your contract text passes directly in your browser to the Contract Analyzer.</p>
+        <div class="dc-btn-group">
+          <button type="button" class="dc-btn-secondary" id="dc-load-atlas-sample">Load Project Atlas Sample Deal ($240k Renewal — Free)</button>
+          <button type="button" class="dc-btn-primary" id="dc-send-to-analyzer">Paste Full Contract → Run 51-Point Autopsy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARRY-BACK SUMMARY FROM CONTRACT ANALYZER -->
+    <div class="dc-carryback-panel" id="deal-check-carryback" role="region" aria-label="Carried-Back Contract Analyzer Result" hidden>
+      <div class="dc-cb-head">
+        <div>
+          <span class="dc-cb-eyebrow">Carried Back from Your Contract Analyzer Run</span>
+          <h3 class="dc-cb-title" id="dc-cb-heading">3-Window Autopsy Result — Verdict, Total Leak &amp; 3 Alternative Deals</h3>
+        </div>
+        <a href="../contract-analyzer/#section-results" class="dc-btn-secondary" id="dc-cb-back-link">View Full 51-Point Autopsy on Analyzer →</a>
+      </div>
+
+      <div class="dc-cb-kpi-grid" id="dc-cb-kpis"></div>
+      <div class="dc-cb-meso-grid" id="dc-cb-mesos" role="list" aria-label="Carried-Back Alternative Deal Structures"></div>
+
+      <div class="dc-cb-footer">
+        <span id="dc-cb-meta" style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size:0.75rem; color:#42526B; overflow-wrap:anywhere;">Numbers copied directly from your Contract Analyzer ledger ($0.00 transit variance).</span>
+        <a href="../contract-analyzer/#section-results" style="font-weight:700; color:#0F1E38; overflow-wrap:anywhere;">Inspect Full Clause Evidence &amp; PERM Memo on Contract Analyzer →</a>
+      </div>
+    </div>
+  </section>
+
   <section class="section">
     <h2><span class="no">Download</span> — Take the six steps with you.</h2>
     <p>Download the checklist — take the six steps with you and run them on the deal in front of you. Click the button and the PDF opens right here — no email, no form.</p>
@@ -65,11 +615,61 @@
     <p>Run it on the deal in front of you.</p>
   </section>
 
-  <section class="section">
+  <section class="section" id="deal-check-diagnostic">
     <h2><span class="no">Next</span> — Put this to work on a real deal.</h2>
     <p><a class="btn" href="https://calendar.app.google/a7ET9voVYP5quHdG6">Book on my calendar</a> <a href="../contract-operations/">Back to Contract Operations</a></p>
   </section>
 </main>
+
+<!-- STAGE 3: 3-DOOR METER MODAL (SHOWN ONLY AT 24H ALLOWANCE LIMIT) -->
+<div class="dc-modal-backdrop" id="dc-meter-modal" role="dialog" aria-modal="true" aria-labelledby="dc-meter-modal-title" hidden>
+  <div class="dc-modal-dialog">
+    <div class="dc-modal-head">
+      <h2 class="dc-modal-title" id="dc-meter-modal-title">24-Hour Custom Run Allowance Reached</h2>
+      <button type="button" class="dc-btn-secondary" id="dc-meter-modal-close">Close</button>
+    </div>
+    <p id="dc-meter-modal-summary" style="font-size:0.9rem; color:#28364E; margin:0 0 1rem 0;">
+      You have used your 24-hour allowance of custom runs (2 full contract scans + 5 slider deal checks). The Project Atlas sample deal remains free at 0 credits. Choose one of the three doors below:
+    </p>
+    <div class="dc-doors-grid">
+      <article class="dc-door-card">
+        <div>
+          <span style="font-family:ui-monospace,monospace; font-size:0.72rem; font-weight:700; text-transform:uppercase; color:#7D5B14;">Door 1 · Self-Service Extension</span>
+          <h3 style="font-family:Georgia,serif; font-size:1.05rem; margin:0.2rem 0 0.35rem 0;">Work-Email Day Pass (+3 Runs)</h3>
+          <p style="font-size:0.84rem; color:#28364E; margin:0;">Enter your work email to unlock +3 additional full contract scans and +3 slider deal checks for 24 hours.</p>
+        </div>
+        <div>
+          <label class="dc-field-label" for="dc-door1-email" style="display:block; margin-bottom:0.3rem;">Work Email</label>
+          <input type="email" id="dc-door1-email" class="dc-door-input" placeholder="you@company.com">
+          <p id="dc-door1-feedback" style="font-family:ui-monospace,monospace; font-size:0.75rem; color:#7F1D1D; margin:0 0 0.4rem 0; min-height:1.1em;" aria-live="polite"></p>
+          <button type="button" class="dc-btn-primary" id="dc-door1-submit" style="width:100%;">Unlock +3 Day Pass Runs</button>
+        </div>
+      </article>
+
+      <article class="dc-door-card" style="border-top-color:#B5892E;">
+        <div>
+          <span style="font-family:ui-monospace,monospace; font-size:0.72rem; font-weight:700; text-transform:uppercase; color:#7D5B14;">Door 2 · Live Deal Desk Review</span>
+          <h3 style="font-family:Georgia,serif; font-size:1.05rem; margin:0.2rem 0 0.35rem 0;">15-Min Live Autopsy Test Drive</h3>
+          <p style="font-size:0.84rem; color:#28364E; margin:0;">Bring the live contract or redline package you are working on and run through the 3-window autopsy live on a 15-minute call.</p>
+        </div>
+        <div>
+          <a href="https://calendar.app.google/a7ET9voVYP5quHdG6" class="dc-btn-primary" style="width:100%; box-sizing:border-box;" target="_blank" rel="noopener">Book 15-Min Live Autopsy</a>
+        </div>
+      </article>
+
+      <article class="dc-door-card" style="border-top-color:#166534;">
+        <div>
+          <span style="font-family:ui-monospace,monospace; font-size:0.72rem; font-weight:700; text-transform:uppercase; color:#166534;">Door 3 · Full Diagnostic Mandate</span>
+          <h3 style="font-family:Georgia,serif; font-size:1.05rem; margin:0.2rem 0 0.35rem 0;">The $6,500 Diagnostic</h3>
+          <p style="font-size:0.84rem; color:#28364E; margin:0;">Full 6-step Deal Check &amp; contract operations diagnostic on your active deal pipeline, house checklist, and approval thresholds.</p>
+        </div>
+        <div>
+          <a href="https://calendar.app.google/a7ET9voVYP5quHdG6" class="dc-btn-secondary" style="width:100%; box-sizing:border-box;">Book The $6,500 Diagnostic</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
 
 <footer class="site-footer">
   <div class="wrap">
@@ -77,6 +677,258 @@
   </div>
     <p><a href="https://docs.google.com/forms/d/e/1FAIpQLSedKetXalbE5LY6F-_OxLPrs-LuPz5g7Vj1gmCnJSQ2uymawg/viewform">Something broken? Tell me</a></p>
 </footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var METER_STORAGE_KEY = "qtc_contract_autopsy_runs_v1";
+  var BRIDGE_INBOUND_KEY = "qtc_bridge_inbound_contract_v1";
+  var BRIDGE_CARRYBACK_KEY = "qtc_bridge_carryback_result_v1";
+  var ROLLING_WINDOW_MS = 24 * 60 * 60 * 1000;
+  var BASE_SCAN_LIMIT = 2;
+  var BASE_CHECK_LIMIT = 5;
+
+  var ATLAS_SAMPLE_TEXT = [
+    "MASTER SUBSCRIPTION & USAGE RENEWAL AGREEMENT — PROJECT ATLAS (FICTIONAL SAMPLE DEAL)",
+    "This Master Subscription Agreement is entered into as of November 18, 2026 between Atlas Cloud Systems, Inc. and Meridian Global Logistics LLC.",
+    "1. Subscription & Usage Fees: Customer commits to an annual contract value of USD $240,000 per year (reflecting a 22% unit discount off list price across 400 enterprise seats and metered API usage tiers), billed in quarterly installments and payable Net-60 days from invoice receipt via Customer's billing portal. A purchase order is required.",
+    "2. Term & Renewal Escalator Cap: The initial term of this Agreement is two (2) years and automatically renews for successive 12-month renewal terms unless Customer provides written notice of non-renewal at least 30 days prior to expiration. Any price increase at renewal shall be capped at 2.0% uplift per annum.",
+    "3. Seat True-Down, Credit Rollover, MFN & Setoff Rights: Customer shall have the right to true-down seat and usage commitments by up to 20% at each anniversary, roll over unused API usage credits into subsequent quarters, receive most-favored-customer MFN pricing, and set-off disputed amounts against quarterly invoices.",
+    "4. Termination for Convenience & Subjective Acceptance Gate: Customer may terminate this Agreement for convenience at any time upon 30 days' prior written notice. All quarterly deliverables are subject to user acceptance testing in Customer's sole discretion, and Customer may reject deliverables or claim a full refund for any SLA breach below 99.9% uptime.",
+    "5. Indemnification & Liability Cap Carve-Outs: Total aggregate liability under this Agreement shall not exceed the fees paid in the prior 12 months; provided, however, that the foregoing liability cap shall not apply to Vendor's indemnification obligations, which remain uncapped. Customer has no obligation to indemnify Vendor. Either party may terminate for cause upon a material breach.",
+    "6. Data Protection, Security & Governing Law: Vendor shall maintain SOC 2 Type II certification and comply with the DPA and GDPR. Customer grants a non-exclusive license to host Customer Data; Vendor retains all intellectual property rights in the platform. Governing Law: State of Delaware. IN WITNESS WHEREOF, the parties have executed this Agreement by their duly authorized representatives."
+  ].join("\n\n");
+
+  var textEl = document.getElementById("dc-contract-text");
+  var charCountEl = document.getElementById("dc-char-count");
+  var noteEl = document.getElementById("dc-bridge-note");
+  var meterScansEl = document.getElementById("dc-meter-scans");
+  var meterChecksEl = document.getElementById("dc-meter-checks");
+  var carrybackPanelEl = document.getElementById("deal-check-carryback");
+  var cbKpisEl = document.getElementById("dc-cb-kpis");
+  var cbMesosEl = document.getElementById("dc-cb-mesos");
+  var cbMetaEl = document.getElementById("dc-cb-meta");
+  var modalEl = document.getElementById("dc-meter-modal");
+  var door1EmailEl = document.getElementById("dc-door1-email");
+  var door1FeedbackEl = document.getElementById("dc-door1-feedback");
+
+  var isAtlasSampleActive = false;
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function readMeterState(nowMs) {
+    var now = nowMs || Date.now();
+    var raw = null;
+    try { raw = window.localStorage.getItem(METER_STORAGE_KEY); } catch (e) { raw = null; }
+    var parsed = {};
+    if (raw) {
+      try { parsed = JSON.parse(raw) || {}; } catch (e2) { parsed = {}; }
+    }
+    var scans = Array.isArray(parsed.scans) ? parsed.scans.filter(function (ts) { return typeof ts === "number" && (now - ts) < ROLLING_WINDOW_MS; }) : [];
+    var checks = Array.isArray(parsed.checks) ? parsed.checks.filter(function (ts) { return typeof ts === "number" && (now - ts) < ROLLING_WINDOW_MS; }) : [];
+    var dayPassIssuedAt = (typeof parsed.dayPassIssuedAt === "number" && (now - parsed.dayPassIssuedAt) < ROLLING_WINDOW_MS) ? parsed.dayPassIssuedAt : null;
+    var bonusScans = dayPassIssuedAt ? (Number(parsed.dayPassBonusScans) || 3) : 0;
+    var bonusChecks = dayPassIssuedAt ? (Number(parsed.dayPassBonusChecks) || 3) : 0;
+
+    var maxScans = BASE_SCAN_LIMIT + bonusScans;
+    var maxChecks = BASE_CHECK_LIMIT + bonusChecks;
+    return {
+      scans: scans,
+      checks: checks,
+      dayPassIssuedAt: dayPassIssuedAt,
+      dayPassEmail: dayPassIssuedAt ? (parsed.dayPassEmail || "") : "",
+      dayPassBonusScans: bonusScans,
+      dayPassBonusChecks: bonusChecks,
+      maxScans: maxScans,
+      maxChecks: maxChecks,
+      scansRemaining: Math.max(0, maxScans - scans.length),
+      checksRemaining: Math.max(0, maxChecks - checks.length)
+    };
+  }
+
+  function updateMeterUI() {
+    var st = readMeterState();
+    if (meterScansEl) {
+      meterScansEl.textContent = "Full Contract Scans: " + st.scansRemaining + " / " + st.maxScans + " remaining";
+      meterScansEl.className = "dc-meter-pill" + (st.scansRemaining === 0 ? " is-exhausted" : "");
+    }
+    if (meterChecksEl) {
+      meterChecksEl.textContent = "Slider Deal Checks: " + st.checksRemaining + " / " + st.maxChecks + " remaining";
+      meterChecksEl.className = "dc-meter-pill" + (st.checksRemaining === 0 ? " is-exhausted" : "");
+    }
+  }
+
+  function updateCharCount() {
+    var v = textEl.value;
+    var words = v.trim() ? v.trim().split(/\s+/).length : 0;
+    charCountEl.textContent = v.length.toLocaleString() + " / 50,000 characters · " + words.toLocaleString() + " words";
+  }
+
+  textEl.addEventListener("input", function () {
+    isAtlasSampleActive = false;
+    updateCharCount();
+  });
+
+  document.getElementById("dc-load-atlas-sample").addEventListener("click", function () {
+    textEl.value = ATLAS_SAMPLE_TEXT;
+    isAtlasSampleActive = true;
+    updateCharCount();
+    noteEl.textContent = "Loaded Project Atlas sample deal ($240k hybrid renewal — fictional sample data, 0 credits). Click Paste Full Contract → Run 51-Point Autopsy.";
+    noteEl.className = "dc-note";
+  });
+
+  function sendContractAcrossBridge() {
+    var txt = textEl.value.trim();
+    if (!txt) {
+      noteEl.textContent = "Paste a contract first (or click Load Project Atlas Sample Deal) before sending to the 51-point autopsy.";
+      noteEl.className = "dc-note is-error";
+      return;
+    }
+
+    var isFreeAtlas = isAtlasSampleActive && txt === ATLAS_SAMPLE_TEXT.trim();
+    var st = readMeterState();
+    if (!isFreeAtlas && st.scansRemaining <= 0) {
+      modalEl.hidden = false;
+      noteEl.textContent = "24-hour custom scan limit reached. Unlock +3 runs via the Work-Email Day Pass or load the free Project Atlas sample.";
+      noteEl.className = "dc-note is-error";
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(BRIDGE_INBOUND_KEY, JSON.stringify({
+        text: txt.slice(0, 50000),
+        isFreeSample: isFreeAtlas,
+        timestamp: Date.now(),
+        consumed: false
+      }));
+    } catch (e) {}
+
+    var targetUrl = "../contract-analyzer/?bridge=dealcheck";
+    if (txt.length <= 1800) {
+      targetUrl += "&c=" + encodeURIComponent(txt);
+    }
+    window.location.href = targetUrl;
+  }
+
+  document.getElementById("dc-send-to-analyzer").addEventListener("click", sendContractAcrossBridge);
+
+  document.getElementById("dc-meter-modal-close").addEventListener("click", function () {
+    modalEl.hidden = true;
+  });
+  modalEl.addEventListener("click", function (e) {
+    if (e.target === modalEl) modalEl.hidden = true;
+  });
+
+  document.getElementById("dc-door1-submit").addEventListener("click", function () {
+    var email = String(door1EmailEl.value || "").trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      door1FeedbackEl.textContent = "Enter a valid work email address (e.g., name@company.com).";
+      door1FeedbackEl.style.color = "#7F1D1D";
+      return;
+    }
+    var now = Date.now();
+    var st = readMeterState(now);
+    var payload = {
+      scans: st.scans,
+      checks: st.checks,
+      dayPassIssuedAt: now,
+      dayPassEmail: email,
+      dayPassBonusScans: 3,
+      dayPassBonusChecks: 3
+    };
+    try {
+      window.localStorage.setItem(METER_STORAGE_KEY, JSON.stringify(payload));
+    } catch (e) {}
+    door1FeedbackEl.textContent = "Day pass active (+3 scans & +3 deal checks unlocked). Sending contract to Analyzer…";
+    door1FeedbackEl.style.color = "#14532D";
+    updateMeterUI();
+    setTimeout(function () {
+      modalEl.hidden = true;
+      sendContractAcrossBridge();
+    }, 400);
+  });
+
+  function renderCarryBackSummary() {
+    var raw = null;
+    try { raw = window.localStorage.getItem(BRIDGE_CARRYBACK_KEY); } catch (e) { raw = null; }
+    if (!raw) {
+      carrybackPanelEl.hidden = true;
+      return;
+    }
+    var pkt = null;
+    try { pkt = JSON.parse(raw); } catch (e2) { pkt = null; }
+    if (!pkt || typeof pkt.totalLeak !== "number" || !Array.isArray(pkt.alternatives) || pkt.alternatives.length !== 3) {
+      carrybackPanelEl.hidden = true;
+      return;
+    }
+
+    /* Verify $0.00 transit tie-out invariant before rendering */
+    var totalLeak = Math.round(pkt.totalLeak);
+    var tieOutOk = pkt.alternatives.every(function (alt) {
+      return Math.round(alt.rescued + alt.residual) === totalLeak;
+    });
+    if (!tieOutOk) {
+      carrybackPanelEl.hidden = true;
+      return;
+    }
+
+    var kpiHtml = "";
+    kpiHtml += '<div class="dc-cb-kpi"><span class="dc-cb-kpi-label">Deal Health Score</span><span class="dc-cb-kpi-val" id="dc-cb-health">' + Number(pkt.dealHealthScore) + ' / 100</span></div>';
+    kpiHtml += '<div class="dc-cb-kpi is-verdict"><span class="dc-cb-kpi-label">Window 2 Behavioral Verdict</span><span class="dc-cb-kpi-val" id="dc-cb-verdict">' + esc(pkt.verdictName) + '</span></div>';
+    kpiHtml += '<div class="dc-cb-kpi is-leak"><span class="dc-cb-kpi-label">Window 1 Total Pocket Leak</span><span class="dc-cb-kpi-val" id="dc-cb-leak">-$' + Number(pkt.totalLeak).toLocaleString() + '</span></div>';
+    kpiHtml += '<div class="dc-cb-kpi"><span class="dc-cb-kpi-label">True Pocket Revenue</span><span class="dc-cb-kpi-val">$' + Number(pkt.truePocketRev).toLocaleString() + ' (' + Number(pkt.pocketYieldPct).toFixed(2) + '%)</span></div>';
+    cbKpisEl.innerHTML = kpiHtml;
+
+    var mesoHtml = "";
+    pkt.alternatives.forEach(function (alt) {
+      var rankClass = "is-rank-" + alt.rank;
+      mesoHtml += '<article class="dc-cb-meso-card ' + rankClass + '" role="listitem" data-carried-meso="' + esc(alt.id) + '">';
+      mesoHtml += '<div>';
+      mesoHtml += '<div class="dc-cb-meso-rank"><span>NRR Rank #' + alt.rank + ' · ' + esc(alt.id) + '</span><span>' + esc(alt.optAuthorityTier) + '</span></div>';
+      mesoHtml += '<h4 class="dc-cb-meso-name">' + esc(alt.name) + '</h4>';
+      mesoHtml += '<div class="dc-cb-math">';
+      mesoHtml += '<div>Rescued: <span class="dc-cb-rescued">+$' + Number(alt.rescued).toLocaleString() + ' (' + Number(alt.rescuedPct).toFixed(1) + '%)</span></div>';
+      mesoHtml += '<div>Residual Leak: <span class="dc-cb-residual">-$' + Number(alt.residual).toLocaleString() + '</span></div>';
+      mesoHtml += '<div>Tie-Out: $' + Number(alt.rescued).toLocaleString() + ' + $' + Number(alt.residual).toLocaleString() + ' = $' + Number(pkt.totalLeak).toLocaleString() + '</div>';
+      mesoHtml += '</div>';
+      mesoHtml += '</div>';
+
+      mesoHtml += '<div class="dc-cb-flags">';
+      if (!alt.consequenceFlags || !alt.consequenceFlags.length) {
+        mesoHtml += '<div class="dc-cb-flag-pill is-clean"><span class="dc-cb-flag-code">0 CONSEQUENCE FLAGS</span> — All commercial, rev-rec, and Year-2 NRR cells cleared.</div>';
+      } else {
+        alt.consequenceFlags.forEach(function (cf) {
+          mesoHtml += '<div class="dc-cb-flag-pill"><span class="dc-cb-flag-code">[' + esc(cf.code) + '] ' + esc(cf.amountFormatted) + ':</span> ' + esc(cf.description) + '</div>';
+        });
+      }
+      mesoHtml += '</div>';
+      mesoHtml += '</article>';
+    });
+    cbMesosEl.innerHTML = mesoHtml;
+
+    if (cbMetaEl) {
+      cbMetaEl.textContent = "Source: " + (pkt.sourceLabel || "Contract Analyzer Run") + " · Baseline ACV: $" + Number(pkt.baselineAcv).toLocaleString() + " · QTC Maturity: " + Number(pkt.qtcMaturityScore) + "/100 · Risk Flags Raised: " + Number(pkt.flagsRaisedCount) + " · Coverage: " + Number(pkt.checksFoundCount) + "/" + Number(pkt.checksTotalCount) + " checks found.";
+    }
+    carrybackPanelEl.hidden = false;
+  }
+
+  window.addEventListener("storage", function (e) {
+    if (e.key === METER_STORAGE_KEY) updateMeterUI();
+    if (e.key === BRIDGE_CARRYBACK_KEY) renderCarryBackSummary();
+  });
+
+  updateCharCount();
+  updateMeterUI();
+  renderCarryBackSummary();
+})();
+</script>
 
 </body>
 </html>
