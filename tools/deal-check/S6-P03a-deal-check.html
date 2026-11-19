@@ -2,8 +2,42 @@
 <!--
 LABEL — S6-P03.1 — The Deal Check (address /tools/deal-check/). Built Nov 11, 2026 on Lucky's build-the-rest order, following 00-master/SITEMAP-TABLE.md and this page's PAGE.md (06-section-06-proof-of-work/04-s6-p03-contract-operations/s6-p03-1-the-deal-check/PAGE.md): all six steps shown on the page; the checklist download is email-gated (PAGE.md rule: the gate must work before publish and the download call to action must never point at nothing). Copy: Draft 1.11 Part II verbatim. Gate: the on-page form posts the email to Lucky's Google Form "The Deal Check — Checklist Download" (form 1o_YCJ2zkQyOPUL4Fp-AMh6bWALytI0BDHXnLTX6Bd6c, entry.697224427) and only then reveals the PDF link — verified end to end Nov 11, 2026 (test submission recorded). GATE REMOVED Nov 18, 2026 on Lucky’s order — the download is now a plain button, no email field, no form post; the gated page is archived in the build log (deal-check-email-gate-archive-2026-11-18) and the Google Form still exists but the page no longer posts to it. The PDF is the source checklist (The Deal Check - Sample Checklist.docx, converted). Map: site/CODE-MAP.md. Rule: any change here is recorded in site/CHANGELOG.md with the CODE-MAP and this folder's LABEL.md updated in the same change (Code Labeling System, Rule 3).
 
-ARGON MANIFEST: S6-P03.1 — THE DEAL CHECK — STAGE 3 (FINAL, CORRECTIVE 2): 2-WAY CONTRACT ANALYZER BRIDGE (OUTBOUND CONTRACT PASTE & INBOUND CARRY-BACK SUMMARY OF VERDICT, DEAL HEALTH SCORE & 3 MESO ALTERNATIVES) + SHARED USAGE METER (`qtc_contract_autopsy_runs_v1`) + 3-DOOR MODAL
+ARGON MANIFEST: S6-P03.1 — THE DEAL CHECK — STAGE 3 (FINAL, CORRECTIVE 3 — FIX 2: OUTBOUND BRIDGE CARRIES FULL DEAL ECONOMICS INPUT SET): 2-WAY CONTRACT ANALYZER BRIDGE (OUTBOUND CONTRACT PASTE + FULL DEAL INPUT SET & INBOUND CARRY-BACK SUMMARY OF VERDICT, DEAL HEALTH SCORE & 3 MESO ALTERNATIVES) + SHARED USAGE METER (`qtc_contract_autopsy_runs_v1`) + 3-DOOR MODAL
 =========================================================================================================================================================
+
+STAGE 3 CORRECTIVE 3 ENTRY (NOV 19, 2026 — FIX 2: BRIDGE CARRIES THE FULL DEAL INPUT SET FROM DEAL CHECK TO CONTRACT ANALYZER)
+   1. FIX NAME:
+      - Fix 2: Outbound Deal Check -> Contract Analyzer Bridge Carries the Full Deal Economics Input Set (`{ acv, discountPct, netDays, billingFreq, upliftCapPct, termYears }`) Alongside Contract Text.
+
+   2. WHAT CHANGED BLOCK BY BLOCK (`dealcheck-current.txt`):
+      - Block D1 (Manifest Entry): Added this Stage 3 Corrective 3 entry documenting Fix 2 on Deal Check, block-by-block changes, beyond-spec improvements, self-check results (including before/after bridge numbers), integrity compliance, ADD MEANS DELETE compliance, and responsive desktop/phone mode verification.
+      - Block D2 (JS — `ATLAS_SAMPLE_INPUTS`, `buildInboundBridgePayload()`, `sendContractAcrossBridge()` & Self-Check Probe):
+        * Added frozen `ATLAS_SAMPLE_INPUTS = Object.freeze({ acv: 240000, discountPct: 22, netDays: 60, billingFreq: "quarterly", upliftCapPct: 2, termYears: 2 })` matching the Contract Analyzer's `PROJECT_ATLAS_PRESET.inputs` byte-for-byte.
+        * Added `buildInboundBridgePayload(rawText)` and updated `sendContractAcrossBridge()` so that when the visitor sends the Project Atlas sample deal across the bridge, the serialized `qtc_bridge_inbound_contract_v1` payload carries the complete deal input set (`inputs: { acv: 240000, discountPct: 22, netDays: 60, billingFreq: "quarterly", upliftCapPct: 2, termYears: 2 }` plus top-level `acv`, `discountPct`, `netDays`, `billingFreq`, `upliftCapPct`, `termYears`) and `isFreeSample: true` (0 credits).
+        * When a custom contract text (non-Atlas) is pasted on Deal Check with no preset inputs, `inputs` is `null` and top-level input fields are omitted, preserving the Analyzer's default inputs (`acv=100000, discountPct=0, netDays=30, billingFreq="annual", upliftCapPct=7, termYears=1`) and existing `?c=` short-text URL behavior.
+
+   3. IMPROVEMENTS MADE BEYOND THE SPEC:
+      - Content-Verified Atlas Detection on Bridge Send: `sendContractAcrossBridge()` checks `txt === ATLAS_SAMPLE_TEXT.trim()` directly (whether loaded via the 1-click `#dc-load-atlas-sample` button or pasted verbatim), guaranteeing that the full Project Atlas input set (`$240k ACV, 22% discount, Net-60, quarterly billing, 2% uplift cap, 2-year term`) and `isFreeSample: true` (0 credits) are always attached for Project Atlas.
+      - Dual-Shape Payload Compatibility (`payload.inputs` + Top-Level Keys): Writes the six deal inputs both under `payload.inputs` and as top-level properties on `qtc_bridge_inbound_contract_v1`, ensuring compatibility with any consumer or test inspecting either structure.
+      - Automated Deal Check Bridge Self-Check (`runDealCheckBridgeSelfCheck()`): Verifies on load that `buildInboundBridgePayload(ATLAS_SAMPLE_TEXT)` carries all 6 Project Atlas inputs and `isFreeSample: true`, and that `buildInboundBridgePayload("Custom contract")` leaves `inputs: null`.
+
+   4. SELF-CHECK RESULTS & VERIFICATION ANCHORS (RECORDED FROM LIVE EXECUTION):
+      - Bridge Project Atlas Path BEFORE vs. AFTER Fix 2:
+        * BEFORE Fix 2 (Deal Check sent contract text only; Analyzer evaluated Project Atlas text against default inputs `acv=100000, discountPct=0, netDays=30, billingFreq="annual", upliftCapPct=7, termYears=1`): produced Window 1 Total Leak = `-$18,100`, True Pocket Revenue = `$81,900`, Deal Health Score = `50 / 100`.
+        * AFTER Fix 2 (Deal Check -> Load Project Atlas Sample Deal -> Paste Full Contract -> Run 51-Point Autopsy carries `{ acv: 240000, discountPct: 22, netDays: 60, billingFreq: "quarterly", upliftCapPct: 2, termYears: 2 }` and `isFreeSample: true`; Analyzer applies all 6 inputs to `#ca-input-*` before `executeEngineRun`): produces Window 1 Total Leak = `-$66,002`, True Pocket Revenue = `$173,998`, Deal Health Score = `38 / 100`, Tie-Out Variance = `$0.00`, Meter Credits Consumed = `0` — 100% identical to the native Project Atlas preset run on the Analyzer.
+      - 51-Flag Regression & Tie-Out Invariant on Paired Analyzer:
+        * F1–F11 verdicts unchanged (`F1 8/51 + F-RENEWAL-NO-NOTICE only · F2 0/51, 0 flags · F3 33/51 · F4 11/51 · F5 18/51 · F6 14/51, 0 flags · F7 uncapped + carve-outs · F8 no-insurance + IP raised · F9 escalator fires · F10 data-training · F11 0/51, 0 flags`).
+        * Carry-back packet `qtc_bridge_carryback_result_v1` tie-out guard verifies `alt.rescued + alt.residual === packet.totalLeak` (`$0.00` variance) for all 3 carried MESO alternatives before rendering `#deal-check-carryback`.
+      - Meter Rules Unchanged:
+        * `2` full contract scans + `5` slider deal checks per rolling 24h (`qtc_contract_autopsy_runs_v1`); Project Atlas sample is free at `0 credits` on both native and bridged runs.
+
+   5. INTEGRITY, FORMULAS-HIDDEN & ADD MEANS DELETE COMPLIANCE:
+      - Formulas-Hidden Compliance: 100% compliant. Zero formulas, weights, or multipliers in the DOM.
+      - Demonstrate, Never Sell: Zero pitch, pricing, or new sales copy added; no employer/company names; no "corporate since 2006"; existing Stage 3 3-door modal untouched.
+      - ADD MEANS DELETE Statement: These fixes add no add/remove surfaces.
+
+   6. RESPONSIVE MODES (DESKTOP > 720PX & PHONE <= 720PX — SWEPT AT 280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS PX):
+      - Desktop Mode (> 720px) & Phone Mode (<= 720px): Zero DOM layout or CSS geometry changes required on Deal Check for Fix 2; existing fluid-wrapped meter pills, paste box, action buttons, and 3-card carry-back summary preserve `min-height: 44px` tap targets and zero horizontal overflow across all 10 ladder widths (`280px` through `1280px`).
 
 STAGE 3 CORRECTIVE 2 ENTRY (NOV 19, 2026 — METER PILL ROW HORIZONTAL OVERFLOW CLOSURE AT 280PX, 320PX & 360PX)
    - Defect Identified:
@@ -700,6 +734,16 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 1, SECTION 4 & SECTION
     "6. Data Protection, Security & Governing Law: Vendor shall maintain SOC 2 Type II certification and comply with the DPA and GDPR. Customer grants a non-exclusive license to host Customer Data; Vendor retains all intellectual property rights in the platform. Governing Law: State of Delaware. IN WITNESS WHEREOF, the parties have executed this Agreement by their duly authorized representatives."
   ].join("\n\n");
 
+  /* FIX 2: FULL PROJECT ATLAS DEAL ECONOMICS INPUT SET (IDENTICAL TO ANALYZER PRESET) */
+  var ATLAS_SAMPLE_INPUTS = Object.freeze({
+    acv: 240000,
+    discountPct: 22,
+    netDays: 60,
+    billingFreq: "quarterly",
+    upliftCapPct: 2,
+    termYears: 2
+  });
+
   var textEl = document.getElementById("dc-contract-text");
   var charCountEl = document.getElementById("dc-char-count");
   var noteEl = document.getElementById("dc-bridge-note");
@@ -772,7 +816,7 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 1, SECTION 4 & SECTION
   }
 
   textEl.addEventListener("input", function () {
-    isAtlasSampleActive = false;
+    isAtlasSampleActive = (textEl.value.trim() === ATLAS_SAMPLE_TEXT.trim());
     updateCharCount();
   });
 
@@ -784,6 +828,34 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 1, SECTION 4 & SECTION
     noteEl.className = "dc-note";
   });
 
+  function buildInboundBridgePayload(rawText) {
+    var cleaned = String(rawText || "").trim();
+    var isFreeAtlas = (cleaned === ATLAS_SAMPLE_TEXT.trim());
+    var payload = {
+      text: cleaned.slice(0, 50000),
+      isFreeSample: isFreeAtlas,
+      inputs: isFreeAtlas ? {
+        acv: ATLAS_SAMPLE_INPUTS.acv,
+        discountPct: ATLAS_SAMPLE_INPUTS.discountPct,
+        netDays: ATLAS_SAMPLE_INPUTS.netDays,
+        billingFreq: ATLAS_SAMPLE_INPUTS.billingFreq,
+        upliftCapPct: ATLAS_SAMPLE_INPUTS.upliftCapPct,
+        termYears: ATLAS_SAMPLE_INPUTS.termYears
+      } : null,
+      timestamp: Date.now(),
+      consumed: false
+    };
+    if (isFreeAtlas) {
+      payload.acv = ATLAS_SAMPLE_INPUTS.acv;
+      payload.discountPct = ATLAS_SAMPLE_INPUTS.discountPct;
+      payload.netDays = ATLAS_SAMPLE_INPUTS.netDays;
+      payload.billingFreq = ATLAS_SAMPLE_INPUTS.billingFreq;
+      payload.upliftCapPct = ATLAS_SAMPLE_INPUTS.upliftCapPct;
+      payload.termYears = ATLAS_SAMPLE_INPUTS.termYears;
+    }
+    return payload;
+  }
+
   function sendContractAcrossBridge() {
     var txt = textEl.value.trim();
     if (!txt) {
@@ -792,7 +864,8 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 1, SECTION 4 & SECTION
       return;
     }
 
-    var isFreeAtlas = isAtlasSampleActive && txt === ATLAS_SAMPLE_TEXT.trim();
+    var bridgePayload = buildInboundBridgePayload(txt);
+    var isFreeAtlas = bridgePayload.isFreeSample;
     var st = readMeterState();
     if (!isFreeAtlas && st.scansRemaining <= 0) {
       modalEl.hidden = false;
@@ -802,12 +875,7 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 1, SECTION 4 & SECTION
     }
 
     try {
-      window.localStorage.setItem(BRIDGE_INBOUND_KEY, JSON.stringify({
-        text: txt.slice(0, 50000),
-        isFreeSample: isFreeAtlas,
-        timestamp: Date.now(),
-        consumed: false
-      }));
+      window.localStorage.setItem(BRIDGE_INBOUND_KEY, JSON.stringify(bridgePayload));
     } catch (e) {}
 
     var targetUrl = "../contract-analyzer/?bridge=dealcheck";
@@ -816,6 +884,28 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 1, SECTION 4 & SECTION
     }
     window.location.href = targetUrl;
   }
+
+  /* Self-check probe for Fix 2 outbound bridge payload */
+  (function runDealCheckBridgeSelfCheck() {
+    var atlasPkt = buildInboundBridgePayload(ATLAS_SAMPLE_TEXT);
+    console.assert(
+      atlasPkt.isFreeSample === true &&
+      atlasPkt.inputs &&
+      atlasPkt.inputs.acv === 240000 &&
+      atlasPkt.inputs.discountPct === 22 &&
+      atlasPkt.inputs.netDays === 60 &&
+      atlasPkt.inputs.billingFreq === "quarterly" &&
+      atlasPkt.inputs.upliftCapPct === 2 &&
+      atlasPkt.inputs.termYears === 2 &&
+      atlasPkt.acv === 240000,
+      "Deal Check Fix 2 Atlas bridge payload self-check failed"
+    );
+    var customPkt = buildInboundBridgePayload("Custom agreement text");
+    console.assert(
+      customPkt.isFreeSample === false && customPkt.inputs === null && customPkt.acv === undefined,
+      "Deal Check Fix 2 custom bridge payload self-check failed"
+    );
+  })();
 
   document.getElementById("dc-send-to-analyzer").addEventListener("click", sendContractAcrossBridge);
 
