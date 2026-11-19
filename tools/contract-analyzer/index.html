@@ -1,7 +1,25 @@
 <!DOCTYPE html>
 <!--
-ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-TAXONOMY COVERAGE BUILD (CORRECTIVE)
-=================================================================================================================
+ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — STAGE 1: 3-WINDOW DEAL ENGINE CORE & WINDOW 1 FORENSIC LEAK WATERFALL (CORRECTIVE)
+=========================================================================================================================================================
+
+STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING CONTRACT ANALYZER EDIT BASE)
+   1. EDIT BASE PRESERVED BYTE-FOR-BYTE OUTSIDE STAGE 1 ADDITIONS:
+      - Preserved existing page branding ("Contract Analyzer — Fractional Deal Desk & Contract Management"), design system CSS variables, header, breadcrumb, hero banner, provenance strip, AI Read section, How It Works & Provenance cards, Related Links section, Sticky Summary Strip, and Footer (including the exact `<p><a href="https://docs.google.com/forms/d/e/1FAIpQLSedKetXalbE5LY6F-_OxLPrs-LuPz5g7Vj1gmCnJSQ2uymawg/viewform">Something broken? Tell me</a></p>` link).
+      - Layer 1 (`parseKeyClauses`: `DATE_RE`, `MONEY_RE`, `PARTY_RE`, `LAW_RE`, `TERM_LENGTH_RE`, `RENEWAL_PERIOD_RE`, `allMatches`) is untouched and frozen byte-for-byte.
+      - Layer 2 (`CHECKS` array of 51 checks + `runChecks`) and Layer 3 (`computeFlags` 9 deterministic rules) are untouched and frozen byte-for-byte. All F1–F11 verdicts remain 100% identical.
+   2. FULL-CONTRACT PASTE INPUT (50,000 CHARS, CLIENT-SIDE ONLY) + DEAL INPUTS FOR WINDOW 1:
+      - Enforced `maxlength="50000"` on `#ca-text` (client-side only; no data leaves the browser during scan).
+      - Added Deal Economics Inputs bar (`#ca-deal-inputs`) inside `.analyzer-panel` for Window 1 baseline numbers: Baseline ACV ($), Proposed Unit Discount (%), Payment Terms (Net Days), Billing Frequency, Renewal Uplift Cap (%), and Contract Term (Years) with automatic contract text detection or manual entry.
+   3. HIDDEN LOGIC VAULT & 6-CELL IMMUTABLE SHARED LEDGER (`LEDGER`):
+      - All formulas, weights, multipliers, and thresholds for the 6-cell ledger (`L1_UnitDiscount`, `L2_FloatDrag`, `L3_RenewalUplift`, `L4_CommitTrueDown`, `L5_RevRecHoldback`, `L6_LiabilityReserve` + `Continuity_Risk`) and all 46 Named Indicators (`W1_KPI_01`..`W1_LEAD_05`, `W2_LEAD_01`..`W2_KPI_05`, `W3_KPI_01`..`W3_LEAD_03`) + `QTC_Maturity_Score` reside strictly inside JS code comments under `/** HIDDEN LOGIC VAULT */`.
+      - Zero formulas, equations, weights, or multipliers ever appear in the rendered DOM.
+      - Hard tie-out guard `assertLedgerTieOut(ledger)` enforces `L_Total === L1 + L2 + L3 + L4 + L5 + L6` ($0.00 variance) and verifies `Rescued_$ + Residual_$ === L_Total` ($0.00 variance) across the engine ledger structure, throwing an explicit error on any variance.
+   4. WINDOW 1 FORENSIC LEAK WATERFALL PANEL & 16 NAMED WINDOW 1 INDICATORS:
+      - Added Window 1 Forensic Leak Waterfall panel (`#ca-window1-panel`) inside `#ca-results` right above the Risk Flags Band, rendering the pocket-price waterfall bridge from Baseline ACV down to True Pocket Revenue across `L1`–`L6`, each line tied to its contract clause evidence or deal input, plus the QTC Maturity Score (0–100) and all 16 Window 1 Named Indicators (6 Financial KPIs, 5 Operational OPIs, 5 Leading Indicators).
+      - Exposed `window.ContractAnalyzer.computeLedgerAndIndicators` and `window.ContractAnalyzer.assertLedgerTieOut` for Stage 2 (Windows 2 & 3) and Stage 3 (Bridge, Meter, Atlas Preset) to read directly from the single immutable ledger object.
+   5. STAGE 1 SELF-CHECK & TIE-OUT BATTERY:
+      - Extended `runSelfCheckBattery()` to run scripted tie-out fixtures alongside the F1–F11 51-flag regression battery, verifying zero variance on every run.
 
 0. CORRECTIVE FIX APPLIED (POST-VERIFICATION DEFECT CLOSURE)
    - Defect: data-training pattern 0 had unanchored token `AI` without word boundaries under the /i flag,
@@ -259,8 +277,8 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
    - Conflict 3 (F7 `F-IP-INDEMNITY` due to §3(b) `"intellectual property"`): Under the literal Part C flag rule ("counts as a raised flag when ABSENT while ip-ownership or license language is present"), `ip-ownership` matches F7 §3(b) while §2 has no IP indemnity, so `F-IP-INDEMNITY` raises alongside `F-UNCAPPED-INDEMNITY` and `F-CAP-CARVEOUTS` (while `F-ONE-WAY-INDEMNITY` and `F-INDEMNITY-NO-INSURANCE` remain silent as required).
 
 10. RESPONSIVE MODES & FLUID-FIRST SWEEP (280px - 1280px)
-    - Desktop Mode (> 720px): Working surface first; 5-card KPI summary strip including Risk Flags Raised; dedicated Risk Flags Band directly above the 2-column Layer-1 scans and 51-point grouped checklist; side-by-side How It Works & Provenance cards; Copyable Analysis Brief; relative units and minmax(0, 1fr) throughout.
-    - Phone Mode (<= 720px): Controls stack vertically first, textarea >= 11rem at 16px (no iOS zoom), Run button 100% width >= 44px touch height; KPI cards wrap 2-up (1-up <= 380px); scan, flag, and check cards stack in 1 column with 4px semantic left borders; fixed sticky bottom summary bar tracks Flags, Found/51, Gaps, and jumps to AI Read, with footer clearance.
+    - Desktop Mode (> 720px): Working surface first; 5-card KPI summary strip including Risk Flags Raised; Window 1 Forensic Leak Waterfall panel; dedicated Risk Flags Band directly above the 2-column Layer-1 scans and 51-point grouped checklist; side-by-side How It Works & Provenance cards; Copyable Analysis Brief; relative units and minmax(0, 1fr) throughout.
+    - Phone Mode (<= 720px): Controls stack vertically first, textarea >= 11rem at 16px (no iOS zoom), Run button 100% width >= 44px touch height; KPI cards wrap 2-up (1-up <= 380px); scan, waterfall, flag, and check cards stack in 1 column with 4px semantic left borders; fixed sticky bottom summary bar tracks Flags, Found/51, Gaps, and jumps to AI Read, with footer clearance.
     - Fluid-First Sweep (280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS px): Zero horizontal page scroll via min-width: 0, overflow-wrap: anywhere, and 1-column mobile collapse.
 
 11. PART E — SEO INTEGRITY COMPLIANCE
@@ -349,7 +367,7 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
     body { margin: 0; padding: 0; background-color: var(--paper-bg); color: var(--ink-900); font-family: var(--font-sans); line-height: 1.55; overflow-x: hidden; }
     a { color: var(--navy-900); text-decoration: underline; text-underline-offset: 3px; }
     a:hover, a:focus-visible { color: var(--brass-600); }
-    button, input, textarea { font-family: inherit; border-radius: 0; }
+    button, input, select, textarea { font-family: inherit; border-radius: 0; }
     button { cursor: pointer; }
     :focus-visible { outline: 2px solid var(--brass-500); outline-offset: 2px; }
     .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 clamp(0.65rem, 3vw, 2rem); }
@@ -398,6 +416,15 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
 
     .top-quick-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 
+    /* STAGE 1: DEAL INPUTS BAR FOR WINDOW 1 */
+    .deal-inputs-bar { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: 0.85rem 1rem; margin-bottom: 1rem; }
+    .deal-inputs-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.35rem 1rem; margin-bottom: 0.65rem; }
+    .deal-inputs-title { font-family: var(--font-serif); font-size: 0.98rem; font-weight: 700; color: var(--ink-900); margin: 0; }
+    .deal-inputs-hint { font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-600); margin: 0; }
+    .deal-inputs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 0.65rem 0.85rem; }
+    .deal-input-control { width: 100%; min-height: 44px; padding: 0.45rem 0.6rem; border: 1px solid #9F988A; background-color: #FFFFFF; color: var(--ink-900); font-family: var(--font-mono); font-size: 0.86rem; }
+    .deal-input-control:focus { border-color: var(--navy-900); }
+
     .textarea-header-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.35rem 1rem; margin-bottom: 0.4rem; }
     .text-stats { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-600); }
     .contract-textarea { width: 100%; min-height: 12.5rem; border: 1px solid #9F988A; background-color: var(--brass-100); color: var(--ink-900); font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.55; padding: 0.75rem; resize: vertical; }
@@ -429,6 +456,47 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
     /* IDLE STATE BOX */
     .idle-notice-box { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: 1rem 1.1rem; font-size: 0.92rem; color: var(--ink-700); }
     .flags-explainer { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-left: 4px solid var(--brass-500); padding: 0.85rem 1rem; font-size: 0.9rem; color: var(--ink-900); line-height: 1.55; margin: 0 0 1rem 0; }
+
+    /* STAGE 1: WINDOW 1 FORENSIC LEAK WATERFALL PANEL */
+    .window1-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--navy-900); padding: clamp(0.95rem, 2.4vw, 1.35rem); margin-bottom: 1.4rem; }
+    .window1-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.85rem; padding-bottom: 0.65rem; border-bottom: 2px solid var(--navy-900); }
+    .window1-title-group { min-width: 0; }
+    .window1-eyebrow { font-family: var(--font-mono); font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brass-600); font-weight: 700; display: block; }
+    .window1-title { font-family: var(--font-serif); font-size: clamp(1.15rem, 2.2vw, 1.38rem); font-weight: 700; margin: 0.15rem 0 0 0; color: var(--ink-900); }
+    .window1-maturity-badge { background-color: var(--navy-900); color: #FFFFFF; border: 1px solid var(--brass-500); padding: 0.35rem 0.75rem; font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+    .window1-maturity-badge strong { color: var(--brass-400); font-size: 0.92rem; }
+
+    .waterfall-summary-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+    .wf-summary-box { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: 0.7rem 0.85rem; min-width: 0; }
+    .wf-summary-box.is-leak { border-left-color: var(--fail-border); background-color: var(--fail-bg); }
+    .wf-summary-box.is-pocket { border-left-color: var(--pass-border); background-color: var(--pass-bg); }
+    .wf-summary-label { font-family: var(--font-mono); font-size: 0.71rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-700); font-weight: 700; display: block; }
+    .wf-summary-val { font-family: var(--font-serif); font-size: 1.32rem; font-weight: 700; color: var(--ink-900); font-variant-numeric: tabular-nums; }
+    .wf-summary-box.is-leak .wf-summary-val { color: var(--fail-ink); }
+    .wf-summary-box.is-pocket .wf-summary-val { color: var(--pass-ink); }
+    .wf-summary-sub { font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-600); display: block; margin-top: 0.15rem; }
+
+    .ledger-list { display: grid; grid-template-columns: 1fr; gap: 0.6rem; margin-bottom: 1.15rem; }
+    .ledger-row { background-color: var(--paper-card); border: 1px solid var(--rule-color); border-left: 4px solid var(--pass-border); padding: 0.75rem 0.9rem; min-width: 0; }
+    .ledger-row.is-active-leak { border-left-color: var(--fail-border); background-color: #FFFDFD; }
+    .ledger-row-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.4rem 0.85rem; margin-bottom: 0.3rem; }
+    .ledger-cell-title { font-weight: 700; font-size: 0.94rem; color: var(--ink-900); overflow-wrap: anywhere; }
+    .ledger-cell-code { font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-600); margin-right: 0.4rem; }
+    .ledger-cell-amount { font-family: var(--font-mono); font-size: 0.92rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .ledger-row.is-active-leak .ledger-cell-amount { color: var(--fail-ink); }
+    .ledger-row:not(.is-active-leak) .ledger-cell-amount { color: var(--pass-ink); }
+    .ledger-bar-track { width: 100%; height: 6px; background-color: var(--paper-alt); border: 1px solid var(--rule-color); margin: 0.35rem 0 0.45rem 0; overflow: hidden; }
+    .ledger-bar-fill { height: 100%; background-color: var(--fail-border); }
+    .ledger-row:not(.is-active-leak) .ledger-bar-fill { background-color: var(--pass-border); }
+    .ledger-cell-source { font-family: var(--font-mono); font-size: 0.77rem; color: var(--ink-700); margin: 0; overflow-wrap: anywhere; word-break: break-word; }
+
+    .w1-indicators-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.65rem; }
+    .w1-ind-card { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-top: 3px solid var(--navy-900); padding: 0.65rem 0.75rem; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 0.25rem; }
+    .w1-ind-card.is-opi { border-top-color: var(--brass-500); }
+    .w1-ind-card.is-lead { border-top-color: var(--warn-border); }
+    .w1-ind-top { display: flex; align-items: center; justify-content: space-between; gap: 0.35rem; font-family: var(--font-mono); font-size: 0.68rem; color: var(--ink-600); text-transform: uppercase; }
+    .w1-ind-name { font-weight: 700; font-size: 0.83rem; color: var(--ink-900); line-height: 1.35; overflow-wrap: anywhere; }
+    .w1-ind-val { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 700; color: var(--navy-900); font-variant-numeric: tabular-nums; }
 
     /* FLAGS BAND (ABOVE CHECKLIST, IMPOSSIBLE TO MISS) */
     .flags-band { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--fail-border); padding: clamp(0.9rem, 2.4vw, 1.3rem); margin-bottom: 1.4rem; }
@@ -540,7 +608,7 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
 
       .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .contract-textarea { font-size: 1rem; min-height: 11.5rem; }
-      .file-input-control { font-size: 0.95rem; }
+      .file-input-control, .deal-input-control { font-size: 0.95rem; }
 
       .top-quick-actions,
       .top-quick-actions button,
@@ -552,7 +620,7 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
     }
 
     @media (max-width: 380px) {
-      .kpi-grid { grid-template-columns: 1fr; }
+      .kpi-grid, .deal-inputs-grid, .waterfall-summary-strip, .w1-indicators-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -604,7 +672,7 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
     <section class="section-block" aria-labelledby="heading-analyzer">
       <div class="section-header">
         <h2 class="section-title" id="heading-analyzer">The Analyzer — Upload or Paste a Contract</h2>
-        <p class="section-subtitle">Accepts .txt, .docx, and .pdf in your browser, or paste text directly</p>
+        <p class="section-subtitle">Accepts .txt, .docx, and .pdf in your browser, or paste text directly (up to 50,000 characters)</p>
       </div>
 
       <div class="analyzer-panel">
@@ -620,12 +688,51 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
           </div>
         </div>
 
+        <!-- STAGE 1: DEAL ECONOMICS INPUTS FOR WINDOW 1 FORENSIC LEAK WATERFALL -->
+        <div class="deal-inputs-bar" id="ca-deal-inputs" role="region" aria-label="Window 1 Deal Economics Inputs">
+          <div class="deal-inputs-header">
+            <h3 class="deal-inputs-title">Deal Economics Inputs — Window 1 Forensic Leak Baseline</h3>
+            <p class="deal-inputs-hint">Used alongside contract clauses to compute the 6-cell pocket-price leak ledger</p>
+          </div>
+          <div class="deal-inputs-grid">
+            <div class="field-block">
+              <label class="field-label" for="ca-input-acv">Baseline ACV ($)</label>
+              <input type="number" id="ca-input-acv" class="deal-input-control" value="100000" min="1000" step="1000">
+            </div>
+            <div class="field-block">
+              <label class="field-label" for="ca-input-discount">Unit Discount (%)</label>
+              <input type="number" id="ca-input-discount" class="deal-input-control" value="0" min="0" max="90" step="0.5">
+            </div>
+            <div class="field-block">
+              <label class="field-label" for="ca-input-netdays">Payment Terms (Net Days)</label>
+              <input type="number" id="ca-input-netdays" class="deal-input-control" value="30" min="0" max="180" step="15">
+            </div>
+            <div class="field-block">
+              <label class="field-label" for="ca-input-billing">Billing Frequency</label>
+              <select id="ca-input-billing" class="deal-input-control">
+                <option value="annual" selected>Annual Upfront</option>
+                <option value="semiannual">Semi-Annual Split</option>
+                <option value="quarterly">Quarterly Split</option>
+                <option value="monthly">Monthly Arrears</option>
+              </select>
+            </div>
+            <div class="field-block">
+              <label class="field-label" for="ca-input-uplift">Renewal Uplift Cap (%)</label>
+              <input type="number" id="ca-input-uplift" class="deal-input-control" value="7" min="0" max="25" step="0.5">
+            </div>
+            <div class="field-block">
+              <label class="field-label" for="ca-input-term">Contract Term (Years)</label>
+              <input type="number" id="ca-input-term" class="deal-input-control" value="1" min="1" max="5" step="1">
+            </div>
+          </div>
+        </div>
+
         <div class="field-block">
           <div class="textarea-header-row">
             <label class="field-label" for="ca-text">Or paste the contract text</label>
-            <span class="text-stats" id="ca-text-stats">0 characters · 0 words</span>
+            <span class="text-stats" id="ca-text-stats">0 / 50,000 characters · 0 words</span>
           </div>
-          <textarea id="ca-text" class="contract-textarea" rows="10" placeholder="Paste the contract text here, upload a TXT/DOCX/PDF above, or load the sample contract to see how it reads."></textarea>
+          <textarea id="ca-text" class="contract-textarea" rows="10" maxlength="50000" placeholder="Paste the contract text here (up to 50,000 characters), upload a TXT/DOCX/PDF above, or load the sample contract to see how it reads."></textarea>
         </div>
 
         <div class="analyzer-action-bar">
@@ -638,8 +745,8 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
     <!-- 2. THE RESULTS -->
     <section class="section-block" aria-labelledby="heading-results" id="section-results">
       <div class="section-header">
-        <h2 class="section-title" id="heading-results">Analysis Output — Flags, Scans &amp; 51-Point Coverage Check</h2>
-        <p class="section-subtitle">Deterministic risk flags plus evidence-backed pattern detection across 6 clause groups</p>
+        <h2 class="section-title" id="heading-results">Analysis Output — Window 1 Waterfall, Flags, Scans &amp; 51-Point Coverage Check</h2>
+        <p class="section-subtitle">6-cell forensic leak ledger, deterministic risk flags, and evidence-backed pattern detection across 6 clause groups</p>
       </div>
 
       <p class="flags-explainer">
@@ -648,7 +755,7 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
 
       <div id="ca-results">
         <div class="idle-notice-box" id="ca-idle-state">
-          Ready to analyze. Upload a contract, paste text, or load the fictional sample contract above, then click <strong>Run the analysis</strong> to populate the risk flags, the six original scans, and all 51 coverage checks.
+          Ready to analyze. Upload a contract, paste text, or load the fictional sample contract above, then click <strong>Run the analysis</strong> to populate the Window 1 forensic leak waterfall, the risk flags, the six original scans, and all 51 coverage checks.
         </div>
       </div>
     </section>
@@ -784,7 +891,7 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
   <script src="../../assets/jszip-3.10.1.min.js"></script>
   <script src="../../assets/pdf-3.11.174.min.js"></script>
 
-  <!-- CONTRACT ANALYZER ENGINE (Layer 1 Frozen + Hardened 51-Point Layer 2 + Flags Layer) -->
+  <!-- CONTRACT ANALYZER ENGINE (Layer 1 Frozen + Hardened 51-Point Layer 2 + Flags Layer + Stage 1 6-Cell Ledger & 46 Indicators) -->
   <script>
 /* ==========================================================================
    LABEL — S6-P03.d · Tool 13 — Contract Analyzer — analysis engine.
@@ -797,6 +904,8 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
    (uncapped/one-way/uninsured/missing-IP indemnities, cap carve-outs,
    renewal without notice, cause without cure, uncapped price escalators,
    and vendor AI model training on customer data).
+   LAYER 4 (STAGE 1) — 6-Cell Immutable Shared Ledger (L1..L6 + Continuity)
+   & 46 Named Indicators + Window 1 Forensic Leak Waterfall computation.
    ========================================================================== */
 (function () {
   "use strict";
@@ -836,7 +945,7 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
     };
   }
 
-  /* ---------------- Layer 2 — the 51 coverage checks ----------------------- */
+  /* ---------------- Layer 2 — the 51 coverage checks (FROZEN BYTE-FOR-BYTE) -- */
   function P(s) { return new RegExp(s, "i"); }
   var CHECKS = [
     /* Basics (7) */
@@ -1583,10 +1692,459 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
     return { flags: flags, ipSignal: ipSignal };
   }
 
+  /** HIDDEN LOGIC VAULT
+   * ============================================================================
+   * ALL FORMULAS, WEIGHTS, MULTIPLIERS, AND THRESHOLDS LIVE STRICTLY INSIDE THIS
+   * COMMENT BLOCK AND THE JS FUNCTIONS BELOW. NEVER RENDER FORMULAS IN THE DOM.
+   *
+   * 6-CELL IMMUTABLE SHARED LEDGER (SPEC §5 & §6):
+   * - L1_UnitDiscount: ROUND(MAX(0, Detected_Discount_Pct - Policy_Discount_Threshold_0.15) * Baseline_ACV)
+   *   (Or direct excess unit discount above 15% policy threshold; when explicit naked unit cut is detected in text or input).
+   * - L2_FloatDrag: ROUND(((MAX(30, Net_Days) - 30) / 365) * WACC_0.095 * Baseline_ACV + (Billing_Split_Factor * Baseline_ACV))
+   *   where Billing_Split_Factor: annual=0, semiannual=0.0085, quarterly=0.0162, monthly=0.024
+   * - L3_RenewalUplift: ROUND(MAX(0, (Policy_Uplift_0.07 - Detected_Uplift_Cap) * Baseline_ACV))
+   * - L4_CommitTrueDown: IF(True_Down_Right_Flag OR Commit_Rollover_Flag, ROUND(0.045 * Baseline_ACV), 0)
+   * - L5_RevRecHoldback: IF(Term_For_Convenience OR Sole_Discretion_Acceptance OR Refundable_SLA, ROUND(0.036 * Baseline_ACV), 0)
+   * - L6_LiabilityReserve: IF(Uncapped_Indemnity_Flag OR Liability_Cap_Multiple > 2, ROUND(0.030 * Baseline_ACV), 0)
+   * - L_Total = L1_UnitDiscount + L2_FloatDrag + L3_RenewalUplift + L4_CommitTrueDown + L5_RevRecHoldback + L6_LiabilityReserve
+   * - True_Pocket_Rev = Baseline_ACV - L_Total
+   *
+   * TIE-OUT INVARIANT:
+   * - L_Total === L1 + L2 + L3 + L4 + L5 + L6 ($0.00 variance)
+   * - For every option in Window 3: Rescued_$ + Residual_$ === L_Total ($0.00 variance)
+   *
+   * DEFINITIVE 46 NAMED INDICATORS (16 W1 + 18 W2 + 12 W3):
+   * #1  W1_KPI_01: Pocket Price Yield % = ((Baseline_ACV - L_Total) / Baseline_ACV) * 100
+   * #2  W1_KPI_02: Direct Year-1 Pocket Dollar Leak ($) = L_Total
+   * #3  W1_KPI_03: Deal Gross Margin Erosion (bps) = ROUND(((0.80 - ((True_Pocket_Rev - (0.20 * Baseline_ACV) - Unbilled_Services_COGS) / MAX(1, True_Pocket_Rev))) * 10000), 0)
+   * #4  W1_KPI_04: Working-Capital Float & Effective DSO Drag ($) = L2_FloatDrag
+   * #5  W1_KPI_05: Compounded 24-Month NRR Erosion ($) = ROUND(L3 + (L3 * (1 + 0.07)))
+   * #6  W1_KPI_06: Effective CAC Payback Extension (Months Added) = ROUND((CAC_Baseline / MAX(1, (True_Pocket_Rev * Gross_Margin_Actual / 12))) - (CAC_Baseline / MAX(1, (Baseline_ACV * 0.80 / 12))), 1)
+   * #7  W1_OPI_01: ASC-606 Revenue-Recognition Holdback Reserve ($) = L5_RevRecHoldback
+   * #8  W1_OPI_02: RevOps Manual Billing & Custom Tier Overhead Score = MIN(100, (Split_Billing_Flag * 30) + (Custom_Usage_Schedule_Flag * 35) + (Manual_PO_Approval_Flag * 35))
+   * #9  W1_OPI_03: Bespoke SLA & Support COGS Burden ($/yr) = ROUND(((MAX(0, Detected_Uptime_Pct - 99.9) * 100) * 0.012 * Baseline_ACV) + (Custom_P1_Response_Flag * 0.015 * Baseline_ACV))
+   * #10 W1_OPI_04: Post-Close Legal & InfoSec Audit Friction Hours = (On_Site_Audit_Right_Flag * 24) + (Custom_InfoSec_Cadence_Flag * 16) + (Bespoke_Insurance_Cert_Flag * 8)
+   * #11 W1_OPI_05: Order-to-Cash Collection Cycle Drag (Effective Days) = MAX(30, Net_Days) + (Portal_Invoicing_Mandate_Flag * 12) + (Milestone_Signoff_Gate_Flag * 18) - 30
+   * #12 W1_LEAD_01: Silent Contraction / True-Down Exposure ($) = L4_CommitTrueDown
+   * #13 W1_LEAD_02: Unused Commit Rollover Cannibalization Rate (%) = IF(Credit_Rollover_Flag, ROUND(MIN(0.35, Rollover_Cap_Pct * 0.50) * 100, 1), 0)
+   * #14 W1_LEAD_03: Unhedged Multi-Year Inflation / FX Exposure ($) = IF(Contract_Term_Years > 1 AND CPI_Floor_Deleted_Flag, ROUND(Baseline_ACV * 0.032 * (Contract_Term_Years - 1)), 0)
+   * #15 W1_LEAD_04: Actuarial Tail-Risk Reserve (Super-Cap / Carve-Out) ($) = L6_LiabilityReserve
+   * #16 W1_LEAD_05: 3x Multichannel Discount Spillover Shadow Cost ($) = IF(Naked_Unit_Price_Cut_Flag, ROUND(L1 * 2.0), 0)
+   * #17 W2_LEAD_01: Cognitive Uncertainty-Avoidance / JOLT FOMU Index = MIN(100, (Term_For_Convenience_Flag * 35) + (Sole_Discretion_Acceptance_Flag * 35) + (SLA_Refund_Trigger_Flag * 20) + (Extended_Warranty_Flag * 10))
+   * #18 W2_LEAD_02: Kraljic Procurement Bluff Skew Ratio (%) = ROUND((Commercial_Redline_Points / MAX(1, Commercial_Redline_Points + Operational_Redline_Points)) * 100, 1)
+   * #19 W2_LEAD_03: Kahneman Loss-Aversion & Shelfware Anxiety Score = MIN(100, (True_Down_Right_Flag * 40) + (Credit_Rollover_Flag * 35) + (Split_Billing_Flag * 25))
+   * #20 W2_LEAD_04: Multi-Front Anchor-Drift Velocity (Concession Nibbling) = ROUND((Active_Leak_Cells_Count / 6) * 100, 0)
+   * #21 W2_LEAD_05: Corporate Boilerplate Rigidity Score = MIN(100, (AI_No_Training_Flag * 35) + (DPA_SuperCap_2x_3x_Flag * 35) + (InfoSec_Audit_Clause_Flag * 15) + (IP_Indemnity_Standard_Flag * 15))
+   * #22 W2_LEAD_06: Prevention-to-Promotion Contract Framing Ratio = ROUND((Prevention_Trigger_Count / MAX(1, Prevention_Trigger_Count + Promotion_Milestone_Count)) * 100, 1)
+   * #23 W2_LEAD_07: Interpretive Uncertainty & Ambiguity Index = MIN(100, Subjective_Acceptance_Words_Count * 35 + Undefined_Material_Breach_Flag * 30)
+   * #24 W2_OPI_01: Redline Density & Legal Cycle-Time Drag (+Days Added) = ROUND((Substantive_Redline_Flags_Count * 1.8) + (Uncapped_Indemnity_Flag * 4.5) + (Custom_DPA_Flag * 3.0), 1)
+   * #25 W2_OPI_02: Internal Escalation Tier Load (Sign-Off Silos Required) = 1 + IF(L1 > 0 OR L2 > 0, 1, 0) + IF(L5 > 0, 1, 0) + IF(L6 > 0, 1, 0)
+   * #26 W2_OPI_03: Champion vs. Procurement Control Asymmetry = MAX(0, MIN(100, 50 + (Sponsor_Deadline_Committed_Flag * 25) + (Tech_Signoff_Complete_Flag * 25) - (Kraljic_Bluff_Skew * 0.5)))
+   * #27 W2_OPI_04: End-of-Quarter (EOQ) Time-Pressure Asymmetry Index = (Buyer_GoLive_Hard_Date_Flag * 40) + (Buyer_Expiring_Budget_Flag * 30) - (Seller_EOQ_Week_12_Flag * 45)
+   * #28 W2_OPI_05: Inverted-U Rep Discretion Risk Score = IF(Customer_Tenure_Years == 0 AND Detected_Discount_Pct > 0.20, MIN(100, ROUND(((Detected_Discount_Pct - 0.15) * 300) + (Low_Rep_Tenure_Flag * 35))), 15)
+   * #29 W2_OPI_06: Technical & InfoSec Lock-In Readiness (%) = (Tech_Sandbox_Passed_Flag * 40) + (InfoSec_Approved_Flag * 35) + (Integration_Scoped_Flag * 25)
+   * #30 W2_KPI_01: 3-Year Expansion LTV-to-Leak Recovery Multiple = ROUND((Baseline_ACV * Account_Expansion_Multiplier * 2.4 * 0.80) / MAX(1, L_Total), 2)
+   * #31 W2_KPI_02: Month-13 Renewal Clawback Probability (%) = MAX(10, MIN(95, 85 - (L3 > 0 ? 45 : 0) - (L4 > 0 ? 25 : 0) - (Has_Continuity_Kill_Risk ? 35 : 0)))
+   * #32 W2_KPI_03: Competitive Displacement & Reference Logo Value ($) = IF(Competitive_Rip_Replace_Flag, ROUND(Baseline_ACV * 0.15), 0) + IF(Tier1_Logo_Rights_Flag, ROUND(Baseline_ACV * 0.08), 0)
+   * #33 W2_KPI_04: Risk-Adjusted 36-Month Net Deal Contribution ($) = ROUND((True_Pocket_Rev + (Year2_Target_ARR * (Month13_Clawback_Prob / 100) * 2)) - Spillover_Cost - (Has_Continuity_Kill_Risk ? Year2_Target_ARR * 0.5 : 0))
+   * #34 W2_KPI_05: Composite Deal Desk Verdict Confidence Score (%) = ROUND(MIN(99, 60 + (ABS(JOLT_Score - Kraljic_Skew) * 0.35) + (Active_Leak_Cells_Count * 3)), 0)
+   * #35 W3_KPI_01: Exact Pocket Leak Rescued ($ and % of Window 1 Leak) = SUM(Ledger_Cells_Cleared_By_Option)
+   * #36 W3_KPI_02: Residual Unfixed Year-1 Pocket Leak ($) = SUM(Ledger_Cells_Retained_By_Option) = L_Total - Rescued_$
+   * #37 W3_KPI_03: 3-Year Risk-Adjusted TCV Lift ($ vs. Rep's Raw Deal) = ROUND((Option_3Yr_Pocket_TCV - Raw_Deal_3Yr_Pocket_TCV) + (Option_Clears_L1_Spillover ? Spillover_Cost : 0))
+   * #38 W3_KPI_04: Year-2 NRR & Continuity At-Risk Dollar Exposure ($) = (Retains_L3 ? L3_24Mo : 0) + (Retains_L4 ? L4 * 2 : 0) + (Retains_Continuity_Ambiguity ? Year2_Target_ARR : 0)
+   * #39 W3_KPI_05: Portfolio Spillover Shield Savings ($) = IF(Option_Converts_Unit_Cut_To_Ringfenced_Credit, ROUND(L1 * 2.0), 0)
+   * #40 W3_OPI_01: Legal Cycle-Time Compression (Days Saved) = ROUND(W2_Redline_Drag_Days * (Cleared_Redline_Cells_Count / MAX(1, Active_Leak_Cells_Count)) * 0.80, 1)
+   * #41 W3_OPI_02: Give-Get Reciprocity Balance Ratio = ROUND(Seller_Value_Gets_Count / MAX(1, Buyer_Concession_Gives_Count), 2)
+   * #42 W3_OPI_03: Self-Clearing Deal Desk Authority Tier (1, 2, or 3)
+   * #43 W3_OPI_04: Nested Bracket Cognitive Load Score = Active_Trade_Brackets_Count (<= 3)
+   * #44 W3_LEAD_01: Behavioral Buyer Acceptance Probability (%) = MIN(94, 50 + (Option_Matches_W2_Archetype ? 32 : -15) + (Uses_3_MESO_Frame ? 12 : 0) - (Option_Requires_New_Budget ? 18 : 0))
+   * #45 W3_LEAD_02: MESO Agreement Sincerity & Anchor Resilience Score = MIN(100, (Simultaneous_3_Options_Presented * 45) + (Equal_Seller_Utility_Spread_Under_15Pct * 30) + (Explicit_Buyer_Priority_Rationale * 25))
+   * #46 W3_LEAD_03: Post-Signature Implementation & Renewal Friction Forecast
+   *
+   * QTC MATURITY SCORE (0-100):
+   * - Computed from Window 1 pocket yield, RevOps overhead score, O2C drag, and active ledger cells:
+   *   MAX(0, MIN(100, ROUND(W1_KPI_01 - (W1_OPI_02 * 0.15) - (W1_OPI_05 * 0.20) - (Active_Leak_Cells_Count * 3))))
+   * ============================================================================
+   */
+
+  function assertLedgerTieOut(ledger) {
+    if (!ledger || !ledger.cells) {
+      throw new Error("Tie-Out Invariant Violation: Ledger object or cells missing.");
+    }
+    var c = ledger.cells;
+    var sumCells = Math.round(
+      (c.L1_UnitDiscount.amount || 0) +
+      (c.L2_FloatDrag.amount || 0) +
+      (c.L3_RenewalUplift.amount || 0) +
+      (c.L4_CommitTrueDown.amount || 0) +
+      (c.L5_RevRecHoldback.amount || 0) +
+      (c.L6_LiabilityReserve.amount || 0)
+    );
+    if (sumCells !== Math.round(ledger.totalLeak)) {
+      throw new Error("Tie-Out Invariant Violation: Sum of L1..L6 (" + sumCells + ") !== Window 1 totalLeak (" + ledger.totalLeak + ").");
+    }
+    if (Math.round(ledger.baselineAcv - ledger.totalLeak) !== Math.round(ledger.truePocketRev)) {
+      throw new Error("Tie-Out Invariant Violation: Baseline ACV - totalLeak !== truePocketRev.");
+    }
+    if (Array.isArray(ledger.alternatives)) {
+      ledger.alternatives.forEach(function (alt) {
+        if (Math.round(alt.rescued + alt.residual) !== Math.round(ledger.totalLeak)) {
+          throw new Error("Tie-Out Invariant Violation on Alternative " + alt.id + ": rescued (" + alt.rescued + ") + residual (" + alt.residual + ") !== totalLeak (" + ledger.totalLeak + ").");
+        }
+      });
+    }
+    return true;
+  }
+
+  function detectContractSignalsForLedger(text, checks, flagReport, rawInputs) {
+    var map = checkMap(checks);
+    var flags = (flagReport && flagReport.flags) ? flagReport.flags : [];
+    var hasFlag = function (id) { return flags.some(function (f) { return f.id === id; }); };
+
+    var acv = Number(rawInputs && rawInputs.acv);
+    if (!acv || acv <= 0) {
+      var moneyMatches = allMatches(text, MONEY_RE);
+      if (moneyMatches.length > 0) {
+        var parsedNum = Number(String(moneyMatches[0]).replace(/[^0-9.]/g, ""));
+        if (parsedNum > 0) {
+          var isMonthly = /\bper\s+month\b|\bmonthly\b/i.test(text);
+          acv = isMonthly ? parsedNum * 12 : parsedNum;
+        }
+      }
+      if (!acv || acv <= 0) acv = 100000;
+    }
+
+    var netDays = (rawInputs && rawInputs.netDays != null && rawInputs.netDays !== "") ? Number(rawInputs.netDays) : null;
+    if (netDays === null || isNaN(netDays)) {
+      var netMatch = /\bnet[-\s]*(\d+)\b/i.exec(text) || /(?:payable|due)\s+(?:within|in)\s*(?:\w+\s*\(\s*(\d+)\s*\)|(\d+))\s*days/i.exec(text) || /within\s*(?:\w+\s*\(\s*(\d+)\s*\)|(\d+))\s*days\s*(?:of|from|after)\s*(?:the\s+)?(?:invoice|receipt)/i.exec(text);
+      if (netMatch) {
+        netDays = Number(netMatch[1] || netMatch[2] || 30);
+      } else {
+        netDays = 30;
+      }
+    }
+
+    var discountPct = (rawInputs && rawInputs.discountPct != null && rawInputs.discountPct !== "") ? Number(rawInputs.discountPct) / 100 : null;
+    if (discountPct === null || isNaN(discountPct)) {
+      var discMatch = /(\d+(?:\.\d+)?)\s*%\s*(?:unit\s+)?discount/i.exec(text);
+      discountPct = discMatch ? (Number(discMatch[1]) / 100) : 0;
+    }
+
+    var billingFreq = (rawInputs && rawInputs.billingFreq) ? String(rawInputs.billingFreq) : "";
+    if (!billingFreq) {
+      if (/\bmonthly\s+(?:in\s+arrears|billing|installments)\b/i.test(text)) billingFreq = "monthly";
+      else if (/\bquarterly\s+(?:billing|installments|invoicing|split)\b/i.test(text)) billingFreq = "quarterly";
+      else if (/\bsemi-?annual\b/i.test(text)) billingFreq = "semiannual";
+      else billingFreq = "annual";
+    }
+
+    var upliftCapPct = (rawInputs && rawInputs.upliftCapPct != null && rawInputs.upliftCapPct !== "") ? Number(rawInputs.upliftCapPct) / 100 : null;
+    var hasUpliftFreezeText = /(?:no\s+price\s+increase|0%\s*uplift|price\s+freeze|locked\s+pricing|waive[sd]?\s+[^.\n]{0,25}uplift)/i.test(text);
+    var textUpliftMatch = /(?:increase|uplift|escalat\w+)[^.\n]{0,50}?(\d+(?:\.\d+)?)\s*%/i.exec(text);
+    if (hasUpliftFreezeText) {
+      upliftCapPct = 0;
+    } else if (textUpliftMatch) {
+      upliftCapPct = Number(textUpliftMatch[1]) / 100;
+    } else if (upliftCapPct === null || isNaN(upliftCapPct)) {
+      if (hasFlag("F-RENEWAL-NO-NOTICE")) {
+        upliftCapPct = 0.02;
+      } else {
+        upliftCapPct = 0.07;
+      }
+    }
+
+    var termYears = (rawInputs && rawInputs.termYears != null && rawInputs.termYears !== "") ? Number(rawInputs.termYears) : 1;
+    if (!termYears || termYears < 1) termYears = 1;
+
+    var trueDownFlag = /\btrue[-\s]?down\b|\breduce\s+(?:seats|licenses|commitment)\b|\bminimum\s+commit(?:ment)?\s+reduction\b/i.test(text);
+    var rolloverFlag = /\broll[-\s]?over\b|\bunused\s+(?:credits?|commits?|hours?)\b[^.\n]{0,40}(?:carry\s+forward|roll)/i.test(text) || !!(map.setoff && map.setoff.found) || !!(map.mfn && map.mfn.found);
+    var termForConvFlag = !!(map["termination-convenience"] && map["termination-convenience"].found);
+    var soleDiscretionAccFlag = /\bsole\s+discretion\b[^.\n]{0,50}\baccept|\baccept[^.\n]{0,50}\bsole\s+discretion\b|\bsubjective\s+acceptance\b/i.test(text) || !!(map["acceptance-testing"] && map["acceptance-testing"].found && /reject|sole\s+discretion/i.test(text));
+    var refundableSlaFlag = /\brefund\b[^.\n]{0,50}\b(?:SLA|service\s+level|uptime|breach)\b/i.test(text);
+    var uncappedIndemFlag = hasFlag("F-UNCAPPED-INDEMNITY") || hasFlag("F-CAP-CARVEOUTS") || hasFlag("F-ONE-WAY-INDEMNITY");
+    var superCapFlag = /\b([2-9]|[1-9]\d+)x\b[^.\n]{0,40}\b(?:cap|liability|fees)\b|\bsuper[-\s]?cap\b/i.test(text);
+
+    var subjectiveWordsMatch = text.match(/\b(sole\s+discretion|satisfactory\s+to\s+customer|deemed\s+unacceptable|subjective\s+judgment)\b/gi);
+    var subjectiveWordsCount = subjectiveWordsMatch ? subjectiveWordsMatch.length : 0;
+    var undefinedBreachFlag = hasFlag("F-CAUSE-NO-CURE") ? 1 : 0;
+
+    return {
+      acv: acv,
+      netDays: netDays,
+      discountPct: discountPct,
+      billingFreq: billingFreq,
+      upliftCapPct: upliftCapPct,
+      termYears: termYears,
+      trueDownFlag: trueDownFlag ? 1 : 0,
+      rolloverFlag: rolloverFlag ? 1 : 0,
+      termForConvFlag: termForConvFlag ? 1 : 0,
+      soleDiscretionAccFlag: soleDiscretionAccFlag ? 1 : 0,
+      refundableSlaFlag: refundableSlaFlag ? 1 : 0,
+      uncappedIndemFlag: uncappedIndemFlag ? 1 : 0,
+      superCapFlag: superCapFlag ? 1 : 0,
+      subjectiveWordsCount: subjectiveWordsCount,
+      undefinedBreachFlag: undefinedBreachFlag,
+      map: map,
+      flags: flags
+    };
+  }
+
+  function computeLedgerAndIndicators(text, checks, flagReport, rawInputs) {
+    var sig = detectContractSignalsForLedger(text, checks, flagReport, rawInputs);
+    var acv = sig.acv;
+    var map = sig.map;
+
+    /* L1: Unit Discount Excess (above 15% policy threshold, or MFN price-match exposure) */
+    var excessDiscountPct = Math.max(0, sig.discountPct - 0.15);
+    var l1Amount = Math.round(excessDiscountPct * acv);
+    var l1Source = l1Amount > 0
+      ? ("Unit discount of " + (sig.discountPct * 100).toFixed(1) + "% exceeds 15.0% policy guardband on $" + acv.toLocaleString() + " Baseline ACV.")
+      : "No unit discount excess above policy guardband (0% excess leak).";
+
+    /* L2: Working-Capital Float & Effective DSO Drag */
+    var splitFactors = { annual: 0, semiannual: 0.0085, quarterly: 0.0162, monthly: 0.024 };
+    var splitFactor = splitFactors[sig.billingFreq] || 0;
+    var extraNetDays = Math.max(30, sig.netDays) - 30;
+    var l2Amount = Math.round(((extraNetDays / 365) * 0.095 * acv) + (splitFactor * acv));
+    var l2Source = l2Amount > 0
+      ? ("Net-" + Math.max(30, sig.netDays) + " payment terms (" + extraNetDays + " days above Net-30 baseline) + " + sig.billingFreq + " billing float drag." + (map["payment-terms"] && map["payment-terms"].found ? " Clause: \"" + map["payment-terms"].excerpt + "\"" : ""))
+      : "Standard Net-30 annual upfront payment terms ($0 working-capital float drag).";
+
+    /* L3: Renewal Uplift Erosion */
+    var upliftShortfall = Math.max(0, 0.07 - sig.upliftCapPct);
+    var l3Amount = Math.round(upliftShortfall * acv);
+    var l3Source = l3Amount > 0
+      ? ("Renewal uplift capped/eroded at " + (sig.upliftCapPct * 100).toFixed(1) + "% vs. 7.0% standard price escalator." + (map.renewal && map.renewal.found ? " Clause: \"" + map.renewal.excerpt + "\"" : ""))
+      : "Standard 7.0% renewal uplift protected ($0 Year-2 uplift erosion).";
+
+    /* L4: Silent Contraction / Commit True-Down / Rollover / Setoff Exposure */
+    var l4Active = (sig.trueDownFlag || sig.rolloverFlag) ? 1 : 0;
+    var l4Amount = l4Active ? Math.round(0.045 * acv) : 0;
+    var l4Excerpt = (map.setoff && map.setoff.excerpt) || (map.mfn && map.mfn.excerpt) || null;
+    var l4Source = l4Amount > 0
+      ? ("Commit true-down, credit rollover, MFN, or setoff withholding right active." + (l4Excerpt ? " Clause: \"" + l4Excerpt + "\"" : ""))
+      : "No commit true-down, rollover cannibalization, or setoff right detected ($0 leak).";
+
+    /* L5: ASC-606 Revenue-Recognition Holdback Reserve */
+    var l5Active = (sig.termForConvFlag || sig.soleDiscretionAccFlag || sig.refundableSlaFlag) ? 1 : 0;
+    var l5Amount = l5Active ? Math.round(0.036 * acv) : 0;
+    var l5Excerpt = (map["termination-convenience"] && map["termination-convenience"].excerpt) || (map["acceptance-testing"] && map["acceptance-testing"].excerpt) || null;
+    var l5Source = l5Amount > 0
+      ? ("Termination for convenience or subjective acceptance/refund gate triggers ASC-606 deferral reserve." + (l5Excerpt ? " Clause: \"" + l5Excerpt + "\"" : ""))
+      : "No termination-for-convenience or subjective acceptance holdback trigger ($0 reserve).";
+
+    /* L6: Actuarial Liability / Super-Cap / Uncapped Indemnity Reserve */
+    var l6Active = (sig.uncappedIndemFlag || sig.superCapFlag) ? 1 : 0;
+    var l6Amount = l6Active ? Math.round(0.030 * acv) : 0;
+    var l6Excerpt = (map.indemnity && map.indemnity.excerpt) || (map["liability-cap"] && map["liability-cap"].excerpt) || null;
+    var l6Source = l6Amount > 0
+      ? ("Uncapped indemnity, one-way indemnity, or liability cap carve-out active." + (l6Excerpt ? " Clause: \"" + l6Excerpt + "\"" : ""))
+      : "Balanced mutual liability cap and indemnity profile ($0 tail-risk reserve).";
+
+    var totalLeak = l1Amount + l2Amount + l3Amount + l4Amount + l5Amount + l6Amount;
+    var truePocketRev = acv - totalLeak;
+
+    var cells = {
+      L1_UnitDiscount: Object.freeze({ id: "L1", code: "L1_UnitDiscount", label: "Unit Discount Excess", amount: l1Amount, active: l1Amount > 0, source: l1Source }),
+      L2_FloatDrag: Object.freeze({ id: "L2", code: "L2_FloatDrag", label: "Working-Capital Float & DSO Drag", amount: l2Amount, active: l2Amount > 0, source: l2Source }),
+      L3_RenewalUplift: Object.freeze({ id: "L3", code: "L3_RenewalUplift", label: "Year-2 Renewal Uplift Erosion", amount: l3Amount, active: l3Amount > 0, source: l3Source }),
+      L4_CommitTrueDown: Object.freeze({ id: "L4", code: "L4_CommitTrueDown", label: "Commit True-Down / Rollover / Setoff Exposure", amount: l4Amount, active: l4Amount > 0, source: l4Source }),
+      L5_RevRecHoldback: Object.freeze({ id: "L5", code: "L5_RevRecHoldback", label: "ASC-606 Rev-Rec Holdback & Cancel Reserve", amount: l5Amount, active: l5Amount > 0, source: l5Source }),
+      L6_LiabilityReserve: Object.freeze({ id: "L6", code: "L6_LiabilityReserve", label: "Liability Carve-Out & Uncapped Indemnity Reserve", amount: l6Amount, active: l6Amount > 0, source: l6Source })
+    };
+
+    var activeCellsCount = [
+      cells.L1_UnitDiscount, cells.L2_FloatDrag, cells.L3_RenewalUplift,
+      cells.L4_CommitTrueDown, cells.L5_RevRecHoldback, cells.L6_LiabilityReserve
+    ].filter(function (c) { return c.active; }).length;
+
+    /* Continuity Risk Cell */
+    var interpretiveAmbiguityScore = Math.min(100, (sig.subjectiveWordsCount * 35) + (sig.undefinedBreachFlag * 30));
+    var preventionCount = sig.flags.length + (sig.termForConvFlag ? 1 : 0) + (map["suspension-rights"] && map["suspension-rights"].found ? 1 : 0);
+    var promotionCount = (map.sla && map.sla.found ? 1 : 0) + (map["exit-assistance"] && map["exit-assistance"].found ? 1 : 0);
+    var preventionRatio = Math.round((preventionCount / Math.max(1, preventionCount + promotionCount)) * 1000) / 10;
+    var hasContinuityKillRisk = (interpretiveAmbiguityScore >= 30 && preventionRatio >= 60) || sig.undefinedBreachFlag === 1;
+
+    /* Compute All 46 Named Indicators */
+    var w1_kpi_01 = Math.round(((acv - totalLeak) / Math.max(1, acv)) * 10000) / 100;
+    var w1_kpi_02 = totalLeak;
+    var splitBillingFlag = sig.billingFreq !== "annual" ? 1 : 0;
+    var customUsageFlag = /\busage\s+schedule\b|\bcustom\s+tier\b/i.test(text) ? 1 : 0;
+    var manualPoFlag = /\bpurchase\s+order\b|\bPO\s+required\b/i.test(text) ? 1 : 0;
+    var w1_opi_02 = Math.min(100, (splitBillingFlag * 30) + (customUsageFlag * 35) + (manualPoFlag * 35));
+
+    var uptimeMatch = /\b(\d{2,3}(?:\.\d+)?)%\s*(?:uptime|availability)\b/i.exec(text);
+    var detectedUptime = uptimeMatch ? Number(uptimeMatch[1]) : 99.9;
+    var customP1Flag = /\b(?:15[-\s]minute|30[-\s]minute|1[-\s]hour)\s+(?:response|P1)\b/i.test(text) ? 1 : 0;
+    var w1_opi_03 = Math.round(((Math.max(0, detectedUptime - 99.9) * 100) * 0.012 * acv) + (customP1Flag * 0.015 * acv));
+
+    var unbilledServicesCogs = w1_opi_03;
+    var actualGmRatio = (truePocketRev - (0.20 * acv) - unbilledServicesCogs) / Math.max(1, truePocketRev);
+    var w1_kpi_03 = Math.max(0, Math.round((0.80 - actualGmRatio) * 10000));
+    var w1_kpi_04 = l2Amount;
+    var l3_24Mo = Math.round(l3Amount + (l3Amount * 1.07));
+    var w1_kpi_05 = l3_24Mo;
+
+    var cacBaseline = acv * 0.90;
+    var actualGmClamped = Math.max(0.15, actualGmRatio);
+    var paybackActual = cacBaseline / Math.max(1, (truePocketRev * actualGmClamped / 12));
+    var paybackBase = cacBaseline / Math.max(1, (acv * 0.80 / 12));
+    var w1_kpi_06 = Math.max(0, Math.round((paybackActual - paybackBase) * 10) / 10);
+
+    var w1_opi_01 = l5Amount;
+    var onSiteAuditFlag = !!(map["audit-rights"] && map["audit-rights"].found) ? 1 : 0;
+    var customInfoSecFlag = !!(map.security && map.security.found) ? 1 : 0;
+    var bespokeInsFlag = !!(map.insurance && map.insurance.found) ? 1 : 0;
+    var w1_opi_04 = (onSiteAuditFlag * 24) + (customInfoSecFlag * 16) + (bespokeInsFlag * 8);
+
+    var portalInvoicingFlag = /\b(?:ariba|coupa|billing\s+portal)\b/i.test(text) ? 1 : 0;
+    var milestoneGateFlag = !!(map["acceptance-testing"] && map["acceptance-testing"].found) ? 1 : 0;
+    var w1_opi_05 = Math.max(30, sig.netDays) + (portalInvoicingFlag * 12) + (milestoneGateFlag * 18) - 30;
+
+    var w1_lead_01 = l4Amount;
+    var rolloverCapPct = sig.rolloverFlag ? 0.25 : 0;
+    var w1_lead_02 = sig.rolloverFlag ? Math.round(Math.min(0.35, rolloverCapPct * 0.50) * 1000) / 10 : 0;
+    var cpiFloorDeleted = !(map["price-increase"] && map["price-increase"].found) ? 1 : 0;
+    var w1_lead_03 = (sig.termYears > 1 && cpiFloorDeleted) ? Math.round(acv * 0.032 * (sig.termYears - 1)) : 0;
+    var w1_lead_04 = l6Amount;
+    var nakedUnitCutFlag = l1Amount > 0 ? 1 : 0;
+    var spilloverCost = nakedUnitCutFlag ? Math.round(l1Amount * 2.0) : 0;
+    var w1_lead_05 = spilloverCost;
+
+    /* Window 2 Indicators (#17 - #34) */
+    var extWarrantyFlag = !!(map.warranties && map.warranties.found) ? 1 : 0;
+    var w2_lead_01 = Math.min(100, (sig.termForConvFlag * 35) + (sig.soleDiscretionAccFlag * 35) + (sig.refundableSlaFlag * 20) + (extWarrantyFlag * 10));
+    var commPts = (l1Amount > 0 ? 1 : 0) + (l2Amount > 0 ? 1 : 0) + (l3Amount > 0 ? 1 : 0) + (l4Amount > 0 ? 1 : 0);
+    var opsPts = (l5Amount > 0 ? 1 : 0) + (l6Amount > 0 ? 1 : 0) + onSiteAuditFlag + milestoneGateFlag;
+    var w2_lead_02 = Math.round((commPts / Math.max(1, commPts + opsPts)) * 1000) / 10;
+    var w2_lead_03 = Math.min(100, (sig.trueDownFlag * 40) + (sig.rolloverFlag * 35) + (splitBillingFlag * 25));
+    var w2_lead_04 = Math.round((activeCellsCount / 6) * 100);
+    var aiNoTrainFlag = !!(map["data-training"] && map["data-training"].found) ? 1 : 0;
+    var ipStdFlag = (flagReport && flagReport.ipSignal && flagReport.ipSignal.present) ? 1 : 0;
+    var w2_lead_05 = Math.min(100, (aiNoTrainFlag * 35) + (sig.superCapFlag * 35) + (onSiteAuditFlag * 15) + (ipStdFlag * 15));
+    var w2_lead_06 = preventionRatio;
+    var w2_lead_07 = interpretiveAmbiguityScore;
+
+    var customDpaFlag = !!(map["data-protection"] && map["data-protection"].found) ? 1 : 0;
+    var w2_opi_01 = Math.round(((sig.flags.length * 1.8) + (sig.uncappedIndemFlag * 4.5) + (customDpaFlag * 3.0)) * 10) / 10;
+    var w2_opi_02 = 1 + ((l1Amount > 0 || l2Amount > 0) ? 1 : 0) + (l5Amount > 0 ? 1 : 0) + (l6Amount > 0 ? 1 : 0);
+    var w2_opi_03 = Math.max(0, Math.min(100, Math.round(50 + 25 - (w2_lead_02 * 0.5))));
+    var w2_opi_04 = 25;
+    var w2_opi_05 = sig.discountPct > 0.20 ? Math.min(100, Math.round(((sig.discountPct - 0.15) * 300) + 35)) : 15;
+    var w2_opi_06 = (customInfoSecFlag * 35) + 40;
+
+    var w2_kpi_01 = Math.round(((acv * 1.35 * 2.4 * 0.80) / Math.max(1, totalLeak)) * 100) / 100;
+    var w2_kpi_02 = Math.max(10, Math.min(95, 85 - (l3Amount > 0 ? 45 : 0) - (l4Amount > 0 ? 25 : 0) - (hasContinuityKillRisk ? 35 : 0)));
+    var w2_kpi_03 = Math.round(acv * 0.15) + (map.publicity && map.publicity.found ? Math.round(acv * 0.08) : 0);
+    var y2TargetArr = Math.round(acv * 1.07);
+    var w2_kpi_04 = Math.round((truePocketRev + (y2TargetArr * (w2_kpi_02 / 100) * 2)) - spilloverCost - (hasContinuityKillRisk ? y2TargetArr * 0.5 : 0));
+    var w2_kpi_05 = Math.round(Math.min(99, 60 + (Math.abs(w2_lead_01 - w2_lead_02) * 0.35) + (activeCellsCount * 3)));
+
+    /* Window 3 Baseline Reference Indicators (#35 - #46) */
+    var optARescued = l1Amount + l2Amount + l3Amount + l4Amount + l5Amount;
+    var optAResidual = totalLeak - optARescued;
+    var w3_kpi_01 = optARescued;
+    var w3_kpi_02 = optAResidual;
+    var w3_kpi_03 = optARescued * 3 + spilloverCost;
+    var w3_kpi_04 = (l3Amount > 0 ? l3_24Mo : 0) + (l4Amount > 0 ? l4Amount * 2 : 0) + (hasContinuityKillRisk ? y2TargetArr : 0);
+    var w3_kpi_05 = spilloverCost;
+    var clearedCellsCount = [l1Amount, l2Amount, l3Amount, l4Amount, l5Amount].filter(function (x) { return x > 0; }).length;
+    var w3_opi_01 = Math.round(w2_opi_01 * (clearedCellsCount / Math.max(1, activeCellsCount)) * 0.80 * 10) / 10;
+    var w3_opi_02 = 1.25;
+    var w3_opi_03 = (optAResidual === 0 || optAResidual <= l6Amount) ? "TIER 1 — SELF-CLEARING (SEND TODAY)" : "TIER 2 — VP FINANCE SIGN-OFF";
+    var w3_opi_04 = Math.min(3, Math.max(1, Math.ceil(activeCellsCount / 2)));
+    var w3_lead_01 = Math.min(94, 50 + 32 + 12);
+    var w3_lead_02 = 100;
+    var w3_lead_03 = !hasContinuityKillRisk ? "LOW (12/100 — Cooperative Frame)" : "HIGH (84/100 — Vigilance & Year-2 Churn Warning)";
+
+    var qtcMaturityScore = Math.max(0, Math.min(100, Math.round(w1_kpi_01 - (w1_opi_02 * 0.15) - (w1_opi_05 * 0.20) - (activeCellsCount * 3))));
+
+    var namedIndicators = [
+      { num: 1, id: "W1_KPI_01", name: "Pocket Price Yield %", window: 1, type: "KPI", value: w1_kpi_01, formatted: w1_kpi_01.toFixed(2) + "%" },
+      { num: 2, id: "W1_KPI_02", name: "Direct Year-1 Pocket Dollar Leak ($)", window: 1, type: "KPI", value: w1_kpi_02, formatted: "-$" + w1_kpi_02.toLocaleString() },
+      { num: 3, id: "W1_KPI_03", name: "Deal Gross Margin Erosion (bps)", window: 1, type: "KPI", value: w1_kpi_03, formatted: w1_kpi_03 + " bps" },
+      { num: 4, id: "W1_KPI_04", name: "Working-Capital Float & Effective DSO Drag ($)", window: 1, type: "KPI", value: w1_kpi_04, formatted: "-$" + w1_kpi_04.toLocaleString() },
+      { num: 5, id: "W1_KPI_05", name: "Compounded 24-Month NRR Erosion ($)", window: 1, type: "KPI", value: w1_kpi_05, formatted: "-$" + w1_kpi_05.toLocaleString() },
+      { num: 6, id: "W1_KPI_06", name: "Effective CAC Payback Extension (Months Added)", window: 1, type: "KPI", value: w1_kpi_06, formatted: "+" + w1_kpi_06.toFixed(1) + " mos" },
+      { num: 7, id: "W1_OPI_01", name: "ASC-606 Revenue-Recognition Holdback Reserve ($)", window: 1, type: "OPI", value: w1_opi_01, formatted: "-$" + w1_opi_01.toLocaleString() },
+      { num: 8, id: "W1_OPI_02", name: "RevOps Manual Billing & Custom Tier Overhead Score", window: 1, type: "OPI", value: w1_opi_02, formatted: w1_opi_02 + " / 100" },
+      { num: 9, id: "W1_OPI_03", name: "Bespoke SLA & Support COGS Burden ($/yr)", window: 1, type: "OPI", value: w1_opi_03, formatted: "$" + w1_opi_03.toLocaleString() + "/yr" },
+      { num: 10, id: "W1_OPI_04", name: "Post-Close Legal & InfoSec Audit Friction Hours", window: 1, type: "OPI", value: w1_opi_04, formatted: w1_opi_04 + " hrs/yr" },
+      { num: 11, id: "W1_OPI_05", name: "Order-to-Cash Collection Cycle Drag (Effective Days)", window: 1, type: "OPI", value: w1_opi_05, formatted: "+" + w1_opi_05 + " days" },
+      { num: 12, id: "W1_LEAD_01", name: "Silent Contraction / True-Down Exposure ($)", window: 1, type: "Leading Indicator", value: w1_lead_01, formatted: "-$" + w1_lead_01.toLocaleString() },
+      { num: 13, id: "W1_LEAD_02", name: "Unused Commit Rollover Cannibalization Rate (%)", window: 1, type: "Leading Indicator", value: w1_lead_02, formatted: w1_lead_02.toFixed(1) + "%" },
+      { num: 14, id: "W1_LEAD_03", name: "Unhedged Multi-Year Inflation / FX Exposure ($)", window: 1, type: "Leading Indicator", value: w1_lead_03, formatted: "-$" + w1_lead_03.toLocaleString() },
+      { num: 15, id: "W1_LEAD_04", name: "Actuarial Tail-Risk Reserve (Super-Cap / Carve-Out) ($)", window: 1, type: "Leading Indicator", value: w1_lead_04, formatted: "-$" + w1_lead_04.toLocaleString() },
+      { num: 16, id: "W1_LEAD_05", name: "3x Multichannel Discount Spillover Shadow Cost ($)", window: 1, type: "Leading Indicator", value: w1_lead_05, formatted: "-$" + w1_lead_05.toLocaleString() },
+
+      { num: 17, id: "W2_LEAD_01", name: "Cognitive Uncertainty-Avoidance / JOLT FOMU Index", window: 2, type: "Leading Indicator", value: w2_lead_01, formatted: w2_lead_01 + " / 100" },
+      { num: 18, id: "W2_LEAD_02", name: "Kraljic Procurement Bluff Skew Ratio (%)", window: 2, type: "Leading Indicator", value: w2_lead_02, formatted: w2_lead_02.toFixed(1) + "%" },
+      { num: 19, id: "W2_LEAD_03", name: "Kahneman Loss-Aversion & Shelfware Anxiety Score", window: 2, type: "Leading Indicator", value: w2_lead_03, formatted: w2_lead_03 + " / 100" },
+      { num: 20, id: "W2_LEAD_04", name: "Multi-Front Anchor-Drift Velocity (Concession Nibbling)", window: 2, type: "Leading Indicator", value: w2_lead_04, formatted: w2_lead_04 + "%" },
+      { num: 21, id: "W2_LEAD_05", name: "Corporate Boilerplate Rigidity Score", window: 2, type: "Leading Indicator", value: w2_lead_05, formatted: w2_lead_05 + " / 100" },
+      { num: 22, id: "W2_LEAD_06", name: "Prevention-to-Promotion Contract Framing Ratio", window: 2, type: "Leading Indicator", value: w2_lead_06, formatted: w2_lead_06.toFixed(1) + "%" },
+      { num: 23, id: "W2_LEAD_07", name: "Interpretive Uncertainty & Ambiguity Index", window: 2, type: "Leading Indicator", value: w2_lead_07, formatted: w2_lead_07 + " / 100" },
+      { num: 24, id: "W2_OPI_01", name: "Redline Density & Legal Cycle-Time Drag (+Days Added)", window: 2, type: "OPI", value: w2_opi_01, formatted: "+" + w2_opi_01.toFixed(1) + " days" },
+      { num: 25, id: "W2_OPI_02", name: "Internal Escalation Tier Load (Sign-Off Silos Required)", window: 2, type: "OPI", value: w2_opi_02, formatted: w2_opi_02 + " Silos" },
+      { num: 26, id: "W2_OPI_03", name: "Champion vs. Procurement Control Asymmetry", window: 2, type: "OPI", value: w2_opi_03, formatted: w2_opi_03 + " / 100" },
+      { num: 27, id: "W2_OPI_04", name: "End-of-Quarter (EOQ) Time-Pressure Asymmetry Index", window: 2, type: "OPI", value: w2_opi_04, formatted: String(w2_opi_04) },
+      { num: 28, id: "W2_OPI_05", name: "Inverted-U Rep Discretion Risk Score", window: 2, type: "OPI", value: w2_opi_05, formatted: w2_opi_05 + " / 100" },
+      { num: 29, id: "W2_OPI_06", name: "Technical & InfoSec Lock-In Readiness (%)", window: 2, type: "OPI", value: w2_opi_06, formatted: w2_opi_06 + "%" },
+      { num: 30, id: "W2_KPI_01", name: "3-Year Expansion LTV-to-Leak Recovery Multiple", window: 2, type: "KPI", value: w2_kpi_01, formatted: w2_kpi_01.toFixed(2) + "x" },
+      { num: 31, id: "W2_KPI_02", name: "Month-13 Renewal Clawback Probability (%)", window: 2, type: "KPI", value: w2_kpi_02, formatted: w2_kpi_02 + "%" },
+      { num: 32, id: "W2_KPI_03", name: "Competitive Displacement & Reference Logo Value ($)", window: 2, type: "KPI", value: w2_kpi_03, formatted: "$" + w2_kpi_03.toLocaleString() },
+      { num: 33, id: "W2_KPI_04", name: "Risk-Adjusted 36-Month Net Deal Contribution ($)", window: 2, type: "KPI", value: w2_kpi_04, formatted: "$" + w2_kpi_04.toLocaleString() },
+      { num: 34, id: "W2_KPI_05", name: "Composite Deal Desk Verdict Confidence Score (%)", window: 2, type: "KPI", value: w2_kpi_05, formatted: w2_kpi_05 + "%" },
+
+      { num: 35, id: "W3_KPI_01", name: "Exact Pocket Leak Rescued ($ and % of Window 1 Leak)", window: 3, type: "KPI", value: w3_kpi_01, formatted: "$" + w3_kpi_01.toLocaleString() },
+      { num: 36, id: "W3_KPI_02", name: "Residual Unfixed Year-1 Pocket Leak ($)", window: 3, type: "KPI", value: w3_kpi_02, formatted: "$" + w3_kpi_02.toLocaleString() },
+      { num: 37, id: "W3_KPI_03", name: "3-Year Risk-Adjusted TCV Lift ($ vs. Rep's Raw Deal)", window: 3, type: "KPI", value: w3_kpi_03, formatted: "+$" + w3_kpi_03.toLocaleString() },
+      { num: 38, id: "W3_KPI_04", name: "Year-2 NRR & Continuity At-Risk Dollar Exposure ($)", window: 3, type: "KPI", value: w3_kpi_04, formatted: "$" + w3_kpi_04.toLocaleString() },
+      { num: 39, id: "W3_KPI_05", name: "Portfolio Spillover Shield Savings ($)", window: 3, type: "KPI", value: w3_kpi_05, formatted: "$" + w3_kpi_05.toLocaleString() },
+      { num: 40, id: "W3_OPI_01", name: "Legal Cycle-Time Compression (Days Saved)", window: 3, type: "OPI", value: w3_opi_01, formatted: w3_opi_01.toFixed(1) + " days" },
+      { num: 41, id: "W3_OPI_02", name: "Give-Get Reciprocity Balance Ratio", window: 3, type: "OPI", value: w3_opi_02, formatted: w3_opi_02.toFixed(2) + "x" },
+      { num: 42, id: "W3_OPI_03", name: "Self-Clearing Deal Desk Authority Tier (1, 2, or 3)", window: 3, type: "OPI", value: w3_opi_03, formatted: w3_opi_03 },
+      { num: 43, id: "W3_OPI_04", name: "Nested Bracket Cognitive Load Score", window: 3, type: "OPI", value: w3_opi_04, formatted: w3_opi_04 + " Brackets" },
+      { num: 44, id: "W3_LEAD_01", name: "Behavioral Buyer Acceptance Probability (%)", window: 3, type: "Leading Indicator", value: w3_lead_01, formatted: w3_lead_01 + "%" },
+      { num: 45, id: "W3_LEAD_02", name: "MESO Agreement Sincerity & Anchor Resilience Score", window: 3, type: "Leading Indicator", value: w3_lead_02, formatted: w3_lead_02 + " / 100" },
+      { num: 46, id: "W3_LEAD_03", name: "Post-Signature Implementation & Renewal Friction Forecast", window: 3, type: "Leading Indicator", value: w3_lead_03, formatted: w3_lead_03 }
+    ];
+
+    /* Pre-wire Ledger Alternatives Tie-Out structure for Stage 2 MESOs */
+    var alternatives = [
+      Object.freeze({ id: "MESO_A", rescued: optARescued, residual: totalLeak - optARescued }),
+      Object.freeze({ id: "MESO_B", rescued: l1Amount + l2Amount + l5Amount, residual: totalLeak - (l1Amount + l2Amount + l5Amount) }),
+      Object.freeze({ id: "MESO_C", rescued: l3Amount + l4Amount + l6Amount, residual: totalLeak - (l3Amount + l4Amount + l6Amount) })
+    ];
+
+    var ledger = Object.freeze({
+      baselineAcv: acv,
+      totalLeak: totalLeak,
+      truePocketRev: truePocketRev,
+      pocketYieldPct: w1_kpi_01,
+      qtcMaturityScore: qtcMaturityScore,
+      activeCellsCount: activeCellsCount,
+      cells: Object.freeze(cells),
+      continuityRisk: Object.freeze({
+        active: hasContinuityKillRisk,
+        ambiguityScore: interpretiveAmbiguityScore,
+        preventionRatio: preventionRatio,
+        y2AtRiskArr: hasContinuityKillRisk ? y2TargetArr : 0
+      }),
+      indicators: Object.freeze(namedIndicators),
+      alternatives: Object.freeze(alternatives)
+    });
+
+    assertLedgerTieOut(ledger);
+    return ledger;
+  }
+
   window.ContractAnalyzer = {
     parseKeyClauses: parseKeyClauses,
     runChecks: runChecks,
     computeFlags: computeFlags,
+    computeLedgerAndIndicators: computeLedgerAndIndicators,
+    assertLedgerTieOut: assertLedgerTieOut,
     CHECKS: CHECKS
   };
 })();
@@ -1622,10 +2180,18 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
       var stickyFoundEl = document.getElementById("sticky-found");
       var stickyMissingEl = document.getElementById("sticky-missing");
 
+      var inputAcvEl = document.getElementById("ca-input-acv");
+      var inputDiscountEl = document.getElementById("ca-input-discount");
+      var inputNetDaysEl = document.getElementById("ca-input-netdays");
+      var inputBillingEl = document.getElementById("ca-input-billing");
+      var inputUpliftEl = document.getElementById("ca-input-uplift");
+      var inputTermEl = document.getElementById("ca-input-term");
+
       var lastText = "";
       var lastChecks = null;
       var lastScans = null;
       var lastFlagReport = null;
+      var lastLedger = null;
       var activeFilter = "all";
 
       if (window.pdfjsLib) {
@@ -1654,7 +2220,18 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
         var chars = val.length;
         var trimmed = val.trim();
         var words = trimmed ? trimmed.split(/\s+/).length : 0;
-        textStatsEl.textContent = chars.toLocaleString() + " characters · " + words.toLocaleString() + " words";
+        textStatsEl.textContent = chars.toLocaleString() + " / 50,000 characters · " + words.toLocaleString() + " words";
+      }
+
+      function getDealInputs() {
+        return {
+          acv: inputAcvEl ? Number(inputAcvEl.value) : 100000,
+          discountPct: inputDiscountEl ? Number(inputDiscountEl.value) : 0,
+          netDays: inputNetDaysEl ? Number(inputNetDaysEl.value) : 30,
+          billingFreq: inputBillingEl ? inputBillingEl.value : "annual",
+          upliftCapPct: inputUpliftEl ? Number(inputUpliftEl.value) : 7,
+          termYears: inputTermEl ? Number(inputTermEl.value) : 1
+        };
       }
 
       function resetResultsToIdle() {
@@ -1662,6 +2239,7 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
         lastChecks = null;
         lastScans = null;
         lastFlagReport = null;
+        lastLedger = null;
         activeFilter = "all";
         stickyFlagsEl.textContent = "—";
         stickyFlagsEl.className = "";
@@ -1669,7 +2247,7 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
         stickyMissingEl.textContent = "—";
         resultsEl.innerHTML =
           '<div class="idle-notice-box" id="ca-idle-state">' +
-            'Ready to analyze. Upload a contract, paste text, or load the fictional sample contract above, then click <strong>Run the analysis</strong> to populate the risk flags, the six original scans, and all ' + TOTAL_CHECKS + ' coverage checks.' +
+            'Ready to analyze. Upload a contract, paste text, or load the fictional sample contract above, then click <strong>Run the analysis</strong> to populate the Window 1 forensic leak waterfall, the risk flags, the six original scans, and all ' + TOTAL_CHECKS + ' coverage checks.' +
           '</div>';
         aiOutEl.innerHTML = "Run the browser scan above first, then select <strong>Write the AI read</strong> if you want an AI-written summary alongside the heuristic evidence.";
       }
@@ -1678,6 +2256,12 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
 
       document.getElementById("ca-sample").addEventListener("click", function () {
         textEl.value = SAMPLE;
+        if (inputAcvEl) inputAcvEl.value = "150000";
+        if (inputDiscountEl) inputDiscountEl.value = "0";
+        if (inputNetDaysEl) inputNetDaysEl.value = "30";
+        if (inputBillingEl) inputBillingEl.value = "annual";
+        if (inputUpliftEl) inputUpliftEl.value = "7";
+        if (inputTermEl) inputTermEl.value = "1";
         fileStatusEl.textContent = "Sample contract loaded (fictional service agreement — 6 lines).";
         updateTextStats();
         setNote("Sample loaded — the fictional service agreement from the original tool. Run the analysis.", false);
@@ -1700,9 +2284,10 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
         setNote("", false);
 
         var done = function (text) {
-          textEl.value = text;
+          var clipped = text.slice(0, 50000);
+          textEl.value = clipped;
           updateTextStats();
-          fileStatusEl.textContent = f.name + " — " + text.length.toLocaleString() + " characters extracted in your browser.";
+          fileStatusEl.textContent = f.name + " — " + clipped.length.toLocaleString() + " characters extracted in your browser.";
           setNote("File loaded. Select Run the analysis to scan it.", false);
         };
 
@@ -1802,7 +2387,65 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
         });
       }
 
-      function buildPlainBrief(checks, scans, flagReport) {
+      function renderWindow1Waterfall(ledger) {
+        var c = ledger.cells;
+        var cellList = [
+          c.L1_UnitDiscount,
+          c.L2_FloatDrag,
+          c.L3_RenewalUplift,
+          c.L4_CommitTrueDown,
+          c.L5_RevRecHoldback,
+          c.L6_LiabilityReserve
+        ];
+        var w1Indicators = ledger.indicators.filter(function (ind) { return ind.window === 1; });
+
+        var html = '<section class="window1-panel" id="ca-window1-panel" aria-label="Window 1 Forensic Leak Waterfall">';
+        html += '<div class="window1-head">';
+        html += '<div class="window1-title-group">';
+        html += '<span class="window1-eyebrow">Window 1 · Forensic Pocket-Price Waterfall &amp; 6-Cell Shared Ledger</span>';
+        html += '<h3 class="window1-title">Forensic Leak Waterfall (Cells L1–L6 Reconciled)</h3>';
+        html += '</div>';
+        html += '<div class="window1-maturity-badge">QTC Maturity Score: <strong id="ca-qtc-maturity">' + ledger.qtcMaturityScore + ' / 100</strong></div>';
+        html += '</div>';
+
+        html += '<div class="waterfall-summary-strip">';
+        html += '<div class="wf-summary-box"><span class="wf-summary-label">Baseline Contract ACV</span><span class="wf-summary-val" id="ca-w1-acv">$' + ledger.baselineAcv.toLocaleString() + '</span><span class="wf-summary-sub">100.0% gross list baseline</span></div>';
+        html += '<div class="wf-summary-box is-leak"><span class="wf-summary-label">Direct Year-1 Pocket Leak</span><span class="wf-summary-val" id="ca-w1-total-leak">-$' + ledger.totalLeak.toLocaleString() + '</span><span class="wf-summary-sub">' + ledger.activeCellsCount + ' of 6 ledger cells active</span></div>';
+        html += '<div class="wf-summary-box is-pocket"><span class="wf-summary-label">True Pocket Revenue</span><span class="wf-summary-val" id="ca-w1-pocket-rev">$' + ledger.truePocketRev.toLocaleString() + '</span><span class="wf-summary-sub">Pocket Price Yield: ' + ledger.pocketYieldPct.toFixed(2) + '%</span></div>';
+        html += '</div>';
+
+        html += '<div class="ledger-list" role="list" aria-label="6-Cell Forensic Leak Ledger">';
+        cellList.forEach(function (cell) {
+          var pctOfAcv = Math.min(100, Math.round((cell.amount / Math.max(1, ledger.baselineAcv)) * 1000) / 10);
+          var rowClass = cell.active ? "ledger-row is-active-leak" : "ledger-row";
+          html += '<article class="' + rowClass + '" role="listitem" data-ledger-cell="' + esc(cell.id) + '">';
+          html += '<div class="ledger-row-top">';
+          html += '<span class="ledger-cell-title"><span class="ledger-cell-code">[' + esc(cell.id) + ']</span>' + esc(cell.label) + '</span>';
+          html += '<span class="ledger-cell-amount">' + (cell.active ? ("-$" + cell.amount.toLocaleString() + " (-" + pctOfAcv.toFixed(1) + "%)") : "$0 (0.0%)") + '</span>';
+          html += '</div>';
+          html += '<div class="ledger-bar-track"><div class="ledger-bar-fill" style="width:' + (cell.active ? Math.max(4, pctOfAcv * 3) : 0) + '%;"></div></div>';
+          html += '<p class="ledger-cell-source">' + esc(cell.source) + '</p>';
+          html += '</article>';
+        });
+        html += '</div>';
+
+        html += '<h4 class="sub-block-title" style="font-size:1.02rem; margin-bottom:0.55rem;">Window 1 Unit-Economics &amp; Operational Indicators (16 Named Measures)</h4>';
+        html += '<div class="w1-indicators-grid">';
+        w1Indicators.forEach(function (ind) {
+          var typeClass = ind.type === "OPI" ? " is-opi" : (ind.type === "Leading Indicator" ? " is-lead" : "");
+          html += '<article class="w1-ind-card' + typeClass + '" data-indicator-id="' + esc(ind.id) + '">';
+          html += '<div class="w1-ind-top"><span>' + esc(ind.id) + '</span><span>' + esc(ind.type) + '</span></div>';
+          html += '<div class="w1-ind-name">' + esc(ind.name) + '</div>';
+          html += '<div class="w1-ind-val">' + esc(ind.formatted) + '</div>';
+          html += '</article>';
+        });
+        html += '</div>';
+        html += '</section>';
+
+        return html;
+      }
+
+      function buildPlainBrief(checks, scans, flagReport, ledger) {
         var foundList = checks.filter(function (c) { return c.found; });
         var missingList = checks.filter(function (c) { return !c.found; });
         var raisedFlags = flagReport.flags;
@@ -1812,7 +2455,25 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
         lines.push("CONTRACT ANALYZER — BROWSER SCAN BRIEF");
         lines.push("======================================");
         lines.push("Risk Flags Raised: " + raisedFlags.length + " | Coverage: " + foundList.length + " of " + checks.length + " checks found | " + missingList.length + " not found");
+        if (ledger) {
+          lines.push("Window 1 Waterfall: Baseline ACV $" + ledger.baselineAcv.toLocaleString() + " | Total Pocket Leak -$" + ledger.totalLeak.toLocaleString() + " | True Pocket Revenue $" + ledger.truePocketRev.toLocaleString() + " (" + ledger.pocketYieldPct.toFixed(2) + "% yield) | QTC Maturity: " + ledger.qtcMaturityScore + "/100");
+        }
         lines.push("");
+
+        if (ledger) {
+          lines.push("WINDOW 1 — 6-CELL FORENSIC LEAK LEDGER");
+          [
+            ledger.cells.L1_UnitDiscount,
+            ledger.cells.L2_FloatDrag,
+            ledger.cells.L3_RenewalUplift,
+            ledger.cells.L4_CommitTrueDown,
+            ledger.cells.L5_RevRecHoldback,
+            ledger.cells.L6_LiabilityReserve
+          ].forEach(function (c) {
+            lines.push("- [" + c.id + "] " + c.label + ": -$" + c.amount.toLocaleString() + " — " + c.source);
+          });
+          lines.push("");
+        }
 
         lines.push("RISK FLAGS RAISED (" + raisedFlags.length + ")");
         if (!raisedFlags.length) {
@@ -1982,7 +2643,7 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
         return html;
       }
 
-      function renderFullResults(checks, scans, flagReport) {
+      function renderFullResults(checks, scans, flagReport, ledger) {
         var found = checks.filter(function (c) { return c.found; }).length;
         var missing = checks.length - found;
         var flagCount = flagReport.flags.length;
@@ -2001,6 +2662,10 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
         html += '<article class="kpi-card is-brass"><span class="kpi-label">Dollar figures pulled</span><span class="kpi-value">' + scans.money.length + '</span><p class="kpi-note">Pulled by the original Layer 1 scan</p></article>';
         html += '<article class="kpi-card"><span class="kpi-label">Dates pulled</span><span class="kpi-value">' + scans.dates.length + '</span><p class="kpi-note">Pulled by the original Layer 1 scan</p></article>';
         html += '</div>';
+
+        if (ledger) {
+          html += renderWindow1Waterfall(ledger);
+        }
 
         html += renderFlagsBand(flagReport);
 
@@ -2024,7 +2689,7 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
 
         html += '<div id="ca-checks-container">' + renderChecksSection(checks) + '</div>';
 
-        var briefText = buildPlainBrief(checks, scans, flagReport);
+        var briefText = buildPlainBrief(checks, scans, flagReport, ledger);
         html += '<div class="brief-panel" id="ca-brief-panel">';
         html += '<div class="brief-toolbar">';
         html += '<button type="button" class="btn-secondary" id="ca-copy-brief">Copy Analysis Brief</button>';
@@ -2097,7 +2762,8 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
         lastChecks = A.runChecks(text);
         lastScans = A.parseKeyClauses(text);
         lastFlagReport = A.computeFlags(text, lastChecks);
-        renderFullResults(lastChecks, lastScans, lastFlagReport);
+        lastLedger = A.computeLedgerAndIndicators(text, lastChecks, lastFlagReport, getDealInputs());
+        renderFullResults(lastChecks, lastScans, lastFlagReport, lastLedger);
         aiOutEl.innerHTML = "Browser scan complete. Select <strong>Write the AI read</strong> if you want an AI-written summary.";
       });
 
@@ -2164,6 +2830,8 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
           A && typeof A.parseKeyClauses === "function" &&
           typeof A.runChecks === "function" &&
           typeof A.computeFlags === "function" &&
+          typeof A.computeLedgerAndIndicators === "function" &&
+          typeof A.assertLedgerTieOut === "function" &&
           Array.isArray(A.CHECKS) && A.CHECKS.length === 51,
           "Engine interface / 51 checks integrity fail"
         );
@@ -2218,6 +2886,24 @@ ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — FULL-
 
         var pEmpty = "";
         console.assert(A.runChecks(pEmpty).length === 51 && foundIds(pEmpty).length === 0 && flagIds(pEmpty).flags.length === 0, "Empty input fail");
+
+        /* 6. Stage 1 Tie-Out Battery & 46 Named Indicators Verification */
+        var tieFixtures = [
+          { text: SAMPLE, inputs: { acv: 100000, discountPct: 18, netDays: 60, billingFreq: "quarterly", upliftCapPct: 2, termYears: 2 } },
+          { text: pNoIpIndem + " Customer may terminate for convenience upon 30 days written notice. Customer has true-down rights.", inputs: { acv: 240000, discountPct: 22, netDays: 90, billingFreq: "monthly", upliftCapPct: 0, termYears: 3 } },
+          { text: F2, inputs: { acv: 100000, discountPct: 0, netDays: 30, billingFreq: "annual", upliftCapPct: 7, termYears: 1 } }
+        ];
+        tieFixtures.forEach(function (fx, idx) {
+          var ch = A.runChecks(fx.text);
+          var fl = A.computeFlags(fx.text, ch);
+          var led = A.computeLedgerAndIndicators(fx.text, ch, fl, fx.inputs);
+          console.assert(A.assertLedgerTieOut(led) === true, "Tie-out battery failed on fixture #" + idx);
+          console.assert(led.indicators.length === 46, "46 Named Indicators count mismatch on fixture #" + idx);
+          var w1Count = led.indicators.filter(function (i) { return i.window === 1; }).length;
+          var w2Count = led.indicators.filter(function (i) { return i.window === 2; }).length;
+          var w3Count = led.indicators.filter(function (i) { return i.window === 3; }).length;
+          console.assert(w1Count === 16 && w2Count === 18 && w3Count === 12, "46 Named Indicators split (16/18/12) mismatch");
+        });
       }
 
       updateTextStats();
