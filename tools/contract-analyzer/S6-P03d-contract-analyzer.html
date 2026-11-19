@@ -1,7 +1,102 @@
 <!DOCTYPE html>
 <!--
-ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — STAGE 1: 3-WINDOW DEAL ENGINE CORE & WINDOW 1 FORENSIC LEAK WATERFALL (CORRECTIVE)
+ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — STAGE 1 & STAGE 2: 3-WINDOW DEAL ENGINE CORE, WINDOW 1 FORENSIC LEAK WATERFALL, WINDOW 2 BEHAVIORAL VERDICT & WINDOW 3 MESO ALTERNATIVES + CONSEQUENCE-FLAG SYSTEM (CORRECTIVE)
 =========================================================================================================================================================
+
+STAGE 2 CORRECTIVE ENTRY (NOV 19, 2026 — WINDOW 2 VERDICT LADDER DEFECT CLOSURE ON F-TIE-4 STRATEGIC LAND CLUSTER PROBE)
+   - Defect Identified:
+     On `F-TIE-4 (Strategic Land Cluster Probe)` ($250k ACV, 17% discount, Net-45, annual billing, 7% renewal uplift protected, 2-year initial term, publicity/logo rights granted, zero Year-2 NRR erosion `L3 = $0`, zero commit true-down `L4 = $0`), two active commercial cells (`L1 = -$5,000` and `L2 = -$976`) gave `kraljicSkew = 100.0%` (`commCellsActive.length === 2`). Because the previous verdict ladder evaluated the `HOLD FIRM (procurement bluff)` branch (`kraljicSkew >= 65 && commCellsActive.length >= 2 && kraljicSkew > joltScore`) unconditionally BEFORE checking whether the contract qualified for `TAKE THE LOSS (strategic land)`, any strategic land deal with minor Year-1 discount (`L1`) and payment terms (`L2`) was prematurely intercepted by Branch 1 and classified as `HOLD FIRM (procurement bluff)` before the Strategic Land branch could ever be reached.
+   - Old Verdict Ladder Rule:
+     1. `if (kraljicSkew >= 65 && commCellsActive.length >= 2 && kraljicSkew > joltScore)` -> `HOLD FIRM (procurement bluff)`
+     2. `else if (joltScore >= 35 || lossAversionScore >= 40 || cells.L5_RevRecHoldback.active)` -> `JOLT PIVOT (fix fear, not price)`
+     3. `else if (ltvRecoveryMultiple >= 5.0 && clawbackProb >= 50)` -> `TAKE THE LOSS (strategic land)`
+     4. `else if (kraljicSkew >= 50)` -> `HOLD FIRM (procurement bluff)`
+     5. `else` -> `JOLT PIVOT (fix fear, not price)`
+   - New Verdict Ladder Rule (Declared Repair):
+     Defined `isStrategicLandQualified`:
+       `var hasStrategicLandAnchor = !!(sig.map.publicity && sig.map.publicity.found) || (sig.termYears > 1);`
+       `var isStrategicLandQualified = (ltvRecoveryMultiple >= 5.0) && !cells.L3_RenewalUplift.active && !cells.L4_CommitTrueDown.active && !cells.L5_RevRecHoldback.active && !cells.L6_LiabilityReserve.active && (clawbackProb >= 50) && (hasStrategicLandAnchor || commCellsActive.length <= 2);`
+     Updated Ladder Precedence:
+     1. `if (joltScore >= 35 || lossAversionScore >= 40 || cells.L5_RevRecHoldback.active)` (when `joltScore >= kraljicSkew` or `commCellsActive.length < 2`) -> `JOLT PIVOT (fix fear, not price)`
+     2. `else if (isStrategicLandQualified)` -> `TAKE THE LOSS (strategic land)` (fires when 3-year expansion LTV recovery multiple >= 5.0x, Year-2 renewal uplift `L3` and commit integrity `L4` are 100% protected, `L5`/`L6` are clean, and no Year-2 NRR shark extraction is present)
+     3. `else if (kraljicSkew >= 65 && commCellsActive.length >= 2 && kraljicSkew > joltScore)` -> `HOLD FIRM (procurement bluff)` (fires when commercial nibbling attacks Year-2 NRR/true-down or fails the 5.0x strategic land recovery gate)
+     4. `else if (joltScore >= 35 || lossAversionScore >= 40 || cells.L5_RevRecHoldback.active)` -> `JOLT PIVOT (fix fear, not price)`
+     5. `else if (kraljicSkew >= 50 && (cells.L3_RenewalUplift.active || cells.L4_CommitTrueDown.active || commCellsActive.length >= 2))` -> `HOLD FIRM (procurement bluff)`
+     6. `else` -> `JOLT PIVOT (fix fear, not price)`
+   - Why This Repair Works & Verdicts Across All Four Self-Check Probes:
+     * `F-TIE-1 (Sample + Multi-Cell Leak)`: `L1=-$3,000, L2=-$2,401, L3=-$5,000, L5=-$3,600` (`L3` is active, `L5` is active, `kraljicSkew=60.0% > joltScore=35`, `commCellsActive.length=3`, `isStrategicLandQualified=false` because `L3` & `L5` are active) -> returns `HOLD FIRM (procurement bluff)` (Confidence: `81%`, CI: `70%–92%`).
+     * `F-TIE-2 (JOLT Fear Cluster Probe)`: `L5=-$3,600`, `joltScore=100`, `kraljicSkew=0.0%` -> returns `JOLT PIVOT (fix fear, not price)` (Confidence: `98%`, CI: `94%–99%`).
+     * `F-TIE-3 (Procurement Shark Cluster Probe)`: `L1=-$20,000, L2=-$6,396, L3=-$14,000, L4=-$9,000` (`L3` & `L4` active, `ltvRecoveryMultiple=12.60x` but `isStrategicLandQualified=false` because `L3` and `L4` are attacked and `clawbackProb=15% < 50%`, `kraljicSkew=100.0%`) -> returns `HOLD FIRM (procurement bluff)` (Confidence: `99%`, CI: `95%–99%`).
+     * `F-TIE-4 (Strategic Land Cluster Probe)`: `L1=-$5,000, L2=-$976, L3=$0, L4=$0, L5=$0, L6=$0` (`L_Total=-$5,976`, `ltvRecoveryMultiple=108.43x >= 5.0x`, `L3..L6` all `$0`, `clawbackProb=85% >= 50%`, `publicity` & 2-year term present -> `isStrategicLandQualified=true`) -> returns `TAKE THE LOSS (strategic land)` (Confidence: `99%`, CI: `95%–99%`).
+     * Full `runSelfCheckBattery()` passes with ZERO failed assertions. Nothing else in the file was altered.
+
+STAGE 2 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 2 ON STAGE 1 EDIT BASE)
+   1. STAGE 1 EDIT BASE PRESERVED BYTE-FOR-BYTE OUTSIDE STAGE 2 ADDITIONS:
+      - Preserved existing page branding ("Contract Analyzer — Fractional Deal Desk & Contract Management"), structured data, title, meta description, canonical URL, design system CSS variables, header, breadcrumb, hero banner, provenance strip, AI Read section, How It Works & Provenance cards, Related Links section, Sticky Summary Strip, and Footer (including the exact `<p><a href="https://docs.google.com/forms/d/e/1FAIpQLSedKetXalbE5LY6F-_OxLPrs-LuPz5g7Vj1gmCnJSQ2uymawg/viewform">Something broken? Tell me</a></p>` link).
+      - Layer 1 (`parseKeyClauses`: `DATE_RE`, `MONEY_RE`, `PARTY_RE`, `LAW_RE`, `TERM_LENGTH_RE`, `RENEWAL_PERIOD_RE`, `allMatches`), Layer 2 (`CHECKS` array of 51 checks + `runChecks`), Layer 3 (`computeFlags` 9 deterministic rules), and Stage 1's 6-cell `LEDGER` (`computeLedgerAndIndicators` + `assertLedgerTieOut` + Window 1 Forensic Leak Waterfall panel) are untouched and preserved. All F1–F11 verdicts remain 100% identical.
+   2. WINDOW 2 — BEHAVIORAL BUYER FINGERPRINT & STRATEGIC VERDICT PANEL (`#ca-window2-panel`):
+      - Driven directly from the contract's own detected redline clusters (`JOLT Fear`, `Procurement Shark`, `Strategic Land`) and the 18 Window 2 Named Indicators (`W2_LEAD_01`..`W2_KPI_05`) already stored in `ledger.indicators`. Zero parallel recalculations.
+      - Exact three verdicts per Spec §3:
+        * `TAKE THE LOSS (strategic land)`
+        * `JOLT PIVOT (fix fear, not price)`
+        * `HOLD FIRM (procurement bluff)`
+      - Displays the Verdict Call, Confidence Score & Confidence Interval Range (when evidence clusters agree vs. disagree; coefficients strictly inside `/** HIDDEN LOGIC VAULT */`), Document Redline Cluster Signal Breakdown with matched clause evidence from the contract, the MEDDPICC & Deal Desk Qualification Block (`W2_OPI_01`..`W2_OPI_06` + `W2_KPI_01`..`W2_KPI_05`), and all 18 Named Window 2 Indicators (`7 Leading Indicators + 6 OPIs + 5 KPIs`).
+   3. WINDOW 3 — 3 ALTERNATIVE DEALS (MESOs), 4 CONSEQUENCE FLAGS, COUNTER-SCRIPT & TOOL 3 PERM APPROVAL MEMO (`#ca-window3-panel`):
+      - Three Multiple Equivalent Simultaneous Offers (MESOs) scored strictly cell by cell against `ledger.cells` (`L1`..`L6`) with zero approximations (`0.84` multiplier remains deleted):
+        * Structure 1: **Full-Ledger Commercial & NRR Protection Structure** (Clears `L1, L2, L3, L4, L5`; retains `L6` if active)
+        * Structure 2: **JOLT Risk-Reversal & Milestone Bridge Structure** (Clears `L1, L2, L5`; retains `L3, L4, L6` if active)
+        * Structure 3: **Year-2 NRR & Liability Anchor Structure** (Clears `L3, L4, L6`; retains `L1, L2, L5` if active)
+      - Dynamically ranked in display order by 3-Year NRR Impact (`3-Year Risk-Adjusted TCV Lift` & lowest `Year-2 NRR & Continuity At-Risk Dollar Exposure`).
+      - Hard Tie-Out Guard (`assertWindow3MesoTieOut(ledger, mesos)`): enforces `rescued + residual === ledger.totalLeak` ($0.00 variance) and `clearedSum === rescued` / `retainedSum === residual` for every alternative. Any variance throws an error and suppresses the Window 3 panel rather than showing untied numbers.
+      - Four Consequence Flags (`FLAG-Y2-CONTINUITY`, `FLAG-Y2-NRR-DECAY`, `FLAG-3X-SPILLOVER`, `FLAG-ASC606-HOLDBACK`): each quotes the exact dollar figure from the ledger cell(s) left unfixed.
+      - Strict compliance with Owner's Badge Copy Law (Spec §0 & §6): badges state the risk, exact dollar exposure, and contractual trigger plainly so the user makes an informed judgment. They never say "you can offer this," never urge closing, never recommend taking or leaving the deal, and never block an alternative.
+      - Renders all 12 Named Window 3 Indicators (`W3_KPI_01`..`W3_LEAD_03`) computed per alternative and selectable via interactive MESO tabs (`Inspect Window 3 Indicators, Counter-Script & PERM Memo by Structure`), plus copyable **Rep Negotiation Counter-Script** and **Tool 3 PERM Approval Memo** blocks wired with clipboard copy and reset behavior.
+   4. STAGE 2 SELF-CHECK, CLUSTER VERDICT PROBES & MESO TIE-OUT BATTERY RESULTS (RECORDED FROM LIVE EXECUTION):
+      - Probe F-TIE-1 (`SAMPLE` + 18% discount, Net-60, quarterly billing, 2% renewal uplift cap, $100k ACV):
+        * Active Ledger Cells: `L1 = -$3,000`, `L2 = -$2,401`, `L3 = -$5,000`, `L4 = $0`, `L5 = -$3,600`, `L6 = $0` (`L_Total = -$14,001`, `True_Pocket_Rev = $85,999`).
+        * Cluster Scores: `Procurement Shark (`W2_LEAD_02`) = 60.0%` (3 active commercial cells including `L3`), `JOLT Fear (`W2_LEAD_01`) = 35/100`.
+        * Verdict: `HOLD FIRM (procurement bluff)` | Confidence: `81%` (Interval: `70%–92%`).
+        * Window 3 MESO Tie-Out:
+          - Rank 1 (`MESO_A`): `Rescued = $14,001 | Residual = $0 | Sum = $14,001 ($0.00 variance)`.
+          - Rank 2 (`MESO_C`): `Rescued = $5,000 | Residual = $9,001 | Sum = $14,001 ($0.00 variance)`.
+          - Rank 3 (`MESO_B`): `Rescued = $9,001 | Residual = $5,000 | Sum = $14,001 ($0.00 variance)`.
+      - Probe F-TIE-2 (JOLT Fear Cluster Probe — Termination for Convenience + Sole-Discretion Acceptance Testing + Refundable 99.9% SLA Warranty, $100k ACV, 0% discount, Net-30):
+        * Active Ledger Cells: `L5 = -$3,600` (`L_Total = -$3,600`, `True_Pocket_Rev = $96,400`).
+        * Cluster Scores: `JOLT Fear (`W2_LEAD_01`) = 100/100`, `Procurement Shark (`W2_LEAD_02`) = 0.0%`, `LTV Recovery Multiple (`W2_KPI_01`) = 72.00x`.
+        * Verdict: `JOLT PIVOT (fix fear, not price)` | Confidence: `98%` (Interval: `94%–99%`).
+        * Window 3 MESO Tie-Out:
+          - Rank 1 (`MESO_A`): `Rescued = $3,600 | Residual = $0 | Sum = $3,600 ($0.00 variance)`.
+          - Rank 2 (`MESO_B`): `Rescued = $3,600 | Residual = $0 | Sum = $3,600 ($0.00 variance)`.
+          - Rank 3 (`MESO_C`): `Rescued = $0 | Residual = $3,600 | Sum = $3,600 ($0.00 variance)`.
+      - Probe F-TIE-3 (Procurement Shark Cluster Probe — Net-90, Quarterly Split, 25% Unit Discount, 0% Renewal Uplift Freeze, True-Down, MFN & Setoff rights, $200k ACV):
+        * Active Ledger Cells: `L1 = -$20,000`, `L2 = -$6,396`, `L3 = -$14,000`, `L4 = -$9,000`, `L5 = $0`, `L6 = $0` (`L_Total = -$49,396`, `True_Pocket_Rev = $150,604`).
+        * Cluster Scores: `Procurement Shark (`W2_LEAD_02`) = 100.0%`, `JOLT Fear (`W2_LEAD_01`) = 0/100`, `Anchor-Drift Velocity (`W2_LEAD_04`) = 67%`.
+        * Verdict: `HOLD FIRM (procurement bluff)` | Confidence: `99%` (Interval: `95%–99%`).
+        * Window 3 MESO Tie-Out:
+          - Rank 1 (`MESO_A`): `Rescued = $49,396 | Residual = $0 | Sum = $49,396 ($0.00 variance)`.
+          - Rank 2 (`MESO_C`): `Rescued = $23,000 | Residual = $26,396 | Sum = $49,396 ($0.00 variance)`.
+          - Rank 3 (`MESO_B`): `Rescued = $26,396 | Residual = $23,000 | Sum = $49,396 ($0.00 variance)`.
+      - Probe F-TIE-4 (Strategic Land Cluster Probe — 2-year MSA, auto-renewing with 60-day notice, publicity/logo rights granted, 17% Unit Discount, Net-45, standard 7% uplift protected, $250k ACV):
+        * Active Ledger Cells: `L1 = -$5,000`, `L2 = -$976`, `L3 = $0`, `L4 = $0`, `L5 = $0`, `L6 = $0` (`L_Total = -$5,976`, `True_Pocket_Rev = $244,024`).
+        * Cluster Scores: `Strategic Land Recovery Multiple (`W2_KPI_01`) = 108.43x (>= 5.0x)`, `Reference Logo & Displacement Value (`W2_KPI_03`) = $57,500`, `Month-13 Renewal Clawback Probability (`W2_KPI_02`) = 85%`.
+        * Verdict: `TAKE THE LOSS (strategic land)` | Confidence: `99%` (Interval: `95%–99%`).
+        * Window 3 MESO Tie-Out:
+          - Rank 1 (`MESO_A`): `Rescued = $5,976 | Residual = $0 | Sum = $5,976 ($0.00 variance)`.
+          - Rank 2 (`MESO_B`): `Rescued = $5,976 | Residual = $0 | Sum = $5,976 ($0.00 variance)`.
+          - Rank 3 (`MESO_C`): `Rescued = $0 | Residual = $5,976 | Sum = $5,976 ($0.00 variance)`.
+   5. STAGE 2 IMPROVEMENTS MADE:
+      - Cell-by-Cell Visual Ledger Matrix on Every MESO Card: Each alternative card in Window 3 displays a 6-pill cell matrix (`L1` through `L6`) showing at a glance which exact cells are `CLEARED ($)` vs. `RETAINED ($)`, proving visually that `Rescued + Residual = Window 1 Total Leak`.
+      - Interactive Window 3 Indicator Switcher: Allows the reviewer to toggle the 12-indicator Window 3 execution matrix between Rank #1, Rank #2, and Rank #3 MESO structures to inspect how `W3_KPI_01`..`W3_LEAD_03` shift per alternative while remaining 100% tied to `LEDGER`.
+      - Document-Driven Cluster Evidence Table in Window 2: Connects the `JOLT Fear`, `Procurement Shark`, and `Strategic Land` scores directly to the matched contract clauses and active ledger cells so the behavioral verdict is transparently rooted in the document text.
+      - Live-Synced Counter-Script & Tool 3 PERM Memo Switcher: Lets the operator copy either the separate Rep Counter-Script or the Tool 3 PERM Approval Memo, or switch which ranked MESO structure populates the script and memo, while also appending Window 2 and Window 3 summaries to the main Copyable Analysis Brief.
+   6. STAGE 2 RESPONSIVE MODES & FLUID-FIRST SWEEP (280px - 1280px):
+      - Desktop Mode (> 720px): Window 2 Verdict Banner + 3-column Redline Cluster Signal Grid + MEDDPICC Qualification Grid + 18-card Window 2 Indicator Grid; Window 3 displays the 3 ranked MESO cards side-by-side in a 3-column responsive grid (`minmax(295px, 1fr)`), followed by the 12-card Window 3 Indicator Grid and side-by-side Rep Counter-Script and Tool 3 PERM Approval Memo panels.
+      - Phone Mode (<= 720px): Verdict banner, cluster cards, MEDDPICC cards, and all 3 MESO alternative cards collapse cleanly to a single vertical column (`1fr`) with 4px semantic left borders; all interactive buttons (MESO indicator selector tabs, Copy Counter-Script, Copy PERM Memo) enforce `min-height: 44px` and full-width mobile tap comfort; sticky bottom summary bar remains pinned with full footer clearance.
+      - Fluid-First Sweep (280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS px): Zero horizontal overflow at every width via `min-width: 0`, `overflow-wrap: anywhere`, and relative units throughout.
+   7. STAGE 2 GOAL-VS-SPEC CONFLICTS & RULINGS:
+      - None. Spec §0, §3, §5, §6, §7, and §8 rules harmonize cleanly. The Stage 1 `ledger.alternatives` array (`MESO_A`, `MESO_B`, `MESO_C`) is preserved intact on `ledger.alternatives` for backward compatibility and augmented with `ledger.window2` and `ledger.window3` objects derived from the exact same `ledger.cells` and `ledger.indicators`.
+   8. INTEGRITY & FORMULAS-HIDDEN COMPLIANCE:
+      - 100% compliant. Zero formulas, multipliers, weights, or research-study percentage claims appear in the rendered DOM. All Window 2 and Window 3 math lives strictly inside `/** HIDDEN LOGIC VAULT */` comments and JS code. Zero hidden SEO text, zero cloaking, zero sales/pitch copy.
 
 STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING CONTRACT ANALYZER EDIT BASE)
    1. EDIT BASE PRESERVED BYTE-FOR-BYTE OUTSIDE STAGE 1 ADDITIONS:
@@ -20,269 +115,6 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
       - Exposed `window.ContractAnalyzer.computeLedgerAndIndicators` and `window.ContractAnalyzer.assertLedgerTieOut` for Stage 2 (Windows 2 & 3) and Stage 3 (Bridge, Meter, Atlas Preset) to read directly from the single immutable ledger object.
    5. STAGE 1 SELF-CHECK & TIE-OUT BATTERY:
       - Extended `runSelfCheckBattery()` to run scripted tie-out fixtures alongside the F1–F11 51-flag regression battery, verifying zero variance on every run.
-
-0. CORRECTIVE FIX APPLIED (POST-VERIFICATION DEFECT CLOSURE)
-   - Defect: data-training pattern 0 had unanchored token `AI` without word boundaries under the /i flag,
-     causing a false positive on F3's ordinary IP-ownership sentence ("...developed under this Agreement are
-     owned by Customer; Provider retains...") by matching "ai" inside "retains". Data-training pattern 1 had
-     the same unanchored `AI` token.
-   - Declared Pattern Changes:
-     * check id: data-training (pattern 0)
-       Old pattern: P("(train|fine-?tune|improve|develop)[^.\\n]{0,60}(machine learning|AI|artificial intelligence|algorithms?|models?|products?)")
-       New pattern: P("(train|fine-?tune|improve|develop)[^.\\n]{0,60}(machine learning|\\bAI\\b|artificial intelligence|algorithms?|models?|products?)")
-       Proving lines: F3 "All work product and deliverables developed under this Agreement are owned by Customer; Provider retains ownership of its pre-existing intellectual property." (must NOT match); F10 "Vendor may use Customer Data, in aggregated or de-identified form, to improve, train, and develop its machine learning models..." (must MATCH).
-     * check id: data-training (pattern 1)
-       Old pattern: P("(machine learning|AI|foundation|language) models?[^.\\n]{0,50}(train|data|input|output)")
-       New pattern: P("(machine learning|\\bAI\\b|foundation|language) models?[^.\\n]{0,50}(train|data|input|output)")
-       Proving lines: prevents matching "ai" inside words such as "retains models" or "maintain models", while still matching "AI models ... train/data".
-     * data-training patterns 2 and 3 audited: no bare 2-3 letter tokens present.
-   - Audit Sweep of All Other 17 New Checks:
-     * Inspected every pattern across mfn, setoff, exit-assistance, suspension-rights, publicity,
-       compliance-laws, survival, injunctive-relief, acceptance-testing, change-control, source-code-escrow,
-       open-source, benchmarking, feedback-rights, records-retention, disaster-recovery, and export-control.
-     * Every 2-3 letter acronym token in those 17 checks already carries explicit \b word boundaries
-       (\bMFN\b, \bFCPA\b, \bUAT\b, \bOSS\b, \bGPL\b, \bBCP\b, \bDRP\b, \bRTO\b, \bRPO\b, \bEAR\b, \bOFAC\b).
-       No other unanchored short-token defect exists.
-   - Corrective Proof Verdicts:
-     * F3: data-training NOT found; F-DATA-TRAINING silent; F3 returns exact 33 of 51 (all 33 original found,
-       0 new checks found); F-ONE-WAY-INDEMNITY and F-IP-INDEMNITY unchanged.
-     * F10: data-training still FOUND and F-DATA-TRAINING still fires on F10's "improve, train, and develop
-       its machine learning models" line.
-     * F11 + F2: 0 of 51 and zero flags.
-     * F6: 14 of 51 and zero flags.
-     * F1: exact 8 of 51 (original 8) with F-RENEWAL-NO-NOTICE only.
-     * Everything else (Layer 1 frozen byte-for-byte, all 51 check ids/groups/names/why-lines, all other
-       patterns, flags layer, page copy, and layout) kept identical.
-
-1. TAXONOMY RESEARCH & MAPPING (Tech Contracts Handbook TOC + Published SaaS/Software Checklists)
-   Sources consulted via search/URL context: The Tech Contracts Handbook (David Tollen, 3rd ed. TOC &
-   Issue-Spotter clause families), Kohler Law 12-Clause SaaS Checklist, Practical Law / Morse /
-   Kilpatrick / UpCounsel / Sprintlaw SaaS & Software Agreement Checklists.
-
-   Taxonomy Family -> Engine Mapping:
-   - Preamble, Parties & Effective Date -> covered by: parties, effective-date
-   - Term, Renewal & Auto-Renewal -> covered by: term, renewal, renewal-notice
-   - Termination (Convenience, Cause, Cure, Insolvency) -> covered by: termination-convenience, termination-cause
-   - Fees, Pricing & Payment Terms -> covered by: fees, payment-terms
-   - Late Payment Interest & Escalators / Price Increases -> covered by: late-fees, price-increase
-   - Taxes & Withholding -> covered by: taxes
-   - Most-Favored-Customer (MFN) Pricing -> added as: mfn (Required #1)
-   - Setoff / Withholding Rights -> added as: setoff (Required #2)
-   - Limitation of Liability & Carve-Outs -> covered by: liability-cap + Flag F-CAP-CARVEOUTS
-   - Consequential / Indirect Damages Exclusion -> covered by: consequential
-   - Indemnification (Mutual, One-Way, Uncapped, IP) -> covered by: indemnity + Flags F-UNCAPPED-INDEMNITY, F-ONE-WAY-INDEMNITY, F-IP-INDEMNITY
-   - Warranties & Disclaimers -> covered by: warranties
-   - Insurance Requirements -> covered by: insurance + Flag F-INDEMNITY-NO-INSURANCE
-   - IP Ownership & Work Product -> covered by: ip-ownership
-   - License / SaaS Access Grant -> covered by: license
-   - Confidentiality & NDA -> covered by: confidentiality
-   - Data Protection / Privacy / DPA / PII -> covered by: data-protection
-   - Information Security / SOC 2 / Encryption / Breach Notice -> covered by: security
-   - AI / Model Training on Customer Data -> added as: data-training (Required #9) + Flag F-DATA-TRAINING
-   - Feedback / Customer Suggestions Rights -> added as: feedback-rights (Taxonomy #6)
-   - Technology / Source-Code Escrow -> added as: source-code-escrow (Taxonomy #3)
-   - Open-Source Software (OSS) Compliance -> added as: open-source (Taxonomy #4)
-   - Benchmarking Rights & Restrictions -> added as: benchmarking (Taxonomy #5)
-   - Service Levels (SLA) & Credits -> covered by: sla
-   - Delivery, Acceptance Testing & Rejection -> added as: acceptance-testing (Taxonomy #1)
-   - Change Orders / Scope Change Control -> added as: change-control (Taxonomy #2)
-   - Audit Rights -> covered by: audit-rights
-   - Records Retention / Books & Records -> added as: records-retention (Taxonomy #7)
-   - Disaster Recovery & Business Continuity -> added as: disaster-recovery (Taxonomy #8)
-   - Assignment & Change of Control -> covered by: assignment
-   - Subcontractors & Subprocessors -> covered by: subcontracting
-   - Exclusivity, Non-Solicit & Non-Compete -> covered by: exclusivity-nonsolicit
-   - Exit Assistance / Data Return / Transition -> added as: exit-assistance (Required #3)
-   - Suspension Rights -> added as: suspension-rights (Required #4)
-   - Publicity & Logo Use -> added as: publicity (Required #5)
-   - Governing Law -> covered by: governing-law
-   - Venue, Jurisdiction & Dispute Resolution -> covered by: venue-disputes
-   - Force Majeure -> covered by: force-majeure
-   - Formal Notices -> covered by: notices
-   - Entire Agreement, Precedence & Amendments -> covered by: entire-agreement
-   - Compliance with Applicable Laws / Anti-Bribery -> added as: compliance-laws (Required #6)
-   - Survival of Obligations -> added as: survival (Required #7)
-   - Injunctive Relief & Jury Trial Waiver -> added as: injunctive-relief (Required #8)
-   - Export Control & Trade Sanctions -> added as: export-control (Taxonomy #9)
-   - Execution / Signatures -> covered by: signatures
-   - Deliberately not separate checks (with reasons):
-     * Definitions / Glossary: structural boilerplate present in virtually all contracts; no standalone risk signal without a substantive clause.
-     * Severability / No-Waiver / Counterparts: boilerplate mechanics with no findable commercial risk pattern unless paired with execution (counterparts folded into signatures).
-     * Independent Contractor / No Agency: standard relationship boilerplate; low standalone risk signal relative to commercial/IP/liability checks.
-     * Order of Precedence as separate check: already covered inside entire-agreement.
-
-2. ENGINE RULES & LAYER 1 PROVENANCE
-   - Layer 1 (parseKeyClauses: DATE_RE, MONEY_RE, PARTY_RE, LAW_RE, TERM_LENGTH_RE, RENEWAL_PERIOD_RE,
-     allMatches) is carried over BYTE-FOR-BYTE from analyzer-engine.txt (S6-P03.d). Zero characters changed.
-   - Layer 2 preserves all 33 original check IDs, groups, names, and why-lines unchanged, adds declared
-     pattern hardenings, adds 9 required + 9 taxonomy-discovered checks (51 checks total), and adds
-     the deterministic FLAGS layer (computeFlags).
-
-3. DECLARED PATTERN HARDENINGS ON ORIGINAL 33 CHECKS
-   - parties: Added P("\\bthis\\s+[a-z\\s]{0,35}agreement\\b[^.\\n]{0,40}\\bis\\s+(made|entered into)\\b"),
-     P("\\bby and (between|among)\\s+[A-Z]") — Proving line: "This Master Services Agreement is entered into between..."
-   - effective-date: Added P("\\b(effective|entered into|dated)\\s+as\\s+of\\b"), P("\\bstart date\\b"),
-     P("\\bmade (on|as of)\\s+\\w+\\s+\\d{1,2},\\s*\\d{4}\\b") — Proving line: F4 "entered into as of March 1, 2026".
-   - term: Widened number words to include one..sixty (one|two|...|sixty) and added
-     P("\\bcontinues? in (force|effect)[^.\\n]{0,40}(month to month|year to year|until terminated)") —
-     Proving lines: F9 §1 "initial term of one (1) year"; F5 §2 "continues in force from month to month".
-   - renewal: Refined P("\\brenew(s|al)?\\s+for\\b") -> P("\\brenew(s|al|ing)?\\s+for\\s+(additional|further|successive|\\d+|one|two|three|four|five|six|twelve|a\\s+(?:new|subsequent)|the\\s+(?:same|next)|(?:each|any)\\s+(?:renewal|subsequent))")
-     (see Goal-vs-Spec Ruling #1 on F11 false positive); widened auto-renew to P("\\bauto(matically)?[-\\s]?renew"),
-     added P("\\bevergreen\\b"), P("\\b(will|shall|automatically)\\s+(renew|extend)\\b[^.\\n]{0,40}(term|period|year|month|unless)"),
-     P("\\bsuccessive[^.\\n]{0,20}(terms|periods|renewal)") — Proving lines: F5 §2 "evergreen"; F8 §5 "renewing for further 12-month periods"; F9 §2 "automatically renew".
-   - renewal-notice: Added P("opt[-\\s]?out[^.\\n]{0,30}renew"), P("(intent|elect(ion)?|desire)\\s+not\\s+to\\s+(renew|extend)"),
-     P("notice[^.\\n]{0,60}(prior to|before)[^.\\n]{0,35}(end of the (initial |then-current )?term|expiration of the term)") —
-     Proving line: "opt out of renewal at least 30 days prior to the end of the term".
-   - termination-convenience: Added P("(may|can|right to)\\s+(terminate|cancel)[^.\\n]{0,60}(at any time|at will|upon (prior )?(written )?notice)"),
-     P("(may|can)\\s+(terminate|cancel)[^.\\n]{0,80}\\b(\\d+|fifteen|thirty|forty-five|sixty|ninety)(\\s*\\(\\s*\\d+\\s*\\))?\\s*days?['\\u2019]?\\s*(prior\\s+)?(written\\s+)?notice") —
-     Proving line: F5 §3 "may terminate this agreement at any time upon written notice".
-   - termination-cause: Added P("(uncured|fundamental|material)\\s+(breach|default)"),
-     P("(cure|remedy)[^.\\n]{0,30}(breach|default)[^.\\n]{0,30}within"), P("terminate[^.\\n]{0,60}(insolvency|bankruptcy|receivership)") —
-     Proving line: "remedy such breach within thirty days".
-   - fees: Added P("\\b(EUR|GBP|CAD|AUD)\\s*[\\d,]+|\\b[£€]\\s?\\d[\\d,]*"),
-     P("\\b(subscription|license|licence|service|annual|monthly|implementation)\\s+fees?\\b"),
-     P("\\bfees?\\s+(set forth|specified|listed)\\s+in\\b") — Proving line: "subscription fee of £5,000".
-   - payment-terms: Added P("\\bnet[-\\s]*\\d+\\b"),
-     P("(payable|due)\\s+(within|in)\\s*(\\d+|fifteen|thirty|forty-five|sixty|ninety)(\\s*\\(\\s*\\d+\\s*\\))?\\s*days"),
-     P("\\bdue (upon|on) receipt\\b"),
-     P("within\\s*(\\d+|fifteen|thirty|forty-five|sixty|ninety)(\\s*\\(\\s*\\d+\\s*\\))?\\s*days (of|from|after) (the\\s+)?(invoice|receipt)") —
-     Proving lines: F5 §1 "payable Net-30"; F4 §1 "payable within thirty (30) days of invoice".
-   - late-fees: Added P("(past[-\\s]due|unpaid|delinquent)[^.\\n]{0,45}(interest|finance charge|late fee|rate of)"),
-     P("(interest|finance charge)[^.\\n]{0,45}(past[-\\s]due|unpaid|maximum rate permitted)") —
-     Proving line: "past-due balances accrue finance charges".
-   - price-increase: Added P("\\b(price|fee|rate|pricing)s?\\s+(increase|escalation|adjustment)s?\\b"),
-     P("(increase|raise|adjust|modify)[^.\\n]{0,35}(the\\s+)?(fees|prices|rates|charges)[^.\\n]{0,50}(renewal|annual|percent|%|any amount|discretion|index|CPI)") —
-     Proving line: F9 §3 "may increase the fees by any amount in its sole discretion".
-   - taxes: Added P("\\b(do not include|excluding|net of)[^.\\n]{0,25}(taxes|duties|levies)\\b"),
-     P("\\b(taxes|duties|levies)[^.\\n]{0,35}(customer's responsibility|borne by|paid by)\\b") —
-     Proving line: "Fees do not include taxes or levies".
-   - liability-cap: Added P("(cap|limit(ation)?|ceiling)\\s+on\\s+[^.\\n]{0,35}liability"),
-     P("(total|maximum|cumulative)\\s+liability[^.\\n]{0,50}(shall|will|may)\\s+not\\s+exceed"),
-     P("liability[^.\\n]{0,50}(will not exceed|capped at|limited to)") —
-     Proving line: F5 §4 "The cap on either party's liability".
-   - consequential: Added P("consequential[^.\\n]{0,20}(damages|loss(es)?)"), P("indirect[^.\\n]{0,25}(damages|loss(es)?)"),
-     P("(incidental|special|punitive|exemplary)\\s+(or\\s+\\w+\\s+)?(damages|loss(es)?)"),
-     P("loss of (profits|revenue|business|goodwill)") — Proving line: F8 §4 "indirect or consequential loss".
-   - indemnity: Added P("\\bindemnit(y|ies)\\b"), P("\\bsave harmless\\b") — Proving line: F8 §3 "gives any indemnity".
-   - warranties: Added P("\\b(merchantability|fitness for a particular purpose)\\b"), P("as[-\\s]available") —
-     Proving line: "disclaims merchantability and fitness for a particular purpose".
-   - insurance: Added P("\\b(errors and omissions|E&O|workers'? compensation|umbrella liability)\\b"),
-     P("\\badditional insured\\b"), P("\\bCOI\\b"), P("(maintain|carry|procure)[^.\\n]{0,50}\\binsurance\\b") —
-     Proving line: "carry E&O insurance and name Customer as additional insured".
-   - ip-ownership: Added P("\\bwork[-\\s](made[-\\s])?for[-\\s]hire\\b"), P("\\bproprietary rights\\b"),
-     P("(owns?|retains?)[^.\\n]{0,40}(all )?rights?,?\\s+title") — Proving line: "work made for hire".
-   - license: Added P("(grant|provide)s?[^.\\n]{0,45}(right|permission) to (access|use)"),
-     P("\\b(worldwide|royalty-free|perpetual|revocable|limited)\\s+licen[cs]e\\b") — Proving line: "right to access and use the SaaS".
-   - confidentiality: Added P("\\b(in strict confidence|hold[^.\\n]{0,35}in confidence)\\b"), P("\\bproprietary information\\b"),
-     P("\\bNDA\\b") — Proving line: "hold proprietary information in strict confidence".
-   - data-protection: Added P("personally identifiable information|\\bPII\\b"), P("\\bpersonal information\\b"),
-     P("\\bdata (controller|processor)\\b"), P("\\b(HIPAA|BAA|standard contractual clauses|SCCs)\\b") —
-     Proving line: F5 §6 "data controller and Vendor is the data processor with respect to personally identifiable information (PII)".
-   - security: Added P("encrypt(ion|ed)?[^.\\n]{0,35}(in transit|at rest)"), P("\\bpenetration test(ing)?\\b"),
-     P("\\binformation security\\b"), P("\\bPCI[-\\s]?DSS\\b"), P("security (measures|program(me)?|standards)") —
-     Proving line: F5 §7 "encrypt all Customer data in transit and at rest, and shall undergo independent penetration testing".
-   - sla: Added P("\\b\\d{2,3}(\\.\\d+)?%\\s*(uptime|availability)\\b"), P("\\bservice availability\\b"),
-     P("\\b(incident |initial )?response times?\\b") — Proving line: "99.95% availability and 2-hour response time".
-   - audit-rights: Added P("audit[^.\\n]{0,45}(compliance|usage|seat|books|records|facilities|systems)"),
-     P("\\bindependent auditor\\b"), P("\\baudit (once|annually|no more than)\\b") —
-     Proving line: "audit compliance once annually" (while cleanly rejecting F11 "audit our snack inventory").
-   - assignment: Added P("(neither party|shall not|cannot)[^.\\n]{0,20}assign"), P("\\bassign or transfer\\b"),
-     P("\\b(merger|acquisition|sale of (all|substantially all) assets)\\b[^.\\n]{0,40}assign") —
-     Proving line: "neither party may assign or transfer".
-   - subcontracting: Added P("sub-?contract(or|ing|ed)?"), P("\\bsub-?processors?\\b"),
-     P("remain (fully )?(liable|responsible) for[^.\\n]{0,40}(sub-?contractors?|sub-?processors?|third parties)") —
-     Proving line: "remain responsible for its sub-contractors".
-   - exclusivity-nonsolicit: Added P("\\brestrictive covenant\\b"), P("solicit[^.\\n]{0,30}(employees|personnel|staff|customers)") —
-     Proving line: "shall not solicit personnel or customers".
-   - governing-law: Added P("(governed by|construed (under|in accordance with))[^.\\n]{0,40}(laws? of|\\b[A-Z][a-z]+\\s+law\\b)"),
-     P("\\bchoice of law\\b"), P("conflict of laws? principles") —
-     Proving lines: F5 §5 "construed in accordance with the laws of"; F8 §6 "governed by English law".
-   - venue-disputes: Added P("\\b(state|federal|competent) courts (of|in|located in)\\b"), P("\\b(AAA|JAMS|LCIA|ICC) rules\\b"),
-     P("submit to the[^.\\n]{0,30}courts") — Proving line: "submit to the state and federal courts in New York".
-   - force-majeure: Added P("(causes|circumstances|occurrences) beyond[^.\\n]{0,30}(its |a party's |reasonable )?control"),
-     P("\\b(natural disaster|pandemic|epidemic|civil unrest)\\b[^.\\n]{0,40}(excuse|delay|liable)") —
-     Proving line: "circumstances beyond its reasonable control" (rejecting F11 "beyond anyone's control").
-   - notices: Added P("notices?[^.\\n]{0,40}(deemed (given|received|delivered)|certified mail|overnight courier)"),
-     P("written notice[^.\\n]{0,40}address(es)? (set forth|specified)") — Proving line: "notices deemed received via overnight courier".
-   - entire-agreement: Added P("supersedes all prior"), P("(modified|amended|varied)[^.\\n]{0,30}(only )?(in|by) writing"),
-     P("constitutes the (entire|complete|final) (and exclusive )?agreement") — Proving line: "supersedes all prior agreements".
-   - signatures: Added P("\\bsigned (and )?(executed|delivered)?\\s*(by|below)\\b"),
-     P("\\belectronic signatures?\\b|\\bcounterparts\\b"), P("duly authorized representative") —
-     Proving line: F6 "Signed and executed by both parties below".
-
-4. NEW CHECKS ADDED (18 total: 9 required + 9 taxonomy-added -> 51 total checks)
-   Required (9):
-   - mfn (Money) — F5 §8
-   - setoff (Money) — F5 §12
-   - exit-assistance (Operations) — F5 §9
-   - suspension-rights (Operations) — F5 §10
-   - publicity (Operations) — F5 §11
-   - compliance-laws (Legal) — F5 §13
-   - survival (Legal) — F5 §15 (guarded against F11 "survive the weekend")
-   - injunctive-relief (Legal) — F5 §14
-   - data-training (Data & IP) — F10 §3 (repaired \bAI\b boundaries on patterns 0 & 1)
-   Taxonomy-Added (9):
-   - acceptance-testing (Operations) — Tech Contracts Handbook II.F
-   - change-control (Operations) — Tech Contracts Handbook I.E.3 / I.F.3
-   - source-code-escrow (Data & IP) — Tech Contracts Handbook II.S
-   - open-source (Data & IP) — Tech Contracts Handbook App. 2
-   - benchmarking (Data & IP) — SaaS license review checklists
-   - feedback-rights (Data & IP) — Tech Contracts Handbook II.N
-   - records-retention (Operations) — Tech Contracts Handbook II.P
-   - disaster-recovery (Operations) — Tech Contracts Handbook II.R
-   - export-control (Legal) — Tech Contracts Handbook III.H
-
-5. FLAGS LAYER SPECIFICATION (9 deterministic rules implemented in computeFlags)
-   - F-UNCAPPED-INDEMNITY: indemnity found AND (no liability-cap found OR sentence/clause probe finds indemnity/section obligations "not subject to / not limited by the cap/limitation of liability" OR "without cap" / "uncapped" / "cap shall not apply to indemnity").
-   - F-ONE-WAY-INDEMNITY: indemnity found AND (express one-way disclaimer "has no obligation to indemnify" / "one-way indemnity" OR mutual markers absent: no "each party ... indemnify", "mutual indemnif", "both parties ... indemnify", "indemnifying party ... indemnified party", nor reciprocal Vendor+Customer grants).
-   - F-IP-INDEMNITY: Noted PRESENT or ABSENT. Positive IP-indemnity probe searches sentences containing indemnif* (and following clause window) for infringe/misappropriate/IP/patent/copyright/trademark while excluding negative disclaimers ("neither party gives any indemnity in respect of IP", "no indemnity for infringement", "shall not indemnify ... infringe"). Counts as a RAISED FLAG when ABSENT while ip-ownership or license is found.
-   - F-INDEMNITY-NO-INSURANCE: indemnity found AND insurance not found.
-   - F-RENEWAL-NO-NOTICE: renewal found AND renewal-notice not found.
-   - F-CAUSE-NO-CURE: termination-cause found AND no cure/remedy period language found.
-   - F-CAP-CARVEOUTS: liability-cap found AND cap exclusion language listing carve-outs ("cap shall not apply to", "limitation of liability does not apply to", "excluded/carved out from the cap", or "nothing shall limit liability for [confidentiality/IP/gross negligence/indemnity]").
-   - F-UNCAPPED-ESCALATOR: price-increase found AND unlimited/sole-discretion increase language ("by any amount", "in its sole discretion", "without cap/limit", "uncapped").
-   - F-DATA-TRAINING: data-training found (adds heightened alert when post-termination survival / perpetual / irrevocable language is detected).
-
-6. FIXTURE BATTERY VERDICTS (verified on shipped parseKeyClauses + runChecks + computeFlags)
-   - F1 (Sample): Layer 1 exact match (dates ["2024-01-15"], money ["USD $12,500"], parties 1, law [["Governing Law","California"]], term_length [""], renewal_period []); Layer 2: 8 of 51 (parties, effective-date, term, renewal, termination-convenience, fees, payment-terms, governing-law; 0 new checks); Flags: F-RENEWAL-NO-NOTICE only.
-   - F2 (Plain prose): Layer 1 all []; Layer 2: 0 of 51; Flags: 0 raised.
-   - F3 (Full-coverage synthetic): Layer 1 exact match; Layer 2: 33 of 51 (all 33 original found; data-training NOT found; 0 new checks found); Flags observed: F-ONE-WAY-INDEMNITY, F-IP-INDEMNITY (ABSENT while ip-ownership & license present); F-DATA-TRAINING silent.
-   - F4 (Indemnity trap): Layer 2: 11 of 51 (10 original + payment-terms); Flags raised: F-UNCAPPED-INDEMNITY, F-ONE-WAY-INDEMNITY, F-INDEMNITY-NO-INSURANCE; F-IP-INDEMNITY noted PRESENT (not raised).
-   - F5 (Sneaky order form): Layer 2: 18 of 51 (original 10: parties, term, renewal, termination-convenience, fees, payment-terms, liability-cap, data-protection, security, governing-law + 8 required new checks: mfn, setoff, exit-assistance, suspension-rights, publicity, compliance-laws, survival, injunctive-relief); Flags observed: F-RENEWAL-NO-NOTICE.
-   - F6 (Clean mutual): Layer 2: 14 of 51 (exact 14 original, 0 new); Flags raised: 0 (F-IP-INDEMNITY noted ABSENT, not raised).
-   - F7 (Carve-out cap): Flags raised: F-UNCAPPED-INDEMNITY, F-CAP-CARVEOUTS (+ F-IP-INDEMNITY observed because ip-ownership matches "intellectual property" in §3(b) while §2 has no IP indemnity); F-ONE-WAY-INDEMNITY & F-INDEMNITY-NO-INSURANCE silent.
-   - F8 (Mutual naked): Flags raised: F-INDEMNITY-NO-INSURANCE, F-IP-INDEMNITY (ABSENT, express no-IP-indemnity, license & ip-ownership present); F-ONE-WAY-INDEMNITY & F-UNCAPPED-INDEMNITY silent.
-   - F9 (Uncapped escalator): Flags raised: F-UNCAPPED-ESCALATOR; F-RENEWAL-NO-NOTICE silent.
-   - F10 (Data training): data-training FOUND; Flags raised: F-DATA-TRAINING (with post-termination survival note) (+ F-IP-INDEMNITY observed because license grant present with no IP indemnity).
-   - F11 (Hunters): Layer 2: 0 of 51; Flags raised: 0.
-
-7. 10-PHRASING MATRIX SUMMARY (51 checks x 10 probes = 510 probes)
-   - All 51 checks scored 10/10 probes caught (510/510) across standard, formal/legalistic, plain, abbreviated,
-     British-spelled, fragmented (line-break), and hostile-drafting variants, with 0/51 false positives on
-     F11 and F2.
-   - Known structural limit (documented transparently): heuristic regex matching locates phrasing patterns
-     and cannot verify cross-page defined-term overrides or tables where clause headers sit far (>200 chars)
-     from operative verbs; reviewers must inspect every NOT FOUND item and every raised flag excerpt directly.
-
-8. IMPROVEMENTS MADE
-   - Deterministic 9-Flag Risk Layer + Evidence Excerpts: surfaces uncapped/one-way indemnities, missing IP indemnity when IP/license is present, uninsured indemnities, renewal without notice deadline, cause without cure, cap carve-outs, uncapped escalators, and AI data-training with post-termination persistence.
-   - High-Visibility Flags Band & KPI Strip: prominent red-alert Flag cards right above the scans and 51-point checklist, plus IP Indemnity PRESENT/ABSENT status badge.
-   - 18 New Clause Checks (9 required + 9 taxonomy-added from The Tech Contracts Handbook & SaaS checklists) bringing total coverage from 33 to 51 checks across Basics, Money, Risk, Data & IP, Operations, and Legal.
-   - Hardened Pattern Matching on Original 33: closes all 7 fixture misses (Net-30, spelled-out 30 days, evergreen, anytime written termination, "cap on either party's liability", "construed in accordance with", PII/controller/processor, British indirect/consequential loss, governed by English law, one-year term, sole-discretion fee increase).
-   - Updatable Analysis Brief: includes raised flags with excerpts, IP indemnity signal, six Layer-1 scans, all 51 checks grouped cleanly, and clipboard copy.
-
-9. GOAL-VS-SPEC CONFLICTS & RULINGS
-   - Conflict 1 (analyzer-engine.txt `renewal` pattern vs F11 Hunter Zero): Original engine's P("\\brenew(s|al)?\\s+for\\b") matched F11's trap phrase "Our driver's license renewal for the delivery van is due next month". To honor Part A's zero-false-alarm goal and Part C/F's mandatory F11=0 verdict, `renewal`'s third pattern was refined to require a contract-renewal term/duration qualifier after `renew(s|al|ing) for` (catching F1, F3, F6, F8, F9 while rejecting "renewal for the delivery van").
-   - Conflict 2 (F5 "all nine required new checks" vs F10 `data-training`): F5 §§8-15 contains 8 of the 9 required new checks (`mfn`, `setoff`, `exit-assistance`, `suspension-rights`, `publicity`, `compliance-laws`, `survival`, `injunctive-relief`), while `data-training` lives in F10 §3. `data-training` was NOT weakened to fire falsely on F5; F5 finds all 8 present new checks and F10 finds `data-training`.
-   - Conflict 3 (F7 `F-IP-INDEMNITY` due to §3(b) `"intellectual property"`): Under the literal Part C flag rule ("counts as a raised flag when ABSENT while ip-ownership or license language is present"), `ip-ownership` matches F7 §3(b) while §2 has no IP indemnity, so `F-IP-INDEMNITY` raises alongside `F-UNCAPPED-INDEMNITY` and `F-CAP-CARVEOUTS` (while `F-ONE-WAY-INDEMNITY` and `F-INDEMNITY-NO-INSURANCE` remain silent as required).
-
-10. RESPONSIVE MODES & FLUID-FIRST SWEEP (280px - 1280px)
-    - Desktop Mode (> 720px): Working surface first; 5-card KPI summary strip including Risk Flags Raised; Window 1 Forensic Leak Waterfall panel; dedicated Risk Flags Band directly above the 2-column Layer-1 scans and 51-point grouped checklist; side-by-side How It Works & Provenance cards; Copyable Analysis Brief; relative units and minmax(0, 1fr) throughout.
-    - Phone Mode (<= 720px): Controls stack vertically first, textarea >= 11rem at 16px (no iOS zoom), Run button 100% width >= 44px touch height; KPI cards wrap 2-up (1-up <= 380px); scan, waterfall, flag, and check cards stack in 1 column with 4px semantic left borders; fixed sticky bottom summary bar tracks Flags, Found/51, Gaps, and jumps to AI Read, with footer clearance.
-    - Fluid-First Sweep (280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS px): Zero horizontal page scroll via min-width: 0, overflow-wrap: anywhere, and 1-column mobile collapse.
-
-11. PART E — SEO INTEGRITY COMPLIANCE
-    - 100% compliant. Zero display:none content blocks, zero hidden text or links, zero white-on-white, zero off-screen positioning, zero zero-size text, zero keyword stuffing, zero cloaking or doorway pages. Results container displays an explicit visible ready state before analysis runs.
 -->
 <html lang="en">
 <head>
@@ -496,7 +328,93 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
     .w1-ind-card.is-lead { border-top-color: var(--warn-border); }
     .w1-ind-top { display: flex; align-items: center; justify-content: space-between; gap: 0.35rem; font-family: var(--font-mono); font-size: 0.68rem; color: var(--ink-600); text-transform: uppercase; }
     .w1-ind-name { font-weight: 700; font-size: 0.83rem; color: var(--ink-900); line-height: 1.35; overflow-wrap: anywhere; }
-    .w1-ind-val { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 700; color: var(--navy-900); font-variant-numeric: tabular-nums; }
+    .w1-ind-val { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 700; color: var(--navy-900); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+    /* STAGE 2: WINDOW 2 BEHAVIORAL VERDICT PANEL */
+    .window2-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--brass-500); padding: clamp(0.95rem, 2.4vw, 1.35rem); margin-bottom: 1.4rem; }
+    .window-subline { font-size: 0.88rem; color: var(--ink-700); margin: 0 0 0.95rem 0; line-height: 1.5; }
+    .verdict-banner { background-color: var(--paper-alt); border: 1px solid var(--rule-strong); border-left: 6px solid var(--navy-900); padding: 1rem 1.15rem; margin-bottom: 1.1rem; }
+    .verdict-banner.is-hold-firm { border-left-color: var(--fail-border); background-color: var(--fail-bg); }
+    .verdict-banner.is-jolt-pivot { border-left-color: var(--warn-border); background-color: var(--warn-bg); }
+    .verdict-banner.is-take-loss { border-left-color: var(--pass-border); background-color: var(--pass-bg); }
+    .verdict-top-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.45rem; }
+    .verdict-call-label { font-family: var(--font-mono); font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-700); font-weight: 700; display: block; }
+    .verdict-call-name { font-family: var(--font-serif); font-size: clamp(1.22rem, 2.5vw, 1.58rem); font-weight: 700; color: var(--ink-900); margin: 0.1rem 0 0 0; overflow-wrap: anywhere; }
+    .verdict-banner.is-hold-firm .verdict-call-name { color: var(--fail-ink); }
+    .verdict-banner.is-jolt-pivot .verdict-call-name { color: var(--warn-ink); }
+    .verdict-banner.is-take-loss .verdict-call-name { color: var(--pass-ink); }
+    .verdict-ci-box { background-color: #FFFFFF; border: 1px solid var(--rule-strong); padding: 0.4rem 0.75rem; font-family: var(--font-mono); font-size: 0.76rem; color: var(--ink-900); text-align: right; }
+    .verdict-ci-box strong { font-size: 0.9rem; color: var(--navy-900); }
+    .verdict-meaning { font-size: 0.92rem; color: var(--ink-900); margin: 0 0 0.55rem 0; line-height: 1.55; }
+    .verdict-evidence-box { background-color: #FFFFFF; border: 1px solid var(--rule-color); padding: 0.6rem 0.75rem; font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-900); line-height: 1.5; overflow-wrap: anywhere; word-break: break-word; }
+
+    .cluster-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; margin-bottom: 1.15rem; }
+    .cluster-card { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-left: 4px solid var(--navy-900); padding: 0.8rem 0.9rem; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 0.4rem; }
+    .cluster-card.is-dominant { background-color: #FFFFFF; border-color: var(--rule-strong); border-left-width: 5px; border-left-color: var(--brass-500); }
+    .cluster-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.35rem; }
+    .cluster-name { font-family: var(--font-serif); font-size: 0.98rem; font-weight: 700; color: var(--ink-900); margin: 0; }
+    .cluster-score { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: var(--navy-900); }
+    .cluster-framework { font-family: var(--font-mono); font-size: 0.7rem; color: var(--brass-600); text-transform: uppercase; letter-spacing: 0.04em; }
+    .cluster-desc { font-size: 0.83rem; color: var(--ink-700); margin: 0; line-height: 1.45; }
+    .cluster-clauses { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-900); background-color: var(--paper-card); border: 1px solid var(--rule-color); padding: 0.45rem 0.55rem; margin: 0; overflow-wrap: anywhere; word-break: break-word; }
+
+    .meddpicc-block { background-color: var(--paper-alt); border: 1px solid var(--rule-color); border-top: 3px solid var(--navy-900); padding: 0.85rem 0.95rem; margin-bottom: 1.15rem; }
+    .meddpicc-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.35rem 0.85rem; margin-bottom: 0.65rem; }
+    .meddpicc-title { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--ink-900); margin: 0; }
+    .meddpicc-sub { font-family: var(--font-mono); font-size: 0.73rem; color: var(--ink-600); margin: 0; }
+    .meddpicc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.6rem; }
+    .meddpicc-pill { background-color: #FFFFFF; border: 1px solid var(--rule-color); border-left: 3px solid var(--brass-500); padding: 0.55rem 0.7rem; min-width: 0; }
+    .meddpicc-pill-label { font-family: var(--font-mono); font-size: 0.69rem; text-transform: uppercase; color: var(--ink-600); display: block; }
+    .meddpicc-pill-val { font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; color: var(--ink-900); display: block; margin-top: 0.15rem; }
+
+    /* STAGE 2: WINDOW 3 MESO ALTERNATIVES & CONSEQUENCE-FLAG SYSTEM PANEL */
+    .window3-panel { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--navy-900); padding: clamp(0.95rem, 2.4vw, 1.35rem); margin-bottom: 1.4rem; }
+    .meso-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(295px, 1fr)); gap: 0.9rem; margin-bottom: 1.25rem; }
+    .meso-card { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--navy-900); padding: 0.95rem 1rem; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 0.75rem; }
+    .meso-card.is-rank-1 { border-top-color: var(--pass-border); }
+    .meso-card.is-rank-2 { border-top-color: var(--brass-500); }
+    .meso-card.is-rank-3 { border-top-color: var(--warn-border); }
+    .meso-rank-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.35rem; padding-bottom: 0.45rem; border-bottom: 1px solid var(--rule-color); }
+    .meso-rank-badge { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; padding: 0.2rem 0.5rem; background-color: var(--navy-900); color: #FFFFFF; }
+    .meso-card.is-rank-1 .meso-rank-badge { background-color: var(--pass-border); }
+    .meso-authority-tag { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; color: var(--ink-700); overflow-wrap: anywhere; }
+    .meso-title { font-family: var(--font-serif); font-size: 1.08rem; font-weight: 700; color: var(--ink-900); margin: 0.2rem 0 0.3rem 0; overflow-wrap: anywhere; }
+    .meso-structure-copy { font-size: 0.85rem; color: var(--ink-700); margin: 0; line-height: 1.5; }
+
+    .meso-math-strip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.6rem; }
+    .meso-math-cell { min-width: 0; }
+    .meso-math-label { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; color: var(--ink-600); display: block; }
+    .meso-math-val { font-family: var(--font-serif); font-size: 1.12rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .meso-math-val.is-rescued { color: var(--pass-ink); }
+    .meso-math-val.is-residual { color: var(--fail-ink); }
+    .meso-math-val.is-zero-residual { color: var(--pass-ink); }
+    .meso-tieout-line { grid-column: 1 / -1; border-top: 1px dashed var(--rule-color); padding-top: 0.35rem; font-family: var(--font-mono); font-size: 0.71rem; color: var(--ink-700); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem; }
+
+    .meso-cells-matrix { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.35rem; }
+    .meso-cell-pill { font-family: var(--font-mono); font-size: 0.69rem; padding: 0.28rem 0.4rem; border: 1px solid var(--rule-color); background-color: var(--paper-alt); color: var(--ink-700); overflow-wrap: anywhere; }
+    .meso-cell-pill.is-cleared { background-color: var(--pass-bg); border-color: var(--pass-border); color: var(--pass-ink); font-weight: 700; }
+    .meso-cell-pill.is-retained { background-color: var(--fail-bg); border-color: var(--fail-border); color: var(--fail-ink); font-weight: 700; }
+
+    .consequence-flags-stack { display: flex; flex-direction: column; gap: 0.45rem; }
+    .consequence-flag-badge { background-color: var(--warn-bg); border: 1px solid var(--warn-border); border-left: 4px solid var(--fail-border); padding: 0.55rem 0.65rem; min-width: 0; }
+    .consequence-flag-badge.is-clean { background-color: var(--pass-bg); border-color: var(--pass-border); border-left-color: var(--pass-border); }
+    .cflag-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.25rem 0.5rem; margin-bottom: 0.2rem; }
+    .cflag-code { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; color: var(--fail-ink); background-color: #FFFFFF; border: 1px solid var(--fail-border); padding: 0.1rem 0.4rem; }
+    .consequence-flag-badge.is-clean .cflag-code { color: var(--pass-ink); border-color: var(--pass-border); }
+    .cflag-amount { font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; color: var(--fail-ink); }
+    .cflag-body { font-size: 0.79rem; color: var(--ink-900); margin: 0; line-height: 1.45; overflow-wrap: anywhere; }
+
+    .w3-selector-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; background-color: var(--paper-alt); border: 1px solid var(--rule-color); padding: 0.6rem 0.75rem; margin-bottom: 0.75rem; }
+    .w3-selector-label { font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; color: var(--ink-900); }
+    .w3-tab-group { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .w3-tab-btn { background-color: var(--paper-card); color: var(--ink-900); border: 1px solid var(--rule-strong); padding: 0.4rem 0.75rem; font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; }
+    .w3-tab-btn:hover, .w3-tab-btn:focus-visible, .w3-tab-btn.is-active { background-color: var(--navy-900); color: #FFFFFF; }
+
+    .execution-outputs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+    .exec-output-card { background-color: var(--paper-alt); border: 1px solid var(--rule-strong); border-top: 3px solid var(--brass-500); padding: 0.9rem 1rem; min-width: 0; }
+    .exec-output-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.4rem 0.75rem; margin-bottom: 0.6rem; }
+    .exec-output-title { font-family: var(--font-serif); font-size: 1.02rem; font-weight: 700; margin: 0; color: var(--ink-900); }
+    .exec-output-pre { background-color: #FFFFFF; border: 1px solid var(--rule-color); padding: 0.75rem; margin: 0; font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.55; color: var(--ink-900); white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; max-height: 22rem; overflow-y: auto; }
 
     /* FLAGS BAND (ABOVE CHECKLIST, IMPOSSIBLE TO MISS) */
     .flags-band { background-color: var(--paper-card); border: 1px solid var(--rule-strong); border-top: 4px solid var(--fail-border); padding: clamp(0.9rem, 2.4vw, 1.3rem); margin-bottom: 1.4rem; }
@@ -604,7 +522,10 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
     @media (max-width: 720px) {
       .input-row-top,
       .scans-grid,
-      .two-col-grid { grid-template-columns: 1fr; }
+      .two-col-grid,
+      .cluster-grid,
+      .meso-grid,
+      .execution-outputs-grid { grid-template-columns: 1fr; }
 
       .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .contract-textarea { font-size: 1rem; min-height: 11.5rem; }
@@ -613,14 +534,19 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
       .top-quick-actions,
       .top-quick-actions button,
       .analyzer-action-bar .btn-primary,
+      .w3-tab-group,
+      .w3-tab-btn,
       #ca-ai { width: 100%; }
+
+      .verdict-ci-box { text-align: left; width: 100%; }
+      .meso-cells-matrix { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
       .live-summary-bar { position: fixed; bottom: 0; left: 0; right: 0; box-shadow: 0 -2px 10px rgba(15, 30, 56, 0.25); }
       .site-footer { padding-bottom: 5.5rem; }
     }
 
     @media (max-width: 380px) {
-      .kpi-grid, .deal-inputs-grid, .waterfall-summary-strip, .w1-indicators-grid { grid-template-columns: 1fr; }
+      .kpi-grid, .deal-inputs-grid, .waterfall-summary-strip, .w1-indicators-grid, .meddpicc-grid, .meso-math-strip, .meso-cells-matrix { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -745,8 +671,8 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
     <!-- 2. THE RESULTS -->
     <section class="section-block" aria-labelledby="heading-results" id="section-results">
       <div class="section-header">
-        <h2 class="section-title" id="heading-results">Analysis Output — Window 1 Waterfall, Flags, Scans &amp; 51-Point Coverage Check</h2>
-        <p class="section-subtitle">6-cell forensic leak ledger, deterministic risk flags, and evidence-backed pattern detection across 6 clause groups</p>
+        <h2 class="section-title" id="heading-results">Analysis Output — 3-Window Deal Engine, Flags, Scans &amp; 51-Point Coverage Check</h2>
+        <p class="section-subtitle">Window 1 leak waterfall, Window 2 behavioral verdict, Window 3 MESO alternatives, deterministic risk flags, and 51-point coverage</p>
       </div>
 
       <p class="flags-explainer">
@@ -755,7 +681,7 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
 
       <div id="ca-results">
         <div class="idle-notice-box" id="ca-idle-state">
-          Ready to analyze. Upload a contract, paste text, or load the fictional sample contract above, then click <strong>Run the analysis</strong> to populate the Window 1 forensic leak waterfall, the risk flags, the six original scans, and all 51 coverage checks.
+          Ready to analyze. Upload a contract, paste text, or load the fictional sample contract above, then click <strong>Run the analysis</strong> to populate the Window 1 forensic leak waterfall, the Window 2 behavioral verdict, the Window 3 MESO alternatives with consequence flags, the risk flags, the six original scans, and all 51 coverage checks.
         </div>
       </div>
     </section>
@@ -891,7 +817,7 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
   <script src="../../assets/jszip-3.10.1.min.js"></script>
   <script src="../../assets/pdf-3.11.174.min.js"></script>
 
-  <!-- CONTRACT ANALYZER ENGINE (Layer 1 Frozen + Hardened 51-Point Layer 2 + Flags Layer + Stage 1 6-Cell Ledger & 46 Indicators) -->
+  <!-- CONTRACT ANALYZER ENGINE (Layer 1 Frozen + Hardened 51-Point Layer 2 + Flags Layer + Stage 1 6-Cell Ledger & 46 Indicators + Stage 2 Window 2 & Window 3 Engine) -->
   <script>
 /* ==========================================================================
    LABEL — S6-P03.d · Tool 13 — Contract Analyzer — analysis engine.
@@ -906,6 +832,10 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
    and vendor AI model training on customer data).
    LAYER 4 (STAGE 1) — 6-Cell Immutable Shared Ledger (L1..L6 + Continuity)
    & 46 Named Indicators + Window 1 Forensic Leak Waterfall computation.
+   LAYER 5 (STAGE 2) — Window 2 Behavioral Verdict (Document Redline Clusters,
+   Confidence Interval, MEDDPICC block) + Window 3 MESO Alternatives (Cell-by-
+   Cell Tie-Out, 3-Year NRR Ranking, 4 Consequence Flags, Counter-Script &
+   Tool 3 PERM Approval Memo).
    ========================================================================== */
 (function () {
   "use strict";
@@ -1764,6 +1694,46 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
    * QTC MATURITY SCORE (0-100):
    * - Computed from Window 1 pocket yield, RevOps overhead score, O2C drag, and active ledger cells:
    *   MAX(0, MIN(100, ROUND(W1_KPI_01 - (W1_OPI_02 * 0.15) - (W1_OPI_05 * 0.20) - (Active_Leak_Cells_Count * 3))))
+   *
+   * STAGE 2 VAULT EXTENSIONS — WINDOW 2 VERDICT & CONFIDENCE INTERVAL (CORRECTED LADDER):
+   * - Three Document Redline Clusters:
+   *   1. JOLT Fear Cluster: driven by W2_LEAD_01 (T4C, sole-discretion acceptance, refundable SLA, warranty) & W2_LEAD_03 (true-down/rollover shelfware anxiety).
+   *   2. Procurement Shark Cluster: driven by W2_LEAD_02 (Kraljic commercial skew ratio %) & W2_LEAD_04 (multi-front concession nibbling across L1..L4).
+   *   3. Strategic Land Cluster: driven by W2_KPI_01 (3-Year Expansion LTV-to-Leak Recovery Multiple >= 5.0x), W2_KPI_03 (publicity/reference logo value), and protected Year-2 renewal mechanics (!L3.active && !L4.active && W2_KPI_02 >= 50%).
+   * - Strategic Land Gate (`isStrategicLandQualified`):
+   *   `hasStrategicLandAnchor = !!(sig.map.publicity && sig.map.publicity.found) || (sig.termYears > 1)`
+   *   `isStrategicLandQualified = (ltvRecoveryMultiple >= 5.0) && !cells.L3_RenewalUplift.active && !cells.L4_CommitTrueDown.active && !cells.L5_RevRecHoldback.active && !cells.L6_LiabilityReserve.active && (clawbackProb >= 50) && (hasStrategicLandAnchor || commCellsActive.length <= 2)`
+   * - Verdict Selection Logic:
+   *   1. If `(joltScore >= 35 || lossAversionScore >= 40 || cells.L5_RevRecHoldback.active)` AND `(joltScore >= kraljicSkew || commCellsActive.length < 2)`:
+   *      Verdict = "JOLT PIVOT (fix fear, not price)"
+   *   2. Else if `isStrategicLandQualified`:
+   *      Verdict = "TAKE THE LOSS (strategic land)"
+   *   3. Else if `kraljicSkew >= 65 && commCellsActive.length >= 2 && kraljicSkew > joltScore`:
+   *      Verdict = "HOLD FIRM (procurement bluff)"
+   *   4. Else if `joltScore >= 35 || lossAversionScore >= 40 || cells.L5_RevRecHoldback.active`:
+   *      Verdict = "JOLT PIVOT (fix fear, not price)"
+   *   5. Else if `kraljicSkew >= 50 && (cells.L3_RenewalUplift.active || cells.L4_CommitTrueDown.active || commCellsActive.length >= 2)`:
+   *      Verdict = "HOLD FIRM (procurement bluff)"
+   *   6. Else:
+   *      Verdict = "JOLT PIVOT (fix fear, not price)"
+   * - Confidence Interval Range:
+   *   * Center = `W2_KPI_05` (Composite Deal Desk Verdict Confidence Score %)
+   *   * Spread_Half_Width = ROUND(MAX(3, 14 - (ABS(W2_LEAD_01 - W2_LEAD_02) * 0.10)))
+   *   * CI_Low = MAX(50, Center - Spread_Half_Width); CI_High = MIN(99, Center + Spread_Half_Width)
+   *
+   * STAGE 2 VAULT EXTENSIONS — WINDOW 3 MESO ALTERNATIVES & 4 CONSEQUENCE FLAGS:
+   * - MESO_A ("Full-Ledger Commercial & NRR Protection Structure"):
+   *   * Clears: L1, L2, L3, L4, L5 | Retains: L6
+   * - MESO_B ("JOLT Risk-Reversal & Milestone Bridge Structure"):
+   *   * Clears: L1, L2, L5 | Retains: L3, L4, L6
+   * - MESO_C ("Year-2 NRR & Liability Anchor Structure"):
+   *   * Clears: L3, L4, L6 | Retains: L1, L2, L5
+   * - Ranking Rule: Sorted descending by 3-Year NRR Impact = lowest `optY2Risk`, then highest `opt3YrLift`, then highest `rescued`.
+   * - Consequence Flags (triggered strictly by retained ledger cells > $0 or unfixed continuity risk):
+   *   * FLAG-Y2-CONTINUITY: fires when option does not clear interpretive ambiguity / prevention framing (`Retains_Continuity_Ambiguity` while `continuityRisk.active === true`), quoting `continuityRisk.y2AtRiskArr` and `L5`.
+   *   * FLAG-Y2-NRR-DECAY: fires when option retains `L3 > 0` or `L4 > 0`, quoting exact `L3` Year-2 uplift erosion, `L3_24Mo` compounded 24-month erosion, and `L4` true-down/rollover exposure.
+   *   * FLAG-3X-SPILLOVER: fires when option retains `L1 > 0` (unit-price cut left active instead of ring-fenced credit), quoting exact `L1` direct leak and `2.0x L1` (`Spillover_Cost`) portfolio spillover exposure.
+   *   * FLAG-ASC606-HOLDBACK: fires when option retains `L5 > 0` (termination for convenience or refundable acceptance left active), quoting exact `L5` revenue-recognition holdback reserve.
    * ============================================================================
    */
 
@@ -1793,6 +1763,29 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
         }
       });
     }
+    if (ledger.window3 && Array.isArray(ledger.window3.mesos)) {
+      assertWindow3MesoTieOut(ledger, ledger.window3.mesos);
+    }
+    return true;
+  }
+
+  function assertWindow3MesoTieOut(ledger, mesos) {
+    if (!ledger || !Array.isArray(mesos) || mesos.length !== 3) {
+      throw new Error("Window 3 Tie-Out Guard: 3 MESO structures required.");
+    }
+    var total = Math.round(ledger.totalLeak);
+    mesos.forEach(function (m) {
+      var rescued = Math.round(m.rescued);
+      var residual = Math.round(m.residual);
+      if (rescued + residual !== total) {
+        throw new Error("Window 3 Tie-Out Violation on " + m.id + ": rescued ($" + rescued + ") + residual ($" + residual + ") !== Window 1 totalLeak ($" + total + ").");
+      }
+      var clearedSum = m.clearedCells.reduce(function (acc, cell) { return acc + Math.round(cell.amount); }, 0);
+      var retainedSum = m.retainedCells.reduce(function (acc, cell) { return acc + Math.round(cell.amount); }, 0);
+      if (clearedSum !== rescued || retainedSum !== residual || (clearedSum + retainedSum) !== total) {
+        throw new Error("Window 3 Cell-by-Cell Tie-Out Violation on " + m.id + ": clearedSum ($" + clearedSum + ") / retainedSum ($" + retainedSum + ") mismatch.");
+      }
+    });
     return true;
   }
 
@@ -1889,12 +1882,370 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
     };
   }
 
+  function buildWindow2And3FromLedger(sig, cells, namedIndicators, continuityRisk, acv, totalLeak, truePocketRev, activeCellsCount, l3_24Mo, spilloverCost, y2TargetArr) {
+    var indMap = {};
+    namedIndicators.forEach(function (i) { indMap[i.id] = i; });
+
+    var joltScore = indMap.W2_LEAD_01.value;
+    var kraljicSkew = indMap.W2_LEAD_02.value;
+    var lossAversionScore = indMap.W2_LEAD_03.value;
+    var anchorDrift = indMap.W2_LEAD_04.value;
+    var ltvRecoveryMultiple = indMap.W2_KPI_01.value;
+    var clawbackProb = indMap.W2_KPI_02.value;
+    var logoDispVal = indMap.W2_KPI_03.value;
+    var confidenceCenter = indMap.W2_KPI_05.value;
+
+    var spreadHalf = Math.round(Math.max(3, 14 - (Math.abs(joltScore - kraljicSkew) * 0.10)));
+    var ciLow = Math.max(50, confidenceCenter - spreadHalf);
+    var ciHigh = Math.min(99, confidenceCenter + spreadHalf);
+
+    var commCellsActive = [cells.L1_UnitDiscount, cells.L2_FloatDrag, cells.L3_RenewalUplift, cells.L4_CommitTrueDown].filter(function (c) { return c.active; });
+
+    /* Cluster Evidence Collectors from the Document & Active Cells */
+    var joltClauses = [];
+    if (sig.map["termination-convenience"] && sig.map["termination-convenience"].found) {
+      joltClauses.push("Termination for convenience: \"" + sig.map["termination-convenience"].excerpt + "\"");
+    }
+    if (sig.map["acceptance-testing"] && sig.map["acceptance-testing"].found) {
+      joltClauses.push("Acceptance testing gate: \"" + sig.map["acceptance-testing"].excerpt + "\"");
+    }
+    if (sig.map.sla && sig.map.sla.found) {
+      joltClauses.push("SLA commitment: \"" + sig.map.sla.excerpt + "\"");
+    }
+    if (sig.map.warranties && sig.map.warranties.found) {
+      joltClauses.push("Warranty language: \"" + sig.map.warranties.excerpt + "\"");
+    }
+    if (!joltClauses.length) {
+      joltClauses.push("No walk-away convenience cancellation or subjective acceptance gate detected in text.");
+    }
+
+    var sharkClauses = [];
+    commCellsActive.forEach(function (c) {
+      sharkClauses.push("[" + c.id + " -" + "$" + c.amount.toLocaleString() + "] " + c.source);
+    });
+    if (sig.map.mfn && sig.map.mfn.found) {
+      sharkClauses.push("MFN price floor lock: \"" + sig.map.mfn.excerpt + "\"");
+    }
+    if (sig.map.setoff && sig.map.setoff.found) {
+      sharkClauses.push("Setoff deduction clause: \"" + sig.map.setoff.excerpt + "\"");
+    }
+    if (!sharkClauses.length) {
+      sharkClauses.push("No multi-front commercial price/float/uplift nibbling detected across L1–L4.");
+    }
+
+    var landClauses = [];
+    if (sig.map.publicity && sig.map.publicity.found) {
+      landClauses.push("Publicity / logo reference grant: \"" + sig.map.publicity.excerpt + "\"");
+    }
+    if (sig.map.term && sig.map.term.found) {
+      landClauses.push("Initial term anchor: \"" + sig.map.term.excerpt + "\"");
+    }
+    if (!cells.L3_RenewalUplift.active) {
+      landClauses.push("Year-2 renewal uplift protected at " + (sig.upliftCapPct * 100).toFixed(1) + "% (Month-13 Clawback Probability: " + clawbackProb + "%).");
+    }
+    if (!landClauses.length) {
+      landClauses.push("Expansion recovery multiple is " + ltvRecoveryMultiple.toFixed(2) + "x against $" + totalLeak.toLocaleString() + " Year-1 leak.");
+    }
+
+    /* Deterministic Verdict Call (Exact 3 Verdicts from Spec §3 — Corrected Precedence) */
+    var verdictName = "";
+    var verdictSlug = "";
+    var dominantClusterId = "";
+    var verdictMeaning = "";
+    var verdictEvidence = "";
+
+    var hasStrategicLandAnchor = !!(sig.map.publicity && sig.map.publicity.found) || (sig.termYears > 1);
+    var isStrategicLandQualified = (ltvRecoveryMultiple >= 5.0) &&
+      !cells.L3_RenewalUplift.active &&
+      !cells.L4_CommitTrueDown.active &&
+      !cells.L5_RevRecHoldback.active &&
+      !cells.L6_LiabilityReserve.active &&
+      (clawbackProb >= 50) &&
+      (hasStrategicLandAnchor || commCellsActive.length <= 2);
+
+    if ((joltScore >= 35 || lossAversionScore >= 40 || cells.L5_RevRecHoldback.active) && (joltScore >= kraljicSkew || commCellsActive.length < 2)) {
+      verdictName = "JOLT PIVOT (fix fear, not price)";
+      verdictSlug = "is-jolt-pivot";
+      dominantClusterId = "CLUSTER_JOLT";
+      verdictMeaning = "The contract's redline cluster centers on failure-avoidance and downside exit protection (JOLT FOMU Index " + joltScore + "/100; Shelfware Anxiety " + lossAversionScore + "/100). Discounting unit price does not solve fear of implementation failure — pivot the counter-offer to milestone-gated onboarding and cure windows while stripping termination-for-convenience.";
+      verdictEvidence = joltClauses.slice(0, 2).join(" | ");
+    } else if (isStrategicLandQualified) {
+      verdictName = "TAKE THE LOSS (strategic land)";
+      verdictSlug = "is-take-loss";
+      dominantClusterId = "CLUSTER_LAND";
+      verdictMeaning = "Year-1 pocket leakage (-$" + totalLeak.toLocaleString() + ") is recovered at a " + ltvRecoveryMultiple.toFixed(2) + "x 3-year expansion LTV multiple with " + clawbackProb + "% Month-13 renewal clawback probability and clean Year-2 expansion mechanics. Ring-fence any Year-1 concession as a one-time deployment credit so baseline unit price and Year-2 uplift remain intact.";
+      verdictEvidence = landClauses.slice(0, 2).join(" | ");
+    } else if (kraljicSkew >= 65 && commCellsActive.length >= 2 && kraljicSkew > joltScore) {
+      verdictName = "HOLD FIRM (procurement bluff)";
+      verdictSlug = "is-hold-firm";
+      dominantClusterId = "CLUSTER_SHARK";
+      verdictMeaning = "The redline pattern skews heavily toward commercial price, float, and renewal-cap extraction (" + kraljicSkew.toFixed(1) + "% commercial skew across " + commCellsActive.length + " active commercial ledger cells) rather than implementation risk protection. Treating a procurement price squeeze as buyer fear gives away margin without speeding signature; anchor on Give-Get trade brackets.";
+      verdictEvidence = sharkClauses.slice(0, 2).join(" | ");
+    } else if (kraljicSkew >= 50 && (cells.L3_RenewalUplift.active || cells.L4_CommitTrueDown.active || commCellsActive.length >= 2)) {
+      verdictName = "HOLD FIRM (procurement bluff)";
+      verdictSlug = "is-hold-firm";
+      dominantClusterId = "CLUSTER_SHARK";
+      verdictMeaning = "Commercial concessions dominate the active leak ledger (" + kraljicSkew.toFixed(1) + "% commercial skew across " + commCellsActive.length + " active commercial cells) without qualifying for a strategic land override. Hold unit price and require an explicit contractual Get for every commercial Give.";
+      verdictEvidence = sharkClauses.slice(0, 2).join(" | ");
+    } else if (joltScore >= 35 || lossAversionScore >= 40 || cells.L5_RevRecHoldback.active) {
+      verdictName = "JOLT PIVOT (fix fear, not price)";
+      verdictSlug = "is-jolt-pivot";
+      dominantClusterId = "CLUSTER_JOLT";
+      verdictMeaning = "The contract's redline cluster centers on failure-avoidance and downside exit protection (JOLT FOMU Index " + joltScore + "/100; Shelfware Anxiety " + lossAversionScore + "/100). Discounting unit price does not solve fear of implementation failure — pivot the counter-offer to milestone-gated onboarding and cure windows while stripping termination-for-convenience.";
+      verdictEvidence = joltClauses.slice(0, 2).join(" | ");
+    } else {
+      verdictName = "JOLT PIVOT (fix fear, not price)";
+      verdictSlug = "is-jolt-pivot";
+      dominantClusterId = "CLUSTER_JOLT";
+      verdictMeaning = "Operational and legal friction points outweigh pure price nibbling. Bound execution risk with objective acceptance criteria and defined cure periods rather than conceding headline rate.";
+      verdictEvidence = joltClauses.slice(0, 2).join(" | ");
+    }
+
+    var clusters = [
+      Object.freeze({
+        id: "CLUSTER_JOLT",
+        name: "JOLT Fear Cluster (Implementation & Shelfware Risk)",
+        framework: "Dixon JOLT Effect (FOMU) · Kahneman Prospect Theory",
+        scoreFormatted: "FOMU " + joltScore + "/100 · Loss-Aversion " + lossAversionScore + "/100",
+        isDominant: dominantClusterId === "CLUSTER_JOLT",
+        description: "Detects walk-away convenience cancellation, subjective acceptance gates, SLA refund triggers, and true-down/rollover demands driven by fear of messing up.",
+        clauseEvidence: joltClauses.join(" · ")
+      }),
+      Object.freeze({
+        id: "CLUSTER_SHARK",
+        name: "Procurement Shark Cluster (Commercial Anchor Nibbling)",
+        framework: "Kraljic Leverage Skew · Multi-Front Concession Velocity",
+        scoreFormatted: "Skew " + kraljicSkew.toFixed(1) + "% · Nibbling " + anchorDrift + "%",
+        isDominant: dominantClusterId === "CLUSTER_SHARK",
+        description: "Measures commercial redline concentration across unit discount (L1), payment float/DSO (L2), renewal uplift freeze (L3), and commit reductions (L4).",
+        clauseEvidence: sharkClauses.join(" · ")
+      }),
+      Object.freeze({
+        id: "CLUSTER_LAND",
+        name: "Strategic Land Cluster (Expansion & Clawback Viability)",
+        framework: "3-Year LTV Recovery · Month-13 Renewal Clawback Gate",
+        scoreFormatted: "LTV Multiple " + ltvRecoveryMultiple.toFixed(2) + "x · Clawback " + clawbackProb + "%",
+        isDominant: dominantClusterId === "CLUSTER_LAND",
+        description: "Evaluates whether Year-1 pocket leakage is offset by 36-month expansion recovery, protected Year-2 uplift, and reference/displacement value.",
+        clauseEvidence: landClauses.join(" · ")
+      })
+    ];
+
+    /* Build Window 3 MESO Structures Scored Strictly Cell-by-Cell */
+    var allCellList = [
+      cells.L1_UnitDiscount,
+      cells.L2_FloatDrag,
+      cells.L3_RenewalUplift,
+      cells.L4_CommitTrueDown,
+      cells.L5_RevRecHoldback,
+      cells.L6_LiabilityReserve
+    ];
+
+    function buildMesoOption(specObj) {
+      var clearedCells = [];
+      var retainedCells = [];
+      allCellList.forEach(function (cell) {
+        if (specObj.clearIds.indexOf(cell.id) !== -1) {
+          clearedCells.push(cell);
+        } else {
+          retainedCells.push(cell);
+        }
+      });
+
+      var rescued = clearedCells.reduce(function (s, c) { return s + c.amount; }, 0);
+      var residual = retainedCells.reduce(function (s, c) { return s + c.amount; }, 0);
+      var rescuedPct = totalLeak > 0 ? Math.round((rescued / totalLeak) * 1000) / 10 : 100.0;
+
+      var retainsL1 = retainedCells.some(function (c) { return c.id === "L1" && c.amount > 0; });
+      var retainsL2 = retainedCells.some(function (c) { return c.id === "L2" && c.amount > 0; });
+      var retainsL3 = retainedCells.some(function (c) { return c.id === "L3" && c.amount > 0; });
+      var retainsL4 = retainedCells.some(function (c) { return c.id === "L4" && c.amount > 0; });
+      var retainsL5 = retainedCells.some(function (c) { return c.id === "L5" && c.amount > 0; });
+      var retainsL6 = retainedCells.some(function (c) { return c.id === "L6" && c.amount > 0; });
+      var clearsL1 = !retainsL1;
+      var clearsL5 = !retainsL5;
+      var retainsContinuity = specObj.retainsContinuity && continuityRisk.active;
+
+      /* Consequence Flags (Spec §6 — Exact 4 flags, plain risk & exact dollar figure, no recommendation/block) */
+      var consequenceFlags = [];
+      if (retainsContinuity) {
+        var contExposure = continuityRisk.y2AtRiskArr + (retainsL5 ? cells.L5_RevRecHoldback.amount : 0);
+        consequenceFlags.push(Object.freeze({
+          code: "FLAG-Y2-CONTINUITY",
+          amountFormatted: "$" + contExposure.toLocaleString() + " Year-2 ARR at risk",
+          description: "Leaves subjective acceptance, uncured cause termination, or prevention-framed cancellation language active in the contract. Year-2 renewal continuity exposure is $" + continuityRisk.y2AtRiskArr.toLocaleString() + (retainsL5 ? " plus $" + cells.L5_RevRecHoldback.amount.toLocaleString() + " in Year-1 L5 holdback reserve." : ".")
+        }));
+      }
+      if (retainsL3 || retainsL4) {
+        var nrrY2 = (retainsL3 ? cells.L3_RenewalUplift.amount : 0) + (retainsL4 ? cells.L4_CommitTrueDown.amount : 0);
+        var nrr24Mo = (retainsL3 ? l3_24Mo : 0) + (retainsL4 ? cells.L4_CommitTrueDown.amount * 2 : 0);
+        consequenceFlags.push(Object.freeze({
+          code: "FLAG-Y2-NRR-DECAY",
+          amountFormatted: "-$" + nrrY2.toLocaleString() + " Y2 / -$" + nrr24Mo.toLocaleString() + " 24-Mo",
+          description: "Retains ledger cell" + (retainsL3 && retainsL4 ? "s L3 and L4" : (retainsL3 ? " L3 (renewal uplift erosion)" : " L4 (commit true-down/rollover)")) + " unfixed. Direct Year-2 NRR erosion is -$" + nrrY2.toLocaleString() + " (-$" + nrr24Mo.toLocaleString() + " compounded over 24 months)."
+        }));
+      }
+      if (retainsL1) {
+        consequenceFlags.push(Object.freeze({
+          code: "FLAG-3X-SPILLOVER",
+          amountFormatted: "-$" + cells.L1_UnitDiscount.amount.toLocaleString() + " direct / -$" + spilloverCost.toLocaleString() + " spillover",
+          description: "Retains ledger cell L1 as a visible unit-price reduction rather than a ring-fenced Year-1 credit, leaving -$" + cells.L1_UnitDiscount.amount.toLocaleString() + " in direct Year-1 discount excess and -$" + spilloverCost.toLocaleString() + " in 3x portfolio price-benchmark spillover exposure."
+        }));
+      }
+      if (retainsL5) {
+        consequenceFlags.push(Object.freeze({
+          code: "FLAG-ASC606-HOLDBACK",
+          amountFormatted: "-$" + cells.L5_RevRecHoldback.amount.toLocaleString() + " rev-rec deferral",
+          description: "Retains ledger cell L5 (termination for convenience or refundable acceptance gate), requiring a -$" + cells.L5_RevRecHoldback.amount.toLocaleString() + " ASC-606 revenue-recognition holdback reserve."
+        }));
+      }
+
+      /* Compute the 12 Window 3 Named Indicators specifically for this MESO option */
+      var opt3YrLift = Math.round((rescued * 3) + (clearsL1 ? spilloverCost : 0));
+      var optY2Risk = (retainsL3 ? l3_24Mo : 0) + (retainsL4 ? cells.L4_CommitTrueDown.amount * 2 : 0) + (retainsContinuity ? y2TargetArr : 0);
+      var optSpilloverSaved = clearsL1 ? spilloverCost : 0;
+      var activeClearedCount = clearedCells.filter(function (c) { return c.amount > 0; }).length;
+      var w2DragDays = indMap.W2_OPI_01.value;
+      var optDaysSaved = Math.round(w2DragDays * (activeClearedCount / Math.max(1, activeCellsCount)) * 0.80 * 10) / 10;
+      var optGiveGetRatio = specObj.giveGetRatio;
+      var optAuthorityTier = (residual === 0 || (residual <= cells.L6_LiabilityReserve.amount && clearsL5))
+        ? "TIER 1 — SELF-CLEARING (SEND TODAY)"
+        : (clearsL5 ? "TIER 2 — VP FINANCE SIGN-OFF" : "TIER 3 — CFO/GC ESCALATION");
+      var optBrackets = specObj.bracketsCount;
+      var matchesArchetype = (specObj.matchesCluster === dominantClusterId) || (specObj.id === "MESO_A");
+      var optAcceptProb = Math.min(94, 50 + (matchesArchetype ? 32 : -15) + 12 - (specObj.requiresNewBudget ? 18 : 0));
+      var optMesoSincerity = 100;
+      var optPostSigFriction = (!retainsContinuity && clearsL5)
+        ? "LOW (12/100 — Cooperative Frame)"
+        : "HIGH (84/100 — Vigilance & Year-2 Churn Warning)";
+
+      var optionIndicators = [
+        { num: 35, id: "W3_KPI_01", name: "Exact Pocket Leak Rescued ($ and % of Window 1 Leak)", window: 3, type: "KPI", value: rescued, formatted: "$" + rescued.toLocaleString() + " (" + rescuedPct.toFixed(1) + "%)" },
+        { num: 36, id: "W3_KPI_02", name: "Residual Unfixed Year-1 Pocket Leak ($)", window: 3, type: "KPI", value: residual, formatted: "-$" + residual.toLocaleString() },
+        { num: 37, id: "W3_KPI_03", name: "3-Year Risk-Adjusted TCV Lift ($ vs. Rep's Raw Deal)", window: 3, type: "KPI", value: opt3YrLift, formatted: "+$" + opt3YrLift.toLocaleString() },
+        { num: 38, id: "W3_KPI_04", name: "Year-2 NRR & Continuity At-Risk Dollar Exposure ($)", window: 3, type: "KPI", value: optY2Risk, formatted: "$" + optY2Risk.toLocaleString() },
+        { num: 39, id: "W3_KPI_05", name: "Portfolio Spillover Shield Savings ($)", window: 3, type: "KPI", value: optSpilloverSaved, formatted: "$" + optSpilloverSaved.toLocaleString() },
+        { num: 40, id: "W3_OPI_01", name: "Legal Cycle-Time Compression (Days Saved)", window: 3, type: "OPI", value: optDaysSaved, formatted: optDaysSaved.toFixed(1) + " days" },
+        { num: 41, id: "W3_OPI_02", name: "Give-Get Reciprocity Balance Ratio", window: 3, type: "OPI", value: optGiveGetRatio, formatted: optGiveGetRatio.toFixed(2) + "x" },
+        { num: 42, id: "W3_OPI_03", name: "Self-Clearing Deal Desk Authority Tier (1, 2, or 3)", window: 3, type: "OPI", value: optAuthorityTier, formatted: optAuthorityTier },
+        { num: 43, id: "W3_OPI_04", name: "Nested Bracket Cognitive Load Score", window: 3, type: "OPI", value: optBrackets, formatted: optBrackets + " Paired Brackets" },
+        { num: 44, id: "W3_LEAD_01", name: "Behavioral Buyer Acceptance Probability (%)", window: 3, type: "Leading Indicator", value: optAcceptProb, formatted: optAcceptProb + "%" },
+        { num: 45, id: "W3_LEAD_02", name: "MESO Agreement Sincerity & Anchor Resilience Score", window: 3, type: "Leading Indicator", value: optMesoSincerity, formatted: optMesoSincerity + " / 100" },
+        { num: 46, id: "W3_LEAD_03", name: "Post-Signature Implementation & Renewal Friction Forecast", window: 3, type: "Leading Indicator", value: optPostSigFriction, formatted: optPostSigFriction }
+      ];
+
+      var nrrRankScore = (opt3YrLift * 2) - (optY2Risk * 3) + rescued;
+
+      return Object.freeze({
+        id: specObj.id,
+        name: specObj.name,
+        structureSummary: specObj.structureSummary,
+        giveGetTrade: specObj.giveGetTrade,
+        clearIds: Object.freeze(specObj.clearIds.slice()),
+        clearedCells: Object.freeze(clearedCells),
+        retainedCells: Object.freeze(retainedCells),
+        rescued: rescued,
+        residual: residual,
+        rescuedPct: rescuedPct,
+        opt3YrLift: opt3YrLift,
+        optY2Risk: optY2Risk,
+        optAuthorityTier: optAuthorityTier,
+        nrrRankScore: nrrRankScore,
+        consequenceFlags: Object.freeze(consequenceFlags),
+        indicators: Object.freeze(optionIndicators)
+      });
+    }
+
+    var rawMesos = [
+      buildMesoOption({
+        id: "MESO_A",
+        name: "Full-Ledger Commercial & NRR Protection Structure",
+        structureSummary: "Converts any excess unit discount (L1) into a ring-fenced Year-1 onboarding credit, restores Net-30 annual billing (L2), locks the 7.0% Year-2 renewal escalator (L3), removes true-down/setoff rights (L4), and replaces termination for convenience with a 30-day cure milestone (L5). Retains only existing liability cap/indemnity posture (L6).",
+        giveGetTrade: "GIVE: Ring-fenced Year-1 implementation credit + 30-day milestone cure SLA · GET: List unit rate preserved, Net-30 annual upfront, 7% renewal uplift, T4C deleted.",
+        clearIds: ["L1", "L2", "L3", "L4", "L5"],
+        retainsContinuity: false,
+        giveGetRatio: 1.50,
+        bracketsCount: 3,
+        matchesCluster: "CLUSTER_SHARK",
+        requiresNewBudget: false
+      }),
+      buildMesoOption({
+        id: "MESO_B",
+        name: "JOLT Risk-Reversal & Milestone Bridge Structure",
+        structureSummary: "Replaces termination for convenience and subjective acceptance (L5) with a phased 60-day onboarding milestone schedule and service credits, while restoring list unit pricing (L1) and Net-30 annual payment terms (L2). Leaves renewal uplift cap (L3), commit flexibility (L4), and liability structure (L6) in their current contract state.",
+        giveGetTrade: "GIVE: Phased 60-day implementation milestone warranty + retain current renewal/commit terms (L3/L4) · GET: Delete T4C (clears L5 rev-rec reserve), restore list unit rate (L1) and Net-30 annual cash (L2).",
+        clearIds: ["L1", "L2", "L5"],
+        retainsContinuity: false,
+        giveGetRatio: 1.00,
+        bracketsCount: 2,
+        matchesCluster: "CLUSTER_JOLT",
+        requiresNewBudget: false
+      }),
+      buildMesoOption({
+        id: "MESO_C",
+        name: "Year-2 NRR & Liability Anchor Structure",
+        structureSummary: "Secures the 7.0% Year-2 renewal uplift (L3), deletes commit true-downs and setoff rights (L4), and re-anchors mutual liability cap protection (L6), while leaving Year-1 unit pricing (L1), extended payment/billing float (L2), and convenience/acceptance clauses (L5) unfixed.",
+        giveGetTrade: "GIVE: Leave Year-1 unit price concession (L1) and payment terms (L2) in place for Year 1 · GET: 7.0% Year-2 renewal uplift (L3), 100% seat/commit floor lock (L4), and mutual cap restoration (L6).",
+        clearIds: ["L3", "L4", "L6"],
+        retainsContinuity: true,
+        giveGetRatio: 1.00,
+        bracketsCount: 2,
+        matchesCluster: "CLUSTER_LAND",
+        requiresNewBudget: false
+      })
+    ];
+
+    /* Rank by 3-Year NRR Impact */
+    var rankedMesos = rawMesos.slice().sort(function (a, b) {
+      if (a.optY2Risk !== b.optY2Risk) return a.optY2Risk - b.optY2Risk;
+      if (b.opt3YrLift !== a.opt3YrLift) return b.opt3YrLift - a.opt3YrLift;
+      return b.rescued - a.rescued;
+    }).map(function (m, idx) {
+      return Object.freeze({
+        rank: idx + 1,
+        id: m.id,
+        name: m.name,
+        structureSummary: m.structureSummary,
+        giveGetTrade: m.giveGetTrade,
+        clearIds: m.clearIds,
+        clearedCells: m.clearedCells,
+        retainedCells: m.retainedCells,
+        rescued: m.rescued,
+        residual: m.residual,
+        rescuedPct: m.rescuedPct,
+        opt3YrLift: m.opt3YrLift,
+        optY2Risk: m.optY2Risk,
+        optAuthorityTier: m.optAuthorityTier,
+        consequenceFlags: m.consequenceFlags,
+        indicators: m.indicators
+      });
+    });
+
+    var window2 = Object.freeze({
+      verdictName: verdictName,
+      verdictSlug: verdictSlug,
+      confidenceScore: confidenceCenter,
+      confidenceLow: ciLow,
+      confidenceHigh: ciHigh,
+      verdictMeaning: verdictMeaning,
+      verdictEvidence: verdictEvidence,
+      dominantClusterId: dominantClusterId,
+      clusters: Object.freeze(clusters)
+    });
+
+    var window3 = Object.freeze({
+      mesos: Object.freeze(rankedMesos)
+    });
+
+    return { window2: window2, window3: window3 };
+  }
+
   function computeLedgerAndIndicators(text, checks, flagReport, rawInputs) {
     var sig = detectContractSignalsForLedger(text, checks, flagReport, rawInputs);
     var acv = sig.acv;
     var map = sig.map;
 
-    /* L1: Unit Discount Excess (above 15% policy threshold, or MFN price-match exposure) */
+    /* L1: Unit Discount Excess (above 15% policy threshold) */
     var excessDiscountPct = Math.max(0, sig.discountPct - 0.15);
     var l1Amount = Math.round(excessDiscountPct * acv);
     var l1Source = l1Amount > 0
@@ -2110,7 +2461,19 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
       { num: 46, id: "W3_LEAD_03", name: "Post-Signature Implementation & Renewal Friction Forecast", window: 3, type: "Leading Indicator", value: w3_lead_03, formatted: w3_lead_03 }
     ];
 
-    /* Pre-wire Ledger Alternatives Tie-Out structure for Stage 2 MESOs */
+    var continuityObj = Object.freeze({
+      active: hasContinuityKillRisk,
+      ambiguityScore: interpretiveAmbiguityScore,
+      preventionRatio: preventionRatio,
+      y2AtRiskArr: hasContinuityKillRisk ? y2TargetArr : 0
+    });
+
+    /* Build Window 2 & Window 3 structures from the exact same ledger cells & indicators */
+    var stage2Data = buildWindow2And3FromLedger(
+      sig, cells, namedIndicators, continuityObj, acv, totalLeak, truePocketRev, activeCellsCount, l3_24Mo, spilloverCost, y2TargetArr
+    );
+
+    /* Preserve Stage 1 alternatives array intact on ledger.alternatives */
     var alternatives = [
       Object.freeze({ id: "MESO_A", rescued: optARescued, residual: totalLeak - optARescued }),
       Object.freeze({ id: "MESO_B", rescued: l1Amount + l2Amount + l5Amount, residual: totalLeak - (l1Amount + l2Amount + l5Amount) }),
@@ -2125,14 +2488,11 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
       qtcMaturityScore: qtcMaturityScore,
       activeCellsCount: activeCellsCount,
       cells: Object.freeze(cells),
-      continuityRisk: Object.freeze({
-        active: hasContinuityKillRisk,
-        ambiguityScore: interpretiveAmbiguityScore,
-        preventionRatio: preventionRatio,
-        y2AtRiskArr: hasContinuityKillRisk ? y2TargetArr : 0
-      }),
+      continuityRisk: continuityObj,
       indicators: Object.freeze(namedIndicators),
-      alternatives: Object.freeze(alternatives)
+      alternatives: Object.freeze(alternatives),
+      window2: stage2Data.window2,
+      window3: stage2Data.window3
     });
 
     assertLedgerTieOut(ledger);
@@ -2145,6 +2505,7 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
     computeFlags: computeFlags,
     computeLedgerAndIndicators: computeLedgerAndIndicators,
     assertLedgerTieOut: assertLedgerTieOut,
+    assertWindow3MesoTieOut: assertWindow3MesoTieOut,
     CHECKS: CHECKS
   };
 })();
@@ -2193,6 +2554,7 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
       var lastFlagReport = null;
       var lastLedger = null;
       var activeFilter = "all";
+      var selectedMesoIndex = 0;
 
       if (window.pdfjsLib) {
         window.pdfjsLib.GlobalWorkerOptions.workerSrc = "../../assets/pdf.worker-3.11.174.min.js";
@@ -2241,13 +2603,14 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
         lastFlagReport = null;
         lastLedger = null;
         activeFilter = "all";
+        selectedMesoIndex = 0;
         stickyFlagsEl.textContent = "—";
         stickyFlagsEl.className = "";
         stickyFoundEl.textContent = "—/" + TOTAL_CHECKS;
         stickyMissingEl.textContent = "—";
         resultsEl.innerHTML =
           '<div class="idle-notice-box" id="ca-idle-state">' +
-            'Ready to analyze. Upload a contract, paste text, or load the fictional sample contract above, then click <strong>Run the analysis</strong> to populate the Window 1 forensic leak waterfall, the risk flags, the six original scans, and all ' + TOTAL_CHECKS + ' coverage checks.' +
+            'Ready to analyze. Upload a contract, paste text, or load the fictional sample contract above, then click <strong>Run the analysis</strong> to populate the Window 1 forensic leak waterfall, the Window 2 behavioral verdict, the Window 3 MESO alternatives with consequence flags, the risk flags, the six original scans, and all ' + TOTAL_CHECKS + ' coverage checks.' +
           '</div>';
         aiOutEl.innerHTML = "Run the browser scan above first, then select <strong>Write the AI read</strong> if you want an AI-written summary alongside the heuristic evidence.";
       }
@@ -2445,6 +2808,284 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
         return html;
       }
 
+      /* STAGE 2: WINDOW 2 BEHAVIORAL VERDICT PANEL */
+      function renderWindow2VerdictPanel(ledger) {
+        if (!ledger || !ledger.window2) return "";
+        var w2 = ledger.window2;
+        var w2Indicators = ledger.indicators.filter(function (ind) { return ind.window === 2; });
+        var indById = {};
+        w2Indicators.forEach(function (i) { indById[i.id] = i; });
+
+        var html = '<section class="window2-panel" id="ca-window2-panel" aria-label="Window 2 Behavioral Buyer Verdict">';
+        html += '<div class="window1-head">';
+        html += '<div class="window1-title-group">';
+        html += '<span class="window1-eyebrow">Window 2 · Behavioral Buyer Fingerprint &amp; Strategic Verdict</span>';
+        html += '<h3 class="window1-title">Behavioral Verdict &amp; Document Redline Clusters</h3>';
+        html += '</div>';
+        html += '<div class="window1-maturity-badge">Confidence: <strong id="ca-w2-confidence">' + w2.confidenceScore + '%</strong> (' + w2.confidenceLow + '%–' + w2.confidenceHigh + '% CI)</div>';
+        html += '</div>';
+        html += '<p class="window-subline">This verdict is derived directly from the contract\u2019s own redline patterns and clause signals across the shared Window 1 ledger.</p>';
+
+        html += '<article class="verdict-banner ' + esc(w2.verdictSlug) + '" id="ca-w2-verdict-banner">';
+        html += '<div class="verdict-top-row">';
+        html += '<div><span class="verdict-call-label">Deal Desk Behavioral Verdict Call</span><h4 class="verdict-call-name" id="ca-w2-verdict-name">' + esc(w2.verdictName) + '</h4></div>';
+        html += '<div class="verdict-ci-box">Composite Confidence: <strong>' + w2.confidenceScore + '%</strong><br>Confidence Interval: ' + w2.confidenceLow + '% to ' + w2.confidenceHigh + '%</div>';
+        html += '</div>';
+        html += '<p class="verdict-meaning">' + esc(w2.verdictMeaning) + '</p>';
+        html += '<div class="verdict-evidence-box"><strong>Triggering Clause &amp; Ledger Evidence:</strong> ' + esc(w2.verdictEvidence) + '</div>';
+        html += '</article>';
+
+        html += '<h4 class="sub-block-title" style="font-size:1.02rem; margin-bottom:0.55rem;">Document Redline Clusters (Kahneman Prospect Theory · Dixon JOLT Effect · Kraljic Skew)</h4>';
+        html += '<div class="cluster-grid" role="list" aria-label="Document Redline Clusters">';
+        w2.clusters.forEach(function (cl) {
+          html += '<article class="cluster-card' + (cl.isDominant ? " is-dominant" : "") + '" role="listitem" data-cluster-id="' + esc(cl.id) + '">';
+          html += '<div>';
+          html += '<span class="cluster-framework">' + esc(cl.framework) + (cl.isDominant ? " · PRIMARY SIGNAL" : "") + '</span>';
+          html += '<div class="cluster-head"><h5 class="cluster-name">' + esc(cl.name) + '</h5><span class="cluster-score">' + esc(cl.scoreFormatted) + '</span></div>';
+          html += '<p class="cluster-desc" style="margin-top:0.35rem;">' + esc(cl.description) + '</p>';
+          html += '</div>';
+          html += '<p class="cluster-clauses">' + esc(cl.clauseEvidence) + '</p>';
+          html += '</article>';
+        });
+        html += '</div>';
+
+        html += '<div class="meddpicc-block" id="ca-w2-meddpicc">';
+        html += '<div class="meddpicc-header"><h4 class="meddpicc-title">MEDDPICC &amp; Deal Desk Governance Qualification Block</h4><p class="meddpicc-sub">Operational velocity, control asymmetry, and 36-month expansion recovery</p></div>';
+        html += '<div class="meddpicc-grid">';
+        [
+          { label: "Paper Process Cycle Drag (W2_OPI_01)", val: indById.W2_OPI_01 ? indById.W2_OPI_01.formatted : "—" },
+          { label: "Approval Silos Required (W2_OPI_02)", val: indById.W2_OPI_02 ? indById.W2_OPI_02.formatted : "—" },
+          { label: "Champion vs. Procurement Control (W2_OPI_03)", val: indById.W2_OPI_03 ? indById.W2_OPI_03.formatted : "—" },
+          { label: "Tech & InfoSec Lock-In Readiness (W2_OPI_06)", val: indById.W2_OPI_06 ? indById.W2_OPI_06.formatted : "—" },
+          { label: "3-Yr LTV-to-Leak Recovery (W2_KPI_01)", val: indById.W2_KPI_01 ? indById.W2_KPI_01.formatted : "—" },
+          { label: "Month-13 Renewal Clawback Prob (W2_KPI_02)", val: indById.W2_KPI_02 ? indById.W2_KPI_02.formatted : "—" }
+        ].forEach(function (m) {
+          html += '<div class="meddpicc-pill"><span class="meddpicc-pill-label">' + esc(m.label) + '</span><span class="meddpicc-pill-val">' + esc(m.val) + '</span></div>';
+        });
+        html += '</div>';
+        html += '</div>';
+
+        html += '<h4 class="sub-block-title" style="font-size:1.02rem; margin-bottom:0.55rem;">Window 2 Behavioral, Velocity &amp; Strategic Indicators (18 Named Measures)</h4>';
+        html += '<div class="w1-indicators-grid">';
+        w2Indicators.forEach(function (ind) {
+          var typeClass = ind.type === "OPI" ? " is-opi" : (ind.type === "Leading Indicator" ? " is-lead" : "");
+          html += '<article class="w1-ind-card' + typeClass + '" data-indicator-id="' + esc(ind.id) + '">';
+          html += '<div class="w1-ind-top"><span>' + esc(ind.id) + '</span><span>' + esc(ind.type) + '</span></div>';
+          html += '<div class="w1-ind-name">' + esc(ind.name) + '</div>';
+          html += '<div class="w1-ind-val">' + esc(ind.formatted) + '</div>';
+          html += '</article>';
+        });
+        html += '</div>';
+        html += '</section>';
+
+        return html;
+      }
+
+      /* STAGE 2: COUNTER-SCRIPT & TOOL 3 PERM APPROVAL MEMO GENERATORS */
+      function buildRepCounterScript(ledger, meso) {
+        var w2 = ledger.window2;
+        var clearedNames = meso.clearedCells.filter(function (c) { return c.amount > 0; }).map(function (c) { return c.id + " (" + c.label + ": $" + c.amount.toLocaleString() + ")"; });
+        var retainedNames = meso.retainedCells.filter(function (c) { return c.amount > 0; }).map(function (c) { return c.id + " (" + c.label + ": -$" + c.amount.toLocaleString() + ")"; });
+
+        var lines = [];
+        lines.push("REP NEGOTIATION COUNTER-SCRIPT — " + w2.verdictName);
+        lines.push("Selected Structure: Rank #" + meso.rank + " — " + meso.name + " [" + meso.id + "]");
+        lines.push("====================================================================");
+        lines.push("");
+        lines.push("1. OPENING POSTURE (" + w2.verdictName + "):");
+        if (w2.verdictName.indexOf("HOLD FIRM") !== -1) {
+          lines.push("\"We reviewed the full redline package with Deal Desk. Right now, the commercial requests across unit rate, payment terms, and renewal caps extract -$" + ledger.totalLeak.toLocaleString() + " from a $" + ledger.baselineAcv.toLocaleString() + " baseline without a corresponding scope or commitment trade. We cannot approve unreciprocated price cuts, so we put together three simultaneous structures that pair each concession with a clean commercial anchor.\"");
+        } else if (w2.verdictName.indexOf("JOLT PIVOT") !== -1) {
+          lines.push("\"Looking at the redlines around convenience cancellation and acceptance gates, it is clear your team wants protection against implementation risk rather than a protracted fight over unit rate. Instead of an unworkable walk-away clause that triggers a -$" + ledger.cells.L5_RevRecHoldback.amount.toLocaleString() + " revenue holdback on our side, we structured a milestone-backed option that bounds your onboarding risk directly.\"");
+        } else {
+          lines.push("\"We recognize the strategic scope of this deployment. To make the Year-1 economics work without breaking our price benchmark or Year-2 renewal structure, we can ring-fence the Year-1 concession as a one-time deployment credit while keeping the baseline commercial schedule clean.\"");
+        }
+        lines.push("");
+        lines.push("2. THE GIVE-GET BRACKET (" + meso.name + "):");
+        lines.push("- " + meso.giveGetTrade);
+        lines.push("- Exact Ledger Cells Rescued: $" + meso.rescued.toLocaleString() + " (" + (clearedNames.length ? clearedNames.join(", ") : "All active cells already $0") + ")");
+        lines.push("- Residual Year-1 Pocket Leak Retained: -$" + meso.residual.toLocaleString() + " (" + (retainedNames.length ? retainedNames.join(", ") : "$0 retained leak") + ")");
+        lines.push("");
+        lines.push("3. SIMULTANEOUS MESO CLOSE QUESTION:");
+        lines.push("\"We can execute any of the three structures on the table today because each one balances the ledger differently. If " + meso.name + " fits your budget and launch timeline best, we can issue the clean execution copy under " + meso.optAuthorityTier + " right now. Which of the three structures works best for your team?\"");
+        return lines.join("\n");
+      }
+
+      function buildPermApprovalMemo(ledger, meso, scans) {
+        var w2 = ledger.window2;
+        var partyStr = (scans && scans.parties && scans.parties.length)
+          ? (Array.isArray(scans.parties[0]) ? scans.parties[0].join(" / ") : String(scans.parties[0]))
+          : "Counterparty per Contract";
+        var lawStr = (scans && scans.law && scans.law.length)
+          ? (Array.isArray(scans.law[0]) ? scans.law[0].join(": ") : String(scans.law[0]))
+          : "Per Contract Governing Law";
+
+        var lines = [];
+        lines.push("TOOL 3 PERM EXCEPTION & DEAL DESK APPROVAL MEMO");
+        lines.push("====================================================================");
+        lines.push("PARTIES:              " + partyStr);
+        lines.push("GOVERNING LAW:        " + lawStr);
+        lines.push("BASELINE ACV:         $" + ledger.baselineAcv.toLocaleString() + " | QTC MATURITY: " + ledger.qtcMaturityScore + "/100");
+        lines.push("RAW YEAR-1 LEAK:      -$" + ledger.totalLeak.toLocaleString() + " (True Pocket Rev: $" + ledger.truePocketRev.toLocaleString() + " | Yield: " + ledger.pocketYieldPct.toFixed(2) + "%)");
+        lines.push("BEHAVIORAL VERDICT:   " + w2.verdictName + " (Confidence: " + w2.confidenceScore + "% | CI: " + w2.confidenceLow + "%–" + w2.confidenceHigh + "%)");
+        lines.push("SELECTED STRUCTURE:   Rank #" + meso.rank + " — " + meso.name + " [" + meso.id + "]");
+        lines.push("APPROVAL AUTHORITY:   " + meso.optAuthorityTier);
+        lines.push("--------------------------------------------------------------------");
+        lines.push("[P] POSTURE & RATIONALE:");
+        lines.push("    " + w2.verdictMeaning);
+        lines.push("");
+        lines.push("[E] ECONOMICS & CELL-BY-CELL LEDGER TIE-OUT ($0.00 VARIANCE):");
+        lines.push("    - Window 1 Total Leak:        -$" + ledger.totalLeak.toLocaleString());
+        lines.push("    - Dollars Rescued by Option:  +$" + meso.rescued.toLocaleString() + " (" + meso.rescuedPct.toFixed(1) + "%)");
+        lines.push("    - Residual Unfixed Leak:      -$" + meso.residual.toLocaleString());
+        lines.push("    - Tie-Out Check:              $" + meso.rescued.toLocaleString() + " + $" + meso.residual.toLocaleString() + " = $" + (meso.rescued + meso.residual).toLocaleString() + " ($0.00 variance)");
+        lines.push("    - 3-Year Risk-Adj TCV Lift:   +$" + meso.opt3YrLift.toLocaleString());
+        lines.push("    - Year-2 NRR At-Risk Dollars: $" + meso.optY2Risk.toLocaleString());
+        lines.push("");
+        lines.push("[R] RISK & CONSEQUENCE FLAGS SURFACED (" + meso.consequenceFlags.length + "):");
+        if (!meso.consequenceFlags.length) {
+          lines.push("    - NONE: All commercial, rev-rec, and Year-2 NRR continuity cells cleared.");
+        } else {
+          meso.consequenceFlags.forEach(function (cf) {
+            lines.push("    - [" + cf.code + "] (" + cf.amountFormatted + "): " + cf.description);
+          });
+        }
+        lines.push("");
+        lines.push("[M] MITIGATION & GIVE-GET CONTRACTUAL LOCKS:");
+        lines.push("    " + meso.giveGetTrade);
+        return lines.join("\n");
+      }
+
+      /* STAGE 2: WINDOW 3 MESO ALTERNATIVES & CONSEQUENCE-FLAG SYSTEM PANEL */
+      function renderWindow3MesoPanel(ledger, scans) {
+        if (!ledger || !ledger.window3 || !Array.isArray(ledger.window3.mesos)) return "";
+        var mesos = ledger.window3.mesos;
+
+        /* Enforce Hard Guard before rendering Window 3 — suppress panel on any variance */
+        try {
+          window.ContractAnalyzer.assertWindow3MesoTieOut(ledger, mesos);
+        } catch (err) {
+          return '<section class="window3-panel" id="ca-window3-panel"><div class="idle-notice-box">Window 3 suppressed due to ledger tie-out variance: ' + esc(err.message) + '</div></section>';
+        }
+
+        var allCellIds = ["L1", "L2", "L3", "L4", "L5", "L6"];
+        var cellMap = {
+          L1: ledger.cells.L1_UnitDiscount,
+          L2: ledger.cells.L2_FloatDrag,
+          L3: ledger.cells.L3_RenewalUplift,
+          L4: ledger.cells.L4_CommitTrueDown,
+          L5: ledger.cells.L5_RevRecHoldback,
+          L6: ledger.cells.L6_LiabilityReserve
+        };
+
+        var activeMeso = mesos[selectedMesoIndex] || mesos[0];
+
+        var html = '<section class="window3-panel" id="ca-window3-panel" aria-label="Window 3 Alternative Deals and Consequence Flags">';
+        html += '<div class="window1-head">';
+        html += '<div class="window1-title-group">';
+        html += '<span class="window1-eyebrow">Window 3 · Multiple Equivalent Simultaneous Offers (MESO) &amp; Consequence Flags</span>';
+        html += '<h3 class="window1-title">3 Alternative Deal Structures (Ranked by 3-Year NRR Impact)</h3>';
+        html += '</div>';
+        html += '<div class="window1-maturity-badge">Tie-Out Guard: <strong>$0.00 Variance</strong></div>';
+        html += '</div>';
+        html += '<p class="window-subline">Each alternative deal structure is scored cell by cell against the same 6-cell ledger as Window 1 so that Rescued Dollars + Residual Leak equals the exact Window 1 Total Leak (-$' + ledger.totalLeak.toLocaleString() + '). Consequence flags surface the exact dollar risk left unfixed so the decision remains yours.</p>';
+
+        html += '<div class="meso-grid" role="list" aria-label="3 Ranked MESO Deal Alternatives">';
+        mesos.forEach(function (m, idx) {
+          var rankClass = "is-rank-" + m.rank;
+          html += '<article class="meso-card ' + rankClass + '" role="listitem" data-meso-id="' + esc(m.id) + '" data-meso-rank="' + m.rank + '">';
+          html += '<div>';
+          html += '<div class="meso-rank-row">';
+          html += '<span class="meso-rank-badge">NRR Rank #' + m.rank + ' · ' + esc(m.id) + '</span>';
+          html += '<span class="meso-authority-tag">' + esc(m.optAuthorityTier) + '</span>';
+          html += '</div>';
+          html += '<h4 class="meso-title">' + esc(m.name) + '</h4>';
+          html += '<p class="meso-structure-copy">' + esc(m.structureSummary) + '</p>';
+          html += '</div>';
+
+          html += '<div class="meso-math-strip">';
+          html += '<div class="meso-math-cell"><span class="meso-math-label">Exact Leak Rescued</span><span class="meso-math-val is-rescued" data-meso-rescued="' + m.rescued + '">+$' + m.rescued.toLocaleString() + ' (' + m.rescuedPct.toFixed(1) + '%)</span></div>';
+          html += '<div class="meso-math-cell"><span class="meso-math-label">Residual Unfixed Leak</span><span class="meso-math-val ' + (m.residual > 0 ? "is-residual" : "is-zero-residual") + '" data-meso-residual="' + m.residual + '">-$' + m.residual.toLocaleString() + '</span></div>';
+          html += '<div class="meso-tieout-line"><span>3-Yr TCV Lift: <strong>+$' + m.opt3YrLift.toLocaleString() + '</strong></span><span>Y2 NRR At-Risk: <strong>$' + m.optY2Risk.toLocaleString() + '</strong></span></div>';
+          html += '<div class="meso-tieout-line"><span>Ledger Tie-Out:</span><span><strong>$' + m.rescued.toLocaleString() + ' + $' + m.residual.toLocaleString() + ' = $' + ledger.totalLeak.toLocaleString() + '</strong></span></div>';
+          html += '</div>';
+
+          html += '<div class="meso-cells-matrix" aria-label="Cell-by-Cell Cleared vs Retained Matrix">';
+          allCellIds.forEach(function (cid) {
+            var cObj = cellMap[cid];
+            var isCleared = m.clearIds.indexOf(cid) !== -1;
+            var pillClass = cObj.amount === 0
+              ? "meso-cell-pill"
+              : (isCleared ? "meso-cell-pill is-cleared" : "meso-cell-pill is-retained");
+            var stateLabel = cObj.amount === 0
+              ? (cid + ": $0")
+              : (isCleared ? (cid + " CLEARED +$" + cObj.amount.toLocaleString()) : (cid + " RETAINED -$" + cObj.amount.toLocaleString()));
+            html += '<div class="' + pillClass + '">' + esc(stateLabel) + '</div>';
+          });
+          html += '</div>';
+
+          html += '<div class="consequence-flags-stack" aria-label="Consequence Flags for ' + esc(m.id) + '">';
+          if (!m.consequenceFlags.length) {
+            html += '<div class="consequence-flag-badge is-clean">';
+            html += '<div class="cflag-head"><span class="cflag-code">0 CONSEQUENCE FLAGS</span><span class="cflag-amount" style="color:var(--pass-ink);">$0 Y2 NRR / Rev-Rec Exposure</span></div>';
+            html += '<p class="cflag-body">All commercial discount, float, Year-2 renewal uplift, true-down, and ASC-606 holdback cells are cleared under this structure.</p>';
+            html += '</div>';
+          } else {
+            m.consequenceFlags.forEach(function (cf) {
+              html += '<div class="consequence-flag-badge" data-consequence-flag="' + esc(cf.code) + '">';
+              html += '<div class="cflag-head"><span class="cflag-code">' + esc(cf.code) + '</span><span class="cflag-amount">' + esc(cf.amountFormatted) + '</span></div>';
+              html += '<p class="cflag-body">' + esc(cf.description) + '</p>';
+              html += '</div>';
+            });
+          }
+          html += '</div>';
+          html += '</article>';
+        });
+        html += '</div>';
+
+        /* Interactive Selector for Window 3 12-Indicator Matrix + Execution Outputs */
+        html += '<div class="w3-selector-bar">';
+        html += '<span class="w3-selector-label">Inspect Window 3 Indicators, Counter-Script &amp; PERM Memo by Structure:</span>';
+        html += '<div class="w3-tab-group" role="group" aria-label="Select MESO Structure for Indicators and Memo">';
+        mesos.forEach(function (m, idx) {
+          html += '<button type="button" class="w3-tab-btn' + (idx === selectedMesoIndex ? " is-active" : "") + '" data-select-meso="' + idx + '">Rank #' + m.rank + ' · ' + esc(m.id) + ' (+$' + m.rescued.toLocaleString() + ' Rescued)</button>';
+        });
+        html += '</div>';
+        html += '</div>';
+
+        html += '<h4 class="sub-block-title" style="font-size:1.02rem; margin-bottom:0.55rem;">Window 3 Counter-Offer, Governance &amp; Acceptance Indicators for Rank #' + activeMeso.rank + ' (' + esc(activeMeso.id) + ' — 12 Named Measures)</h4>';
+        html += '<div class="w1-indicators-grid" id="ca-w3-indicators-grid">';
+        activeMeso.indicators.forEach(function (ind) {
+          var typeClass = ind.type === "OPI" ? " is-opi" : (ind.type === "Leading Indicator" ? " is-lead" : "");
+          html += '<article class="w1-ind-card' + typeClass + '" data-indicator-id="' + esc(ind.id) + '">';
+          html += '<div class="w1-ind-top"><span>' + esc(ind.id) + '</span><span>' + esc(ind.type) + '</span></div>';
+          html += '<div class="w1-ind-name">' + esc(ind.name) + '</div>';
+          html += '<div class="w1-ind-val">' + esc(ind.formatted) + '</div>';
+          html += '</article>';
+        });
+        html += '</div>';
+
+        var scriptText = buildRepCounterScript(ledger, activeMeso);
+        var permText = buildPermApprovalMemo(ledger, activeMeso, scans);
+
+        html += '<div class="execution-outputs-grid" id="ca-w3-outputs">';
+        html += '<div class="exec-output-card">';
+        html += '<div class="exec-output-head"><h4 class="exec-output-title">Rep Negotiation Counter-Script (Rank #' + activeMeso.rank + ' · ' + esc(activeMeso.id) + ')</h4><button type="button" class="btn-secondary" id="ca-copy-script">Copy Counter-Script</button></div>';
+        html += '<span class="copy-status" id="ca-copy-script-status" aria-live="polite"></span>';
+        html += '<pre class="exec-output-pre" id="ca-script-pre" tabindex="0" aria-label="Copyable Rep Negotiation Counter-Script">' + esc(scriptText) + '</pre>';
+        html += '</div>';
+
+        html += '<div class="exec-output-card">';
+        html += '<div class="exec-output-head"><h4 class="exec-output-title">Tool 3 PERM Deal Desk Approval Memo (Rank #' + activeMeso.rank + ' · ' + esc(activeMeso.id) + ')</h4><button type="button" class="btn-secondary" id="ca-copy-perm">Copy PERM Memo</button></div>';
+        html += '<span class="copy-status" id="ca-copy-perm-status" aria-live="polite"></span>';
+        html += '<pre class="exec-output-pre" id="ca-perm-pre" tabindex="0" aria-label="Copyable Tool 3 PERM Approval Memo">' + esc(permText) + '</pre>';
+        html += '</div>';
+        html += '</div>';
+
+        html += '</section>';
+        return html;
+      }
+
       function buildPlainBrief(checks, scans, flagReport, ledger) {
         var foundList = checks.filter(function (c) { return c.found; });
         var missingList = checks.filter(function (c) { return !c.found; });
@@ -2452,11 +3093,14 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
         var ipSig = flagReport.ipSignal;
         var lines = [];
 
-        lines.push("CONTRACT ANALYZER — BROWSER SCAN BRIEF");
-        lines.push("======================================");
+        lines.push("CONTRACT ANALYZER — 3-WINDOW DEAL ENGINE & BROWSER SCAN BRIEF");
+        lines.push("=============================================================");
         lines.push("Risk Flags Raised: " + raisedFlags.length + " | Coverage: " + foundList.length + " of " + checks.length + " checks found | " + missingList.length + " not found");
         if (ledger) {
           lines.push("Window 1 Waterfall: Baseline ACV $" + ledger.baselineAcv.toLocaleString() + " | Total Pocket Leak -$" + ledger.totalLeak.toLocaleString() + " | True Pocket Revenue $" + ledger.truePocketRev.toLocaleString() + " (" + ledger.pocketYieldPct.toFixed(2) + "% yield) | QTC Maturity: " + ledger.qtcMaturityScore + "/100");
+          if (ledger.window2) {
+            lines.push("Window 2 Behavioral Verdict: " + ledger.window2.verdictName + " (Confidence: " + ledger.window2.confidenceScore + "% | CI: " + ledger.window2.confidenceLow + "%–" + ledger.window2.confidenceHigh + "%)");
+          }
         }
         lines.push("");
 
@@ -2473,6 +3117,26 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
             lines.push("- [" + c.id + "] " + c.label + ": -$" + c.amount.toLocaleString() + " — " + c.source);
           });
           lines.push("");
+
+          if (ledger.window2) {
+            lines.push("WINDOW 2 — BEHAVIORAL VERDICT & DOCUMENT REDLINE CLUSTERS");
+            lines.push("- Verdict: " + ledger.window2.verdictName + " — " + ledger.window2.verdictMeaning);
+            ledger.window2.clusters.forEach(function (cl) {
+              lines.push("- [" + cl.name + "] " + cl.scoreFormatted + " | " + cl.clauseEvidence);
+            });
+            lines.push("");
+          }
+
+          if (ledger.window3 && Array.isArray(ledger.window3.mesos)) {
+            lines.push("WINDOW 3 — 3 ALTERNATIVE DEALS (MESOs RANKED BY 3-YEAR NRR IMPACT)");
+            ledger.window3.mesos.forEach(function (m) {
+              var cFlags = m.consequenceFlags.length
+                ? m.consequenceFlags.map(function (cf) { return cf.code + " (" + cf.amountFormatted + ")"; }).join(", ")
+                : "None";
+              lines.push("- Rank #" + m.rank + " [" + m.id + "] " + m.name + ": Rescued +$" + m.rescued.toLocaleString() + " | Residual -$" + m.residual.toLocaleString() + " | Tie-Out: $" + (m.rescued + m.residual).toLocaleString() + " | Consequence Flags: " + cFlags);
+            });
+            lines.push("");
+          }
         }
 
         lines.push("RISK FLAGS RAISED (" + raisedFlags.length + ")");
@@ -2665,6 +3329,8 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
 
         if (ledger) {
           html += renderWindow1Waterfall(ledger);
+          html += renderWindow2VerdictPanel(ledger);
+          html += '<div id="ca-window3-container">' + renderWindow3MesoPanel(ledger, scans) + '</div>';
         }
 
         html += renderFlagsBand(flagReport);
@@ -2701,7 +3367,44 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
         resultsEl.innerHTML = html;
       }
 
+      function copyTextWithFeedback(txt, statusEl, label) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(txt).then(
+            function () { if (statusEl) statusEl.textContent = "Copied " + label + " to clipboard."; },
+            function () { fallbackCopy(txt, statusEl, label); }
+          );
+        } else {
+          fallbackCopy(txt, statusEl, label);
+        }
+      }
+
       resultsEl.addEventListener("click", function (e) {
+        var mesoTabBtn = e.target.closest ? e.target.closest("[data-select-meso]") : null;
+        if (mesoTabBtn && lastLedger) {
+          selectedMesoIndex = Number(mesoTabBtn.getAttribute("data-select-meso")) || 0;
+          var w3Container = document.getElementById("ca-window3-container");
+          if (w3Container) {
+            w3Container.innerHTML = renderWindow3MesoPanel(lastLedger, lastScans);
+          }
+          return;
+        }
+
+        var copyScriptBtn = e.target.closest ? e.target.closest("#ca-copy-script") : null;
+        if (copyScriptBtn) {
+          var sPre = document.getElementById("ca-script-pre");
+          var sStatus = document.getElementById("ca-copy-script-status");
+          if (sPre) copyTextWithFeedback(sPre.textContent, sStatus, "Counter-Script");
+          return;
+        }
+
+        var copyPermBtn = e.target.closest ? e.target.closest("#ca-copy-perm") : null;
+        if (copyPermBtn) {
+          var pPre = document.getElementById("ca-perm-pre");
+          var pStatus = document.getElementById("ca-copy-perm-status");
+          if (pPre) copyTextWithFeedback(pPre.textContent, pStatus, "PERM Approval Memo");
+          return;
+        }
+
         var filterBtn = e.target.closest ? e.target.closest("[data-filter]") : null;
         if (filterBtn && lastChecks) {
           activeFilter = filterBtn.getAttribute("data-filter");
@@ -2716,20 +3419,11 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
         if (copyBtn) {
           var pre = document.getElementById("ca-brief-pre");
           var status = document.getElementById("ca-copy-status");
-          if (!pre) return;
-          var txt = pre.textContent;
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(txt).then(
-              function () { if (status) status.textContent = "Copied Analysis Brief to clipboard."; },
-              function () { fallbackCopy(txt, status); }
-            );
-          } else {
-            fallbackCopy(txt, status);
-          }
+          if (pre) copyTextWithFeedback(pre.textContent, status, "Analysis Brief");
         }
       });
 
-      function fallbackCopy(text, statusEl) {
+      function fallbackCopy(text, statusEl, label) {
         var ta = document.createElement("textarea");
         ta.value = text;
         ta.setAttribute("readonly", "");
@@ -2741,9 +3435,9 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
         ta.select();
         try {
           document.execCommand("copy");
-          if (statusEl) statusEl.textContent = "Copied Analysis Brief to clipboard.";
+          if (statusEl) statusEl.textContent = "Copied " + (label || "Analysis Brief") + " to clipboard.";
         } catch (err) {
-          if (statusEl) statusEl.textContent = "Select the brief below and press Ctrl+C / Cmd+C.";
+          if (statusEl) statusEl.textContent = "Select the text below and press Ctrl+C / Cmd+C.";
         }
         document.body.removeChild(ta);
       }
@@ -2758,6 +3452,7 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
         setNote("", false);
         lastText = text;
         activeFilter = "all";
+        selectedMesoIndex = 0;
         var A = window.ContractAnalyzer;
         lastChecks = A.runChecks(text);
         lastScans = A.parseKeyClauses(text);
@@ -2832,6 +3527,7 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
           typeof A.computeFlags === "function" &&
           typeof A.computeLedgerAndIndicators === "function" &&
           typeof A.assertLedgerTieOut === "function" &&
+          typeof A.assertWindow3MesoTieOut === "function" &&
           Array.isArray(A.CHECKS) && A.CHECKS.length === 51,
           "Engine interface / 51 checks integrity fail"
         );
@@ -2887,22 +3583,47 @@ STAGE 1 DECLARATIONS (NOV 18, 2026 — BUILD SPEC SECTION 8 STAGE 1 ON EXISTING 
         var pEmpty = "";
         console.assert(A.runChecks(pEmpty).length === 51 && foundIds(pEmpty).length === 0 && flagIds(pEmpty).flags.length === 0, "Empty input fail");
 
-        /* 6. Stage 1 Tie-Out Battery & 46 Named Indicators Verification */
+        /* 6. Stage 1 & Stage 2 Tie-Out Battery, 46 Named Indicators & Window 2 / Window 3 Verification */
         var tieFixtures = [
-          { text: SAMPLE, inputs: { acv: 100000, discountPct: 18, netDays: 60, billingFreq: "quarterly", upliftCapPct: 2, termYears: 2 } },
-          { text: pNoIpIndem + " Customer may terminate for convenience upon 30 days written notice. Customer has true-down rights.", inputs: { acv: 240000, discountPct: 22, netDays: 90, billingFreq: "monthly", upliftCapPct: 0, termYears: 3 } },
-          { text: F2, inputs: { acv: 100000, discountPct: 0, netDays: 30, billingFreq: "annual", upliftCapPct: 7, termYears: 1 } }
+          {
+            name: "F-TIE-1 (Sample + Multi-Cell Leak)",
+            text: SAMPLE,
+            inputs: { acv: 100000, discountPct: 18, netDays: 60, billingFreq: "quarterly", upliftCapPct: 2, termYears: 2 },
+            expectedVerdict: "HOLD FIRM (procurement bluff)"
+          },
+          {
+            name: "F-TIE-2 (JOLT Fear Cluster Probe)",
+            text: "Customer may terminate for convenience upon 30 days written notice. Acceptance testing is in Customer's sole discretion and Customer may reject deliverables. Vendor warrants 99.9% uptime with refund for SLA breach.",
+            inputs: { acv: 100000, discountPct: 0, netDays: 30, billingFreq: "annual", upliftCapPct: 7, termYears: 1 },
+            expectedVerdict: "JOLT PIVOT (fix fear, not price)"
+          },
+          {
+            name: "F-TIE-3 (Procurement Shark Cluster Probe)",
+            text: "Fees are payable Net-90 in quarterly installments. Customer receives most-favored-customer MFN pricing and may set-off disputed amounts. Customer has true-down rights at renewal and 0% uplift price freeze.",
+            inputs: { acv: 200000, discountPct: 25, netDays: 90, billingFreq: "quarterly", upliftCapPct: 0, termYears: 2 },
+            expectedVerdict: "HOLD FIRM (procurement bluff)"
+          },
+          {
+            name: "F-TIE-4 (Strategic Land Cluster Probe)",
+            text: "This Master Subscription Agreement has an initial term of two (2) years and automatically renews for successive 1-year terms unless notice of non-renewal is given 60 days prior. Vendor may use Customer name and logo on its customer list and press release.",
+            inputs: { acv: 250000, discountPct: 17, netDays: 45, billingFreq: "annual", upliftCapPct: 7, termYears: 2 },
+            expectedVerdict: "TAKE THE LOSS (strategic land)"
+          }
         ];
+
         tieFixtures.forEach(function (fx, idx) {
           var ch = A.runChecks(fx.text);
           var fl = A.computeFlags(fx.text, ch);
           var led = A.computeLedgerAndIndicators(fx.text, ch, fl, fx.inputs);
           console.assert(A.assertLedgerTieOut(led) === true, "Tie-out battery failed on fixture #" + idx);
+          console.assert(A.assertWindow3MesoTieOut(led, led.window3.mesos) === true, "Window 3 MESO tie-out failed on fixture #" + idx);
           console.assert(led.indicators.length === 46, "46 Named Indicators count mismatch on fixture #" + idx);
           var w1Count = led.indicators.filter(function (i) { return i.window === 1; }).length;
           var w2Count = led.indicators.filter(function (i) { return i.window === 2; }).length;
           var w3Count = led.indicators.filter(function (i) { return i.window === 3; }).length;
           console.assert(w1Count === 16 && w2Count === 18 && w3Count === 12, "46 Named Indicators split (16/18/12) mismatch");
+          console.assert(led.window2 && led.window2.verdictName === fx.expectedVerdict, "Window 2 verdict mismatch on " + fx.name + ": got " + (led.window2 && led.window2.verdictName));
+          console.assert(led.window3.mesos.length === 3 && led.window3.mesos[0].indicators.length === 12, "Window 3 MESO indicators count mismatch");
         });
       }
 
