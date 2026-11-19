@@ -1,7 +1,75 @@
 <!DOCTYPE html>
 <!--
-ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — STAGE 1, STAGE 2 & STAGE 3 (FINAL, CORRECTIVE 2): 3-WINDOW DEAL ENGINE CORE, WINDOW 1 FORENSIC LEAK WATERFALL, WINDOW 2 BEHAVIORAL VERDICT, WINDOW 3 MESO ALTERNATIVES + CONSEQUENCE-FLAG SYSTEM, 2-WAY DEAL CHECK BRIDGE, SHARED USAGE METER + 3-DOOR MODAL, PROJECT ATLAS PRESET, QUICK PATH & DEAL HEALTH SCORE
+ARGON MANIFEST: TOOL 13 1000X REBUILD — Contract Analyzer (S6-P03.4) — STAGE 1, STAGE 2 & STAGE 3 (FINAL, CORRECTIVE 3 — FIX 1 CLICKABLE FLAGS & CLAUSE EVIDENCE HIGHLIGHTER + FIX 2 FULL DEAL INPUT BRIDGE INTAKE): 3-WINDOW DEAL ENGINE CORE, WINDOW 1 FORENSIC LEAK WATERFALL, WINDOW 2 BEHAVIORAL VERDICT, WINDOW 3 MESO ALTERNATIVES + CONSEQUENCE-FLAG SYSTEM, 2-WAY DEAL CHECK BRIDGE, SHARED USAGE METER + 3-DOOR MODAL, PROJECT ATLAS PRESET, QUICK PATH & DEAL HEALTH SCORE
 =========================================================================================================================================================
+
+STAGE 3 CORRECTIVE 3 ENTRY (NOV 19, 2026 — FIX 1: CLICKABLE FLAGS & 51-POINT CLAUSE EVIDENCE HIGHLIGHTER + FIX 2: BRIDGE CARRIES FULL DEAL INPUT SET)
+   1. FIX NAMES:
+      - Fix 1 (Ships First): Clickable Risk Flags & 51-Point Coverage Cards -> Exact Contract Sentence Highlighter (`locateEvidenceSpan` + Synchronized Read-Only Contract Evidence Viewer `#ca-contract-viewer` + Native `<textarea id="ca-text">` Selection Sync).
+      - Fix 2 (Ships Second): 2-Way Deal Check Bridge Carries Full Deal Economics Input Set (`{ acv, discountPct, netDays, billingFreq, upliftCapPct, termYears }`) & Preserves 0-Credit Free Sample Rule Across Bridge Intake.
+
+   2. WHAT CHANGED BLOCK BY BLOCK (`analyzer-current.txt`):
+      - Block A1 (Manifest Entry): Added this Stage 3 Corrective 3 entry documenting Fix 1 and Fix 2, block-by-block diffs, absence-flag behavior, beyond-spec improvements, full self-check anchor numbers (including bridge before/after), integrity compliance, ADD MEANS DELETE compliance, and responsive desktop/phone mode verification.
+      - Block A2 (CSS — Interactive Flag/Check Cards & Synchronized Contract Evidence Viewer):
+        * Added interactive button semantics, focus rings (`:focus-visible`), and zero-layout-shift active states (`.is-active-flag`, `.is-active-absence`) for `.flag-card` and `.check-card`.
+        * Added `.card-locate-bar` (44px min-height interactive action pill inside each flag/check card with >= 12:1 active contrast) and `.absence-live-notice` (honest explanation banner for missing-clause cards).
+        * Added `.contract-highlight-viewer` (`#ca-contract-viewer`), `.contract-viewer-header`, `.contract-viewer-body`, and `<mark class="ca-clause-mark" id="ca-active-highlight">` (14.1:1 contrast `#0F1E38` ink on `#FEF08A` highlight fill with crimson underline/outline) plus `@media (max-width: 720px)` single-column button stacking.
+      - Block A3 (HTML — Synchronized Read-Only Contract Evidence Viewer `#ca-contract-viewer`):
+        * Added `#ca-contract-viewer` inside the contract `.field-block` directly above `<textarea id="ca-text">`. The `<textarea id="ca-text">` element remains the live editing surface at all times and its `.value` is never mutated by highlighting.
+      - Block A4 (JS — Fix 1 Evidence Span Locator, Interactive Card Markup & Click/Keyboard Highlight Controller):
+        * Added `locateEvidenceSpan(contractText, rawEvidence)`: locates the first exact match of the evidence string in the pasted contract text (step 1: verbatim `indexOf`; step 2: leading/trailing ellipsis-trimmed `indexOf` for `excerptAround` strings; step 3: whitespace-normalized multiline match when `excerptAround`/`sentenceAround` collapsed a newline in the raw contract). If an evidence string occurs more than once, it lands deterministically on the first exact match.
+        * Updated `renderFlagsBand(flagReport)` and `renderChecksSection(checks)` so every raised `.flag-card`, the `F-IP-INDEMNITY` signal card, and all 51 `.check-card` items carry `role="button"`, `tabindex="0"`, `aria-pressed="true|false"`, `data-item-key`, `data-has-evidence="true|false"`, and `.card-locate-bar`.
+        * Added `activateEvidenceCard(cardEl)` and `clearContractHighlight()` wired to mouse click, touch tap, keyboard `Enter` / `Space` activation, and `Escape` / re-click / `"Clear Highlight"` reversal.
+      - Block A5 (JS — Fix 2 Inbound Bridge Full Input Set Intake & Expanded Self-Check Battery):
+        * Added `extractInboundBridgeInputs(parsed)` and `applyBridgeInputsToDom(inp)` inside the page controller and updated `checkInboundBridgeFromDealCheck()` so any inbound `{ acv, discountPct, netDays, billingFreq, upliftCapPct, termYears }` payload from Deal Check (nested under `parsed.inputs` or at top level, or via URL params) is applied to `#ca-input-acv`, `#ca-input-discount`, `#ca-input-netdays`, `#ca-input-billing`, `#ca-input-uplift`, and `#ca-input-term` BEFORE `executeEngineRun()` executes, while preserving `isFreeSample` (0 credits) for the Project Atlas sample deal.
+        * Expanded `runSelfCheckBattery()` to assert Fix 1 exact-match highlighting + absence-flag non-highlighting and Fix 2 before/after bridge parity (`-$66,002` leak / Deal Health `38`).
+
+   3. ABSENCE-FLAG BEHAVIOR CHOSEN (FIX 1):
+      - For any absence check or un-triggered absence signal where `evidence === null` / `excerpt === null` (a clause that is missing from the contract, or the `CLEAR` card when zero risk flags fire):
+        * The card carries `data-has-evidence="false"` and its footer bar states plainly: `"Clause absent — no sentence in contract to highlight"`.
+        * Clicking, tapping, or pressing `Enter`/`Space` on an absence card NEVER fakes a highlight or scrolls to an arbitrary line. Instead, it clears any active text highlight in `#ca-contract-viewer`, marks the absence card as inspected (`.is-active-absence`, `aria-pressed="true"`), and reveals an inline `.absence-live-notice` on the card stating: `"No sentence to highlight in the contract — “[Clause Name]” was not found in the pasted document. The absence of this clause is itself the finding; verify or draft the language by hand."`
+        * Clicking the absence card a second time (or pressing `Escape`) clears the notice and resets `aria-pressed="false"`.
+
+   4. IMPROVEMENTS MADE BEYOND THE SPEC:
+      - Unified Coverage Across Both Layer 3 Risk Flags AND Layer 2 51-Point Coverage Checks: Both `.flag-card` items in `#ca-flags-band` and all 51 `.check-card` items in `#ca-checks-block` participate in the same single-active-highlight controller, so clicking any raised risk flag or any of the 51 checklist cards highlights its exact sentence in the contract.
+      - Dual Synchronized Highlighting (Read-Only `<mark>` Viewer + Native `<textarea>` Selection Range): Activating a presence card opens `#ca-contract-viewer` with `<mark id="ca-active-highlight">` scrolled to center AND calls `textEl.setSelectionRange(span.start, span.end)` on `#ca-text`, while keeping `#ca-text` unmutated as the editing surface.
+      - Round-Trip `"Jump Back to Active Flag ↓"` Control & Exact Character Offset Readout: The `#ca-contract-viewer` header displays the exact character span (`characters X–Y`) of the first exact match and provides a 1-click `"Jump Back to Active Flag ↓"` button (44px min-height) that scrolls the viewport right back to the active flag/check card and restores keyboard focus.
+
+   5. SELF-CHECK BATTERY RESULTS (RECORDED FROM LIVE EXECUTION):
+      - 51-Flag Regression Unchanged (Fixtures F1–F11 Identical to Shipped Build):
+        * F1 (Sample Contract): `8 / 51` checks found (`parties, effective-date, term, renewal, termination-convenience, fees, payment-terms, governing-law`) + `1` flag (`F-RENEWAL-NO-NOTICE` only).
+        * F2 (Plain Prose): `0 / 51` checks found, `0` flags.
+        * F3 (Full Enterprise MSA): `33 / 51` checks found.
+        * F4 (Commercial Money & Escalator): `11 / 51` checks found.
+        * F5 (Data, Privacy, AI & Security): `18 / 51` checks found.
+        * F6 (Balanced Mutual MSA): `14 / 51` checks found, `0` flags (`CLEAR`).
+        * F7 (Uncapped & Carved-Out Liability): `F-UNCAPPED-INDEMNITY` + `F-CAP-CARVEOUTS` raised.
+        * F8 (Indemnity Without Insurance & Missing IP Indemnity): `F-INDEMNITY-NO-INSURANCE` + `F-IP-INDEMNITY` raised.
+        * F9 (Sole-Discretion Escalator): `F-UNCAPPED-ESCALATOR` fires.
+        * F10 (Vendor AI Model Training on Customer Data): `F-DATA-TRAINING` fires.
+        * F11 (Hunter False-Positive Trap): `0 / 51` checks found, `0` flags.
+      - Tie-Out Invariant:
+        * `Rescued_$ + Residual_$ === Window_1_Total_Leak` (`$0.00` variance) verified across all fixtures (F-TIE-1..F-TIE-4 and Project Atlas) and across all 3 ranked Window 3 MESO structures (`MESO_A`, `MESO_B`, `MESO_C`).
+      - Native Project Atlas Preset Run Unchanged:
+        * Baseline ACV: `$240,000` | `L1 = -$16,800`, `L2 = -$5,762`, `L3 = -$16,800`, `L4 = -$10,800`, `L5 = -$8,640`, `L6 = -$7,200` | Window 1 Total Leak: `-$66,002` | True Pocket Revenue: `$173,998` (`72.50%` yield) | QTC Maturity Score: `33 / 100` | Deal Health Score: `38 / 100` | Window 2 Verdict: `HOLD FIRM (procurement bluff)` (`87%`, `75%–99%` CI) | Meter Credits Consumed: `0`.
+      - Bridge Project Atlas Path BEFORE vs. AFTER Fix 2:
+        * BEFORE Fix 2 (contract text only, evaluated against default inputs `acv=100000, discountPct=0, netDays=30, billingFreq="annual", upliftCapPct=7, termYears=1`): Window 1 Total Leak = `-$18,100`, True Pocket Revenue = `$81,900`, Deal Health Score = `50 / 100`.
+        * AFTER Fix 2 (contract text + full Project Atlas deal inputs `{ acv: 240000, discountPct: 22, netDays: 60, billingFreq: "quarterly", upliftCapPct: 2, termYears: 2 }`, `isFreeSample: true`): Window 1 Total Leak = `-$66,002`, True Pocket Revenue = `$173,998`, Deal Health Score = `38 / 100` — 100% identical to the native Project Atlas preset run.
+      - Fix 1 Evidence Span Locator Self-Check:
+        * Verified `locateEvidenceSpan(atlas.text, evidence)` resolves exact `[start, end]` character offsets (`0 <= start < end <= text.length`) for all 6 raised flags on Project Atlas (`F-UNCAPPED-INDEMNITY`, `F-ONE-WAY-INDEMNITY`, `F-IP-INDEMNITY`, `F-INDEMNITY-NO-INSURANCE`, `F-CAUSE-NO-CURE`, `F-CAP-CARVEOUTS`) and all found checks, and returns `null` (no fake highlight) for all absence checks (`excerpt === null`).
+      - Meter Rules Unchanged:
+        * `2` full contract scans + `5` slider deal checks per rolling 24h (`qtc_contract_autopsy_runs_v1`); Project Atlas sample is free at `0 credits` on both the native preset path and the Deal Check bridge path.
+      - Engine Math Unchanged:
+        * Zero changes to `parseKeyClauses`, `CHECKS`, `runChecks`, `computeFlags`, `computeLedgerAndIndicators`, `computeDealHealthScore`, or any vault formula.
+
+   6. INTEGRITY, FORMULAS-HIDDEN & ADD MEANS DELETE COMPLIANCE:
+      - Formulas-Hidden Compliance: 100% compliant. All math remains strictly inside `/** HIDDEN LOGIC VAULT */`; zero formulas or weights appear in the DOM.
+      - Demonstrate, Never Sell: Zero pitch, pricing, or sales copy added; no employer/company roster; no "corporate since 2006"; existing Stage 3 3-door limit modal untouched.
+      - ADD MEANS DELETE Statement: These fixes add no add/remove surfaces.
+
+   7. RESPONSIVE MODES (DESKTOP > 720PX & PHONE <= 720PX — SWEPT AT 280 / 320 / 360 / 375 / 390 / 412 / 430 / 768 / 1024 / 1280 CSS PX):
+      - Desktop Mode (> 720px): `.flag-card` and `.check-card` items display an inline flex `.card-locate-bar` (`min-height: 44px`); `#ca-contract-viewer` renders a horizontal status header with inline `"Jump Back to Active Flag ↓"` and `"Clear Highlight ×"` buttons above a scrollable monospace evidence pane (`max-height: 16rem`).
+      - Phone Mode (<= 720px): `.card-locate-bar`, `.contract-viewer-header`, and `.contract-viewer-actions` buttons stack cleanly to full width (`width: 100%`) with `min-height: 44px` tap targets, `overflow-wrap: anywhere; word-break: break-word`, and smooth centered scroll-into-view. Zero horizontal overflow across all 10 ladder widths (`280px` through `1280px`).
 
 STAGE 3 CORRECTIVE 2 ENTRY (NOV 19, 2026 — METER PILL ROW HORIZONTAL OVERFLOW CLOSURE AT 280PX & 320PX)
    - Defect Identified:
@@ -469,8 +537,25 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
     .flags-count-pill.is-raised { background-color: var(--fail-bg); color: var(--fail-ink); border-color: var(--fail-border); }
     .flags-count-pill.is-clear { background-color: var(--pass-bg); color: var(--pass-ink); border-color: var(--pass-border); }
 
+    /* FIX 1: SYNCHRONIZED READ-ONLY CONTRACT EVIDENCE VIEWER & INTERACTIVE FLAG/CHECK CARDS */
+    .contract-highlight-viewer { background-color: #FFFFFF; border: 2px solid var(--navy-900); border-top: 5px solid var(--brass-500); margin-bottom: 0.85rem; min-width: 0; max-width: 100%; }
+    .contract-highlight-viewer[hidden] { display: none !important; }
+    .contract-viewer-header { background-color: var(--navy-900); color: #FFFFFF; padding: 0.6rem 0.85rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 0.85rem; min-width: 0; max-width: 100%; }
+    .contract-viewer-status { font-family: var(--font-mono); font-size: 0.78rem; color: #FFFFFF; margin: 0; flex: 1 1 220px; min-width: 0; overflow-wrap: anywhere; word-break: break-word; line-height: 1.4; }
+    .contract-viewer-status strong { color: var(--brass-400); }
+    .contract-viewer-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; min-width: 0; max-width: 100%; }
+    .btn-viewer-action { background-color: var(--navy-800); color: #FFFFFF; border: 1px solid var(--brass-400); padding: 0.4rem 0.75rem; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; text-align: center; white-space: normal; overflow-wrap: anywhere; word-break: break-word; max-width: 100%; }
+    .btn-viewer-action:hover, .btn-viewer-action:focus-visible { background-color: var(--brass-600); border-color: #FFFFFF; color: #FFFFFF; }
+    .contract-viewer-body { max-height: 16rem; overflow-y: auto; padding: 0.85rem; background-color: #FFFFFF; color: var(--ink-900); font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+    .ca-clause-mark { background-color: #FEF08A; color: #0F1E38; border-bottom: 3px solid #991B1B; box-shadow: 0 0 0 2px #991B1B; padding: 0.08rem 0.2rem; font-weight: 700; }
+
     .flags-list { display: grid; grid-template-columns: 1fr; gap: 0.7rem; }
     .flag-card { background-color: var(--fail-bg); border: 1px solid var(--fail-border); border-left: 5px solid var(--fail-border); padding: 0.85rem 0.95rem; min-width: 0; }
+    .flag-card[role="button"], .check-card[role="button"] { cursor: pointer; transition: background-color 0.15s ease, box-shadow 0.15s ease; }
+    .flag-card[role="button"]:hover, .check-card[role="button"]:hover { box-shadow: inset 0 0 0 1px var(--navy-900); }
+    .flag-card[role="button"]:focus-visible, .check-card[role="button"]:focus-visible { outline: 3px solid var(--brass-500); outline-offset: 2px; }
+    .flag-card.is-active-flag, .check-card.is-active-flag { box-shadow: inset 0 0 0 2px var(--navy-900), 0 4px 12px rgba(15, 30, 56, 0.14); }
+    .flag-card.is-active-absence, .check-card.is-active-absence { box-shadow: inset 0 0 0 2px var(--warn-border); }
     .flag-card.is-signal-present { background-color: var(--pass-bg); border-color: var(--pass-border); border-left-color: var(--pass-border); }
     .flag-card.is-signal-neutral { background-color: var(--paper-alt); border-color: var(--rule-color); border-left-color: var(--navy-900); }
     .flag-card-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.4rem 0.75rem; margin-bottom: 0.35rem; }
@@ -480,6 +565,13 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
     .flag-card.is-signal-neutral .flag-code { border-color: var(--navy-900); color: var(--navy-900); }
     .flag-reason { font-size: 0.88rem; color: var(--ink-900); margin: 0 0 0.45rem 0; line-height: 1.5; overflow-wrap: anywhere; }
     .flag-evidence { background-color: #FFFFFF; border: 1px solid var(--rule-color); padding: 0.5rem 0.65rem; font-family: var(--font-mono); font-size: 0.79rem; line-height: 1.5; color: var(--ink-900); margin: 0; overflow-wrap: anywhere; word-break: break-word; }
+
+    .card-locate-bar { min-height: 44px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.35rem 0.75rem; margin-top: 0.55rem; padding: 0.45rem 0.65rem; border: 1px solid var(--rule-strong); background-color: #FFFFFF; color: var(--ink-900); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; min-width: 0; max-width: 100%; overflow-wrap: anywhere; word-break: break-word; line-height: 1.35; }
+    .flag-card.is-active-flag .card-locate-bar, .check-card.is-active-flag .card-locate-bar { background-color: var(--navy-900); color: #FFFFFF; border-color: var(--navy-900); }
+    .flag-card[data-has-evidence="false"] .card-locate-bar, .check-card[data-has-evidence="false"] .card-locate-bar { background-color: var(--paper-alt); color: var(--ink-700); border-style: dashed; border-color: var(--rule-strong); }
+    .flag-card.is-active-absence .card-locate-bar, .check-card.is-active-absence .card-locate-bar { background-color: var(--warn-bg); color: var(--warn-ink); border-style: solid; border-color: var(--warn-border); }
+    .absence-live-notice { margin-top: 0.45rem; padding: 0.5rem 0.65rem; background-color: var(--warn-bg); border: 1px solid var(--warn-border); border-left: 4px solid var(--warn-border); color: var(--warn-ink); font-family: var(--font-mono); font-size: 0.77rem; line-height: 1.45; overflow-wrap: anywhere; word-break: break-word; }
+    .absence-live-notice[hidden] { display: none !important; }
 
     /* LAYER 1: SIX SCANS */
     .sub-block { margin-top: 1.5rem; }
@@ -583,6 +675,8 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
       .top-quick-actions button,
       .meter-actions-group,
       .meter-actions-group button,
+      .contract-viewer-actions,
+      .btn-viewer-action,
       .btn-bridge-return,
       .analyzer-action-bar .btn-primary,
       .quick-path-footer .btn-primary,
@@ -791,6 +885,16 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
           <div class="textarea-header-row">
             <label class="field-label" for="ca-text">Or paste the contract text</label>
             <span class="text-stats" id="ca-text-stats">0 / 50,000 characters · 0 words</span>
+          </div>
+          <div class="contract-highlight-viewer" id="ca-contract-viewer" role="region" aria-label="Highlighted Contract Clause Evidence Viewer" hidden>
+            <div class="contract-viewer-header">
+              <p class="contract-viewer-status" id="ca-viewer-status" aria-live="polite">Highlighted clause evidence in contract text.</p>
+              <div class="contract-viewer-actions">
+                <button type="button" class="btn-viewer-action" id="ca-viewer-jump-back">Jump Back to Active Flag ↓</button>
+                <button type="button" class="btn-viewer-action" id="ca-viewer-clear">Clear Highlight ×</button>
+              </div>
+            </div>
+            <div class="contract-viewer-body" id="ca-viewer-body" tabindex="0"></div>
           </div>
           <textarea id="ca-text" class="contract-textarea" rows="10" maxlength="50000" placeholder="Paste the contract text here (up to 50,000 characters), upload a TXT/DOCX/PDF above, or load the Project Atlas sample deal to see how it reads."></textarea>
         </div>
@@ -2920,6 +3024,12 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
       var door1EmailEl = document.getElementById("ca-door1-email");
       var door1FeedbackEl = document.getElementById("ca-door1-feedback");
 
+      var contractViewerEl = document.getElementById("ca-contract-viewer");
+      var contractViewerStatusEl = document.getElementById("ca-viewer-status");
+      var contractViewerBodyEl = document.getElementById("ca-viewer-body");
+      var viewerJumpBackBtn = document.getElementById("ca-viewer-jump-back");
+      var viewerClearBtn = document.getElementById("ca-viewer-clear");
+
       var lastText = "";
       var lastChecks = null;
       var lastScans = null;
@@ -2929,6 +3039,8 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
       var selectedMesoIndex = 0;
       var isAtlasSampleLoaded = false;
       var pendingRunAfterModal = null;
+      var activeHighlightKey = null;
+      var activeAbsenceKey = null;
 
       if (window.pdfjsLib) {
         window.pdfjsLib.GlobalWorkerOptions.workerSrc = "../../assets/pdf.worker-3.11.174.min.js";
@@ -2949,6 +3061,250 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
       function setNote(msg, isError) {
         noteEl.textContent = msg || "";
         noteEl.className = "analyzer-note" + (isError ? " is-error" : "");
+      }
+
+      /* FIX 1: EXACT CLAUSE EVIDENCE SPAN LOCATOR (FIRST EXACT MATCH IN CONTRACT TEXT) */
+      function locateEvidenceSpan(contractText, rawEvidence) {
+        if (!contractText || !rawEvidence) return null;
+        var text = String(contractText);
+        var raw = String(rawEvidence);
+
+        /* 1. Verbatim exact match of raw evidence string */
+        var directIdx = text.indexOf(raw);
+        if (directIdx !== -1) {
+          return {
+            start: directIdx,
+            end: directIdx + raw.length,
+            matchedText: text.slice(directIdx, directIdx + raw.length),
+            matchType: "verbatim-first-match"
+          };
+        }
+
+        /* 2. Strip leading/trailing ellipsis characters added by excerptAround() */
+        var stripped = raw.replace(/^[\u2026]+|[\u2026]+$/g, "").trim();
+        if (!stripped) return null;
+
+        var strippedIdx = text.indexOf(stripped);
+        if (strippedIdx !== -1) {
+          return {
+            start: strippedIdx,
+            end: strippedIdx + stripped.length,
+            matchedText: text.slice(strippedIdx, strippedIdx + stripped.length),
+            matchType: "excerpt-first-match"
+          };
+        }
+
+        /* 3. Multiline whitespace-normalized exact match (when excerptAround/sentenceAround collapsed \n to space) */
+        var escapedPattern = stripped
+          .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+          .replace(/\s+/g, "[\\s\\r\\n]+");
+        try {
+          var flexRe = new RegExp(escapedPattern);
+          var m = flexRe.exec(text);
+          if (m) {
+            return {
+              start: m.index,
+              end: m.index + m[0].length,
+              matchedText: m[0],
+              matchType: "multiline-exact-first-match"
+            };
+          }
+        } catch (e) {}
+
+        return null;
+      }
+
+      if (window.ContractAnalyzer) {
+        window.ContractAnalyzer.locateEvidenceSpan = locateEvidenceSpan;
+      }
+
+      function getEvidenceForKey(itemKey) {
+        if (!itemKey) return null;
+        if (itemKey.indexOf("flag:") === 0) {
+          var fid = itemKey.slice(5);
+          if (lastFlagReport) {
+            for (var i = 0; i < lastFlagReport.flags.length; i++) {
+              if (lastFlagReport.flags[i].id === fid) {
+                return lastFlagReport.flags[i].evidence || null;
+              }
+            }
+            if (fid === "F-IP-INDEMNITY-SIGNAL" && lastFlagReport.ipSignal) {
+              return lastFlagReport.ipSignal.evidence || null;
+            }
+          }
+        } else if (itemKey.indexOf("check:") === 0) {
+          var cid = itemKey.slice(6);
+          if (lastChecks) {
+            for (var j = 0; j < lastChecks.length; j++) {
+              if (lastChecks[j].id === cid) {
+                return lastChecks[j].found ? (lastChecks[j].excerpt || null) : null;
+              }
+            }
+          }
+        }
+        return null;
+      }
+
+      function syncCardHighlightStatesInDom() {
+        var cards = resultsEl.querySelectorAll("[data-item-key]");
+        for (var i = 0; i < cards.length; i++) {
+          var c = cards[i];
+          var k = c.getAttribute("data-item-key");
+          var hasEv = c.getAttribute("data-has-evidence") === "true";
+          var isHighlightActive = (activeHighlightKey !== null && k === activeHighlightKey);
+          var isAbsenceActive = (activeAbsenceKey !== null && k === activeAbsenceKey);
+
+          c.classList.toggle("is-active-flag", isHighlightActive);
+          c.classList.toggle("is-active-absence", isAbsenceActive);
+          c.setAttribute("aria-pressed", (isHighlightActive || isAbsenceActive) ? "true" : "false");
+
+          var bar = c.querySelector(".card-locate-bar");
+          if (bar) {
+            if (hasEv) {
+              bar.textContent = isHighlightActive
+                ? "● Active — highlighted in contract text above (click or press Enter to clear)"
+                : "Locate & highlight exact clause sentence in contract ↑";
+            } else {
+              bar.textContent = isAbsenceActive
+                ? "● Clause absent in document — no sentence to highlight (click to dismiss)"
+                : "Clause absent — no sentence in contract to highlight";
+            }
+          }
+
+          var absNotice = c.querySelector(".absence-live-notice");
+          if (absNotice) {
+            absNotice.hidden = !isAbsenceActive;
+          }
+        }
+      }
+
+      function clearContractHighlight() {
+        activeHighlightKey = null;
+        activeAbsenceKey = null;
+        if (contractViewerEl) {
+          contractViewerEl.hidden = true;
+        }
+        if (contractViewerBodyEl) {
+          contractViewerBodyEl.innerHTML = "";
+        }
+        try {
+          if (textEl && typeof textEl.setSelectionRange === "function") {
+            textEl.setSelectionRange(0, 0);
+          }
+        } catch (e) {}
+        syncCardHighlightStatesInDom();
+      }
+
+      function activateEvidenceCard(cardEl) {
+        if (!cardEl) return;
+        var itemKey = cardEl.getAttribute("data-item-key");
+        var hasEvidence = cardEl.getAttribute("data-has-evidence") === "true";
+        var itemTitle = cardEl.getAttribute("data-item-title") || "Selected Clause";
+        var itemCode = cardEl.getAttribute("data-item-code") || "";
+
+        /* Reversible: clicking the already-active card clears the highlight / notice */
+        if ((activeHighlightKey && activeHighlightKey === itemKey) || (activeAbsenceKey && activeAbsenceKey === itemKey)) {
+          clearContractHighlight();
+          setNote("Highlight cleared — viewing plain contract text.", false);
+          return;
+        }
+
+        var evidence = hasEvidence ? getEvidenceForKey(itemKey) : null;
+
+        /* Honest Absence-Flag Behavior: never fake a highlight when evidence is null */
+        if (!hasEvidence || !evidence) {
+          activeHighlightKey = null;
+          activeAbsenceKey = itemKey;
+          if (contractViewerEl) contractViewerEl.hidden = true;
+          if (contractViewerBodyEl) contractViewerBodyEl.innerHTML = "";
+          syncCardHighlightStatesInDom();
+          setNote("Clause absent (" + itemTitle + ") — no sentence in the contract to highlight because this clause was not found.", false);
+          return;
+        }
+
+        var currentText = textEl.value;
+        var span = locateEvidenceSpan(currentText, evidence);
+
+        if (!span) {
+          activeHighlightKey = null;
+          activeAbsenceKey = itemKey;
+          syncCardHighlightStatesInDom();
+          if (contractViewerEl && contractViewerStatusEl && contractViewerBodyEl) {
+            contractViewerStatusEl.innerHTML =
+              "<strong>Exact Match Not Found [" + esc(itemCode) + " — " + esc(itemTitle) + "]:</strong> The contract text in the editor was modified after the scan ran. Re-run the analysis to refresh clause positions.";
+            contractViewerBodyEl.textContent = currentText;
+            contractViewerEl.hidden = false;
+          }
+          setNote("Exact sentence not found in current text — re-run the analysis if you edited the contract text.", true);
+          return;
+        }
+
+        activeHighlightKey = itemKey;
+        activeAbsenceKey = null;
+        syncCardHighlightStatesInDom();
+
+        var beforeText = currentText.slice(0, span.start);
+        var matchText = currentText.slice(span.start, span.end);
+        var afterText = currentText.slice(span.end);
+
+        if (contractViewerBodyEl && contractViewerStatusEl && contractViewerEl) {
+          contractViewerStatusEl.innerHTML =
+            "<strong>Highlighted Evidence [" + esc(itemCode) + " — " + esc(itemTitle) + "]:</strong> First exact match highlighted in contract text (characters " +
+            (span.start + 1).toLocaleString() + "–" + span.end.toLocaleString() + ").";
+          contractViewerBodyEl.innerHTML =
+            esc(beforeText) +
+            '<mark class="ca-clause-mark" id="ca-active-highlight">' + esc(matchText) + '</mark>' +
+            esc(afterText);
+          contractViewerEl.hidden = false;
+        }
+
+        /* Mirror selection range on the underlying textarea without mutating its text */
+        try {
+          if (textEl && typeof textEl.setSelectionRange === "function") {
+            textEl.setSelectionRange(span.start, span.end);
+          }
+        } catch (e) {}
+
+        var markEl = document.getElementById("ca-active-highlight");
+        if (markEl && contractViewerBodyEl) {
+          var bodyRect = contractViewerBodyEl.getBoundingClientRect();
+          var markRect = markEl.getBoundingClientRect();
+          var offsetWithinViewer = (markRect.top - bodyRect.top) + contractViewerBodyEl.scrollTop - (contractViewerBodyEl.clientHeight / 2) + (markRect.height / 2);
+          contractViewerBodyEl.scrollTop = Math.max(0, offsetWithinViewer);
+        }
+        if (contractViewerEl && typeof contractViewerEl.scrollIntoView === "function") {
+          contractViewerEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+
+        setNote("Highlighted exact clause evidence for " + itemTitle + " in your contract text.", false);
+      }
+
+      if (viewerClearBtn) {
+        viewerClearBtn.addEventListener("click", function () {
+          var prevKey = activeHighlightKey || activeAbsenceKey;
+          clearContractHighlight();
+          setNote("Highlight cleared — viewing plain contract text.", false);
+          if (prevKey) {
+            var prevCard = resultsEl.querySelector('[data-item-key="' + prevKey + '"]');
+            if (prevCard && typeof prevCard.focus === "function") prevCard.focus();
+          }
+        });
+      }
+
+      if (viewerJumpBackBtn) {
+        viewerJumpBackBtn.addEventListener("click", function () {
+          var targetKey = activeHighlightKey || activeAbsenceKey;
+          if (!targetKey) return;
+          var activeCard = resultsEl.querySelector('[data-item-key="' + targetKey + '"]');
+          if (activeCard) {
+            if (typeof activeCard.scrollIntoView === "function") {
+              activeCard.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+            if (typeof activeCard.focus === "function") {
+              activeCard.focus({ preventScroll: true });
+            }
+          }
+        });
       }
 
       function updateMeterUI() {
@@ -3037,6 +3393,7 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
       }
 
       function resetResultsToIdle() {
+        clearContractHighlight();
         lastText = "";
         lastChecks = null;
         lastScans = null;
@@ -3085,6 +3442,7 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
       });
 
       document.getElementById("ca-sample").addEventListener("click", function () {
+        clearContractHighlight();
         textEl.value = SAMPLE;
         if (inputAcvEl) inputAcvEl.value = "150000";
         if (inputDiscountEl) inputDiscountEl.value = "0";
@@ -3111,6 +3469,7 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
         var f = ev.target.files && ev.target.files[0];
         if (!f) return;
         isAtlasSampleLoaded = false;
+        clearContractHighlight();
         var lower = f.name.toLowerCase();
         fileStatusEl.textContent = "Reading " + f.name + "…";
         setNote("", false);
@@ -3666,13 +4025,21 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
 
         html += '<div class="flags-list">';
         if (isClear) {
-          html += '<article class="flag-card is-signal-present">';
+          var clearKey = "flag:CLEAR";
+          var isClearActive = activeAbsenceKey === clearKey;
+          html += '<article class="flag-card is-signal-present' + (isClearActive ? ' is-active-absence' : '') + '" data-flag-id="CLEAR" data-item-key="' + clearKey + '" data-item-code="CLEAR" data-item-title="No dangerous clause shapes flagged" data-has-evidence="false" role="button" tabindex="0" aria-pressed="' + (isClearActive ? 'true' : 'false') + '">';
           html += '<div class="flag-card-top"><span class="flag-card-title">No dangerous clause shapes flagged</span><span class="flag-code">CLEAR</span></div>';
           html += '<p class="flag-reason">Zero risk flags fired under the deterministic indemnity, cap carve-out, renewal notice, cure, escalator, and AI data-training checks. Still verify every NOT FOUND item below by hand.</p>';
+          html += '<div class="card-locate-bar">' + (isClearActive ? '● Clause absent in document — no sentence to highlight (click to dismiss)' : 'Clause absent — no sentence in contract to highlight') + '</div>';
+          html += '<div class="absence-live-notice"' + (isClearActive ? '' : ' hidden') + '>No sentence to highlight in the contract — zero risk flags were raised on this document. Click any FOUND item in the 51-point coverage checklist below to highlight its exact sentence.</div>';
           html += '</article>';
         } else {
           raised.forEach(function (f) {
-            html += '<article class="flag-card" data-flag-id="' + esc(f.id) + '">';
+            var fKey = "flag:" + f.id;
+            var hasEv = !!f.evidence;
+            var isHi = activeHighlightKey === fKey;
+            var isAbs = activeAbsenceKey === fKey;
+            html += '<article class="flag-card' + (isHi ? ' is-active-flag' : '') + (isAbs ? ' is-active-absence' : '') + '" data-flag-id="' + esc(f.id) + '" data-item-key="' + esc(fKey) + '" data-item-code="' + esc(f.id) + '" data-item-title="' + esc(f.title) + '" data-has-evidence="' + (hasEv ? 'true' : 'false') + '" role="button" tabindex="0" aria-pressed="' + ((isHi || isAbs) ? 'true' : 'false') + '">';
             html += '<div class="flag-card-top">';
             html += '<span class="flag-card-title">' + esc(f.title) + '</span>';
             html += '<span class="flag-code">' + esc(f.id) + '</span>';
@@ -3681,6 +4048,12 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
             if (f.evidence) {
               html += '<p class="flag-evidence">“' + esc(f.evidence) + '”</p>';
             }
+            if (hasEv) {
+              html += '<div class="card-locate-bar">' + (isHi ? '● Active — highlighted in contract text above (click or press Enter to clear)' : 'Locate &amp; highlight exact clause sentence in contract ↑') + '</div>';
+            } else {
+              html += '<div class="card-locate-bar">' + (isAbs ? '● Clause absent in document — no sentence to highlight (click to dismiss)' : 'Clause absent — no sentence in contract to highlight') + '</div>';
+              html += '<div class="absence-live-notice"' + (isAbs ? '' : ' hidden') + '>No sentence to highlight in the contract — “' + esc(f.title) + '” was triggered by the absence of protective language in the document.</div>';
+            }
             html += '</article>';
           });
         }
@@ -3688,14 +4061,25 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
         if (!ipSig.raised) {
           var sigClass = ipSig.present ? "is-signal-present" : "is-signal-neutral";
           var sigBadge = ipSig.present ? "F-IP-INDEMNITY · PRESENT" : "F-IP-INDEMNITY · ABSENT";
-          html += '<article class="flag-card ' + sigClass + '" data-flag-signal="F-IP-INDEMNITY">';
+          var sigKey = "flag:F-IP-INDEMNITY-SIGNAL";
+          var sigHasEv = !!ipSig.evidence;
+          var sigHi = activeHighlightKey === sigKey;
+          var sigAbs = activeAbsenceKey === sigKey;
+          var sigTitle = "IP / Infringement Indemnity Signal: " + (ipSig.present ? "PRESENT" : "ABSENT (Not Triggered)");
+          html += '<article class="flag-card ' + sigClass + (sigHi ? ' is-active-flag' : '') + (sigAbs ? ' is-active-absence' : '') + '" data-flag-signal="F-IP-INDEMNITY" data-item-key="' + sigKey + '" data-item-code="' + sigBadge + '" data-item-title="' + esc(sigTitle) + '" data-has-evidence="' + (sigHasEv ? 'true' : 'false') + '" role="button" tabindex="0" aria-pressed="' + ((sigHi || sigAbs) ? 'true' : 'false') + '">';
           html += '<div class="flag-card-top">';
-          html += '<span class="flag-card-title">IP / Infringement Indemnity Signal: ' + (ipSig.present ? "PRESENT" : "ABSENT (Not Triggered)") + '</span>';
+          html += '<span class="flag-card-title">' + esc(sigTitle) + '</span>';
           html += '<span class="flag-code">' + sigBadge + '</span>';
           html += '</div>';
           html += '<p class="flag-reason">' + esc(ipSig.reason) + '</p>';
           if (ipSig.evidence) {
             html += '<p class="flag-evidence">“' + esc(ipSig.evidence) + '”</p>';
+          }
+          if (sigHasEv) {
+            html += '<div class="card-locate-bar">' + (sigHi ? '● Active — highlighted in contract text above (click or press Enter to clear)' : 'Locate &amp; highlight exact clause sentence in contract ↑') + '</div>';
+          } else {
+            html += '<div class="card-locate-bar">' + (sigAbs ? '● Clause absent in document — no sentence to highlight (click to dismiss)' : 'Clause absent — no sentence in contract to highlight') + '</div>';
+            html += '<div class="absence-live-notice"' + (sigAbs ? '' : ' hidden') + '>No sentence to highlight in the contract — neither IP/infringement indemnification nor IP/license grant language was detected in this document.</div>';
           }
           html += '</article>';
         }
@@ -3721,7 +4105,7 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
 
         var html = '<div class="sub-block" id="ca-checks-block">';
         html += '<h3 class="sub-block-title">The ' + checks.length + '-point coverage checklist</h3>';
-        html += '<p class="sub-block-desc">Every standard item checked across six groups — found items show the matched line; missing items are listed so a human checks by hand.</p>';
+        html += '<p class="sub-block-desc">Every standard item checked across six groups — click any FOUND item to highlight its exact sentence in the contract text above; missing items report honestly that the clause is absent.</p>';
 
         html += '<div class="check-toolbar">';
         html += '<div class="filter-group" role="group" aria-label="Filter coverage checks">';
@@ -3758,7 +4142,11 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
             visibleItems.forEach(function (c) {
               var stateClass = c.found ? "is-found" : "is-missing";
               var badgeText = c.found ? "✓ FOUND" : "✗ NOT FOUND";
-              html += '<article class="check-card ' + stateClass + '" data-check-id="' + esc(c.id) + '">';
+              var cKey = "check:" + c.id;
+              var hasEv = !!(c.found && c.excerpt);
+              var isHi = activeHighlightKey === cKey;
+              var isAbs = activeAbsenceKey === cKey;
+              html += '<article class="check-card ' + stateClass + (isHi ? ' is-active-flag' : '') + (isAbs ? ' is-active-absence' : '') + '" data-check-id="' + esc(c.id) + '" data-item-key="' + esc(cKey) + '" data-item-code="' + esc(c.group + " · " + c.id) + '" data-item-title="' + esc(c.name) + '" data-has-evidence="' + (hasEv ? 'true' : 'false') + '" role="button" tabindex="0" aria-pressed="' + ((isHi || isAbs) ? 'true' : 'false') + '">';
               html += '<div class="check-top-row">';
               html += '<span class="check-name">' + esc(c.name) + '</span>';
               html += '<span class="check-badge ' + stateClass + '">' + badgeText + '</span>';
@@ -3766,8 +4154,11 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
               html += '<p class="check-why">' + esc(c.why) + '</p>';
               if (c.found) {
                 html += '<p class="check-excerpt">“' + esc(c.excerpt) + '”</p>';
+                html += '<div class="card-locate-bar">' + (isHi ? '● Active — highlighted in contract text above (click or press Enter to clear)' : 'Locate &amp; highlight exact clause sentence in contract ↑') + '</div>';
               } else {
                 html += '<p class="check-missing-note">Not found in document. Check by hand.</p>';
+                html += '<div class="card-locate-bar">' + (isAbs ? '● Clause absent in document — no sentence to highlight (click to dismiss)' : 'Clause absent — no sentence in contract to highlight') + '</div>';
+                html += '<div class="absence-live-notice"' + (isAbs ? '' : ' hidden') + '>No sentence to highlight in the contract — “' + esc(c.name) + '” was not found in the pasted document. The absence of this clause is itself the finding; verify or draft the language by hand.</div>';
               }
               html += '</article>';
             });
@@ -3781,6 +4172,7 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
       }
 
       function renderFullResults(checks, scans, flagReport, ledger) {
+        clearContractHighlight();
         var found = checks.filter(function (c) { return c.found; }).length;
         var missing = checks.length - found;
         var flagCount = flagReport.flags.length;
@@ -3898,6 +4290,26 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
           var pre = document.getElementById("ca-brief-pre");
           var status = document.getElementById("ca-copy-status");
           if (pre) copyTextWithFeedback(pre.textContent, status, "Analysis Brief");
+          return;
+        }
+
+        var evidenceCard = e.target.closest ? e.target.closest("[data-item-key]") : null;
+        if (evidenceCard) {
+          activateEvidenceCard(evidenceCard);
+        }
+      });
+
+      resultsEl.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && (activeHighlightKey || activeAbsenceKey)) {
+          e.preventDefault();
+          clearContractHighlight();
+          setNote("Highlight cleared — viewing plain contract text.", false);
+          return;
+        }
+        var evidenceCard = e.target.closest ? e.target.closest("[data-item-key]") : null;
+        if (evidenceCard && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          activateEvidenceCard(evidenceCard);
         }
       });
 
@@ -4037,17 +4449,61 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
         executeEngineRun("check", false, "Quick Path Deal Check (3 Numbers + 1 Clause + 3 Questions)");
       });
 
-      /* STAGE 3: CHECK INBOUND BRIDGE FROM DEAL CHECK ON PAGE LOAD */
+      /* FIX 2: EXTRACT & APPLY FULL DEAL ECONOMICS INPUT SET ON BRIDGE INTAKE */
+      function extractInboundBridgeInputs(parsed) {
+        if (!parsed || typeof parsed !== "object") return null;
+        var src = (parsed.inputs && typeof parsed.inputs === "object") ? parsed.inputs : parsed;
+        var hasAny = (
+          src.acv != null ||
+          src.discountPct != null ||
+          src.netDays != null ||
+          src.billingFreq != null ||
+          src.upliftCapPct != null ||
+          src.termYears != null
+        );
+        if (!hasAny) return null;
+        return {
+          acv: src.acv != null && src.acv !== "" ? Number(src.acv) : null,
+          discountPct: src.discountPct != null && src.discountPct !== "" ? Number(src.discountPct) : null,
+          netDays: src.netDays != null && src.netDays !== "" ? Number(src.netDays) : null,
+          billingFreq: src.billingFreq != null && src.billingFreq !== "" ? String(src.billingFreq) : null,
+          upliftCapPct: src.upliftCapPct != null && src.upliftCapPct !== "" ? Number(src.upliftCapPct) : null,
+          termYears: src.termYears != null && src.termYears !== "" ? Number(src.termYears) : null
+        };
+      }
+
+      function applyBridgeInputsToDom(inp) {
+        if (!inp) return;
+        if (inp.acv != null && !isNaN(inp.acv) && inputAcvEl) inputAcvEl.value = String(inp.acv);
+        if (inp.discountPct != null && !isNaN(inp.discountPct) && inputDiscountEl) inputDiscountEl.value = String(inp.discountPct);
+        if (inp.netDays != null && !isNaN(inp.netDays) && inputNetDaysEl) inputNetDaysEl.value = String(inp.netDays);
+        if (inp.billingFreq && inputBillingEl) inputBillingEl.value = String(inp.billingFreq);
+        if (inp.upliftCapPct != null && !isNaN(inp.upliftCapPct) && inputUpliftEl) inputUpliftEl.value = String(inp.upliftCapPct);
+        if (inp.termYears != null && !isNaN(inp.termYears) && inputTermEl) inputTermEl.value = String(inp.termYears);
+      }
+
+      /* STAGE 3 + FIX 2: CHECK INBOUND BRIDGE FROM DEAL CHECK ON PAGE LOAD */
       function checkInboundBridgeFromDealCheck() {
         var A = window.ContractAnalyzer;
         var inboundText = "";
         var fromBridge = false;
+        var inboundInputs = null;
+        var inboundIsFreeSample = false;
 
         try {
           var params = new URLSearchParams(window.location.search);
           if (params.get("bridge") === "dealcheck") {
             fromBridge = true;
             if (params.get("c")) inboundText = params.get("c");
+            var urlInputs = {};
+            if (params.get("acv") != null) urlInputs.acv = params.get("acv");
+            if (params.get("discountPct") != null) urlInputs.discountPct = params.get("discountPct");
+            if (params.get("netDays") != null) urlInputs.netDays = params.get("netDays");
+            if (params.get("billingFreq") != null) urlInputs.billingFreq = params.get("billingFreq");
+            if (params.get("upliftCapPct") != null) urlInputs.upliftCapPct = params.get("upliftCapPct");
+            if (params.get("termYears") != null) urlInputs.termYears = params.get("termYears");
+            var extractedUrlInputs = extractInboundBridgeInputs(urlInputs);
+            if (extractedUrlInputs) inboundInputs = extractedUrlInputs;
           }
         } catch (e) {}
 
@@ -4058,6 +4514,9 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
             if (parsed && parsed.text && (!parsed.consumed || fromBridge)) {
               inboundText = String(parsed.text).slice(0, 50000);
               fromBridge = true;
+              var extractedStorageInputs = extractInboundBridgeInputs(parsed);
+              if (extractedStorageInputs) inboundInputs = extractedStorageInputs;
+              if (parsed.isFreeSample === true) inboundIsFreeSample = true;
               parsed.consumed = true;
               window.localStorage.setItem(A.BRIDGE_INBOUND_KEY, JSON.stringify(parsed));
             }
@@ -4066,11 +4525,14 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
 
         if (fromBridge && inboundText.trim()) {
           textEl.value = inboundText.trim();
-          isAtlasSampleLoaded = false;
-          fileStatusEl.textContent = "Contract received via Deal Check bridge (" + textEl.value.length.toLocaleString() + " characters).";
+          if (inboundInputs) {
+            applyBridgeInputsToDom(inboundInputs);
+          }
+          isAtlasSampleLoaded = inboundIsFreeSample;
+          fileStatusEl.textContent = "Contract received via Deal Check bridge (" + textEl.value.length.toLocaleString() + " characters" + (inboundInputs ? " + full deal economics inputs" : "") + ").";
           updateTextStats();
           if (bridgeBannerEl) bridgeBannerEl.hidden = false;
-          executeEngineRun("scan", false, "Deal Check Bridge → 51-Point Contract Autopsy");
+          executeEngineRun("scan", inboundIsFreeSample, "Deal Check Bridge → 51-Point Contract Autopsy");
         }
       }
 
@@ -4144,9 +4606,10 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
           typeof A.consumeMeterRun === "function" &&
           typeof A.activateWorkEmailDayPass === "function" &&
           typeof A.buildCarryBackPacket === "function" &&
+          typeof A.locateEvidenceSpan === "function" &&
           A.PROJECT_ATLAS_PRESET &&
           Array.isArray(A.CHECKS) && A.CHECKS.length === 51,
-          "Engine interface / 51 checks / Stage 3 exports integrity fail"
+          "Engine interface / 51 checks / Stage 3 + Fix 1/2 exports integrity fail"
         );
 
         function foundIds(t) {
@@ -4244,7 +4707,7 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
           console.assert(typeof led.dealHealthScore === "number" && led.dealHealthScore >= 0 && led.dealHealthScore <= 100, "Deal Health Score range fail on " + fx.name);
         });
 
-        /* 7. Stage 3 Probes: Project Atlas Preset Tie-Out, Deal Health Score Monotonicity, Meter Allowance & Bridge Serialization */
+        /* 7. Stage 3 + Fix 1 & Fix 2 Probes: Project Atlas Native vs. Bridge Parity, Evidence Span Locator, Deal Health Score & Meter */
         var atlas = A.PROJECT_ATLAS_PRESET;
         var atlasCh = A.runChecks(atlas.text);
         var atlasFl = A.computeFlags(atlas.text, atlasCh);
@@ -4259,8 +4722,43 @@ STAGE 3 DECLARATIONS (NOV 19, 2026 — BUILD SPEC SECTION 8 STAGE 3 FINAL ON STA
           atlasLed.cells.L5_RevRecHoldback.amount === 8640 &&
           atlasLed.cells.L6_LiabilityReserve.amount === 7200 &&
           atlasLed.totalLeak === 66002 &&
-          atlasLed.truePocketRev === 173998,
-          "Project Atlas ledger math mismatch: " + atlasLed.totalLeak
+          atlasLed.truePocketRev === 173998 &&
+          atlasLed.dealHealthScore === 38,
+          "Project Atlas native ledger / Deal Health 38 mismatch: leak=" + atlasLed.totalLeak + " health=" + atlasLed.dealHealthScore
+        );
+
+        /* Fix 1 Probe: Every raised flag and found check on Project Atlas locates its exact character span in atlas.text; absence checks return null */
+        atlasFl.flags.forEach(function (f) {
+          var sp = A.locateEvidenceSpan(atlas.text, f.evidence);
+          console.assert(sp && sp.start >= 0 && sp.end > sp.start && sp.end <= atlas.text.length, "Fix 1 flag span locator failed on " + f.id);
+        });
+        atlasCh.forEach(function (c) {
+          if (c.found && c.excerpt) {
+            var sp = A.locateEvidenceSpan(atlas.text, c.excerpt);
+            console.assert(sp && sp.start >= 0 && sp.end > sp.start && sp.end <= atlas.text.length, "Fix 1 found-check span locator failed on " + c.id);
+          } else {
+            var nullSp = A.locateEvidenceSpan(atlas.text, c.excerpt);
+            console.assert(nullSp === null, "Fix 1 absence check falsely returned a span on " + c.id);
+          }
+        });
+
+        /* Fix 2 Probe: Before-Fix-2 Default Inputs vs. After-Fix-2 Full Bridged Deal Inputs */
+        var unbridgedDefaults = { acv: 100000, discountPct: 0, netDays: 30, billingFreq: "annual", upliftCapPct: 7, termYears: 1 };
+        var beforeFix2Led = A.computeLedgerAndIndicators(atlas.text, atlasCh, atlasFl, unbridgedDefaults);
+        console.assert(beforeFix2Led.totalLeak === 18100 && beforeFix2Led.dealHealthScore === 50, "Pre-Fix-2 baseline sanity check mismatch");
+
+        var bridgedPayload = {
+          text: atlas.text,
+          isFreeSample: true,
+          inputs: { acv: 240000, discountPct: 22, netDays: 60, billingFreq: "quarterly", upliftCapPct: 2, termYears: 2 }
+        };
+        var extractedBridgeInputs = extractInboundBridgeInputs(bridgedPayload);
+        var afterFix2Led = A.computeLedgerAndIndicators(bridgedPayload.text, atlasCh, atlasFl, extractedBridgeInputs);
+        console.assert(
+          afterFix2Led.totalLeak === 66002 &&
+          afterFix2Led.truePocketRev === 173998 &&
+          afterFix2Led.dealHealthScore === 38,
+          "Fix 2 Bridge Project Atlas parity fail: leak=" + afterFix2Led.totalLeak + " health=" + afterFix2Led.dealHealthScore
         );
 
         /* Deal Health Score Monotonicity Probe */
