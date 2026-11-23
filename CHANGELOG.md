@@ -1,3 +1,15 @@
+## 2026-11-22 — Neon Website Fixes LIVE: Page IDs Out of the Titles, og:image, Footer Alignment, Deal Check on the Homepage
+
+Lucky's ruling (Nov 22, 2026, 3:25 AM PT, via "website build tasks"): Neon is right — P01 sounds lame; the IDs are hidden for sure, kept in the comments for the records and later SQL/databasing. Validated by Muse against the shipped files first, then executed, per Lucky's order: validate, add (task sheet items 31–33), execute, strike through.
+
+- **Titles cleaned on all 27 pages (54 files):** the internal page-ID prefixes (P01, P02, P03, S6-P01, S6-P03, S6-P03.1, S6-P04, S6-P06, S6-P06.1, S6-P06.2, S6-P06.3) are stripped from every <title> and og:title. The homepage title is now simply "Fractional Deal Desk & Contract Management". The IDs themselves are NOT deleted — they stay where they belong: the LABEL comments at the top of each file, the file names, the sitemap records, and CODE-MAP.
+- **og:image added to all 27 pages:** https://fractional-deal-desk-site.pages.dev/assets/business-photo.jpg (the site portrait), so LinkedIn and other link previews show a clean thumbnail. Three pages that had no OpenGraph block at all (Perm Calculator, Redlining Playbook, Spend Variance) gained og:title + og:url + og:image.
+- **Primary URL settled and verified:** canonical == og:url on every page, all on the primary host fractional-deal-desk-site.pages.dev; no github.io references anywhere in the pages.
+- **Footer aligned on all 55 content files:** the "Something broken? Tell me" link now sits inside the footer wrapper (div.wrap / div.container) on every page, including 404.html; Spend Variance's footer gained the wrap div it was missing.
+- **Homepage grid (item 33):** The Deal Check (S6-P03.1) added to the Contract Risk & Redlining bucket next to the Contract Analyzer — it was missing from the homepage entirely (0 mentions). The Contract Analyzer blurb now names the 3-Window Deal Engine (leak waterfall, behavioral verdict, MESO alternatives, Deal Health Score).
+- **Checked and NOT changed:** "Eton, Reco" in the hero credentials line — real roster names, not typos (Neon's flag was a false alarm).
+- **Safety:** every edit was exact-match and diff-audited — the only lines that changed anywhere are titles, og tags, the footer link position, and the two homepage list items. No tool logic, math, or other copy was touched. CODE-MAP v81.
+
 ## 2026-11-19 — Stage 3 Corrective 3 LIVE: Clickable Flags (Fix 1) + Bridge Full Input Set (Fix 2, Problems List #21)
 
 Lucky's ruling (Nov 19, 2026, ~3:01 PM PT, via "website build tasks"): "Do the clicking and fix that first — and then fix the other one too." Built by Gemini 4 Argon in AI Studio (Gemini 4 Argon confirmed; Thinking = High, Output length = 1,048,576; prompt audited item by item against the Argon Prompt Checklist — audit on file in the build log) and delivered as 8 surgical change blocks; Muse verified every block's old text matched the shipped files exactly once before applying mechanically.
