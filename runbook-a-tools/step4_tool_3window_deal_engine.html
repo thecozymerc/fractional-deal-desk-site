@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runbook A — Step 4: 3-Window Deal Engine (Leak Waterfall, Behavioral Verdict, 51 Contract Flags)</title>
+<style>
+  :root {
+    --ink: #111827;
+    --muted: #4b5563;
+    --line: #d1d5db;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --navy: #0f172a;
+    --blue: #1d4ed8;
+    --green-bg: #dcfce7;
+    --green-ink: #166534;
+    --amber-bg: #fef3c7;
+    --amber-ink: #92400e;
+    --red-bg: #fee2e2;
+    --red-ink: #991b1b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.4; }
+  .wrap { max-width: 1260px; margin: 18px auto; padding: 0 16px 40px; }
+  .topbar { background: var(--navy); color: #fff; padding: 18px 22px; border-radius: 10px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+  .topbar h1 { margin: 0; font-size: 20px; }
+  .topbar p { margin: 4px 0 0; font-size: 13px; color: #cbd5e1; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .tab-btn { border: 1px solid #cbd5e1; background: #fff; padding: 9px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px; }
+  .tab-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin-top: 14px; }
+  .card h2 { margin: 0 0 10px; font-size: 16px; border-bottom: 1px solid #e5e7eb; padding-bottom: 7px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+  label.field { display: flex; flex-direction: column; font-size: 12px; font-weight: 600; color: var(--muted); gap: 3px; }
+  input[type="text"], input[type="number"], select { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { border: 1px solid #e5e7eb; padding: 6px 7px; text-align: left; vertical-align: top; }
+  th { background: #f9fafb; font-size: 11.5px; color: var(--muted); }
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 10px; margin-top: 12px; }
+  .kpi { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; }
+  .kpi .k { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+  .kpi .v { font-size: 19px; font-weight: 800; margin-top: 3px; }
+  .wf-row { display: grid; grid-template-columns: 270px 1fr 110px; gap: 10px; align-items: center; margin: 7px 0; font-size: 12.5px; }
+  .wf-track { background: #e5e7eb; height: 20px; border-radius: 5px; overflow: hidden; }
+  .wf-bar { height: 100%; border-radius: 5px; }
+  .bar-base { background: #1d4ed8; }
+  .bar-leak { background: #dc2626; }
+  .bar-net { background: #16a34a; }
+  .bar-warn { background: #d97706; }
+  .banner { padding: 12px 15px; border-radius: 8px; font-weight: 700; margin-top: 12px; }
+  .st-red { background: var(--red-bg); color: var(--red-ink); border: 1px solid #fca5a5; }
+  .st-amber { background: var(--amber-bg); color: var(--amber-ink); border: 1px solid #fcd34d; }
+  .st-green { background: var(--green-bg); color: var(--green-ink); border: 1px solid #86efac; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  button { border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 7px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .hidden { display: none; }
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  @media print {
+    body { background: #fff; }
+    .tabs, .toolbar, .filter-bar, .no-print { display: none !important; }
+    .window-panel { display: block !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Runbook A — Step 4: 3-Window Deal Engine (Reusable Forensic Workbench)</h1>
+      <p>Window 1: Leak Waterfall | Window 2: Behavioral Verdict | Window 3: Complete 51-Contract-Flag Audit</p>
+    </div>
+    <div style="font-size:13px;font-weight:700;background:#1e293b;padding:8px 12px;border-radius:8px;" id="topSummary">
+      Engine Ready — Enter Deal Inputs
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="grid">
+      <label class="field">Account Name<input type="text" id="dealName" placeholder="e.g., Acme Corp" oninput="recalcAll()"></label>
+      <label class="field">CRM Opp ID<input type="text" id="oppId" placeholder="e.g., OPP-2026-0001" oninput="recalcAll()"></label>
+      <label class="field">Diagnostic Date<input type="text" id="diagDate" placeholder="YYYY-MM-DD" oninput="recalcAll()"></label>
+      <label class="field">Analyst / Clinician<input type="text" id="analyst" placeholder="Name" oninput="recalcAll()"></label>
+    </div>
+  </div>
+
+  <div class="tabs no-print">
+    <button class="tab-btn active" onclick="showWin(1, this)">Window 1: Leak Waterfall</button>
+    <button class="tab-btn" onclick="showWin(2, this)">Window 2: Behavioral Verdict</button>
+    <button class="tab-btn" onclick="showWin(3, this)">Window 3: 51 Contract Flags</button>
+    <button class="tab-btn" onclick="showAll(this)">View All 3 Windows</button>
+  </div>
+
+  <!-- WINDOW 1 -->
+  <div id="win1" class="card window-panel">
+    <h2>Window 1 — Commercial, Margin &amp; ASC 606 Leak Waterfall</h2>
+    <div class="grid">
+      <label class="field">Std Subscription List ($)<input type="number" id="w1SubList" value="300000" oninput="recalcAll()"></label>
+      <label class="field">Std Impl List ($)<input type="number" id="w1ImplList" value="30000" oninput="recalcAll()"></label>
+      <label class="field">Sub Discretionary Disc (%)<input type="number" step="0.1" id="w1SubDisc" value="0" oninput="recalcAll()"></label>
+      <label class="field">Hidden Impl Override ($)<input type="number" id="w1ImplOver" value="0" oninput="recalcAll()"></label>
+      <label class="field">3-Yr Sub Direct COGS ($)<input type="number" id="w1SubCogs" value="44000" oninput="recalcAll()"></label>
+      <label class="field">Impl Direct COGS ($)<input type="number" id="w1ImplCogs" value="22000" oninput="recalcAll()"></label>
+      <label class="field">Policy GM Floor (%)<input type="number" step="0.1" id="w1GmFloor" value="75.0" oninput="recalcAll()"></label>
+      <label class="field">Y1 Enforceable Rev if Opt-Out ($)<input type="number" id="w1Y1Rev" value="330000" oninput="recalcAll()"></label>
+      <label class="field">Y1 Direct COGS ($)<input type="number" id="w1Y1Cogs" value="33000" oninput="recalcAll()"></label>
+      <label class="field">Upfront Comm % on TCV<input type="number" step="0.1" id="w1CommPct" value="10.0" oninput="recalcAll()"></label>
+      <label class="field">Extra DSO Days Over Net-30<input type="number" id="w1ExtraDso" value="0" oninput="recalcAll()"></label>
+      <label class="field">Y2-3 True-Down Exposure ($)<input type="number" id="w1TrueDown" value="0" oninput="recalcAll()"></label>
+    </div>
+    <div class="kpi-row" id="w1Kpis"></div>
+    <div id="w1Waterfall" style="margin-top:14px;"></div>
+  </div>
+
+  <!-- WINDOW 2 -->
+  <div id="win2" class="card window-panel hidden">
+    <h2>Window 2 — Behavioral Verdict Engine (8 Primary-Source Behavioral Signals)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:7%;">Code</th>
+          <th style="width:14%;">Side</th>
+          <th style="width:28%;">Behavioral Signal</th>
+          <th style="width:17%;">Observed Score</th>
+          <th style="width:34%;">Primary-Source Evidence &amp; Citation</th>
+        </tr>
+      </thead>
+      <tbody id="w2Body"></tbody>
+    </table>
+    <div id="w2Verdict" class="banner st-green">VERDICT: Calculating...</div>
+  </div>
+
+  <!-- WINDOW 3 -->
+  <div id="win3" class="card window-panel hidden">
+    <h2>Window 3 — Complete 51-Contract-Flag Forensic Audit (F01–F51)</h2>
+    <div class="kpi-row" id="w3Kpis"></div>
+    <div class="filter-bar no-print" style="margin-top:12px;">
+      <select id="flagFilter" onchange="filterFlags()" style="max-width:240px;">
+        <option value="ALL">Show All 51 Contract Flags</option>
+        <option value="TRIGGERED">Show Triggered Flags Only (Critical/High/Mod)</option>
+        <option value="CRITICAL">Show CRITICAL Only</option>
+        <option value="HIGH">Show HIGH Only</option>
+        <option value="UNVERIFIED">Show UNVERIFIED Only</option>
+      </select>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:6%;">ID</th>
+          <th style="width:14%;">Category</th>
+          <th style="width:34%;">Contract Risk Flag (Standard 51-Flag Taxonomy)</th>
+          <th style="width:16%;">Audit Status</th>
+          <th style="width:30%;">Clause / Artifact Evidence</th>
+        </tr>
+      </thead>
+      <tbody id="w3Body"></tbody>
+    </table>
+  </div>
+
+  <div class="card no-print">
+    <div class="toolbar">
+      <button class="primary" onclick="exportJSON()">Save 3-Window JSON</button>
+      <button onclick="document.getElementById('jsonIn').click()">Load 3-Window JSON</button>
+      <input type="file" id="jsonIn" accept=".json" style="display:none" onchange="loadJSON(event)">
+      <button onclick="exportFlagsCSV()">Export 51-Flag CSV</button>
+      <button onclick="window.print()">Print / Save Full 3-Window PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const BEHAVIORAL_SIGNALS = [
+  { id: "S1", side: "Seller / AE", name: "Offline quoting / CRM-vs-Quote data suppression", score: 0, note: "" },
+  { id: "S2", side: "Seller / AE", name: "Bypassing Deal Desk / Finance via informal verbal approvals", score: 0, note: "" },
+  { id: "S3", side: "Seller / AE", name: "Unworked internal holds while holding deal in Commit forecast", score: 0, note: "" },
+  { id: "S4", side: "Seller / AE", name: "Misrepresenting stall owner (blaming buyer legal/bureaucracy)", score: 0, note: "" },
+  { id: "B1", side: "Buyer / Prospect", name: "Economic buyer / signatory unengaged with zero budget approval", score: 0, note: "" },
+  { id: "B2", side: "Buyer / Prospect", name: "Demanding multi-year volume discount without multi-year commitment", score: 0, note: "" },
+  { id: "B3", side: "Buyer / Prospect", name: "Shifting payment & acceptance risk onto subjective buyer sign-off", score: 0, note: "" },
+  { id: "B4", side: "Buyer / Prospect", name: "Stacking asymmetric enterprise legal traps (3x cap, uncapped IP/sec, MFN)", score: 0, note: "" }
+];
+
+const FLAGS_51 = [
+  ["F01","Pricing","Discretionary subscription discount exceeds Tier-4 ceiling (>25%)"],
+  ["F02","Pricing","Discount percentage omitted or masked in Order Form Exhibit A"],
+  ["F03","Pricing","Manual list-price cell override on services/implementation"],
+  ["F04","Pricing","Consolidated deal Gross Margin falls below policy floor (<75%)"],
+  ["F05","Pricing","Negative standalone services/implementation Gross Margin (<0%)"],
+  ["F06","Pricing","Fixed-fee services cap with zero overage or T&M pass-through"],
+  ["F07","Pricing","Multi-year seat ramp exceeds 2.0x Year-1 seat guardrail"],
+  ["F08","Pricing","Non-USD billing creating unhedged FX currency exposure"],
+  ["F09","Term/Opt-Out","Unilateral termination for convenience (Opt-Out) on discounted multi-year deal"],
+  ["F10","Term/Opt-Out","Waiver of retroactive multi-year discount clawback upon opt-out"],
+  ["F11","Term/Opt-Out","Early termination fee below 50% of remaining unbilled value ($0 ETF)"],
+  ["F12","Term/Opt-Out","Short opt-out notice window (30 days or less)"],
+  ["F13","Term/Opt-Out","Multi-year downward seat adjustment (true-down) without rate repricing"],
+  ["F14","Term/Opt-Out","Effective date blank or contingent on unapproved buyer budget"],
+  ["F15","Term/Opt-Out","Unilateral pilot-to-production conversion without signed order form"],
+  ["F16","Billing/Pay","Payment terms exceed standard Net-30 (Net-45 / Net-60+)"],
+  ["F17","Billing/Pay","Year-1 subscription invoicing gated on Customer Acceptance Certificate"],
+  ["F18","Billing/Pay","Implementation fee split or holdback gated on acceptance"],
+  ["F19","Billing/Pay","Subjective acceptance standard ('sole reasonable discretion')"],
+  ["F20","Billing/Pay","Missing deemed-acceptance timeout window (indefinite billing hold)"],
+  ["F21","Billing/Pay","Reduced late-payment interest rate below 1.5%/month standard"],
+  ["F22","Billing/Pay","Broad good-faith invoice dispute withholding / interest waiver"],
+  ["F23","Billing/Pay","Monthly or arrears invoicing instead of annual upfront"],
+  ["F24","Rev-Rec/606","ASC 606 enforceable term collapses below quoted multi-year term"],
+  ["F25","Rev-Rec/606","Acceptance-gated revenue recognition deferral (control transfer delayed)"],
+  ["F26","Rev-Rec/606","ASC 606 variable-consideration constraint (true-down, MFN, SLA refunds)"],
+  ["F27","Rev-Rec/606","Pro-rata refund right on prepaid unearned subscription or services"],
+  ["F28","Rev-Rec/606","Upfront multi-year commission mismatch / PB-6.2 clawback risk"],
+  ["F29","Rev-Rec/606","Bundled custom ERP integration creating non-distinct performance obligation"],
+  ["F30","Rev-Rec/606","Off-contract verbal commitment or side-letter risk"],
+  ["F31","Liability/IP","General limitation of liability cap exceeds 12 months' fees paid"],
+  ["F32","Liability/IP","Uncapped data security / breach liability carve-out"],
+  ["F33","Liability/IP","Uncapped confidentiality breach liability carve-out"],
+  ["F34","Liability/IP","Uncapped IP indemnification liability carve-out"],
+  ["F35","Liability/IP","Consequential / indirect damages exclusion weakened or struck"],
+  ["F36","Liability/IP","Buyer IP ownership / work-made-for-hire claim on custom integrations"],
+  ["F37","Liability/IP","Mandatory cyber insurance limits exceeding Seller corporate coverage"],
+  ["F38","Liability/IP","Unilateral customer audit rights at Seller's expense"],
+  ["F39","SLA/Delivery","Hard implementation go-live deadline (<=45 days) without signed SOW"],
+  ["F40","SLA/Delivery","SLA service credit cap exceeds standard 10% monthly pro-rata"],
+  ["F41","SLA/Delivery","Chronic SLA breach termination-for-cause after <=2 misses in 12 months"],
+  ["F42","SLA/Delivery","Uptime commitment exceeds standard 99.9% availability"],
+  ["F43","SLA/Delivery","Unscoped custom ERP/connector scope bundled without SOW sign-off"],
+  ["F44","SLA/Delivery","Missing customer-dependency exclusions on implementation timeline"],
+  ["F45","SLA/Delivery","Unpriced dedicated onshore TAM / Premier Support commitment"],
+  ["F46","Gov/Renewal","Elimination of standard auto-renewal mechanism"],
+  ["F47","Gov/Renewal","Multi-year 0% renewal price increase cap (below 7% standard)"],
+  ["F48","Gov/Renewal","Most Favored Nation (MFN) pricing clause with retroactive credit"],
+  ["F49","Gov/Renewal","Authorized contract signatory differs from CRM Economic Buyer"],
+  ["F50","Gov/Renewal","Mandatory written Finance / Margin sign-off absent before redlining"],
+  ["F51","Gov/Renewal","Three-way mismatch across CRM, Quote Sheet, and Redlined Contract"]
+].map(([id, cat, name]) => ({ id, cat, name, status: "PASS", cite: "" }));
+
+function esc(s) {
+  return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function usd(n) {
+  const neg = n < 0;
+  return (neg ? "-$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US");
+}
+
+function showWin(num, btn) {
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  [1, 2, 3].forEach(i => document.getElementById("win" + i).classList.toggle("hidden", i !== num));
+}
+function showAll(btn) {
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  [1, 2, 3].forEach(i => document.getElementById("win" + i).classList.remove("hidden"));
+}
+
+function renderW2(signals) {
+  const tb = document.getElementById("w2Body");
+  tb.innerHTML = "";
+  signals.forEach((s, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><strong>${esc(s.id)}</strong></td>
+      <td>${esc(s.side)}</td>
+      <td>${esc(s.name)}</td>
+      <td>
+        <select id="b_sc_${i}" onchange="recalcAll()">
+          <option value="0" ${s.score===0?"selected":""}>0 — Clean / Absent</option>
+          <option value="1" ${s.score===1?"selected":""}>1 — Warning Signal</option>
+          <option value="2" ${s.score===2?"selected":""}>2 — Confirmed Breach</option>
+        </select>
+      </td>
+      <td><input type="text" id="b_nt_${i}" value="${esc(s.note)}" placeholder="Primary-source citation..." oninput="recalcAll()"></td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+function renderW3(flags) {
+  const tb = document.getElementById("w3Body");
+  tb.innerHTML = "";
+  flags.forEach((f, i) => {
+    const tr = document.createElement("tr");
+    tr.dataset.idx = i;
+    tr.innerHTML = `
+      <td><strong>${esc(f.id)}</strong></td>
+      <td>${esc(f.cat)}</td>
+      <td>${esc(f.name)}</td>
+      <td>
+        <select id="f_st_${i}" onchange="recalcAll()">
+          <option value="PASS" ${f.status==="PASS"?"selected":""}>PASS</option>
+          <option value="CRITICAL" ${f.status==="CRITICAL"?"selected":""}>FLAGGED — CRITICAL</option>
+          <option value="HIGH" ${f.status==="HIGH"?"selected":""}>FLAGGED — HIGH</option>
+          <option value="MODERATE" ${f.status==="MODERATE"?"selected":""}>FLAGGED — MODERATE</option>
+          <option value="UNVERIFIED" ${f.status==="UNVERIFIED"?"selected":""}>UNVERIFIED (MSA Check)</option>
+        </select>
+      </td>
+      <td><input type="text" id="f_ct_${i}" value="${esc(f.cite)}" placeholder="Clause line / policy ref..." oninput="recalcAll()"></td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+function filterFlags() {
+  const mode = document.getElementById("flagFilter").value;
+  document.querySelectorAll("#w3Body tr").forEach(tr => {
+    const st = document.getElementById("f_st_" + tr.dataset.idx).value;
+    let show = true;
+    if (mode === "TRIGGERED") show = ["CRITICAL", "HIGH", "MODERATE"].includes(st);
+    else if (mode !== "ALL") show = st === mode;
+    tr.style.display = show ? "" : "none";
+  });
+}
+
+function recalcAll() {
+  // Window 1
+  const subList = Number(document.getElementById("w1SubList").value) || 0;
+  const implList = Number(document.getElementById("w1ImplList").value) || 0;
+  const trueList = subList + implList;
+  const subDiscPct = (Number(document.getElementById("w1SubDisc").value) || 0) / 100;
+  const subDiscAmt = subList * subDiscPct;
+  const implOver = Number(document.getElementById("w1ImplOver").value) || 0;
+  const totalPriceLeak = subDiscAmt + implOver;
+  const quotedTcv = trueList - totalPriceLeak;
+  const totalCogs = (Number(document.getElementById("w1SubCogs").value) || 0) + (Number(document.getElementById("w1ImplCogs").value) || 0);
+  const gp = quotedTcv - totalCogs;
+  const gmPct = quotedTcv > 0 ? (gp / quotedTcv) * 100 : 0;
+  const floorPct = Number(document.getElementById("w1GmFloor").value) || 75;
+  const gmDeficit = gp - (quotedTcv * (floorPct / 100));
+  const y1Rev = Number(document.getElementById("w1Y1Rev").value) || 0;
+  const optOutRisk = Math.max(0, quotedTcv - y1Rev);
+  const y1Cogs = Number(document.getElementById("w1Y1Cogs").value) || 0;
+  const y1Gp = y1Rev - y1Cogs;
+  const y1GmPct = y1Rev > 0 ? (y1Gp / y1Rev) * 100 : 0;
+  const commPct = (Number(document.getElementById("w1CommPct").value) || 0) / 100;
+  const upfrontComm = quotedTcv * commPct;
+  const y1NetContrib = y1Gp - upfrontComm;
+  const extraDso = Number(document.getElementById("w1ExtraDso").value) || 0;
+  const dsoDrag = (y1Rev * 0.08 * (extraDso / 365));
+  const trueDownRisk = Number(document.getElementById("w1TrueDown").value) || 0;
+
+  document.getElementById("w1Kpis").innerHTML = `
+    <div class="kpi"><div class="k">True Price Book List</div><div class="v">${usd(trueList)}</div></div>
+    <div class="kpi"><div class="k">Total Price Concession</div><div class="v" style="color:#dc2626;">${usd(-totalPriceLeak)} (${trueList>0?((totalPriceLeak/trueList)*100).toFixed(1):0}%)</div></div>
+    <div class="kpi"><div class="k">Quoted 3-Yr TCV</div><div class="v">${usd(quotedTcv)}</div></div>
+    <div class="kpi"><div class="k">3-Yr Gross Margin</div><div class="v" style="color:${gmPct<floorPct?'#dc2626':'#16a34a'};">${gmPct.toFixed(1)}% (${usd(gmDeficit)} vs floor)</div></div>
+    <div class="kpi"><div class="k">ASC 606 Enforceable TCV</div><div class="v" style="color:${optOutRisk>0?'#dc2626':'#16a34a'};">${usd(y1Rev)}</div></div>
+    <div class="kpi"><div class="k">Y1 Net After Upfront Comm</div><div class="v" style="color:${y1NetContrib<25000?'#dc2626':'#16a34a'};">${usd(y1NetContrib)} (${y1GmPct.toFixed(1)}% Y1 GM)</div></div>
+  `;
+
+  const wfSteps = [
+    ["1. Standard Price Book Total List", trueList, "bar-base"],
+    ["2. Less Visible Subscription Discount", -subDiscAmt, "bar-leak"],
+    ["3. Less Hidden Implementation Override", -implOver, "bar-leak"],
+    ["4. = Quoted 3-Year TCV", quotedTcv, "bar-base"],
+    ["5. Less Direct 3-Yr COGS", -totalCogs, "bar-warn"],
+    ["6. = Consolidated 3-Yr Gross Profit", gp, gmPct < floorPct ? "bar-warn" : "bar-net"],
+    ["7. Less ASC 606 Opt-Out Unenforceable Y2-3", -optOutRisk, "bar-leak"],
+    ["8. = Enforceable Year-1 Revenue", y1Rev, "bar-warn"],
+    ["9. Less Year-1 Direct COGS & Upfront Comm", -(y1Cogs + upfrontComm), "bar-leak"],
+    ["10. = Year-1 Net Contribution (Before CS/DSO)", y1NetContrib, y1NetContrib < 25000 ? "bar-leak" : "bar-net"],
+    ["11. Memo: Y2-3 Seat True-Down Exposure", -trueDownRisk, "bar-warn"],
+    ["12. Memo: Financing Drag (Extra DSO @ 8%)", -dsoDrag, "bar-warn"]
+  ];
+  const scale = Math.max(trueList, 1);
+  document.getElementById("w1Waterfall").innerHTML = wfSteps.map(([lbl, val, cls]) => {
+    const pct = Math.min(100, (Math.abs(val) / scale) * 100);
+    return `<div class="wf-row"><div><strong>${lbl}</strong></div><div class="wf-track"><div class="wf-bar ${cls}" style="width:${pct.toFixed(1)}%"></div></div><div style="text-align:right;font-weight:700;">${usd(val)}</div></div>`;
+  }).join("");
+
+  // Window 2
+  let sellerSc = 0, buyerSc = 0;
+  BEHAVIORAL_SIGNALS.forEach((s, i) => {
+    const sc = Number(document.getElementById("b_sc_" + i).value);
+    if (s.side.startsWith("Seller")) sellerSc += sc;
+    else buyerSc += sc;
+  });
+  const totBeh = sellerSc + buyerSc;
+  const vBox = document.getElementById("w2Verdict");
+  if (sellerSc >= 5 && buyerSc >= 5) {
+    vBox.className = "banner st-red";
+    vBox.textContent = `BEHAVIORAL VERDICT [CRITICAL — ${totBeh}/16]: DUAL FAILURE — Seller Governance Evasion (${sellerSc}/8) + Asymmetric/Unfunded Buyer Gate (${buyerSc}/8). DO NOT SIGN OR RESCUE AS WRITTEN.`;
+  } else if (totBeh >= 6) {
+    vBox.className = "banner st-amber";
+    vBox.textContent = `BEHAVIORAL VERDICT [HIGH RISK — ${totBeh}/16]: Seller Risk=${sellerSc}/8, Buyer Risk=${buyerSc}/8. Resolve governance and buyer authority before turning paper.`;
+  } else {
+    vBox.className = "banner st-green";
+    vBox.textContent = `BEHAVIORAL VERDICT [CLEAN — ${totBeh}/16]: Seller Risk=${sellerSc}/8, Buyer Risk=${buyerSc}/8. Standard commercial negotiation.`;
+  }
+
+  // Window 3
+  let cCrit = 0, cHigh = 0, cMod = 0, cPass = 0, cUnv = 0;
+  FLAGS_51.forEach((_, i) => {
+    const st = document.getElementById("f_st_" + i).value;
+    if (st === "CRITICAL") cCrit++;
+    else if (st === "HIGH") cHigh++;
+    else if (st === "MODERATE") cMod++;
+    else if (st === "UNVERIFIED") cUnv++;
+    else cPass++;
+  });
+  const triggered = cCrit + cHigh + cMod;
+  const toxicity = Math.min(100, Math.round(((cCrit * 3 + cHigh * 2 + cMod * 1) / (51 * 3)) * 100));
+  document.getElementById("w3Kpis").innerHTML = `
+    <div class="kpi"><div class="k">Flags Audited</div><div class="v">51 / 51</div></div>
+    <div class="kpi"><div class="k">Triggered Flags</div><div class="v" style="color:#dc2626;">${triggered} / 51</div></div>
+    <div class="kpi"><div class="k">CRITICAL Flags</div><div class="v" style="color:#dc2626;">${cCrit}</div></div>
+    <div class="kpi"><div class="k">HIGH / MOD Flags</div><div class="v" style="color:#d97706;">${cHigh} / ${cMod}</div></div>
+    <div class="kpi"><div class="k">UNVERIFIED (Full MSA)</div><div class="v">${cUnv}</div></div>
+    <div class="kpi"><div class="k">Contract Toxicity Index</div><div class="v" style="color:${toxicity>=40?'#dc2626':'#16a34a'};">${toxicity} / 100</div></div>
+  `;
+  document.getElementById("topSummary").textContent = `GM: ${gmPct.toFixed(1)}% | Enforceable: ${usd(y1Rev)} | Behavioral: ${totBeh}/16 | Flags: ${triggered}/51 (${cCrit} CRIT)`;
+  filterFlags();
+}
+
+function collectState() {
+  return {
+    meta: {
+      dealName: document.getElementById("dealName").value,
+      oppId: document.getElementById("oppId").value,
+      diagDate: document.getElementById("diagDate").value,
+      analyst: document.getElementById("analyst").value
+    },
+    w1: {
+      w1SubList: Number(document.getElementById("w1SubList").value),
+      w1ImplList: Number(document.getElementById("w1ImplList").value),
+      w1SubDisc: Number(document.getElementById("w1SubDisc").value),
+      w1ImplOver: Number(document.getElementById("w1ImplOver").value),
+      w1SubCogs: Number(document.getElementById("w1SubCogs").value),
+      w1ImplCogs: Number(document.getElementById("w1ImplCogs").value),
+      w1GmFloor: Number(document.getElementById("w1GmFloor").value),
+      w1Y1Rev: Number(document.getElementById("w1Y1Rev").value),
+      w1Y1Cogs: Number(document.getElementById("w1Y1Cogs").value),
+      w1CommPct: Number(document.getElementById("w1CommPct").value),
+      w1ExtraDso: Number(document.getElementById("w1ExtraDso").value),
+      w1TrueDown: Number(document.getElementById("w1TrueDown").value)
+    },
+    w2: BEHAVIORAL_SIGNALS.map((s, i) => ({
+      ...s,
+      score: Number(document.getElementById("b_sc_" + i).value),
+      note: document.getElementById("b_nt_" + i).value
+    })),
+    w3: FLAGS_51.map((f, i) => ({
+      ...f,
+      status: document.getElementById("f_st_" + i).value,
+      cite: document.getElementById("f_ct_" + i).value
+    }))
+  };
+}
+
+function applyState(st) {
+  Object.entries(st.meta || {}).forEach(([k, v]) => { const el = document.getElementById(k); if (el) el.value = v || ""; });
+  Object.entries(st.w1 || {}).forEach(([k, v]) => { const el = document.getElementById(k); if (el) el.value = v; });
+  renderW2(st.w2 || BEHAVIORAL_SIGNALS);
+  renderW3(st.w3 || FLAGS_51);
+  recalcAll();
+}
+
+function downloadFile(name, text, mime) {
+  const blob = new Blob([text], { type: mime });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function exportJSON() {
+  const st = collectState();
+  const slug = (st.meta.dealName || "deal").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  downloadFile(`${slug}_step4_3window_deal_engine.json`, JSON.stringify(st, null, 2), "application/json");
+}
+function loadJSON(evt) {
+  const f = evt.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = e => applyState(JSON.parse(e.target.result));
+  r.readAsText(f);
+}
+function exportFlagsCSV() {
+  const st = collectState();
+  const rows = [["Flag_ID", "Category", "Contract_Flag", "Status", "Evidence_Citation"]];
+  st.w3.forEach(f => rows.push([f.id, f.cat, f.name, f.status, f.cite]));
+  const csv = rows.map(r => r.map(v => `"${String(v || "").replace(/"/g, '""')}"`).join(",")).join("\n");
+  const slug = (st.meta.dealName || "deal").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  downloadFile(`${slug}_step4_51_contract_flags.csv`, csv, "text/csv");
+}
+
+renderW2(BEHAVIORAL_SIGNALS);
+renderW3(FLAGS_51);
+recalcAll();
+</script>
+</body>
+</html>
