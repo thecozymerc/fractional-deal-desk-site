@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runbook A — Step 5 Mandatory Diagnostic Time-Out (Ely / Graber / TWED)</title>
+<style>
+  :root {
+    --ink: #111827;
+    --muted: #4b5563;
+    --line: #d1d5db;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --navy: #0f172a;
+    --blue: #1d4ed8;
+    --green-bg: #dcfce7;
+    --green-ink: #166534;
+    --amber-bg: #fef3c7;
+    --amber-ink: #92400e;
+    --red-bg: #fee2e2;
+    --red-ink: #991b1b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.45; }
+  .wrap { max-width: 1220px; margin: 18px auto; padding: 0 16px 40px; }
+  .topbar { background: var(--navy); color: #fff; padding: 18px 22px; border-radius: 10px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; }
+  .topbar h1 { margin: 0; font-size: 20px; }
+  .topbar p { margin: 4px 0 0; font-size: 13px; color: #cbd5e1; }
+  .timer-box { display: flex; align-items: center; gap: 8px; background: #1e293b; padding: 8px 12px; border-radius: 8px; }
+  .timer-readout { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 22px; font-weight: 700; min-width: 72px; text-align: center; color: #38bdf8; }
+  .timer-readout.warn { color: #fbbf24; }
+  .timer-readout.over { color: #f87171; }
+  button { border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 7px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  button.dark { background: #334155; border-color: #475569; color: #fff; }
+  .banner { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 16px; border-radius: 8px; font-weight: 700; margin-top: 14px; }
+  .st-red { background: var(--red-bg); color: var(--red-ink); border: 1px solid #fca5a5; }
+  .st-amber { background: var(--amber-bg); color: var(--amber-ink); border: 1px solid #fcd34d; }
+  .st-green { background: var(--green-bg); color: var(--green-ink); border: 1px solid #86efac; }
+  .metrics { display: flex; gap: 15px; flex-wrap: wrap; font-size: 13px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin-top: 14px; }
+  .card h2 { margin: 0 0 10px; font-size: 16px; border-bottom: 1px solid #e5e7eb; padding-bottom: 7px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+  label.field { display: flex; flex-direction: column; font-size: 12px; font-weight: 600; color: var(--muted); gap: 3px; }
+  input[type="text"], input[type="date"], select, textarea { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; color: var(--ink); background: #fff; }
+  textarea { min-height: 54px; resize: vertical; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { border: 1px solid #e5e7eb; padding: 7px; text-align: left; vertical-align: top; }
+  th { background: #f9fafb; font-size: 11.5px; color: var(--muted); }
+  .twed-box { border: 1px solid #cbd5e1; border-left: 5px solid var(--navy); border-radius: 8px; padding: 12px 14px; margin-top: 10px; background: #f8fafc; }
+  .twed-box.fail-box { border-left-color: #dc2626; background: #fef2f2; }
+  .twed-box.rem-box { border-left-color: #d97706; background: #fffbeb; }
+  .twed-box.pass-box { border-left-color: #16a34a; background: #f0fdf4; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  @media print {
+    body { background: #fff; }
+    .toolbar, .timer-box button, .no-print { display: none !important; }
+    .card, .twed-box { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Runbook A — Step 5: Mandatory Diagnostic Time-Out (10 Min)</h1>
+      <p>STOP before building the Step 6 Readout. Run Ely Time-Out, Graber Checklist, and TWED to catch bias, weak evidence, and rescue impulses.</p>
+    </div>
+    <div class="timer-box">
+      <span style="font-size:12px;color:#cbd5e1;">STEP 5 TIMER</span>
+      <div id="timerReadout" class="timer-readout">10:00</div>
+      <button class="dark" id="timerBtn" onclick="toggleTimer()">Start</button>
+      <button class="dark" onclick="resetTimer()">Reset</button>
+    </div>
+  </div>
+
+  <div id="gateBanner" class="banner st-red">
+    <div id="gateMsg">RED — HARD STOP: Complete all 19 Ely / Graber / TWED checks and resolve any BLOCKING failures before Step 6.</div>
+    <div class="metrics">
+      <span id="mEval">Evaluated: 0 / 19</span>
+      <span id="mPass">Pass: 0</span>
+      <span id="mRem">Caught &amp; Remediated: 0</span>
+      <span id="mBlock">Blocking Fails: 0</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>1. Time-Out Header</h2>
+    <div class="grid">
+      <label class="field">Account Name<input type="text" id="accountName" placeholder="e.g., Acme Corp" oninput="recalc()"></label>
+      <label class="field">CRM Opp ID<input type="text" id="oppId" placeholder="e.g., OPP-2026-0001" oninput="recalc()"></label>
+      <label class="field">Diagnostic Date<input type="date" id="diagDate" oninput="recalc()"></label>
+      <label class="field">Clinician / Reviewer<input type="text" id="clinician" placeholder="Name" oninput="recalc()"></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. Ely Time-Out (5 Checks) &amp; Graber Cognitive / System Safety Checklist (10 Checks)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:9%;">Code</th>
+          <th style="width:15%;">Framework</th>
+          <th style="width:27%;">Clinical Safety Check</th>
+          <th style="width:17%;">Gate Status</th>
+          <th style="width:32%;">Finding &amp; Required Step 6 Correction (if Failed)</th>
+        </tr>
+      </thead>
+      <tbody id="egBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>3. Mandatory 4-Letter TWED Check (Threat, What Else, Evidence, Dispositional)</h2>
+    <div id="twedContainer"></div>
+  </div>
+
+  <div class="card">
+    <h2>4. Pre-Readout Evidence-to-Line Claim Audit (Step 6 Guardrail)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:7%;">ID</th>
+          <th style="width:35%;">Candidate Step 6 Readout Statement</th>
+          <th style="width:16%;">Exact Line / Timestamp</th>
+          <th style="width:16%;">Audit Disposition</th>
+          <th style="width:20%;">Corrected Wording / Strip Reason</th>
+          <th class="no-print" style="width:6%;">Del</th>
+        </tr>
+      </thead>
+      <tbody id="claimBody"></tbody>
+    </table>
+    <div class="toolbar no-print">
+      <button onclick="addClaim()">+ Add Candidate Claim</button>
+      <button class="primary" onclick="exportJSON()">Save JSON Snapshot</button>
+      <button onclick="document.getElementById('jsonLoad').click()">Load JSON Snapshot</button>
+      <input type="file" id="jsonLoad" accept=".json" style="display:none" onchange="loadJSON(event)">
+      <button onclick="exportCSV()">Export CSV Time-Out Log</button>
+      <button onclick="window.print()">Print / Save PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DEFAULT_EG = [
+  { id: "ELY-1", fw: "Ely Time-Out", q: "Did we review all 5 raw primary-source artifacts before accepting verbal framing?", status: "UNCHECKED", note: "" },
+  { id: "ELY-2", fw: "Ely Time-Out", q: "Does our Leading Hypothesis explain ALL verified data points (not just the easiest one)?", status: "UNCHECKED", note: "" },
+  { id: "ELY-3", fw: "Ely Time-Out", q: "Have we explicitly ruled in/out and quantified the Can't-Miss / ROWS worst-case threat?", status: "UNCHECKED", note: "" },
+  { id: "ELY-4", fw: "Ely Time-Out", q: "Have we actively hunted for and accounted for disconfirming evidence?", status: "UNCHECKED", note: "" },
+  { id: "ELY-5", fw: "Ely Time-Out", q: "Are all unverified unknowns explicitly quarantined from verified facts?", status: "UNCHECKED", note: "" },
+  { id: "GRB-C1", fw: "Graber — Cognitive", q: "Anchoring Bias: Did we break free of the AE's opening story?", status: "UNCHECKED", note: "" },
+  { id: "GRB-C2", fw: "Graber — Cognitive", q: "Premature Closure: Did we scan ALL 5 QTC buckets and all 51 contract flags?", status: "UNCHECKED", note: "" },
+  { id: "GRB-C3", fw: "Graber — Cognitive", q: "Confirmation Bias: Did we test claims contradicting both buyer and seller stories?", status: "UNCHECKED", note: "" },
+  { id: "GRB-C4", fw: "Graber — Cognitive", q: "Framing Effect: Did headline deal size or Q4 Commit urgency distort risk judgment?", status: "UNCHECKED", note: "" },
+  { id: "GRB-C5", fw: "Graber — Cognitive", q: "Attribution Bias: Are we blaming one individual while ignoring systemic tooling/control defects?", status: "UNCHECKED", note: "" },
+  { id: "GRB-C6", fw: "Graber — Cognitive", q: "Search Satisficing: Did we check every approval hop and timestamp before concluding?", status: "UNCHECKED", note: "" },
+  { id: "GRB-S1", fw: "Graber — System", q: "Missing Artifacts: Are any underlying documents (base MSA, SOW) absent and flagged as scope limits?", status: "UNCHECKED", note: "" },
+  { id: "GRB-S2", fw: "Graber — System", q: "Handoff Ownership: Is every stalled handoff tied to a named owner and exact elapsed hours?", status: "UNCHECKED", note: "" },
+  { id: "GRB-S3", fw: "Graber — System", q: "False-Green Controls: Did any automated CRM/CPQ check give a false-green approval signal?", status: "UNCHECKED", note: "" },
+  { id: "GRB-S4", fw: "Graber — System", q: "Client Ownership: Does the final diagnosis belong cleanly to the client without clinician takeover?", status: "UNCHECKED", note: "" }
+];
+
+const DEFAULT_TWED = [
+  { id: "TWED-T", letter: "T — THREAT", q: "What blows up post-signature if this deal closes as written?", status: "UNCHECKED", finding: "", fix: "" },
+  { id: "TWED-W", letter: "W — WHAT ELSE?", q: "Did I accept the AE's framing? What else explains the stall?", status: "UNCHECKED", finding: "", fix: "" },
+  { id: "TWED-E", letter: "E — EVIDENCE", q: "Does every finding tie to a specific document line or timestamp (with clean non-additive math)?", status: "UNCHECKED", finding: "", fix: "" },
+  { id: "TWED-D", letter: "D — DISPOSITIONAL", q: "Am I getting sucked into rescuing the deal instead of diagnosing it?", status: "UNCHECKED", finding: "", fix: "" }
+];
+
+let secLeft = 600;
+let tHandle = null;
+
+function esc(s) { return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function fmt(sec) { const n = sec < 0, a = Math.abs(sec); return (n?"-":"") + String(Math.floor(a/60)).padStart(2,"0") + ":" + String(a%60).padStart(2,"0"); }
+
+function toggleTimer() {
+  const b = document.getElementById("timerBtn");
+  if (tHandle) { clearInterval(tHandle); tHandle = null; b.textContent = "Resume"; }
+  else {
+    tHandle = setInterval(() => {
+      secLeft -= 1;
+      const el = document.getElementById("timerReadout");
+      el.textContent = fmt(secLeft);
+      el.className = "timer-readout" + (secLeft <= 0 ? " over" : secLeft <= 120 ? " warn" : "");
+    }, 1000);
+    b.textContent = "Pause";
+  }
+}
+function resetTimer() {
+  if (tHandle) { clearInterval(tHandle); tHandle = null; }
+  secLeft = 600;
+  document.getElementById("timerBtn").textContent = "Start";
+  const el = document.getElementById("timerReadout");
+  el.textContent = "10:00";
+  el.className = "timer-readout";
+}
+
+function statusOpts(val) {
+  return [
+    ["UNCHECKED", "UNCHECKED"],
+    ["PASS", "PASS — Verified Clean"],
+    ["FAIL - REMEDIATED", "FAIL CAUGHT — Remediated for Step 6"],
+    ["FAIL - BLOCKING", "FAIL — BLOCKING (Stop Step 6)"]
+  ].map(([k, lbl]) => `<option value="${k}" ${val===k?"selected":""}>${lbl}</option>`).join("");
+}
+
+function renderEG(list) {
+  const tb = document.getElementById("egBody");
+  tb.innerHTML = "";
+  list.forEach((item, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><strong>${esc(item.id)}</strong></td>
+      <td>${esc(item.fw)}</td>
+      <td>${esc(item.q)}</td>
+      <td><select id="eg_st_${i}" onchange="recalc()">${statusOpts(item.status)}</select></td>
+      <td><textarea id="eg_nt_${i}" placeholder="Evidence check or Step 6 remediation..." oninput="recalc()">${esc(item.note)}</textarea></td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+function renderTWED(list) {
+  const box = document.getElementById("twedContainer");
+  box.innerHTML = "";
+  list.forEach((item, i) => {
+    const div = document.createElement("div");
+    div.id = `tw_box_${i}`;
+    div.className = "twed-box";
+    div.innerHTML = `
+      <div class="grid">
+        <div><strong>${esc(item.letter)}</strong><br><span style="font-size:12px;color:#4b5563;">${esc(item.q)}</span></div>
+        <label class="field">TWED Gate Status<select id="tw_st_${i}" onchange="recalc()">${statusOpts(item.status)}</select></label>
+      </div>
+      <div class="grid" style="margin-top:8px;">
+        <label class="field">Stress-Test Finding (Testing Step 3 &amp; Step 4 Outputs)
+          <textarea id="tw_fd_${i}" placeholder="What did this TWED test prove or catch?" oninput="recalc()">${esc(item.finding)}</textarea>
+        </label>
+        <label class="field">Mandatory Step 6 Correction / Guardrail (Required if FAIL CAUGHT)
+          <textarea id="tw_fx_${i}" placeholder="State exact correction or boundary enforced before Step 6..." oninput="recalc()">${esc(item.fix)}</textarea>
+        </label>
+      </div>
+    `;
+    box.appendChild(div);
+  });
+}
+
+function renderClaims(list) {
+  const tb = document.getElementById("claimBody");
+  tb.innerHTML = "";
+  list.forEach((c, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><strong>R-${String(i+1).padStart(2,"0")}</strong></td>
+      <td><input type="text" class="cl-txt" value="${esc(c.text)}" placeholder="Candidate headline claim for Step 6..." oninput="recalc()"></td>
+      <td><input type="text" class="cl-cit" value="${esc(c.cite)}" placeholder="Artifact + Line/Timestamp" oninput="recalc()"></td>
+      <td>
+        <select class="cl-disp" onchange="recalc()">
+          <option value="CLEARED" ${c.disp==="CLEARED"?"selected":""}>CLEARED FOR STEP 6</option>
+          <option value="REMEDIATED" ${c.disp==="REMEDIATED"?"selected":""}>FAIL CAUGHT — Rewritten/Stripped</option>
+          <option value="BLOCKED" ${c.disp==="BLOCKED"?"selected":""}>BLOCKED — Unverified/Fix</option>
+        </select>
+      </td>
+      <td><input type="text" class="cl-fix" value="${esc(c.fix)}" placeholder="Approved rewrite or strip reason..." oninput="recalc()"></td>
+      <td class="no-print" style="text-align:center;"><button onclick="delClaim(${i})">X</button></td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+function addClaim() {
+  const st = collectState();
+  st.claims.push({ text: "", cite: "", disp: "BLOCKED", fix: "" });
+  renderClaims(st.claims);
+  recalc();
+}
+function delClaim(i) {
+  const st = collectState();
+  st.claims.splice(i, 1);
+  if (!st.claims.length) st.claims.push({ text: "", cite: "", disp: "CLEARED", fix: "" });
+  renderClaims(st.claims);
+  recalc();
+}
+
+function collectState() {
+  return {
+    header: {
+      accountName: document.getElementById("accountName").value,
+      oppId: document.getElementById("oppId").value,
+      diagDate: document.getElementById("diagDate").value,
+      clinician: document.getElementById("clinician").value
+    },
+    eg: DEFAULT_EG.map((d, i) => ({ ...d, status: document.getElementById(`eg_st_${i}`).value, note: document.getElementById(`eg_nt_${i}`).value })),
+    twed: DEFAULT_TWED.map((d, i) => ({
+      ...d,
+      status: document.getElementById(`tw_st_${i}`).value,
+      finding: document.getElementById(`tw_fd_${i}`).value,
+      fix: document.getElementById(`tw_fx_${i}`).value
+    })),
+    claims: Array.from(document.querySelectorAll("#claimBody tr")).map(tr => ({
+      text: tr.querySelector(".cl-txt").value,
+      cite: tr.querySelector(".cl-cit").value,
+      disp: tr.querySelector(".cl-disp").value,
+      fix: tr.querySelector(".cl-fix").value
+    }))
+  };
+}
+
+function applyState(st) {
+  Object.entries(st.header || {}).forEach(([k, v]) => { const el = document.getElementById(k); if (el) el.value = v || ""; });
+  renderEG(st.eg || DEFAULT_EG);
+  renderTWED(st.twed || DEFAULT_TWED);
+  renderClaims(st.claims && st.claims.length ? st.claims : [{ text: "", cite: "", disp: "CLEARED", fix: "" }]);
+  recalc();
+}
+
+function recalc() {
+  const st = collectState();
+  const all = [...st.eg, ...st.twed];
+  let evaluated = 0, pass = 0, rem = 0, block = 0;
+  all.forEach(item => {
+    if (item.status !== "UNCHECKED") evaluated++;
+    if (item.status === "PASS") pass++;
+    if (item.status === "FAIL - REMEDIATED") rem++;
+    if (item.status === "FAIL - BLOCKING") block++;
+  });
+  st.twed.forEach((item, i) => {
+    const bx = document.getElementById(`tw_box_${i}`);
+    bx.className = "twed-box" + (item.status === "PASS" ? " pass-box" : item.status === "FAIL - REMEDIATED" ? " rem-box" : item.status === "FAIL - BLOCKING" ? " fail-box" : "");
+  });
+  const blockedClaims = st.claims.filter(c => c.text.trim() && (c.disp === "BLOCKED" || (c.disp === "CLEARED" && !c.cite.trim()))).length;
+
+  document.getElementById("mEval").textContent = `Evaluated: ${evaluated} / 19`;
+  document.getElementById("mPass").textContent = `Pass: ${pass}`;
+  document.getElementById("mRem").textContent = `Caught & Remediated: ${rem}`;
+  document.getElementById("mBlock").textContent = `Blocking Fails: ${block + blockedClaims}`;
+
+  const banner = document.getElementById("gateBanner");
+  const msg = document.getElementById("gateMsg");
+  if (evaluated === 19 && block === 0 && blockedClaims === 0) {
+    banner.className = "banner st-green";
+    msg.textContent = `GREEN — TIME-OUT CLEARED (${rem} Catches Remediated): Authorized to build Step 6 SNAPPS Executive Readout.`;
+  } else if (block > 0 || blockedClaims > 0) {
+    banner.className = "banner st-red";
+    msg.textContent = `RED — HARD STOP: ${block} blocking control failure(s) and ${blockedClaims} uncited/blocked Step 6 claim(s). Remediate before Step 6.`;
+  } else {
+    banner.className = "banner st-amber";
+    msg.textContent = "AMBER — TIME-OUT IN PROGRESS: Complete all 19 Ely / Graber / TWED checks before Step 6.";
+  }
+}
+
+function downloadFile(name, text, mime) {
+  const blob = new Blob([text], { type: mime });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function exportJSON() {
+  const st = collectState();
+  const slug = (st.header.accountName || "deal").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  downloadFile(`${slug}_step5_diagnostic_timeout.json`, JSON.stringify(st, null, 2), "application/json");
+}
+function loadJSON(evt) {
+  const f = evt.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = e => applyState(JSON.parse(e.target.result));
+  r.readAsText(f);
+}
+function exportCSV() {
+  const st = collectState();
+  const rows = [["Section", "Code", "Check_or_Claim", "Status", "Finding_or_Cite", "Remediation"]];
+  st.eg.forEach(x => rows.push([x.fw, x.id, x.q, x.status, x.note, ""]));
+  st.twed.forEach(x => rows.push(["TWED", x.id, x.letter + ": " + x.q, x.status, x.finding, x.fix]));
+  st.claims.forEach((c, i) => rows.push(["CLAIM_AUDIT", "R-" + String(i+1).padStart(2,"0"), c.text, c.disp, c.cite, c.fix]));
+  const csv = rows.map(r => r.map(v => `"${String(v || "").replace(/"/g, '""')}"`).join(",")).join("\n");
+  const slug = (st.header.accountName || "deal").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  downloadFile(`${slug}_step5_timeout_log.csv`, csv, "text/csv");
+}
+
+applyState({ header: { accountName: "", oppId: "", diagDate: "", clinician: "" }, eg: DEFAULT_EG, twed: DEFAULT_TWED, claims: [{ text: "", cite: "", disp: "CLEARED", fix: "" }] });
+</script>
+</body>
+</html>
