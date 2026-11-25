@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runbook A — Step 6 SNAPPS Executive Readout &amp; Commercial Bridge Builder</title>
+<style>
+  :root {
+    --ink: #111827;
+    --muted: #4b5563;
+    --line: #d1d5db;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --navy: #0f172a;
+    --blue: #1d4ed8;
+    --green-bg: #dcfce7;
+    --green-ink: #166534;
+    --amber-bg: #fef3c7;
+    --amber-ink: #92400e;
+    --red-bg: #fee2e2;
+    --red-ink: #991b1b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.45; }
+  .wrap { max-width: 1180px; margin: 18px auto; padding: 0 16px 40px; }
+  .topbar { background: var(--navy); color: #fff; padding: 18px 22px; border-radius: 10px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; }
+  .topbar h1 { margin: 0; font-size: 20px; }
+  .topbar p { margin: 4px 0 0; font-size: 13px; color: #cbd5e1; }
+  .timer-box { display: flex; align-items: center; gap: 8px; background: #1e293b; padding: 8px 12px; border-radius: 8px; }
+  .timer-readout { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 22px; font-weight: 700; min-width: 74px; text-align: center; color: #38bdf8; }
+  .timer-readout.warn { color: #fbbf24; }
+  .timer-readout.over { color: #f87171; }
+  button { border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 7px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  button.dark { background: #334155; border-color: #475569; color: #fff; }
+  .banner { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 16px; border-radius: 8px; font-weight: 700; margin-top: 14px; }
+  .st-red { background: var(--red-bg); color: var(--red-ink); border: 1px solid #fca5a5; }
+  .st-green { background: var(--green-bg); color: var(--green-ink); border: 1px solid #86efac; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; margin-top: 14px; }
+  .card h2 { margin: 0 0 10px; font-size: 16px; border-bottom: 1px solid #e5e7eb; padding-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
+  .beat-tag { background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 10px; }
+  label.field { display: flex; flex-direction: column; font-size: 12px; font-weight: 600; color: var(--muted); gap: 4px; }
+  input[type="text"], input[type="date"], textarea { width: 100%; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; color: var(--ink); background: #fff; }
+  textarea { min-height: 78px; resize: vertical; }
+  .check-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 13px; font-weight: 600; }
+  .bridge-quote { background: #eff6ff; border: 1px solid #93c5fd; border-left: 5px solid var(--blue); border-radius: 8px; padding: 12px 14px; font-size: 14px; font-weight: 600; color: #1e3a8a; }
+  .unruled-note { background: var(--amber-bg); color: var(--amber-ink); border: 1px solid #fcd34d; border-radius: 6px; padding: 8px 12px; font-size: 12.5px; margin-top: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 8px; }
+  th, td { border: 1px solid #e5e7eb; padding: 7px; text-align: left; vertical-align: top; }
+  th { background: #f9fafb; font-size: 11.5px; color: var(--muted); }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  @media print {
+    body { background: #fff; }
+    .toolbar, .timer-box button, .no-print { display: none !important; }
+    .card { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Runbook A — Step 6: Structured SNAPPS Readout &amp; Commercial Bridge (30 Min)</h1>
+      <p>Deliver in 4 crisp beats using ONLY Step 1–5 verified facts that survived the Step 5 TWED Time-Out.</p>
+    </div>
+    <div class="timer-box">
+      <span style="font-size:12px;color:#cbd5e1;">STEP 6 TIMER</span>
+      <div id="timerReadout" class="timer-readout">30:00</div>
+      <button class="dark" id="timerBtn" onclick="toggleTimer()">Start</button>
+      <button class="dark" onclick="resetTimer()">Reset</button>
+    </div>
+  </div>
+
+  <div id="lockBanner" class="banner st-red">
+    <div id="lockMsg">LOCKED — Confirm all 3 Step 5 Time-Out Survival checks below before presenting the executive readout.</div>
+    <div id="lockCount">Checks: 0 / 3</div>
+  </div>
+
+  <div class="card">
+    <h2>0. Step 5 Time-Out Survival Lock &amp; Header <span class="beat-tag">PRE-FLIGHT</span></h2>
+    <div class="grid">
+      <label class="field">Account Name<input type="text" id="accountName" placeholder="e.g., Acme Corp" oninput="recalc()"></label>
+      <label class="field">CRM Opp ID<input type="text" id="oppId" placeholder="e.g., OPP-2026-0001" oninput="recalc()"></label>
+      <label class="field">Diagnostic Date<input type="date" id="diagDate" oninput="recalc()"></label>
+      <label class="field">Executive Audience<input type="text" id="audience" placeholder="e.g., CRO, CFO, VP RevOps" oninput="recalc()"></label>
+    </div>
+    <div style="margin-top:10px;">
+      <label class="check-row"><input type="checkbox" id="chkStep5" onchange="recalc()"> All claims in Beats 1–3 passed Step 5 TWED Time-Out (exact line/timestamp citations + non-additive math stripped).</label>
+      <label class="check-row"><input type="checkbox" id="chkUnv" onchange="recalc()"> All unverified unknowns and missing documents (base MSA, SOW) remain explicitly tagged UNVERIFIED.</label>
+      <label class="check-row"><input type="checkbox" id="chkNoRescue" onchange="recalc()"> Clean Boundary enforced: Beat 3 outlines structural MESO options without clinician negotiating or rescuing.</label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Beat 1 — Problem Representation (Align on Verified Facts) <span class="beat-tag">MIN 0–5</span></h2>
+    <label class="field">Verified 60–90 Second UW FCM Problem Representation
+      <textarea id="beat1" placeholder="Paste the Step 2 verified Problem Representation (cleaned by Step 5 Time-Out)..." oninput="recalc()"></textarea>
+    </label>
+  </div>
+
+  <div class="card">
+    <h2>Beat 2 — Exact Stuck Point &amp; Failed Controls (Cause X vs Cause Y) <span class="beat-tag">MIN 5–15</span></h2>
+    <div class="grid">
+      <label class="field">Exact Stuck Point &amp; Verified Dollar Leak / Exposure (Waterfall Only)
+        <textarea id="beat2Leak" placeholder="State non-overlapping price concession, margin floor deficit, ASC 606 enforceable TCV, Y1 net contribution, and separate contingent liability..." oninput="recalc()"></textarea>
+      </label>
+      <label class="field">Artifact Proof &amp; Why It Is Cause X (and NOT Just Cause Y)
+        <textarea id="beat2Cause" placeholder="Prove Cause X with exact document lines/timestamps and refute Cause Y (AE framing or single-person blame)..." oninput="recalc()"></textarea>
+      </label>
+    </div>
+    <label class="field" style="margin-top:8px;">Explicit Scope Limits &amp; UNVERIFIED Gaps Carried from Step 5
+      <textarea id="beat2Scope" placeholder="List missing artifacts (e.g., base MSA, SOW) and unverified unknowns..." oninput="recalc()"></textarea>
+    </label>
+  </div>
+
+  <div class="card">
+    <h2>Beat 3 — Clean Boundary (No Rescue): Client-Owned Structural / MESO Options <span class="beat-tag">MIN 15–23</span></h2>
+    <label class="field">Explicit Clean-Boundary Statement (Read Aloud)
+      <input type="text" id="boundaryLine" value="Our role ends at an ironclad diagnosis and structural options; your Finance, Legal, and Revenue leaders own any counter-offer or negotiation." oninput="recalc()">
+    </label>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:14%;">Option</th>
+          <th style="width:28%;">Structural / Commercial Design</th>
+          <th style="width:20%;">Economics &amp; ASC 606</th>
+          <th style="width:20%;">Required Internal Approvals</th>
+          <th style="width:18%;">Trade-Off Tested</th>
+        </tr>
+      </thead>
+      <tbody id="mesoBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Beat 4 — The Commercial Bridge (Slot #1 -> 5-Deal Forensic Diagnostic) <span class="beat-tag">MIN 23–30</span></h2>
+    <div class="bridge-quote" id="bridgeQuote">
+      "We proved exactly why this deal broke. What neither of us knows yet is whether this is a one-off outlier or how 20-30% of your deal flow quietly leaks across handoffs. That's what the 5-deal Forensic Diagnostic proves in 5 business days — with this deal as Slot #1."
+    </div>
+    <label class="field" style="margin-top:10px;">Tailored Bridge Context &amp; Next-Step Selection for Slots #2–#5
+      <textarea id="beat4Notes" placeholder="Specify which 4 additional enterprise deals (stalled, heavily discounted, or end-of-quarter Commit) should fill Slots #2–#5 over 5 business days..." oninput="recalc()"></textarea>
+    </label>
+    <div class="unruled-note">
+      <strong>Commercial Pricing Note (Unruled Suggestion):</strong> Neon's suggestion of a <strong>$100 validation fee credited toward the 5-deal Forensic Diagnostic</strong> is strictly <strong>unruled and optional — NOT part of the ruled price</strong>. Use only if explicitly approved for your commercial offer.
+    </div>
+    <div class="toolbar no-print">
+      <button class="primary" onclick="exportJSON()">Save SNAPPS JSON</button>
+      <button onclick="document.getElementById('jsonIn').click()">Load SNAPPS JSON</button>
+      <input type="file" id="jsonIn" accept=".json" style="display:none" onchange="loadJSON(event)">
+      <button onclick="exportMD()">Export Markdown Executive Brief</button>
+      <button onclick="window.print()">Print / Save Executive PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DEFAULT_MESO = [
+  { opt: "MESO Option A", design: "", econ: "", approvers: "", trade: "" },
+  { opt: "MESO Option B", design: "", econ: "", approvers: "", trade: "" },
+  { opt: "MESO Option C", design: "", econ: "", approvers: "", trade: "" },
+  { opt: "Option D (Defer/Walk)", design: "", econ: "", approvers: "", trade: "" }
+];
+
+let secLeft = 1800, tHandle = null;
+function esc(s) { return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function fmt(sec) { const n = sec < 0, a = Math.abs(sec); return (n?"-":"") + String(Math.floor(a/60)).padStart(2,"0") + ":" + String(a%60).padStart(2,"0"); }
+
+function toggleTimer() {
+  const b = document.getElementById("timerBtn");
+  if (tHandle) { clearInterval(tHandle); tHandle = null; b.textContent = "Resume"; }
+  else {
+    tHandle = setInterval(() => {
+      secLeft -= 1;
+      const el = document.getElementById("timerReadout");
+      el.textContent = fmt(secLeft);
+      el.className = "timer-readout" + (secLeft <= 0 ? " over" : secLeft <= 300 ? " warn" : "");
+    }, 1000);
+    b.textContent = "Pause";
+  }
+}
+function resetTimer() {
+  if (tHandle) { clearInterval(tHandle); tHandle = null; }
+  secLeft = 1800;
+  document.getElementById("timerBtn").textContent = "Start";
+  const el = document.getElementById("timerReadout");
+  el.textContent = "30:00";
+  el.className = "timer-readout";
+}
+
+function renderMeso(list) {
+  const tb = document.getElementById("mesoBody");
+  tb.innerHTML = "";
+  list.forEach((m, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><strong>${esc(m.opt)}</strong></td>
+      <td><textarea id="m_des_${i}" oninput="recalc()">${esc(m.design)}</textarea></td>
+      <td><textarea id="m_eco_${i}" oninput="recalc()">${esc(m.econ)}</textarea></td>
+      <td><textarea id="m_app_${i}" oninput="recalc()">${esc(m.approvers)}</textarea></td>
+      <td><textarea id="m_trd_${i}" oninput="recalc()">${esc(m.trade)}</textarea></td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+function collectState() {
+  return {
+    meta: {
+      accountName: document.getElementById("accountName").value,
+      oppId: document.getElementById("oppId").value,
+      diagDate: document.getElementById("diagDate").value,
+      audience: document.getElementById("audience").value
+    },
+    locks: {
+      chkStep5: document.getElementById("chkStep5").checked,
+      chkUnv: document.getElementById("chkUnv").checked,
+      chkNoRescue: document.getElementById("chkNoRescue").checked
+    },
+    beat1: document.getElementById("beat1").value,
+    beat2Leak: document.getElementById("beat2Leak").value,
+    beat2Cause: document.getElementById("beat2Cause").value,
+    beat2Scope: document.getElementById("beat2Scope").value,
+    boundaryLine: document.getElementById("boundaryLine").value,
+    meso: DEFAULT_MESO.map((d, i) => ({
+      opt: d.opt,
+      design: document.getElementById(`m_des_${i}`).value,
+      econ: document.getElementById(`m_eco_${i}`).value,
+      approvers: document.getElementById(`m_app_${i}`).value,
+      trade: document.getElementById(`m_trd_${i}`).value
+    })),
+    beat4Notes: document.getElementById("beat4Notes").value
+  };
+}
+
+function applyState(st) {
+  Object.entries(st.meta || {}).forEach(([k, v]) => { const el = document.getElementById(k); if (el) el.value = v || ""; });
+  document.getElementById("chkStep5").checked = !!(st.locks && st.locks.chkStep5);
+  document.getElementById("chkUnv").checked = !!(st.locks && st.locks.chkUnv);
+  document.getElementById("chkNoRescue").checked = !!(st.locks && st.locks.chkNoRescue);
+  document.getElementById("beat1").value = st.beat1 || "";
+  document.getElementById("beat2Leak").value = st.beat2Leak || "";
+  document.getElementById("beat2Cause").value = st.beat2Cause || "";
+  document.getElementById("beat2Scope").value = st.beat2Scope || "";
+  document.getElementById("boundaryLine").value = st.boundaryLine || "Our role ends at an ironclad diagnosis and structural options; your Finance, Legal, and Revenue leaders own any counter-offer or negotiation.";
+  renderMeso(st.meso || DEFAULT_MESO);
+  document.getElementById("beat4Notes").value = st.beat4Notes || "";
+  recalc();
+}
+
+function recalc() {
+  const st = collectState();
+  const c = [st.locks.chkStep5, st.locks.chkUnv, st.locks.chkNoRescue].filter(Boolean).length;
+  document.getElementById("lockCount").textContent = `Checks: ${c} / 3`;
+  const b = document.getElementById("lockBanner");
+  const m = document.getElementById("lockMsg");
+  if (c === 3) {
+    b.className = "banner st-green";
+    m.textContent = "CLEARED — STEP 5 SURVIVAL LOCK ACTIVE: Ready to deliver 4-Beat SNAPPS Executive Readout & Commercial Bridge.";
+  } else {
+    b.className = "banner st-red";
+    m.textContent = "LOCKED — Confirm all 3 Step 5 Time-Out Survival checks before presenting to executive stakeholders.";
+  }
+}
+
+function downloadFile(name, text, mime) {
+  const blob = new Blob([text], { type: mime });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function exportJSON() {
+  const st = collectState();
+  const slug = (st.meta.accountName || "deal").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  downloadFile(`${slug}_step6_snapps_readout.json`, JSON.stringify(st, null, 2), "application/json");
+}
+function loadJSON(evt) {
+  const f = evt.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = e => applyState(JSON.parse(e.target.result));
+  r.readAsText(f);
+}
+function exportMD() {
+  const st = collectState();
+  const slug = (st.meta.accountName || "deal").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  const lines = [
+    `# SNAPPS Executive Readout & Commercial Bridge — ${st.meta.accountName} (${st.meta.oppId})`,
+    `Date: ${st.meta.diagDate} | Audience: ${st.meta.audience}`,
+    "",
+    "## Beat 1 — Problem Representation",
+    st.beat1,
+    "",
+    "## Beat 2 — Exact Stuck Point & Failed Controls",
+    "**Dollar Leak / Exposure:** " + st.beat2Leak,
+    "**Artifact Proof & Cause X vs Cause Y:** " + st.beat2Cause,
+    "**Scope Limits & Unverified Gaps:** " + st.beat2Scope,
+    "",
+    "## Beat 3 — Clean Boundary (No Rescue) & MESO Options",
+    "*" + st.boundaryLine + "*",
+    "",
+    ...st.meso.map(m => `- **${m.opt}:** ${m.design} | Economics: ${m.econ} | Approvals: ${m.approvers} | Trade-off: ${m.trade}`),
+    "",
+    "## Beat 4 — Commercial Bridge",
+    '> "We proved exactly why this deal broke. What neither of us knows yet is whether this is a one-off outlier or how 20-30% of your deal flow quietly leaks across handoffs. That\'s what the 5-deal Forensic Diagnostic proves in 5 business days — with this deal as Slot #1."',
+    "",
+    st.beat4Notes,
+    "",
+    "*Note: Neon's $100 validation fee suggestion (credited toward the diagnostic) is unruled and not part of the ruled price.*"
+  ];
+  downloadFile(`${slug}_step6_snapps_readout.md`, lines.join("\n"), "text/markdown");
+}
+
+renderMeso(DEFAULT_MESO);
+recalc();
+</script>
+</body>
+</html>
