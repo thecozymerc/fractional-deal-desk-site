@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runbook A — Step 5 Sample: Kestrel Diagnostic Time-Out (Ely / Graber / TWED)</title>
+<style>
+  :root {
+    --ink: #111827;
+    --muted: #4b5563;
+    --line: #d1d5db;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --navy: #0f172a;
+    --blue: #1d4ed8;
+    --green-bg: #dcfce7;
+    --green-ink: #166534;
+    --amber-bg: #fef3c7;
+    --amber-ink: #92400e;
+    --red-bg: #fee2e2;
+    --red-ink: #991b1b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.45; }
+  .wrap { max-width: 1220px; margin: 18px auto; padding: 0 16px 40px; }
+  .topbar { background: var(--navy); color: #fff; padding: 18px 22px; border-radius: 10px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; }
+  .topbar h1 { margin: 0; font-size: 20px; }
+  .topbar p { margin: 4px 0 0; font-size: 13px; color: #cbd5e1; }
+  .sample-tag { background: #16a34a; color: #fff; padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 12px; }
+  .banner { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 16px; border-radius: 8px; font-weight: 700; margin-top: 14px; background: var(--green-bg); color: var(--green-ink); border: 1px solid #86efac; }
+  .metrics { display: flex; gap: 15px; flex-wrap: wrap; font-size: 13px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin-top: 14px; }
+  .card h2 { margin: 0 0 10px; font-size: 16px; border-bottom: 1px solid #e5e7eb; padding-bottom: 7px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { border: 1px solid #e5e7eb; padding: 7px; text-align: left; vertical-align: top; }
+  th { background: #f9fafb; font-size: 11.5px; color: var(--muted); }
+  .pill { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .p-pass { background: var(--green-bg); color: var(--green-ink); }
+  .p-rem { background: var(--amber-bg); color: var(--amber-ink); }
+  .p-fail { background: var(--red-bg); color: var(--red-ink); }
+  .twed-box { border: 1px solid #cbd5e1; border-left: 5px solid #16a34a; border-radius: 8px; padding: 12px 14px; margin-top: 10px; background: #f0fdf4; }
+  .twed-box.rem { border-left-color: #d97706; background: #fffbeb; }
+  .kv { margin: 5px 0; font-size: 13px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  button { border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 7px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  @media print { body { background: #fff; } .toolbar, .no-print { display: none !important; } .card, .twed-box { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Runbook A — Step 5 Sample: Kestrel Industrial Holdings Diagnostic Time-Out</h1>
+      <p>OPP-2026-4819 | Diagnostic Date: 2026-11-25 | Ely Time-Out + Graber Checklist + TWED Stress-Test of Steps 3 &amp; 4</p>
+    </div>
+    <span class="sample-tag">COMPLETED SAMPLE — KESTREL</span>
+  </div>
+
+  <div class="banner">
+    <div>GREEN — TIME-OUT CLEARED: 6 real diagnostic/boundary catches flagged and remediated (0 unresolved blockers). Cleared for Step 6 SNAPPS Readout.</div>
+    <div class="metrics">
+      <span>Evaluated: 19 / 19</span>
+      <span>Clean Pass: 13</span>
+      <span>Fail Caught &amp; Remediated: 6</span>
+      <span>Claims Audited: 12 (4 Rewritten/Stripped)</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>1. Ely Time-Out (5 Checks) &amp; Graber Cognitive / System Safety Checklist (10 Checks)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:8%;">Code</th>
+          <th style="width:14%;">Framework</th>
+          <th style="width:24%;">Clinical Safety Check</th>
+          <th style="width:14%;">Status</th>
+          <th style="width:40%;">Kestrel Stress-Test Result &amp; Mandatory Step 6 Correction</th>
+        </tr>
+      </thead>
+      <tbody id="egBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>2. Mandatory 4-Letter TWED Check (Testing Step 3 Leading Hypothesis &amp; Step 4 Findings)</h2>
+    <div id="twedContainer"></div>
+  </div>
+
+  <div class="card">
+    <h2>3. Pre-Readout Claim-to-Evidence Audit (12 Candidate Step 6 Statements — 4 Caught &amp; Fixed)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:6%;">ID</th>
+          <th style="width:31%;">Candidate Step 6 Readout Statement</th>
+          <th style="width:15%;">Raw Audit</th>
+          <th style="width:16%;">Disposition</th>
+          <th style="width:32%;">Approved Step 6 Wording / Remediation</th>
+        </tr>
+      </thead>
+      <tbody id="claimBody"></tbody>
+    </table>
+    <div class="toolbar no-print">
+      <button class="primary" onclick="exportCSV()">Export Kestrel Time-Out CSV</button>
+      <button onclick="window.print()">Print / Save PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KESTREL_EG = [
+  ["ELY-1","Ely Time-Out","Reviewed all 5 raw primary-source artifacts before accepting AE framing?","PASS","All 5 native artifacts (a–e) verified in Step 1 prior to AE interview; 4 AE claims quarantined."],
+  ["ELY-2","Ely Time-Out","Does Leading Hypothesis explain ALL verified data points cleanly?","FAIL - REMEDIATED","CAUGHT: Leading Hypothesis risks over-focusing on AE inaction (85.4% hop share) without equal weight on Seller's broken CRM/Excel controls (a:CRM-22,25; b:E13) AND Buyer CFO's unfunded budget (d:T047-049). FIX: Step 6 presents dual internal control/handoff deadlock + external CFO budget gate."],
+  ["ELY-3","Ely Time-Out","Can't-Miss / ROWS worst-case post-signature threat quantified?","PASS","3-Window Engine quantified ASC 606 collapse ($240K->$78K), 52.6% Y1 GM / $17K net after $24K comm, ~105d DSO, $720K/uncapped liability, and MFN contagion."],
+  ["ELY-4","Ely Time-Out","Disconfirming evidence actively hunted against both buyer and seller stories?","PASS","Step 4 documented 5 disconfirmed buyer claims (P-1..P-5) and 5 disconfirmed AE/internal claims (A-1..A-5) tied to exact lines/timestamps."],
+  ["ELY-5","Ely Time-Out","All unverified unknowns explicitly quarantined from verified facts?","PASS","All 7 unknowns (U-1..U-7) and 4 base-MSA flags (F35..F38) explicitly labeled UNVERIFIED across Steps 2–4."],
+  ["GRB-C1","Graber — Cognitive","Anchoring Bias: Broke free of AE's opening 'slow buyer legal' story?","PASS","Hop audit proved 0.0% of post-redline stall belonged to Kestrel GC (2.7-day pre-stall turn; buyer chased Nov 16)."],
+  ["GRB-C2","Graber — Cognitive","Premature Closure: Scanned ALL 5 QTC buckets & all 51 contract flags?","PASS","All 5 Q1 Block B buckets scored (120/125 composite) and all 51 flags (F01–F51) evaluated individually."],
+  ["GRB-C3","Graber — Cognitive","Confirmation Bias: Actively hunted evidence falsifying both narratives?","PASS","Explicit Part A (Prospect) and Part B (AE) falsification completed in Step 4."],
+  ["GRB-C4","Graber — Cognitive","Framing Effect: Stripped headline '$240K Q4 Commit' pressure?","PASS","Reframed to $78K ASC 606 enforceable TCV and $17K Y1 net contribution after upfront commission."],
+  ["GRB-C5","Graber — Cognitive","Attribution Bias: Separated systemic control failures from rep error?","FAIL - REMEDIATED","CAUGHT: High AE stall share (85.4%) invites scapegoating Jordan Reyes while missing broken system guardrails (unsynced Excel a:CRM-25, false-green Finance clearance a:CRM-22, unlocked cell E13, unblocked Commit on HARD HOLD). FIX: Step 6 leads with failed controls + handoffs, not personal blame."],
+  ["GRB-C6","Graber — Cognitive","Search Satisficing: Audited every single approval hop & timestamp?","PASS","All 12 hops (H-01..H-12) reconciled 100.0% of the 454.8-hour (19-day) post-redline stall."],
+  ["GRB-S1","Graber — System","Missing Artifacts: Base MSA & ERP SOW absence flagged as scope limit?","FAIL - REMEDIATED","CAUGHT: Step 1 pulled Order Form/Amendment redline (c:L001–104), NOT base MSA or ERP SOW; 4 flags (F35–F38) & 45-day cutover feasibility (U-4) remain UNVERIFIED. FIX: Step 6 explicitly scopes flag count to 47 Order Form clauses + 4 UNVERIFIED base-MSA checks."],
+  ["GRB-S2","Graber — System","Handoff Ownership: Every stall hour tied to named owner & timestamp?","PASS","AE 388.3h (85.4%), Deal Desk 64.8h (14.2%), Legal 1.6h (0.4%), VP 0.1h (0.03%), Finance 0.0h (never routed), Buyer Legal 0.0h."],
+  ["GRB-S3","Graber — System","False-Green Controls: Automated CRM false-green approval caught?","PASS","Documented CRM Finance_Margin_SignOff__c = 'Not Required (Auto-Cleared <=20%)' triggered by stale 20% entry (a:CRM-15,22)."],
+  ["GRB-S4","Graber — System","Client Ownership: Diagnosis preserved cleanly for client decision?","PASS","Readout structure frames verified findings and MESO options owned by client leadership."]
+];
+
+const KESTREL_TWED = [
+  {
+    id: "TWED-T", letter: "T — THREAT (What blows up post-signature if closed as written?)", status: "PASS", cls: "",
+    finding: "Verified catastrophic post-signature blow-up across 4 dimensions: (1) ASC 606 collapses enforceable TCV 67.5% ($240K -> $78K; $162K unbookable, c:L028-035; e:PB-5.3); (2) Year-1 GM drops to 52.6% ($41K GP) leaving just $17K (21.8%) net contribution after $24K upfront commission plus -$2K guaranteed impl loss (b:Year1_OptOut!B4:B11); (3) Net-60 post-acceptance pushes Y1 cash ($66K) out ~105+ days (c:L044-060); (4) 3x ($720K) liability cap + UNCAPPED security/confidentiality/IP, 25% annual SLA refund exit, 20% Y2-3 seat true-down, 0% renewal cap, and retroactive MFN expose the <=100-seat industrial base (c:L019-095).",
+    fix: "CLEARED: Lead Step 6 Beat 2 with exact non-overlapping Threat numbers so leadership cannot accidentally rubber-stamp a Q4 panic override."
+  },
+  {
+    id: "TWED-W", letter: "W — WHAT ELSE? (Did I accept AE framing? What else explains the stall?)", status: "FAIL - REMEDIATED", cls: "rem",
+    finding: "AE framing ('slow buyer legal', 'VP approved') was cleanly rejected (0.0% buyer legal stall time; verbal VP DM invalid under PB-4.3). TIME-OUT CATCH: Focusing solely on AE's 16-day unworked HARD HOLD under-weights TWO co-equal drivers: (a) External — CFO Gregory Cho has zero budget approval and Ohio plant consolidation risk (d:T047-049; c:L022-023), meaning clearing DD-8842 alone still will not close Q4; and (b) Systemic — Seller's broken QTC tooling (unsynced Excel, false-green CRM Finance clearance, editable cell E13, unblocked Commit) created the late-stage collision.",
+    fix: "REMEDIATED FOR STEP 6: Present why Kestrel broke as Cause X (Dual Internal Governance/Tooling Deadlock + Unengaged Buyer CFO Gate) and NOT merely Cause Y ('slow buyer legal' or 'one rogue rep')."
+  },
+  {
+    id: "TWED-E", letter: "E — EVIDENCE (Does every finding tie to a specific document line or timestamp?)", status: "FAIL - REMEDIATED", cls: "rem",
+    finding: "TIME-OUT CATCH #1 (Math Hazard): Step 4 Three-Way Diff line-exposure sum ($1,334,967) combines overlapping, non-additive risk indicators ($240K EB + $162K opt-out + $78K SLA refund + $666K cap); quoting $1.33M as cash leak in Step 6 would fail CFO scrutiny. TIME-OUT CATCH #2 (Scope Hazard): 4 base-MSA flags (F35–F38) and 7 unknowns (U-1..U-7, including CFO budget, Finance exception appetite, ERP 45-day SOW cost, and post-Nov 16 phone calls) have NO Step 1 primary document.",
+    fix: "REMEDIATED FOR STEP 6: Strip $1.33M raw sum completely; cite ONLY non-overlapping Waterfall figures ($90K concession, $10K GM floor breach, $162K unenforceable TCV, $17K Y1 net, separate $720K/uncapped legal liability) and explicitly tag F35–F38 and U-1..U-7 as UNVERIFIED."
+  },
+  {
+    id: "TWED-D", letter: "D — DISPOSITIONAL (Am I getting sucked into rescuing instead of diagnosing?)", status: "FAIL - REMEDIATED", cls: "rem",
+    finding: "TIME-OUT CATCH (Active Rescue Pressure): Only 6 calendar days remain before Kestrel's Dec 1 docket cutoff for CFO Gregory Cho's Dec 2 Q4 budget committee (d:T086-088), and $240K sits in Q4 Commit (a:CRM-08). High temptation exists for the clinician to draft Kestrel redline markups, email GC Nadia Benali, join a call with CFO Cho, or lobby Finance Controller Elena Rostova to 'save Q4.'",
+    fix: "REMEDIATED / HARD BOUNDARY LOCKED: Zero rescue permitted. Clinician will NOT negotiate, redline, contact buyer, or lobby Finance. Step 6 Beat 3 provides structural MESO options for client leadership to execute independently."
+  }
+];
+
+const KESTREL_CLAIMS = [
+  ["R-01","19-day post-redline stall (Nov 6–Nov 25): 0.0% Buyer Legal, 85.4% (388.3h) unworked AE hold on DD-8842, 0.0% routed to Finance.","PASS","CLEARED FOR STEP 6","Approved verbatim (d:T039-103; Hop Audit H-05..H-12)."],
+  ["R-02","True pricing = 28.0% sub discount (-$84K) + hidden $6K impl cell E13 override ($30K->$24K) = $90K (27.3%) off $330K list.","PASS","CLEARED FOR STEP 6","Approved verbatim (b:G12,E13,True_List_Leak_Bridge!B5:B10; e:PB-1.3)."],
+  ["R-03","Consolidated 3-yr GM = 70.8% ($170K/$240K), breaching 75.0% policy floor by $10,000; verbal VP Slack nods invalid under PB-4.3.","PASS","CLEARED FOR STEP 6","Approved verbatim (b:M14,F19; d:T036,095,102; e:PB-4.1,4.3)."],
+  ["R-04","Month-12 penalty-free opt-out collapses ASC 606 enforceable TCV 67.5% ($240K -> $78K; $162K unbookable); Y1 net after $24K comm = $17K.","PASS","CLEARED FOR STEP 6","Approved verbatim (c:L028-035; b:Year1_OptOut_Sensitivity!B3:B11; e:PB-5.3)."],
+  ["R-05","Net-60 post-Go-Live Acceptance defers $66K Y1 billing ($54K sub + $12K impl holdback) ~105+ days with subjective sole discretion.","PASS","CLEARED FOR STEP 6","Approved verbatim (c:L041-060; e:PB-5.1,5.2)."],
+  ["R-06","Real Economic Buyer & sole signatory >$50K is CFO Gregory Cho (0 meetings, 0 budget approval), contradicting CRM Economic Buyer field.","PASS","CLEARED FOR STEP 6","Approved verbatim (a:CRM-28,29; c:L100-104; d:T047-049,104)."],
+  ["R-07","Three-Way Diff shows 15 of 16 lines mismatched (93.8%) across CRM, Quote v4, and Redline v3; CRM falsely auto-cleared Finance <=20%.","PASS","CLEARED FOR STEP 6","Approved verbatim (a:CRM-15,22,25; Three-Way Diff TW-01..TW-16; e:PB-6.1)."],
+  ["R-08","41 of 51 standard contract flags triggered (20 CRITICAL, 16 HIGH, 5 MODERATE) including $720K cap, uncapped sec/IP, 25% SLA exit, MFN.","PASS","CLEARED FOR STEP 6","Approved with scope note that 4 base-MSA flags (F35–F38) remain UNVERIFIED."],
+  ["R-09","CANDIDATE FAIL: 'Kestrel carries $1.33M in direct commercial dollar exposure across the Three-Way Diff.'","FAIL — CAUGHT","REMEDIATED — STRIPPED","STRIPPED (TWED-E): $1,334,967 is a non-additive sum of overlapping risks. Replace strictly with Leak Waterfall ($90K / $10K / $162K / $17K) + separate contingent legal cap ($720K / uncapped)."],
+  ["R-10","CANDIDATE FAIL: 'The 19-day stall is purely an AE discipline failure by Jordan Reyes.'","FAIL — CAUGHT","REMEDIATED — REWRITTEN","REWRITTEN (ELY-2 / GRB-C5 / TWED-W): Report dual failure — Seller internal governance/tooling breakdown (unsynced CRM/Excel + false-green clearance + unworked DD-8842) PLUS unengaged Buyer CFO budget gate."],
+  ["R-11","CANDIDATE FAIL: 'We audited all 51 MSA and Order Form clauses and confirmed Kestrel CFO has no Q4 budget.'","FAIL — CAUGHT","REMEDIATED — REWRITTEN","REWRITTEN (GRB-S1 / TWED-E): Scope contract audit to 47 Order Form clauses + 4 UNVERIFIED base-MSA checks (F35–F38); state CFO budget approval is 'absent/unreviewed' (d:T047), while Q4 budget availability remains UNVERIFIED (U-1)."],
+  ["R-12","CANDIDATE FAIL: 'To beat Dec 1, our team will redline OF-2026-4819-v3 and join tomorrow's call with CFO Gregory Cho.'","FAIL — CAUGHT","REMEDIATED — STRIPPED","STRIPPED (TWED-D): Violates Clean Boundary (No Rescue). Replace in Step 6 Beat 3 with client-owned MESO structural options only."]
+];
+
+function esc(s) { return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+function render() {
+  const egb = document.getElementById("egBody");
+  KESTREL_EG.forEach(([id, fw, q, st, note]) => {
+    const tr = document.createElement("tr");
+    const cls = st === "PASS" ? "p-pass" : "p-rem";
+    tr.innerHTML = `<td><strong>${id}</strong></td><td>${fw}</td><td>${esc(q)}</td><td><span class="pill ${cls}">${st}</span></td><td>${esc(note)}</td>`;
+    egb.appendChild(tr);
+  });
+
+  const tc = document.getElementById("twedContainer");
+  KESTREL_TWED.forEach(t => {
+    const div = document.createElement("div");
+    div.className = `twed-box ${t.cls}`;
+    const cls = t.status === "PASS" ? "p-pass" : "p-rem";
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong>${esc(t.letter)}</strong>
+        <span class="pill ${cls}">${t.status}</span>
+      </div>
+      <div class="kv"><strong>Stress-Test Finding:</strong> ${esc(t.finding)}</div>
+      <div class="kv"><strong>Step 6 Guardrail / Action:</strong> ${esc(t.fix)}</div>
+    `;
+    tc.appendChild(div);
+  });
+
+  const cb = document.getElementById("claimBody");
+  KESTREL_CLAIMS.forEach(([id, txt, raw, disp, fix]) => {
+    const tr = document.createElement("tr");
+    const rCls = raw === "PASS" ? "p-pass" : "p-fail";
+    const dCls = disp.startsWith("CLEARED") ? "p-pass" : "p-rem";
+    tr.innerHTML = `<td><strong>${id}</strong></td><td>${esc(txt)}</td><td><span class="pill ${rCls}">${raw}</span></td><td><span class="pill ${dCls}">${disp}</span></td><td>${esc(fix)}</td>`;
+    cb.appendChild(tr);
+  });
+}
+
+function exportCSV() {
+  const rows = [["Section", "ID", "Item", "Status", "Detail_or_Remediation"]];
+  KESTREL_EG.forEach(x => rows.push([x[1], x[0], x[2], x[3], x[4]]));
+  KESTREL_TWED.forEach(t => rows.push(["TWED", t.id, t.letter, t.status, t.finding + " | FIX: " + t.fix]));
+  KESTREL_CLAIMS.forEach(c => rows.push(["CLAIM_AUDIT", c[0], c[1], c[2] + " -> " + c[3], c[4]]));
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "kestrel_step5_diagnostic_timeout.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+render();
+</script>
+</body>
+</html>
