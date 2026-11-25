@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runbook A — Step 1 Primary-Source Intake Gate</title>
+<style>
+  :root {
+    --ink: #111827;
+    --muted: #4b5563;
+    --line: #d1d5db;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --navy: #0f172a;
+    --blue: #1d4ed8;
+    --green-bg: #dcfce7;
+    --green-ink: #166534;
+    --amber-bg: #fef3c7;
+    --amber-ink: #92400e;
+    --red-bg: #fee2e2;
+    --red-ink: #991b1b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.45;
+  }
+  .wrap { max-width: 1180px; margin: 20px auto; padding: 0 16px 40px; }
+  .topbar {
+    background: var(--navy);
+    color: #fff;
+    padding: 18px 22px;
+    border-radius: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+  }
+  .topbar h1 { margin: 0; font-size: 20px; }
+  .topbar p { margin: 4px 0 0; font-size: 13px; color: #cbd5e1; }
+  .timer-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #1e293b;
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+  .timer-readout {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 22px;
+    font-weight: 700;
+    min-width: 72px;
+    text-align: center;
+    color: #38bdf8;
+  }
+  .timer-readout.warn { color: #fbbf24; }
+  .timer-readout.over { color: #f87171; }
+  button {
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  button.dark { background: #334155; border-color: #475569; color: #fff; }
+  button:hover { opacity: 0.92; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-top: 16px;
+  }
+  .card h2 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 8px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+  }
+  label.field { display: flex; flex-direction: column; font-size: 12px; font-weight: 600; color: var(--muted); gap: 4px; }
+  input[type="text"], input[type="date"], select, textarea {
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--ink);
+    background: #fff;
+  }
+  textarea { min-height: 54px; resize: vertical; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; vertical-align: top; }
+  th { background: #f9fafb; font-size: 12px; color: var(--muted); }
+  .gate-banner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    margin-top: 16px;
+  }
+  .gate-red { background: var(--red-bg); color: var(--red-ink); border: 1px solid #fca5a5; }
+  .gate-amber { background: var(--amber-bg); color: var(--amber-ink); border: 1px solid #fcd34d; }
+  .gate-green { background: var(--green-bg); color: var(--green-ink); border: 1px solid #86efac; }
+  .metrics { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; font-weight: 600; }
+  .check-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 13px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .badge-req { background: #e0e7ff; color: #3730a3; }
+  .small { font-size: 12px; color: var(--muted); }
+  @media print {
+    body { background: #fff; }
+    .toolbar, .timer-box button, .no-print { display: none !important; }
+    .card { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Runbook A — Step 1: Primary-Source Check &amp; Artifact Intake Gate (10 Min)</h1>
+      <p>Rule: Pull all 5 raw artifacts BEFORE accepting the AE's story. Quarantine verbal claims until verified.</p>
+    </div>
+    <div class="timer-box">
+      <span class="small" style="color:#cbd5e1;">STEP 1 TIMER</span>
+      <div id="timerReadout" class="timer-readout">10:00</div>
+      <button class="dark" onclick="toggleTimer()" id="timerBtn">Start</button>
+      <button class="dark" onclick="resetTimer()">Reset</button>
+    </div>
+  </div>
+
+  <div id="gateBanner" class="gate-banner gate-red">
+    <div id="gateText">RED — HARD STOP: Pull all 5 raw primary-source artifacts before diagnosing.</div>
+    <div class="metrics">
+      <span id="mReceived">Received: 0 / 5</span>
+      <span id="mVerified">Primary-Source Verified: 0 / 5</span>
+      <span id="mQuarantine">AE Quarantine: Incomplete</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>1. Deal Intake Header</h2>
+    <div class="grid">
+      <label class="field">Account Name<input type="text" id="accountName" placeholder="e.g., Acme Corp" oninput="recalc()"></label>
+      <label class="field">CRM Opportunity ID<input type="text" id="oppId" placeholder="e.g., OPP-2026-0001" oninput="recalc()"></label>
+      <label class="field">Diagnostic Date<input type="date" id="diagDate" oninput="recalc()"></label>
+      <label class="field">Headline Deal Value ($)<input type="text" id="dealValue" placeholder="e.g., $240,000" oninput="recalc()"></label>
+      <label class="field">Account Executive (AE)<input type="text" id="aeName" placeholder="Name" oninput="recalc()"></label>
+      <label class="field">Client Diagnostic Lead<input type="text" id="clientLead" placeholder="Name / Title" oninput="recalc()"></label>
+      <label class="field">Clinician / Facilitator<input type="text" id="clinician" placeholder="Name" oninput="recalc()"></label>
+      <label class="field">Session Mode
+        <select id="sessionMode" onchange="recalc()">
+          <option value="Slot #1 — Validation Mode">Slot #1 — Validation Mode</option>
+          <option value="5-Deal Forensic Diagnostic">5-Deal Forensic Diagnostic</option>
+          <option value="Internal Practice Drill">Internal Practice Drill</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. Mandatory 5-Artifact Primary-Source Check</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:17%;">Required Artifact</th>
+          <th style="width:11%;">Status</th>
+          <th style="width:18%;">Exact File Name / Doc ID</th>
+          <th style="width:13%;">Source System</th>
+          <th style="width:12%;">Last Modified</th>
+          <th style="width:9%;">Native File?</th>
+          <th style="width:20%;">Initial Red Flag Spotted (Fact Only)</th>
+        </tr>
+      </thead>
+      <tbody id="artifactBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>3. AE-Story Quarantine Compliance</h2>
+    <label class="check-row"><input type="checkbox" id="qPullFirst" onchange="recalc()"> All available raw files were opened BEFORE letting the AE narrate the deal backstory.</label>
+    <label class="check-row"><input type="checkbox" id="qNoSummary" onchange="recalc()"> Screenshots, slide decks, and verbal paraphrases were rejected in favor of native records.</label>
+    <label class="check-row"><input type="checkbox" id="qLoggedClaims" onchange="recalc()"> Every verbal AE claim heard prior to Step 2 is logged below as UNVERIFIED until Step 4.</label>
+
+    <h3 style="font-size:14px; margin:14px 0 8px;">Quarantined Verbal Claims Log</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:7%;">#</th>
+          <th style="width:45%;">Verbal Claim (AE or Internal Hearsay)</th>
+          <th style="width:22%;">Artifact Required to Test Claim</th>
+          <th style="width:18%;">Intake Status</th>
+          <th class="no-print" style="width:8%;">Remove</th>
+        </tr>
+      </thead>
+      <tbody id="claimsBody"></tbody>
+    </table>
+    <div class="toolbar no-print">
+      <button onclick="addClaimRow()">+ Add Quarantined Claim</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>4. Step 1 Clinician Sign-Off &amp; Export</h2>
+    <label class="field">Gate Notes / Missing Evidence Action (if Yellow or Red)
+      <textarea id="gateNotes" placeholder="Record exact missing artifacts, file hash notes, or handoff readiness for Step 2..."></textarea>
+    </label>
+    <div class="toolbar no-print">
+      <button class="primary" onclick="exportJSON()">Save JSON Snapshot</button>
+      <button onclick="document.getElementById('jsonLoader').click()">Load JSON Snapshot</button>
+      <input type="file" id="jsonLoader" accept=".json" style="display:none" onchange="loadJSON(event)">
+      <button onclick="exportCSV()">Export CSV Register</button>
+      <button onclick="window.print()">Print / Save PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DEFAULT_ARTIFACTS = [
+  { key: "a", label: "(a) CRM Opportunity Record", status: "Missing", file: "", source: "Salesforce / HubSpot", modified: "", native: false, flag: "" },
+  { key: "b", label: "(b) Quote / Pricing Spreadsheet", status: "Missing", file: "", source: "Excel / CPQ Export", modified: "", native: false, flag: "" },
+  { key: "c", label: "(c) Latest Redlined Contract / Order Form", status: "Missing", file: "", source: "Word / PDF Redline", modified: "", native: false, flag: "" },
+  { key: "d", label: "(d) Approval / Slack / Email Thread", status: "Missing", file: "", source: "Slack / Email Export", modified: "", native: false, flag: "" },
+  { key: "e", label: "(e) Standard Price Book / Discount Policy", status: "Missing", file: "", source: "Finance / Deal Desk Policy", modified: "", native: false, flag: "" }
+];
+
+const INITIAL_STATE = {
+  header: {
+    accountName: "", oppId: "", diagDate: "", dealValue: "",
+    aeName: "", clientLead: "", clinician: "", sessionMode: "Slot #1 — Validation Mode"
+  },
+  artifacts: DEFAULT_ARTIFACTS,
+  quarantine: { qPullFirst: false, qNoSummary: false, qLoggedClaims: false },
+  claims: [
+    { text: "", target: "(d) Approval Thread", status: "Quarantined — Unverified" }
+  ],
+  gateNotes: ""
+};
+
+let secondsLeft = 600;
+let timerHandle = null;
+
+function formatTime(sec) {
+  const neg = sec < 0;
+  const abs = Math.abs(sec);
+  const m = String(Math.floor(abs / 60)).padStart(2, "0");
+  const s = String(abs % 60).padStart(2, "0");
+  return (neg ? "-" : "") + m + ":" + s;
+}
+
+function updateTimerUI() {
+  const el = document.getElementById("timerReadout");
+  el.textContent = formatTime(secondsLeft);
+  el.className = "timer-readout" + (secondsLeft <= 0 ? " over" : secondsLeft <= 120 ? " warn" : "");
+}
+
+function toggleTimer() {
+  const btn = document.getElementById("timerBtn");
+  if (timerHandle) {
+    clearInterval(timerHandle);
+    timerHandle = null;
+    btn.textContent = "Resume";
+  } else {
+    timerHandle = setInterval(() => { secondsLeft -= 1; updateTimerUI(); }, 1000);
+    btn.textContent = "Pause";
+  }
+}
+
+function resetTimer() {
+  if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+  secondsLeft = 600;
+  document.getElementById("timerBtn").textContent = "Start";
+  updateTimerUI();
+}
+
+function esc(str) {
+  return String(str || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function renderArtifacts(list) {
+  const body = document.getElementById("artifactBody");
+  body.innerHTML = "";
+  list.forEach((a, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><strong>${esc(a.label)}</strong><br><span class="badge badge-req">REQUIRED</span></td>
+      <td>
+        <select id="art_status_${idx}" onchange="recalc()">
+          <option value="Missing" ${a.status==="Missing"?"selected":""}>Missing</option>
+          <option value="Partial" ${a.status==="Partial"?"selected":""}>Partial</option>
+          <option value="Received" ${a.status==="Received"?"selected":""}>Received</option>
+        </select>
+      </td>
+      <td><input type="text" id="art_file_${idx}" value="${esc(a.file)}" placeholder="Exact file name" oninput="recalc()"></td>
+      <td><input type="text" id="art_source_${idx}" value="${esc(a.source)}" placeholder="System" oninput="recalc()"></td>
+      <td><input type="text" id="art_mod_${idx}" value="${esc(a.modified)}" placeholder="YYYY-MM-DD" oninput="recalc()"></td>
+      <td style="text-align:center;"><input type="checkbox" id="art_native_${idx}" ${a.native?"checked":""} onchange="recalc()"></td>
+      <td><textarea id="art_flag_${idx}" placeholder="Observed fact only" oninput="recalc()">${esc(a.flag)}</textarea></td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function renderClaims(claims) {
+  const body = document.getElementById("claimsBody");
+  body.innerHTML = "";
+  claims.forEach((c, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><strong>C-${idx + 1}</strong></td>
+      <td><input type="text" class="claim-text" value="${esc(c.text)}" placeholder="Quote exact verbal claim..."></td>
+      <td><input type="text" class="claim-target" value="${esc(c.target)}" placeholder="Artifact(s) to verify"></td>
+      <td>
+        <select class="claim-status">
+          <option ${c.status==="Quarantined — Unverified"?"selected":""}>Quarantined — Unverified</option>
+          <option ${c.status==="Contradicted at Intake"?"selected":""}>Contradicted at Intake</option>
+          <option ${c.status==="Deferred to Step 4"?"selected":""}>Deferred to Step 4</option>
+        </select>
+      </td>
+      <td class="no-print" style="text-align:center;"><button onclick="removeClaimRow(${idx})">X</button></td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function addClaimRow() {
+  const state = collectState();
+  state.claims.push({ text: "", target: "", status: "Quarantined — Unverified" });
+  renderClaims(state.claims);
+}
+
+function removeClaimRow(idx) {
+  const state = collectState();
+  state.claims.splice(idx, 1);
+  if (state.claims.length === 0) state.claims.push({ text: "", target: "", status: "Quarantined — Unverified" });
+  renderClaims(state.claims);
+}
+
+function collectState() {
+  const artifacts = DEFAULT_ARTIFACTS.map((a, idx) => ({
+    key: a.key,
+    label: a.label,
+    status: document.getElementById(`art_status_${idx}`).value,
+    file: document.getElementById(`art_file_${idx}`).value,
+    source: document.getElementById(`art_source_${idx}`).value,
+    modified: document.getElementById(`art_mod_${idx}`).value,
+    native: document.getElementById(`art_native_${idx}`).checked,
+    flag: document.getElementById(`art_flag_${idx}`).value
+  }));
+  const claimRows = Array.from(document.querySelectorAll("#claimsBody tr")).map(tr => ({
+    text: tr.querySelector(".claim-text").value,
+    target: tr.querySelector(".claim-target").value,
+    status: tr.querySelector(".claim-status").value
+  }));
+  return {
+    header: {
+      accountName: document.getElementById("accountName").value,
+      oppId: document.getElementById("oppId").value,
+      diagDate: document.getElementById("diagDate").value,
+      dealValue: document.getElementById("dealValue").value,
+      aeName: document.getElementById("aeName").value,
+      clientLead: document.getElementById("clientLead").value,
+      clinician: document.getElementById("clinician").value,
+      sessionMode: document.getElementById("sessionMode").value
+    },
+    artifacts,
+    quarantine: {
+      qPullFirst: document.getElementById("qPullFirst").checked,
+      qNoSummary: document.getElementById("qNoSummary").checked,
+      qLoggedClaims: document.getElementById("qLoggedClaims").checked
+    },
+    claims: claimRows,
+    gateNotes: document.getElementById("gateNotes").value
+  };
+}
+
+function applyState(state) {
+  Object.entries(state.header).forEach(([k, v]) => {
+    const el = document.getElementById(k);
+    if (el) el.value = v || "";
+  });
+  renderArtifacts(state.artifacts);
+  document.getElementById("qPullFirst").checked = !!state.quarantine.qPullFirst;
+  document.getElementById("qNoSummary").checked = !!state.quarantine.qNoSummary;
+  document.getElementById("qLoggedClaims").checked = !!state.quarantine.qLoggedClaims;
+  renderClaims(state.claims || []);
+  document.getElementById("gateNotes").value = state.gateNotes || "";
+  recalc();
+}
+
+function recalc() {
+  const st = collectState();
+  const received = st.artifacts.filter(a => a.status === "Received").length;
+  const partial = st.artifacts.filter(a => a.status === "Partial").length;
+  const verified = st.artifacts.filter(a => a.status === "Received" && a.native && a.file.trim() !== "").length;
+  const qDone = st.quarantine.qPullFirst && st.quarantine.qNoSummary && st.quarantine.qLoggedClaims;
+
+  document.getElementById("mReceived").textContent = `Received: ${received} / 5`;
+  document.getElementById("mVerified").textContent = `Primary-Source Verified: ${verified} / 5`;
+  document.getElementById("mQuarantine").textContent = `AE Quarantine: ${qDone ? "Complete" : "Incomplete"}`;
+
+  const banner = document.getElementById("gateBanner");
+  const text = document.getElementById("gateText");
+  if (received === 5 && verified === 5 && qDone) {
+    banner.className = "gate-banner gate-green";
+    text.textContent = "GREEN — GATE PASSED: All 5 raw primary-source artifacts verified. Proceed to Step 2 (Focused History).";
+  } else if (received + partial >= 4 && verified >= 3) {
+    banner.className = "gate-banner gate-amber";
+    text.textContent = "YELLOW — CONDITIONAL HOLD: Missing native verification or quarantine sign-off. Flag exact gap before Step 2.";
+  } else {
+    banner.className = "gate-banner gate-red";
+    text.textContent = "RED — HARD STOP: Insufficient primary-source artifacts. Do NOT diagnose from AE story.";
+  }
+}
+
+function downloadFile(filename, content, mime) {
+  const blob = new Blob([content], { type: mime });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function exportJSON() {
+  const st = collectState();
+  const slug = (st.header.accountName || "deal").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  downloadFile(`${slug}_step1_primary_source_gate.json`, JSON.stringify(st, null, 2), "application/json");
+}
+
+function loadJSON(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { applyState(JSON.parse(e.target.result)); };
+  reader.readAsText(file);
+}
+
+function exportCSV() {
+  const st = collectState();
+  const rows = [["Artifact", "Status", "File_Name", "Source_System", "Last_Modified", "Native_Primary_Source", "Initial_Red_Flag"]];
+  st.artifacts.forEach(a => {
+    rows.push([a.label, a.status, a.file, a.source, a.modified, a.native ? "YES" : "NO", a.flag]);
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v || "").replace(/"/g, '""')}"`).join(",")).join("\n");
+  const slug = (st.header.accountName || "deal").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  downloadFile(`${slug}_step1_artifact_register.csv`, csv, "text/csv");
+}
+
+applyState(INITIAL_STATE);
+updateTimerUI();
+</script>
+</body>
+</html>
