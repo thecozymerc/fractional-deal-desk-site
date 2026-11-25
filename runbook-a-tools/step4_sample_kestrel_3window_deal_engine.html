@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runbook A — Step 4 Sample: Kestrel 3-Window Deal Engine Output</title>
+<style>
+  :root {
+    --ink: #111827;
+    --muted: #4b5563;
+    --line: #d1d5db;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --navy: #0f172a;
+    --blue: #1d4ed8;
+    --green-bg: #dcfce7;
+    --green-ink: #166534;
+    --amber-bg: #fef3c7;
+    --amber-ink: #92400e;
+    --red-bg: #fee2e2;
+    --red-ink: #991b1b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.4; }
+  .wrap { max-width: 1260px; margin: 18px auto; padding: 0 16px 40px; }
+  .topbar { background: var(--navy); color: #fff; padding: 18px 22px; border-radius: 10px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+  .topbar h1 { margin: 0; font-size: 20px; }
+  .topbar p { margin: 4px 0 0; font-size: 13px; color: #cbd5e1; }
+  .sample-pill { background: #dc2626; color: #fff; padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 12px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin-top: 14px; }
+  .card h2 { margin: 0 0 10px; font-size: 16px; border-bottom: 1px solid #e5e7eb; padding-bottom: 7px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { border: 1px solid #e5e7eb; padding: 6px 7px; text-align: left; vertical-align: top; }
+  th { background: #f9fafb; font-size: 11.5px; color: var(--muted); }
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 10px; margin-top: 10px; }
+  .kpi { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; }
+  .kpi .k { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+  .kpi .v { font-size: 18px; font-weight: 800; margin-top: 3px; }
+  .wf-row { display: grid; grid-template-columns: 310px 1fr 115px; gap: 10px; align-items: center; margin: 7px 0; font-size: 12.5px; }
+  .wf-track { background: #e5e7eb; height: 20px; border-radius: 5px; overflow: hidden; }
+  .wf-bar { height: 100%; border-radius: 5px; }
+  .bar-base { background: #1d4ed8; }
+  .bar-leak { background: #dc2626; }
+  .bar-warn { background: #d97706; }
+  .banner-red { padding: 13px 16px; border-radius: 8px; font-weight: 700; margin-top: 12px; background: var(--red-bg); color: var(--red-ink); border: 1px solid #fca5a5; }
+  .tag { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .t-crit { background: var(--red-bg); color: var(--red-ink); }
+  .t-high { background: var(--amber-bg); color: var(--amber-ink); }
+  .t-mod { background: #e0e7ff; color: #3730a3; }
+  .t-pass { background: var(--green-bg); color: var(--green-ink); }
+  .t-unv { background: #e5e7eb; color: #374151; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  button { border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 7px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  @media print {
+    body { background: #fff; }
+    .toolbar, .no-print { display: none !important; }
+    .card { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Runbook A — Step 4 Sample: Kestrel 3-Window Deal Engine Output</h1>
+      <p>Kestrel Industrial Holdings (OPP-2026-4819) | Diagnostic Date: 2026-11-25 | Tied Line-by-Line to Step 1 Artifacts (a–e)</p>
+    </div>
+    <span class="sample-pill">DO NOT SIGN AS WRITTEN — 41/51 FLAGS TRIGGERED</span>
+  </div>
+
+  <!-- WINDOW 1 -->
+  <div class="card">
+    <h2>Window 1 — Commercial, Gross Margin &amp; ASC 606 Leak Waterfall (Kestrel)</h2>
+    <div class="kpi-row" id="w1Kpis"></div>
+    <div id="w1Waterfall" style="margin-top:14px;"></div>
+  </div>
+
+  <!-- WINDOW 2 -->
+  <div class="card">
+    <h2>Window 2 — Behavioral Verdict Engine (8 Verified Primary-Source Signals)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:6%;">ID</th>
+          <th style="width:14%;">Side</th>
+          <th style="width:27%;">Behavioral Signal</th>
+          <th style="width:13%;">Score</th>
+          <th style="width:40%;">Primary-Source Evidence &amp; Citation</th>
+        </tr>
+      </thead>
+      <tbody id="w2Body"></tbody>
+    </table>
+    <div class="banner-red" id="w2Verdict"></div>
+  </div>
+
+  <!-- WINDOW 3 -->
+  <div class="card">
+    <h2>Window 3 — Complete 51-Contract-Flag Forensic Audit (F01–F51, Zero Omissions)</h2>
+    <div class="kpi-row" id="w3Kpis"></div>
+    <div class="toolbar no-print">
+      <select id="flagFilter" onchange="renderFlags()" style="padding:7px;border-radius:6px;border:1px solid #d1d5db;">
+        <option value="ALL">Show All 51 Contract Flags</option>
+        <option value="TRIGGERED">Triggered Only (41 Flags)</option>
+        <option value="CRITICAL">CRITICAL Only (20 Flags)</option>
+        <option value="HIGH">HIGH Only (16 Flags)</option>
+        <option value="MODERATE">MODERATE Only (5 Flags)</option>
+        <option value="UNVERIFIED">UNVERIFIED MSA Checks (4 Flags)</option>
+      </select>
+      <button class="primary" onclick="exportFlagsCSV()">Export All 51 Flags CSV</button>
+      <button onclick="window.print()">Print / Save Full 3-Window PDF</button>
+    </div>
+    <table style="margin-top:10px;">
+      <thead>
+        <tr>
+          <th style="width:6%;">ID</th>
+          <th style="width:12%;">Category</th>
+          <th style="width:34%;">Contract Risk Flag (51-Flag Taxonomy)</th>
+          <th style="width:14%;">Audit Status</th>
+          <th style="width:34%;">Exact Kestrel Clause / Artifact Proof</th>
+        </tr>
+      </thead>
+      <tbody id="w3Body"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const KESTREL_W1 = {
+  subList: 300000, implList: 30000, subDiscAmt: 84000, implOverride: 6000,
+  quotedTcv: 240000, totalCogs: 70000, gp: 170000, gmPct: 70.83, floorPct: 75.0,
+  gmDeficit: -10000, y1Enforceable: 78000, optOutRisk: 162000, y1Cogs: 37000,
+  y1Gp: 41000, y1GmPct: 52.56, upfrontComm: 24000, y1NetContrib: 17000,
+  trueDownRisk: 32400, dsoDrag: 1085
+};
+
+const KESTREL_W2 = [
+  { id: "S1", side: "Seller / AE", name: "Offline quoting / CRM-vs-Quote data suppression", score: 2, note: "AE sent offline Quote v4 (28% / Net-60) Nov 3 while leaving CRM at 20% / Net-30 and outdated v2 PDF (a:CRM-15,17,26; b:E13; d:T018-026)." },
+  { id: "S2", side: "Seller / AE", name: "Bypassing Deal Desk / Finance via informal verbal approvals", score: 2, note: "AE solicited two casual Slack DMs from VP Marcus Vance (Nov 4 & Nov 18) hiding 28% disc, 70.8% GM, and opt-out; invalid under PB-4.3 (d:T027-038,089-098)." },
+  { id: "S3", side: "Seller / AE", name: "Unworked internal holds while holding deal in Commit forecast", score: 2, note: "Zero AE action on Deal Desk HARD HOLD DD-8842 for 16 calendar days (Nov 9–25) and zero Finance packet to Elena Rostova while holding Commit (a:CRM-08,23; d:T062-080,101-102)." },
+  { id: "S4", side: "Seller / AE", name: "Misrepresenting stall owner (blaming buyer legal/bureaucracy)", score: 2, note: "AE logged 'Waiting on Kestrel legal' Nov 20 (a:CRM-32,33) and blamed 'bureaucratic Desk' Nov 18 (d:T091), falsified by buyer's 3-day redline turn and Nov 16 chase (d:T039,081)." },
+  { id: "B1", side: "Buyer / Prospect", name: "Economic buyer / signatory unengaged with zero budget approval", score: 2, note: "Sole signatory >$50K is CFO Gregory Cho (c:L100-104); GC confirmed Cho has NOT reviewed/approved budget (d:T047-049); zero meetings logged (d:T104)." },
+  { id: "B2", side: "Buyer / Prospect", name: "Demanding multi-year volume discount without multi-year commitment", score: 2, note: "Buyer takes 28% 3-yr discount ($1,080/seat) while inserting Month-12 penalty-free opt-out w/ zero clawback (c:L028-035) AND 20% Y2-3 seat true-down (c:L019-023)." },
+  { id: "B3", side: "Buyer / Prospect", name: "Shifting payment & acceptance risk onto subjective buyer sign-off", score: 2, note: "Sec 3.2 & 4.1 defer $54K Y1 sub + $12K impl holdback to Net-60 AFTER written Go-Live Acceptance in 'Customer's sole reasonable discretion' (~105+ days DSO; c:L044-060)." },
+  { id: "B4", side: "Buyer / Prospect", name: "Stacking asymmetric enterprise legal traps (3x cap, uncapped IP/sec, MFN)", score: 2, note: "Sec 9.1 (3x/$720K cap + uncapped security/conf/IP), Sec 7.2 (25% SLA credit + refund exit), Sec 5.4 (0% 2-term cap), Sec 11.3 (retroactive MFN; c:L067-095)." }
+];
+
+const KESTREL_51_FLAGS = [
+  ["F01","Pricing","Discretionary subscription discount exceeds Tier-4 ceiling (>25%)","CRITICAL","28.0% (-$84K) off $300K list; breaches PB-3.0 Tier 4 (b:G12,H12; c:L008)."],
+  ["F02","Pricing","Discount percentage omitted or masked in Order Form Exhibit A","HIGH","Exhibit A states $1,080/seat net without disclosing 28% off $1,500 list (c:L008)."],
+  ["F03","Pricing","Manual list-price cell override on services/implementation","CRITICAL","AE overwrote cell E13 from $30K standard list to $24K (-$6K hidden; b:E13; e:PB-1.3)."],
+  ["F04","Pricing","Consolidated deal Gross Margin falls below policy floor (<75%)","CRITICAL","70.8% GM ($170K/$240K) breaches 75.0% floor by $10,000 (b:M14,F19; e:PB-4.1)."],
+  ["F05","Pricing","Negative standalone services/implementation Gross Margin (<0%)","HIGH","Impl net $24K vs $26K direct ERP COGS = -$2,000 / -8.3% GM (b:L13:M13)."],
+  ["F06","Pricing","Fixed-fee services cap with zero overage or T&M pass-through","HIGH","Comment R-01 locks custom SAP/ERP migration at $24K flat w/ zero overage (c:L015-016)."],
+  ["F07","Pricing","Multi-year seat ramp exceeds 2.0x Year-1 seat guardrail","PASS","50 -> 70 -> 80 seats = 1.6x Y1 multiplier; within PB-2.2 2.0x limit (c:L009-011)."],
+  ["F08","Pricing","Non-USD billing creating unhedged FX currency exposure","PASS","Contract denominated strictly in USD (c:L005)."],
+  ["F09","Term/Opt-Out","Unilateral termination for convenience (Opt-Out) on discounted multi-year deal","CRITICAL","Sec 2.3 inserts Month-12 unilateral opt-out on 28%-discounted ramp; violates PB-5.3 (c:L028-035)."],
+  ["F10","Term/Opt-Out","Waiver of retroactive multi-year discount clawback upon opt-out","CRITICAL","Sec 2.3(c) explicitly waives repricing $1,080/seat back to $1,500 list (c:L034-035; e:PB-5.3)."],
+  ["F11","Term/Opt-Out","Early termination fee below 50% of remaining unbilled value ($0 ETF)","CRITICAL","Sec 2.3(a) sets ETF to $0 vs PB-5.3 >=50% requirement (c:L032; e:PB-5.3)."],
+  ["F12","Term/Opt-Out","Short opt-out notice window (30 days or less)","HIGH","Sec 2.3 allows exit on only 30 days' notice prior to Month 12 (c:L030-031)."],
+  ["F13","Term/Opt-Out","Multi-year downward seat adjustment (true-down) without rate repricing","CRITICAL","Sec 1.3 allows up to 20% Y2-3 seat reduction (-$32.4K risk) w/o rate increase; violates PB-2.3 (c:L019-023)."],
+  ["F14","Term/Opt-Out","Effective date blank or contingent on unapproved buyer budget","HIGH","Header ties Nov 30 Effective Date to unapproved CFO budget sign-off (c:L004; d:T047-049)."],
+  ["F15","Term/Opt-Out","Unilateral pilot-to-production conversion without signed order form","PASS","No unilateral pilot conversion clause present in Order Form (c:L001-104)."],
+  ["F16","Billing/Pay","Payment terms exceed standard Net-30 (Net-45 / Net-60+)","HIGH","Sec 4.1 demands Net-60 vs PB-5.1 Net-30 standard; zero Controller sign-off (c:L057-058)."],
+  ["F17","Billing/Pay","Year-1 subscription invoicing gated on Customer Acceptance Certificate","CRITICAL","Sec 4.1 delays $54K Y1 sub invoicing until written Go-Live Acceptance; violates PB-5.1 (c:L055-057)."],
+  ["F18","Billing/Pay","Implementation fee split or holdback gated on acceptance","HIGH","Sec 3.2 holds back 50% ($12K) of impl fee until written acceptance; violates PB-5.2 (c:L044-047)."],
+  ["F19","Billing/Pay","Subjective acceptance standard ('sole reasonable discretion')","CRITICAL","Sec 3.2 places Go-Live Acceptance in 'Customer's sole reasonable discretion' (c:L046-047)."],
+  ["F20","Billing/Pay","Missing deemed-acceptance timeout window (indefinite billing hold)","HIGH","Sec 3.2 has zero deemed-acceptance clock; buyer can stall $66K billing indefinitely (c:L044-047)."],
+  ["F21","Billing/Pay","Reduced late-payment interest rate below 1.5%/month standard","MODERATE","Sec 4.2 slashes late interest from 1.5%/mo to 0.5%/mo (c:L061)."],
+  ["F22","Billing/Pay","Broad good-faith invoice dispute withholding / interest waiver","MODERATE","Sec 4.2 waives all late interest on any 'good faith' disputed amount (c:L061-062)."],
+  ["F23","Billing/Pay","Monthly or arrears invoicing instead of annual upfront","PASS","Annual invoicing cadence preserved after Y1 acceptance gate (c:L055-058)."],
+  ["F24","Rev-Rec/606","ASC 606 enforceable term collapses below quoted multi-year term","CRITICAL","Month-12 penalty-free opt-out cuts enforceable TCV 67.5% from $240K to $78K (b:Year1_OptOut!B4:B5; e:PB-5.3)."],
+  ["F25","Rev-Rec/606","Acceptance-gated revenue recognition deferral (control transfer delayed)","CRITICAL","Subjective Go-Live Acceptance defers ASC 606 revenue recognition start (c:L044-058; e:PB-5.1)."],
+  ["F26","Rev-Rec/606","ASC 606 variable-consideration constraint (true-down, MFN, SLA refunds)","HIGH","Sec 1.3 true-down, Sec 7.2 SLA refund, and Sec 11.3 MFN constrain recognized revenue (c:L019-094)."],
+  ["F27","Rev-Rec/606","Pro-rata refund right on prepaid unearned subscription or services","CRITICAL","Sec 7.2 grants full pro-rata refund of prepaid subscription AND implementation fees (c:L078-079)."],
+  ["F28","Rev-Rec/606","Upfront multi-year commission mismatch / PB-6.2 clawback risk","HIGH","$24K upfront commission vs $41K Y1 GP leaves $17K net contrib + clawback risk (b:Year1_OptOut!B9:B10; e:PB-6.2)."],
+  ["F29","Rev-Rec/606","Bundled custom ERP integration creating non-distinct performance obligation","HIGH","Mandatory custom SAP/ERP migration tied to Y1 subscription acceptance binds obligations (c:L014-016,041-057)."],
+  ["F30","Rev-Rec/606","Off-contract verbal commitment or side-letter risk","MODERATE","Informal VP Slack nods (d:T036,095) and unlogged AE buyer calls after Nov 16 (U-6)."],
+  ["F31","Liability/IP","General limitation of liability cap exceeds 12 months' fees paid","CRITICAL","Sec 9.1 raises cap to 3x TCV ($720,000 = 13.3x Y1 sub); violates PB-5.4 (c:L085-086)."],
+  ["F32","Liability/IP","Uncapped data security / breach liability carve-out","CRITICAL","Sec 9.1 makes data security breaches strictly UNCAPPED; violates PB-5.4 (c:L086-087)."],
+  ["F33","Liability/IP","Uncapped confidentiality breach liability carve-out","CRITICAL","Sec 9.1 makes confidentiality breaches strictly UNCAPPED; violates PB-5.4 (c:L086-087)."],
+  ["F34","Liability/IP","Uncapped IP indemnification liability carve-out","HIGH","Sec 9.1 makes IP indemnification strictly UNCAPPED; violates PB-5.4 (c:L086-087)."],
+  ["F35","Liability/IP","Consequential / indirect damages exclusion weakened or struck","UNVERIFIED","Base MSA consequential damages clause not included in Order Form excerpt; full MSA audit required."],
+  ["F36","Liability/IP","Buyer IP ownership / work-made-for-hire claim on custom integrations","UNVERIFIED","Custom SAP/ERP connector IP ownership not stated in Order Form excerpt; verify base MSA & SOW."],
+  ["F37","Liability/IP","Mandatory cyber insurance limits exceeding Seller corporate coverage","UNVERIFIED","Insurance schedule absent from Order Form excerpt; verify base MSA before turning paper."],
+  ["F38","Liability/IP","Unilateral customer audit rights at Seller's expense","UNVERIFIED","Audit clause absent from Order Form excerpt; verify base MSA security addendum."],
+  ["F39","SLA/Delivery","Hard implementation go-live deadline (<=45 days) without signed SOW","HIGH","Sec 3.1 mandates 45-day ERP cutover with zero signed SOW or Services scoping approval (c:L041; U-4)."],
+  ["F40","SLA/Delivery","SLA service credit cap exceeds standard 10% monthly pro-rata","CRITICAL","Sec 7.2 inflates monthly credit up to 25% of ANNUAL subscription fee ($13.5K Y1); violates PB-5.4 (c:L076-077)."],
+  ["F41","SLA/Delivery","Chronic SLA breach termination-for-cause after <=2 misses in 12 months","CRITICAL","Sec 7.2 triggers termination + full refund after any 2 SLA misses in 12 months; violates PB-5.4 (c:L077-079)."],
+  ["F42","SLA/Delivery","Uptime commitment exceeds standard 99.9% availability","PASS","Sec 7.1 maintains standard 99.9% monthly uptime commitment (c:L073)."],
+  ["F43","SLA/Delivery","Unscoped custom ERP/connector scope bundled without SOW sign-off","HIGH","Comment R-01 bundles custom SAP/ERP connector at fixed $24K without Services SOW (c:L015-016; U-4)."],
+  ["F44","SLA/Delivery","Missing customer-dependency exclusions on implementation timeline","MODERATE","Sec 3.1 imposes 45-day deadline without excusing Kestrel IT/data delays (c:L041)."],
+  ["F45","SLA/Delivery","Unpriced dedicated onshore TAM / Premier Support commitment","PASS","No unpriced Premier Support or dedicated TAM clause added in Order Form (c:L001-104)."],
+  ["F46","Gov/Renewal","Elimination of standard auto-renewal mechanism","MODERATE","Sec 5.4 strikes standard 60-day auto-renewal (c:L065-067; e:PB-5.4)."],
+  ["F47","Gov/Renewal","Multi-year 0% renewal price increase cap (below 7% standard)","HIGH","Sec 5.4 imposes 0% cap for 2 renewal terms ($18,567 foregone uplift vs 7% standard; c:L067-069; e:PB-5.4)."],
+  ["F48","Gov/Renewal","Most Favored Nation (MFN) pricing clause with retroactive credit","CRITICAL","Sec 11.3 adds retroactive MFN across <=100-seat industrial base; violates PB-5.4 (c:L092-095)."],
+  ["F49","Gov/Renewal","Authorized contract signatory differs from CRM Economic Buyer","HIGH","Sec 12 lists CFO Gregory Cho (sole authority >$50K) vs CRM VP Ops Derek Halvorsen (c:L100-104; a:CRM-28)."],
+  ["F50","Gov/Renewal","Mandatory written Finance / Margin sign-off absent before redlining","CRITICAL","ZERO Finance Margin Exception submitted to Controller Elena Rostova; verbal VP nod invalid (d:T102; e:PB-4.2,4.3)."],
+  ["F51","Gov/Renewal","Three-way mismatch across CRM, Quote Sheet, and Redlined Contract","CRITICAL","15 of 16 lines mismatched (93.8%) across CRM, Quote v4, and Redline v3; violates PB-6.1 (a,b,c,e)."]
+];
+
+function usd(n) { return (n < 0 ? "-$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US"); }
+function esc(s) { return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+function renderAll() {
+  const w = KESTREL_W1;
+  document.getElementById("w1Kpis").innerHTML = `
+    <div class="kpi"><div class="k">True Price Book List</div><div class="v">${usd(w.subList + w.implList)}</div></div>
+    <div class="kpi"><div class="k">Total Concession Leak</div><div class="v" style="color:#dc2626;">-${usd(w.subDiscAmt + w.implOverride)} (27.3%)</div></div>
+    <div class="kpi"><div class="k">Quoted 3-Yr TCV</div><div class="v">${usd(w.quotedTcv)}</div></div>
+    <div class="kpi"><div class="k">3-Yr Gross Margin</div><div class="v" style="color:#dc2626;">70.8% (-$10K Floor)</div></div>
+    <div class="kpi"><div class="k">ASC 606 Enforceable</div><div class="v" style="color:#dc2626;">${usd(w.y1Enforceable)} (-67.5%)</div></div>
+    <div class="kpi"><div class="k">Y1 Net After Comm</div><div class="v" style="color:#dc2626;">${usd(w.y1NetContrib)} (21.8%)</div></div>
+  `;
+
+  const steps = [
+    ["1. Standard Price Book Total List (PB-1.1 + PB-1.3)", 330000, "bar-base"],
+    ["2. Less Visible 28.0% Sub Discount (Quote!H12)", -84000, "bar-leak"],
+    ["3. Less Hidden Impl Cell E13 Override ($30K->$24K)", -6000, "bar-leak"],
+    ["4. = Quoted 3-Year Ramp TCV (Quote!I14)", 240000, "bar-base"],
+    ["5. Less 3-Year Direct COGS ($44K Sub + $26K ERP Impl)", -70000, "bar-warn"],
+    ["6. = Consolidated 3-Yr Gross Profit (70.8% GM; -$10K vs Floor)", 170000, "bar-warn"],
+    ["7. Less ASC 606 Unenforceable Y2-3 (Sec 2.3 Month-12 Opt-Out)", -162000, "bar-leak"],
+    ["8. = Enforceable Year-1 Revenue (50 Seats + Impl)", 78000, "bar-warn"],
+    ["9. Less Year-1 Direct COGS ($11K Seats + $26K ERP Impl)", -37000, "bar-leak"],
+    ["10. = Year-1 Gross Profit (52.6% Y1 GM)", 41000, "bar-warn"],
+    ["11. Less Upfront AE Commission Paid on 3-Yr TCV (10%)", -24000, "bar-leak"],
+    ["12. = Year-1 Net Cash Contribution (Before CS/Support/DSO)", 17000, "bar-leak"],
+    ["13. Memo: Y2-3 20% Seat True-Down Exposure (Sec 1.3)", -32400, "bar-warn"],
+    ["14. Memo: Net-60 Post-Acceptance Financing Drag (~75 Extra Days)", -1085, "bar-warn"]
+  ];
+  document.getElementById("w1Waterfall").innerHTML = steps.map(([lbl, val, cls]) => {
+    const pct = Math.min(100, (Math.abs(val) / 330000) * 100);
+    return `<div class="wf-row"><div><strong>${lbl}</strong></div><div class="wf-track"><div class="wf-bar ${cls}" style="width:${pct.toFixed(1)}%"></div></div><div style="text-align:right;font-weight:700;">${usd(val)}</div></div>`;
+  }).join("");
+
+  const w2b = document.getElementById("w2Body");
+  let sTot = 0, bTot = 0;
+  KESTREL_W2.forEach(s => {
+    if (s.side.startsWith("Seller")) sTot += s.score; else bTot += s.score;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><strong>${s.id}</strong></td><td>${s.side}</td><td>${esc(s.name)}</td><td><span class="tag t-crit">${s.score} / 2 BREACH</span></td><td>${esc(s.note)}</td>`;
+    w2b.appendChild(tr);
+  });
+  document.getElementById("w2Verdict").textContent = `BEHAVIORAL VERDICT [CRITICAL — ${sTot + bTot}/16]: DUAL FAILURE — Seller Governance Evasion (${sTot}/8) + Asymmetric/Unfunded Buyer Gate (${bTot}/8). Signing as written triggers immediate ASC 606 collapse and margin loss. DO NOT RESCUE OR SIGN AS WRITTEN.`;
+
+  let cCrit = 0, cHigh = 0, cMod = 0, cPass = 0, cUnv = 0;
+  KESTREL_51_FLAGS.forEach(f => {
+    if (f[3] === "CRITICAL") cCrit++;
+    else if (f[3] === "HIGH") cHigh++;
+    else if (f[3] === "MODERATE") cMod++;
+    else if (f[3] === "UNVERIFIED") cUnv++;
+    else cPass++;
+  });
+  const trig = cCrit + cHigh + cMod;
+  const tox = Math.round(((cCrit * 3 + cHigh * 2 + cMod) / (51 * 3)) * 100);
+  document.getElementById("w3Kpis").innerHTML = `
+    <div class="kpi"><div class="k">Total Flags Audited</div><div class="v">51 / 51</div></div>
+    <div class="kpi"><div class="k">Triggered Flags</div><div class="v" style="color:#dc2626;">${trig} / 51 (80.4%)</div></div>
+    <div class="kpi"><div class="k">CRITICAL Flags</div><div class="v" style="color:#dc2626;">${cCrit}</div></div>
+    <div class="kpi"><div class="k">HIGH / MOD Flags</div><div class="v" style="color:#d97706;">${cHigh} / ${cMod}</div></div>
+    <div class="kpi"><div class="k">PASS / UNVERIFIED</div><div class="v">${cPass} / ${cUnv}</div></div>
+    <div class="kpi"><div class="k">Contract Toxicity Score</div><div class="v" style="color:#dc2626;">${tox} / 100</div></div>
+  `;
+  renderFlags();
+}
+
+function renderFlags() {
+  const mode = document.getElementById("flagFilter").value;
+  const tb = document.getElementById("w3Body");
+  tb.innerHTML = "";
+  const mapCls = { CRITICAL: "t-crit", HIGH: "t-high", MODERATE: "t-mod", PASS: "t-pass", UNVERIFIED: "t-unv" };
+  KESTREL_51_FLAGS.forEach(([id, cat, name, st, cite]) => {
+    let show = true;
+    if (mode === "TRIGGERED") show = ["CRITICAL", "HIGH", "MODERATE"].includes(st);
+    else if (mode !== "ALL") show = st === mode;
+    if (!show) return;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><strong>${id}</strong></td><td>${cat}</td><td>${esc(name)}</td><td><span class="tag ${mapCls[st]}">${st}</span></td><td>${esc(cite)}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function exportFlagsCSV() {
+  const rows = [["Flag_ID", "Category", "Contract_Flag", "Audit_Status", "Kestrel_Proof"]];
+  KESTREL_51_FLAGS.forEach(f => rows.push(f));
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "kestrel_step4_51_contract_flags.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+renderAll();
+</script>
+</body>
+</html>
