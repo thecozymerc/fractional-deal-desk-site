@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runbook A — Step 6 Sample: Kestrel SNAPPS Executive Readout &amp; Commercial Bridge</title>
+<style>
+  :root {
+    --ink: #111827;
+    --muted: #4b5563;
+    --line: #d1d5db;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --navy: #0f172a;
+    --blue: #1d4ed8;
+    --green-bg: #dcfce7;
+    --green-ink: #166534;
+    --amber-bg: #fef3c7;
+    --amber-ink: #92400e;
+    --red-bg: #fee2e2;
+    --red-ink: #991b1b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.5; }
+  .wrap { max-width: 1180px; margin: 18px auto; padding: 0 16px 40px; }
+  .topbar { background: var(--navy); color: #fff; padding: 20px 24px; border-radius: 10px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+  .topbar h1 { margin: 0; font-size: 21px; }
+  .topbar p { margin: 4px 0 0; font-size: 13px; color: #cbd5e1; }
+  .pill { background: #16a34a; color: #fff; padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 12px; }
+  .lock-bar { margin-top: 14px; padding: 11px 16px; border-radius: 8px; background: var(--green-bg); color: var(--green-ink); border: 1px solid #86efac; font-weight: 700; font-size: 13px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 22px; margin-top: 14px; }
+  .card h2 { margin: 0 0 12px; font-size: 16.5px; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .beat-tag { background: #e0e7ff; color: #3730a3; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .pr-box { background: #f8fafc; border: 1px solid #cbd5e1; border-left: 5px solid var(--navy); padding: 14px 16px; border-radius: 6px; font-size: 14px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin: 12px 0; }
+  .kpi { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; }
+  .kpi .k { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+  .kpi .v { font-size: 18px; font-weight: 800; margin-top: 3px; color: #991b1b; }
+  .kpi .s { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; margin-top: 10px; }
+  .panel { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 14px; background: #fff; }
+  .panel.cause-x { border-left: 5px solid #dc2626; background: #fef2f2; }
+  .panel.cause-y { border-left: 5px solid #6b7280; background: #f9fafb; }
+  .panel h3 { margin: 0 0 6px; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 10px; }
+  th, td { border: 1px solid #e5e7eb; padding: 7px 8px; text-align: left; vertical-align: top; }
+  th { background: #f9fafb; font-size: 11.5px; color: var(--muted); }
+  .boundary-box { background: #fffbeb; border: 1px solid #fcd34d; border-left: 5px solid #d97706; border-radius: 6px; padding: 12px 14px; font-size: 13.5px; font-weight: 600; color: #92400e; }
+  .bridge-quote { background: #eff6ff; border: 1px solid #93c5fd; border-left: 5px solid var(--blue); border-radius: 8px; padding: 15px 18px; font-size: 15px; font-weight: 700; color: #1e3a8a; line-height: 1.55; }
+  .scope-box { background: #f8fafc; border: 1px dashed #94a3b8; border-radius: 6px; padding: 10px 12px; font-size: 12.5px; color: #334155; margin-top: 12px; }
+  .unruled { background: var(--amber-bg); color: var(--amber-ink); border: 1px solid #fcd34d; border-radius: 6px; padding: 9px 12px; font-size: 12.5px; margin-top: 10px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  button { border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 7px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  @media print { body { background: #fff; } .toolbar, .no-print { display: none !important; } .card { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>SNAPPS Executive Readout &amp; Commercial Bridge — Kestrel Industrial Holdings</h1>
+      <p>Opportunity OPP-2026-4819 | Diagnostic Date: November 25, 2026 | Slot #1 in Validation Mode | Step 5 Time-Out Cleared</p>
+    </div>
+    <span class="pill">COMPLETED SAMPLE — KESTREL</span>
+  </div>
+
+  <div class="lock-bar">
+    STEP 5 TIME-OUT SURVIVAL VERIFIED: Every figure below ties to a verified Step 1 line/timestamp. Non-additive diff totals ($1.33M) stripped; 4 base-MSA flags &amp; 7 unknowns explicitly labeled UNVERIFIED; Clean No-Rescue Boundary active.
+  </div>
+
+  <!-- BEAT 1 -->
+  <div class="card">
+    <h2>Beat 1 — Problem Representation (Aligned Verified Baseline) <span class="beat-tag">MINUTES 0–5</span></h2>
+    <div class="pr-box">
+      <strong>Kestrel Industrial Holdings</strong> is a <strong>$240,000 enterprise 3-year ramp</strong> opportunity — 50, 70, and 80 seats plus $24,000 implementation — stalled in Stage 5 for <strong>19 calendar days</strong> since Kestrel General Counsel Nadia Benali returned redlines on November 6, 2026 (<code>c:L001-104; d:T039-050</code>). The stall sits internally on Deal Desk Ticket <code>DD-8842</code>, placed on <strong>HARD HOLD</strong> by Priyesh Patel on November 9, and externally with Kestrel's unengaged economic buyer, <strong>CFO Gregory Cho</strong>, who has not reviewed or approved capital budget ahead of a December 2 Q4 budget committee deadline (<code>d:T047-049,T062-076,T086-088,T104</code>). What changed on November 3 and November 6 is that AE Jordan Reyes sent an unapproved offline quote with a <strong>28.0% discretionary subscription discount</strong>, a manual <strong>$6,000 implementation list override</strong>, and <strong>Net-60</strong> terms while leaving CRM at 20.0% and Net-30 (<code>a:CRM-15-26; b:E13,G12</code>), and Kestrel redlined a <strong>penalty-free Month-12 opt-out</strong>, <strong>Net-60 post-acceptance invoicing</strong>, a <strong>20% Year 2–3 seat true-down</strong>, and a <strong>3x ($720K) liability cap with uncapped security/IP</strong> (<code>c:L019-095</code>). Severity is critical: consolidated gross margin is <strong>70.8%</strong> ($10,000 below the 75.0% policy floor) with <strong>verbal VP Sales support only</strong> and <strong>zero Finance margin sign-off</strong> (<code>b:M14,F19; d:T036,T095,T102; e:PB-4.1,4.3</code>), while the Month-12 opt-out collapses ASC 606 enforceable TCV from $240,000 to $78,000 (<code>b:Year1_OptOut!B4:B5; e:PB-5.3</code>).
+    </div>
+  </div>
+
+  <!-- BEAT 2 -->
+  <div class="card">
+    <h2>Beat 2 — Exact Stuck Point &amp; Failed Controls (Cause X vs Cause Y) <span class="beat-tag">MINUTES 5–15</span></h2>
+    <div class="kpi-row">
+      <div class="kpi"><div class="k">True Price Concession</div><div class="v">-$90,000</div><div class="s">27.3% off $330K list ($84K sub + $6K E13 override)</div></div>
+      <div class="kpi"><div class="k">3-Year Gross Margin</div><div class="v">70.8%</div><div class="s">-$10,000 below 75.0% floor; 0 Finance sign-off</div></div>
+      <div class="kpi"><div class="k">ASC 606 Enforceable</div><div class="v">$78,000</div><div class="s">-$162,000 (-67.5%) unenforceable via Month-12 exit</div></div>
+      <div class="kpi"><div class="k">Y1 Net After Comm</div><div class="v">$17,000</div><div class="s">52.6% Y1 GM minus $24K upfront comm; ~105d DSO</div></div>
+      <div class="kpi"><div class="k">3-Way Diff / Flags</div><div class="v">15/16 &amp; 41/47</div><div class="s">93.8% CRM mismatch; 20 CRITICAL flags (+4 MSA unv.)</div></div>
+    </div>
+
+    <div class="two-col">
+      <div class="panel cause-x">
+        <h3>PROVEN CAUSE X — Dual Internal Governance/Tooling Deadlock + Unengaged Buyer CFO Gate</h3>
+        <ul style="margin:6px 0;padding-left:18px;font-size:13px;">
+          <li><strong>85.4% of the 19-day stall (388.3 of 454.8 hrs)</strong> is unworked internal hold time on Deal Desk Ticket <code>DD-8842</code> (16 days since Nov 9 HARD HOLD); <strong>0.0% ever reached Finance Controller Elena Rostova</strong> (<code>d:T062-102</code>).</li>
+          <li><strong>4 Failed Upstream System Controls:</strong> Unsynced offline Excel (<code>a:CRM-25</code>), false-green CRM Finance clearance triggered by stale 20.0% entry (<code>a:CRM-15,22</code>), unlocked list cell <code>E13</code> overwritten $30K->$24K (<code>b:E13; e:PB-1.3</code>), and CRM permitting <code>Forecast=Commit</code> while Legal &amp; Deal Desk are <code>Blocked/On Hold</code> (<code>a:CRM-08,23,24</code>).</li>
+          <li><strong>Invalid Executive Approval:</strong> VP Sales Marcus Vance sent casual Slack nods (Nov 4 &amp; Nov 18) without viewing 28% discount, 70.8% GM, or opt-out — invalid under <code>PB-4.3</code> (<code>d:T032-038,T095-098</code>).</li>
+          <li><strong>External Buyer Authority Gap:</strong> Sole signatory &gt;$50K is <strong>CFO Gregory Cho</strong> (<code>c:L100-104</code>), who has had <strong>ZERO meetings</strong> and <strong>ZERO budget approval</strong> ahead of Dec 2 (<code>d:T047-049,T104</code>); Ohio plant consolidation drives buyer's 20% true-down &amp; exit ask (<code>c:L022-023</code>).</li>
+        </ul>
+      </div>
+      <div class="panel cause-y">
+        <h3>REFUTED CAUSE Y — Why It Is NOT "Slow Buyer Legal" OR "Just One Bad Rep"</h3>
+        <ul style="margin:6px 0;padding-left:18px;font-size:13px;">
+          <li><strong>Not Slow Buyer Legal:</strong> Kestrel GC Nadia Benali turned full redlines in <strong>2.7 days</strong> (Nov 3 -> Nov 6) and champion Derek Halvorsen chased Seller on Nov 16; Buyer Legal held the ball for <strong>0.0% (0.0 hours)</strong> of the 19-day post-redline stall (<code>d:T018,T039,T081</code>).</li>
+          <li><strong>Not Internal Bureaucracy:</strong> Seller Legal triaged in <strong>1.6 hours</strong> (<code>d:T056</code>) and Deal Desk audited 5 SOX/ASC 606/margin violations in <strong>1 business day</strong> (<code>d:T062</code>).</li>
+          <li><strong>Not Just One Rep:</strong> Coaching AE Jordan Reyes alone fails to close the CRM false-green workflow, unprotected Excel price cells, or unblocked Commit holds — and still leaves CFO Gregory Cho unengaged with unapproved budget.</li>
+          <li><strong>Separate Contingent Legal Risk (Non-Additive):</strong> If signed as written under Q4 panic, Seller faces a <code>$720K</code> liability cap + <strong>uncapped security/confidentiality/IP</strong>, 25% annual SLA refund exit, 20% Y2–3 seat true-down (<code>-$32.4K</code>), 0% 2-term renewal cap (<code>-$18.6K</code>), and retroactive MFN contagion (<code>c:L019-095</code>).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="scope-box">
+      <strong>Step 5 Verified Scope Limits &amp; Explicit UNVERIFIED Unknowns:</strong> Contract flag count covers <strong>47 evaluated Order Form/Amendment clauses</strong> (`41` triggered: `20` CRITICAL, `16` HIGH, `5` MODERATE; `6` PASS). Base MSA &amp; ERP SOW were not in Step 1 artifacts: <strong>4 base-MSA flags (`F35` consequential damages, `F36` ERP IP ownership, `F37` cyber insurance, `F38` audit rights)</strong> and <strong>7 unknowns (`U-1` CFO budget availability/trade-off appetite, `U-2` Seller Finance exception floor, `U-3` VP Marcus P&amp;L sponsorship, `U-4` 45-day SAP/ERP delivery cost vs `$26K` COGS, `U-5` competitor presence, `U-6` unlogged phone calls Nov 16–25, `U-7` exact Dec 2 docket specs)</strong> remain explicitly <strong>UNVERIFIED</strong>.
+    </div>
+  </div>
+
+  <!-- BEAT 3 -->
+  <div class="card">
+    <h2>Beat 3 — Clean Boundary (No Rescue): Client-Owned MESO Structural Options <span class="beat-tag">MINUTES 15–23</span></h2>
+    <div class="boundary-box">
+      CLEAN BOUNDARY (NO RESCUE): Our diagnostic work ends here. We will NOT redline OF-2026-4819-v3, email Kestrel GC Nadia Benali, join a call with CFO Gregory Cho, or lobby Finance Controller Elena Rostova. Below are four financially modeled structural options for your Revenue, Finance, and Legal leaders to evaluate and execute directly.
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:15%;">Client Option</th>
+          <th style="width:27%;">Structural &amp; Commercial Design</th>
+          <th style="width:23%;">Verified Economics &amp; ASC 606</th>
+          <th style="width:19%;">Written Approvals Needed</th>
+          <th style="width:16%;">What It Tests</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>MESO Option A</strong><br><em>Keep $240K Price -> Firm 3-Yr Commit &amp; Standard Terms</em></td>
+          <td>50/70/80 ramp at 28% sub ($216K) + $24K impl = <strong>$240K</strong>. <strong>STRIKE</strong> Month-12 opt-out, 20% true-down, Net-60 acceptance, MFN, 3x/uncapped cap, SLA refund. Restore <strong>Net-30 upfront</strong> &amp; signed SOW.</td>
+          <td>TCV: <strong>$240,000</strong><br>ASC 606 Enforceable: <strong>$240,000 (100%)</strong><br>3-Yr GM: <strong>70.8%</strong> (-$10K floor)<br>3-Yr Net After Comm: <strong>$146,000</strong></td>
+          <td>Written Tier-4 Finance Controller/CFO Margin Exception (<code>U-2</code>) + Written VP Sales + ERP SOW (<code>U-4</code>).</td>
+          <td>Tests whether CFO Cho truly wants a $240K 3-yr deal or only a free 1-yr option.</td>
+        </tr>
+        <tr>
+          <td><strong>MESO Option B</strong><br><em>Keep Month-12 Exit &amp; Net-60 Invoice -> Policy Floor + PB-5.3 Clawback</em></td>
+          <td>50/70/80 ramp at <strong>16.0% disc ($1,260/seat)</strong> = $252K + <strong>$30K std impl</strong> = <strong>$282K</strong>. Permit Month-12 exit ONLY w/ 60-day notice + <strong>PB-5.3 clawback to $1,500 list (+$12K)</strong>. <strong>Net-60 from invoice</strong> (no acceptance gate). Standard 1x cap (opt. GC 2x sec sub-cap), no MFN.</td>
+          <td>TCV: <strong>$282,000</strong><br>3-Yr GM: <strong>75.2% (+$500 PASSES FLOOR)</strong><br>ASC 606 Y1 Base: <strong>$93,000</strong> (+$12K exit clawback)<br>Y1 Net After Enforc. Comm ($9.3K): <strong>$46,700</strong></td>
+          <td>Written VP Sales (Tier-2 16%) + Finance Controller (Net-60) + GC/CFO/Rev-Rec (<code>PB-5.3</code> exit) + ERP SOW.</td>
+          <td>Honors buyer exit &amp; Net-60 AP guardrails while passing Seller's 75% GM floor &amp; 606 discipline.</td>
+        </tr>
+        <tr>
+          <td><strong>MESO Option C</strong><br><em>Clean 12-Month Paid Pilot (Zero Multi-Year Discount)</em></td>
+          <td><strong>12-month non-cancellable</strong>: 50 seats @ <strong>$1,500 list (0% disc) = $75K</strong> + <strong>$30K std impl</strong> w/ signed SOW = <strong>$105K</strong>. Pre-negotiated Y2–3 upgrade schedule (70/80 seats) unlocked only upon signed 24-mo expansion order. <strong>Net-45/60 invoice-dated</strong>, standard MSA.</td>
+          <td>1-Yr TCV: <strong>$105,000</strong><br>ASC 606 Enforceable: <strong>$105,000 (100%)</strong><br>Y1 GM: <strong>64.8%</strong> (vs 52.6% redline)<br>Y1 Net After Comm ($10.5K): <strong>$57,500 (3.4x Redline!)</strong></td>
+          <td>Zero discount tier exception (0% off list) + Finance Controller (Net-45/60) + VP Services SOW.</td>
+          <td>Fits smaller Q4 CFO budget, eliminates 606/clawback risk, and triples Y1 cash contribution.</td>
+        </tr>
+        <tr>
+          <td><strong>Option D</strong><br><em>Controlled Q4 De-Commit &amp; Re-Qualification</em></td>
+          <td>Pull $240K out of Q4 Commit immediately; reconcile CRM to v4/redline to clear <code>PB-6.1</code>; require direct CFO Gregory Cho call, ERP SOW, and full base MSA audit (<code>F35–F38</code>) before re-quoting for Q1/Q2 2027.</td>
+          <td>Toxic Risk Signed: <strong>$0</strong><br>Q4 Forecast Integrity: <strong>Restored</strong><br>Avoids -$162K 606 shock &amp; uncapped security risk.</td>
+          <td>CRO / VP RevOps forecast adjustment + Deal Desk CRM hygiene reset.</td>
+          <td>Prevents Q4 panic override on an unverified, unfunded deal with 6 days left.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- BEAT 4 -->
+  <div class="card">
+    <h2>Beat 4 — The Commercial Bridge (Slot #1 -> 5-Deal Forensic Diagnostic) <span class="beat-tag">MINUTES 23–30</span></h2>
+    <div class="bridge-quote">
+      "We proved exactly why this deal broke. What neither of us knows yet is whether this is a one-off outlier or how 20-30% of your deal flow quietly leaks across handoffs. That's what the 5-deal Forensic Diagnostic proves in 5 business days — with this deal as Slot #1."
+    </div>
+    <table style="margin-top:12px;">
+      <thead>
+        <tr>
+          <th style="width:12%;">Slot</th>
+          <th style="width:28%;">Deal Selection</th>
+          <th style="width:16%;">Status</th>
+          <th style="width:44%;">Forensic Objective (5 Business Days)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Slot #1</strong></td><td><strong>Kestrel Industrial Holdings ($240K)</strong></td><td><strong style="color:#166534;">COMPLETED (Day 0)</strong></td><td>Baseline proven: 15/16 CRM mismatches, false-green Finance flag, 85.4% unworked hold, 70.8% GM, $162K ASC 606 opt-out exposure.</td></tr>
+        <tr><td><strong>Slot #2</strong></td><td>Current Q4 Commit Enterprise Deal (&gt;$150K)</td><td>To Pull — Day 1</td><td>Test whether false-green CRM approvals and unengaged Economic Buyers recur inside Q4 Commit.</td></tr>
+        <tr><td><strong>Slot #3</strong></td><td>Current Stalled / Redline-Delayed Deal (&gt;14d)</td><td>To Pull — Day 2</td><td>Test whether post-redline stalls are buyer legal friction or silent internal Deal Desk/Finance deadlocks.</td></tr>
+        <tr><td><strong>Slot #4</strong></td><td>Recently Closed-Won Multi-Year Ramp</td><td>To Pull — Day 3</td><td>Test whether closed-won deals quietly shipped sub-75% GM, overwritten impl cells, or hidden ASC 606 opt-outs.</td></tr>
+        <tr><td><strong>Slot #5</strong></td><td>Recent Closed-Lost Enterprise Deal</td><td>To Pull — Day 4</td><td>Test whether preventable internal approval delays or misqualified champions drove avoidable losses.</td></tr>
+      </tbody>
+    </table>
+    <div class="unruled">
+      <strong>Commercial Offer Clarification (Unruled Suggestion):</strong> Neon's suggestion of a <strong>$100 validation fee credited toward the 5-deal Forensic Diagnostic</strong> is explicitly <strong>unruled and NOT part of the ruled price</strong>. Any commercial engagement proceeds strictly under ruled pricing unless separately authorized.
+    </div>
+    <div class="toolbar no-print">
+      <button class="primary" onclick="window.print()">Print / Save Kestrel SNAPPS Executive Brief (PDF)</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
