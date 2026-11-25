@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runbook A — Tools &amp; Samples Hub</title>
+<style>
+  :root {
+    --ink: #0f172a;
+    --muted: #475569;
+    --line: #cbd5e1;
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --navy: #0f172a;
+    --navy-soft: #1e293b;
+    --tool: #1d4ed8;
+    --tool-bg: #dbeafe;
+    --tool-ink: #1e40af;
+    --sample: #0f766e;
+    --sample-bg: #ccfbf1;
+    --sample-ink: #115e59;
+    --ext-bg: #f1f5f9;
+    --ext-ink: #334155;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.45;
+  }
+  .wrap { max-width: 1320px; margin: 20px auto; padding: 0 18px 48px; }
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #fff;
+    padding: 24px 26px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.14);
+  }
+  .hero-top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .hero h1 { margin: 0; font-size: 24px; letter-spacing: -0.01em; }
+  .hero p { margin: 6px 0 0; font-size: 13.5px; color: #cbd5e1; max-width: 780px; }
+  .backbone {
+    margin-top: 12px;
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: #e2e8f0;
+    font-weight: 600;
+  }
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .stat {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .stat .num { font-size: 20px; font-weight: 800; color: #fff; }
+  .stat .lbl { font-size: 11px; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.04em; }
+  .kestrel-strip {
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    color: #78350f;
+    font-size: 12.5px;
+  }
+  .controls {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 14px;
+    position: sticky;
+    top: 10px;
+    z-index: 20;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+  }
+  .controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  .search-input {
+    flex: 1 1 280px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+  .select-input {
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    font-size: 13px;
+    background: #fff;
+    color: var(--ink);
+  }
+  .pill-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    align-items: center;
+  }
+  .f-btn {
+    border: 1px solid var(--line);
+    background: #f8fafc;
+    color: var(--ink);
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.12s ease, border-color 0.12s ease;
+  }
+  .f-btn:hover { background: #e2e8f0; }
+  .f-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .f-btn.active-tool { background: var(--tool); color: #fff; border-color: var(--tool); }
+  .f-btn.active-sample { background: var(--sample); color: #fff; border-color: var(--sample); }
+  .divider { width: 1px; height: 22px; background: var(--line); margin: 0 4px; }
+  .status-line {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .step-group {
+    margin-top: 20px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .step-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+  }
+  .step-head h2 { margin: 0; font-size: 17px; color: var(--navy); }
+  .step-sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .step-count {
+    background: #e2e8f0;
+    color: #0f172a;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 12px;
+  }
+  .item-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-left: 5px solid var(--tool);
+    border-radius: 8px;
+    padding: 12px 14px;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  }
+  .item-card.is-sample { border-left-color: var(--sample); }
+  .item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.10);
+    border-color: #94a3b8;
+  }
+  .item-card:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+  .item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+  }
+  .badges { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .b-tool { background: var(--tool-bg); color: var(--tool-ink); }
+  .b-sample { background: var(--sample-bg); color: var(--sample-ink); }
+  .b-step { background: #e2e8f0; color: #1e293b; }
+  .b-ext { background: var(--ext-bg); color: var(--ext-ink); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .fname {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
+    word-break: break-all;
+  }
+  .purpose { font-size: 12.5px; color: var(--muted); }
+  .open-cue {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tool);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 6px;
+    border-top: 1px solid #f1f5f9;
+  }
+  .item-card.is-sample .open-cue { color: var(--sample); }
+  /* Compact Row List View */
+  body.view-rows .card-grid { display: flex; flex-direction: column; gap: 8px; }
+  body.view-rows .item-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 9px 14px;
+  }
+  body.view-rows .item-meta { flex: 0 0 215px; }
+  body.view-rows .item-body { flex: 1 1 auto; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; }
+  body.view-rows .fname { min-width: 310px; }
+  body.view-rows .purpose { flex: 1 1 280px; }
+  body.view-rows .open-cue { flex: 0 0 auto; border-top: none; padding-top: 0; }
+  .empty-state {
+    display: none;
+    background: var(--card);
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    padding: 28px;
+    text-align: center;
+    margin-top: 16px;
+    color: var(--muted);
+  }
+  .hidden { display: none !important; }
+  @media (max-width: 780px) {
+    .card-grid { grid-template-columns: 1fr; }
+    body.view-rows .item-card { flex-direction: column; align-items: flex-start; }
+    body.view-rows .item-meta, body.view-rows .fname { min-width: 0; flex: auto; }
+  }
+  @media print {
+    body { background: #fff; }
+    .controls { display: none !important; }
+    .step-group { break-inside: avoid; }
+    .item-card { break-inside: avoid; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-top">
+      <div>
+        <h1>Runbook A — Tools &amp; Samples Hub</h1>
+        <p>Complete interactive index of all 41 working files built for Runbook A: diagnosing ONE difficult deal in 2 hours using the UW FCM Clinical Diagnostic Method.</p>
+        <div class="backbone">UW FCM &rarr; Primary-Source Check &rarr; Surgical Sieve &rarr; Ely / Graber / TWED Time-Out &rarr; SNAPPS Readout</div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="num">41</div><div class="lbl">Total Clickable Files</div></div>
+      <div class="stat"><div class="num">19</div><div class="lbl">Reusable Tools</div></div>
+      <div class="stat"><div class="num">22</div><div class="lbl">Kestrel Samples</div></div>
+      <div class="stat"><div class="num">6</div><div class="lbl">Runbook Steps</div></div>
+      <div class="stat"><div class="num">~2 Hrs</div><div class="lbl">Session Duration</div></div>
+    </div>
+    <div class="kestrel-strip">
+      <strong>Sample Deal Baseline (Slot #1 — Validation Mode):</strong> Kestrel Industrial Holdings, Inc. (<code>OPP-2026-4819</code>) &bull; $240,000 enterprise 3-year ramp (50/70/80 seats + $24K ERP impl) &bull; 28.0% discretionary subscription discount &bull; 70.8% GM ($10K below 75.0% floor) &bull; Month-12 custom opt-out &bull; Net-60 post-acceptance terms &bull; 19-day stall post-redline &bull; Verbal VP support only, zero Finance margin sign-off.
+    </div>
+  </header>
+
+  <section class="controls" aria-label="Filter and search tools and samples">
+    <div class="controls-row">
+      <input type="search" id="searchBox" class="search-input" placeholder="Search by exact file name, step, tool/sample, or purpose..." oninput="applyFilters()">
+      <select id="extFilter" class="select-input" onchange="applyFilters()" aria-label="Filter by file format">
+        <option value="ALL">All File Formats (41)</option>
+        <option value="html">.html — Interactive Browser Apps (12)</option>
+        <option value="py">.py — Python / Excel Builders (13)</option>
+        <option value="md">.md — Playbooks, Docs &amp; Artifacts (15)</option>
+        <option value="csv">.csv — Raw CRM Export (1)</option>
+      </select>
+      <button type="button" class="f-btn" id="viewToggle" onclick="toggleView()">Switch to Row View</button>
+      <button type="button" class="f-btn" onclick="resetFilters()">Reset Filters</button>
+    </div>
+    <div class="pill-bar">
+      <button type="button" class="f-btn active" data-step-btn="ALL" onclick="setStep('ALL')">All Steps (41)</button>
+      <button type="button" class="f-btn" data-step-btn="1" onclick="setStep('1')">Step 1 (9)</button>
+      <button type="button" class="f-btn" data-step-btn="2" onclick="setStep('2')">Step 2 (6)</button>
+      <button type="button" class="f-btn" data-step-btn="3" onclick="setStep('3')">Step 3 (6)</button>
+      <button type="button" class="f-btn" data-step-btn="4" onclick="setStep('4')">Step 4 (8)</button>
+      <button type="button" class="f-btn" data-step-btn="5" onclick="setStep('5')">Step 5 (6)</button>
+      <button type="button" class="f-btn" data-step-btn="6" onclick="setStep('6')">Step 6 (6)</button>
+      <span class="divider" aria-hidden="true"></span>
+      <button type="button" class="f-btn active" data-type-btn="ALL" onclick="setType('ALL')">All Types (41)</button>
+      <button type="button" class="f-btn" data-type-btn="tool" onclick="setType('tool')">Tools Only (19)</button>
+      <button type="button" class="f-btn" data-type-btn="sample" onclick="setType('sample')">Samples Only (22)</button>
+    </div>
+    <div class="status-line">
+      <span id="visibleCount">Showing 41 of 41 clickable fields (19 tools, 22 samples)</span>
+      <span>Click any card or row to open that file directly via its relative file path.</span>
+    </div>
+  </section>
+
+  <div id="emptyState" class="empty-state">
+    <strong>No matching tools or samples found.</strong><br>
+    Try clearing your search query or clicking <button type="button" class="f-btn" onclick="resetFilters()" style="margin-left:6px;">Reset Filters</button>.
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- STEP 1 — 9 CLICKABLE FIELDS (3 TOOLS + 6 SAMPLES)                        -->
+  <!-- ======================================================================= -->
+  <section class="step-group" data-step-group="1">
+    <div class="step-head">
+      <div>
+        <h2>Step 1 — Pull Raw Artifacts: Primary-Source Check (10 Min)</h2>
+        <div class="step-sub">Pull all 5 raw artifacts BEFORE accepting the AE's story: (a) CRM, (b) quote spreadsheet, (c) redlined contract, (d) approval thread, (e) price book &amp; policy.</div>
+      </div>
+      <span class="step-count" data-step-badge="1">9 Files (3 Tools, 6 Samples)</span>
+    </div>
+    <div class="card-grid">
+      <!-- Step 1 Tools (3) -->
+      <a class="item-card is-tool" href="step1_tool_primary_source_gate.html" target="_blank" rel="noopener" data-step="1" data-type="tool" data-ext="html">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 1</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.html</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step1_tool_primary_source_gate.html</div>
+          <div class="purpose">Reusable interactive browser checklist, 10-minute timer, AE-story quarantine log, and Primary-Source Go/No-Go gate calculator with JSON, CSV, and PDF output.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-tool" href="step1_tool_artifact_pull_script.md" target="_blank" rel="noopener" data-step="1" data-type="tool" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 1</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step1_tool_artifact_pull_script.md</div>
+          <div class="purpose">Reusable pre-session artifact request kit, 10-minute live facilitation script, and AE-story deflection playbook for enforcing the Primary-Source Check.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-tool" href="step1_tool_artifact_intake_checker.py" target="_blank" rel="noopener" data-step="1" data-type="tool" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 1</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step1_tool_artifact_intake_checker.py</div>
+          <div class="purpose">Reusable Python verifier that audits any deal folder for all 5 raw artifacts, computes SHA-256 hashes, flags screenshots/empty files, and builds a formula-driven Excel intake register.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <!-- Step 1 Samples (6) -->
+      <a class="item-card is-sample" href="step1_sample_kestrel_primary_source_gate.html" target="_blank" rel="noopener" data-step="1" data-type="sample" data-ext="html">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 1</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.html</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step1_sample_kestrel_primary_source_gate.html</div>
+          <div class="purpose">Completed interactive Step 1 Primary-Source Intake Gate filled in for Kestrel Industrial Holdings with all 5 verified raw artifacts, quarantined AE claims, and initial red flags.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step1_sample_kestrel_a_crm_opportunity.csv" target="_blank" rel="noopener" data-step="1" data-type="sample" data-ext="csv">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 1</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.csv</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step1_sample_kestrel_a_crm_opportunity.csv</div>
+          <div class="purpose">Kestrel Raw Artifact (a): Salesforce CRM Opportunity Record export (OPP-2026-4819) containing field-level audit timestamps and un-synced AE entries (20% discount, Net-30, Commit).</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step1_sample_kestrel_b_pricing_spreadsheet.py" target="_blank" rel="noopener" data-step="1" data-type="sample" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 1</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step1_sample_kestrel_b_pricing_spreadsheet.py</div>
+          <div class="purpose">Kestrel Raw Artifact (b) builder producing step1_sample_kestrel_b_pricing_spreadsheet.xlsx: live formula Quote &amp; Margin Sheet ($240K ramp, 28% disc, E13 override, 70.8% GM, Month-12 opt-out).</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step1_sample_kestrel_c_redlined_contract.md" target="_blank" rel="noopener" data-step="1" data-type="sample" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 1</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step1_sample_kestrel_c_redlined_contract.md</div>
+          <div class="purpose">Kestrel Raw Artifact (c): Line-numbered Redlined Order Form &amp; MSA Amendment (OF-2026-4819-v3) returned Nov 6, 2026 with tracked changes and GC Nadia Benali comments.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step1_sample_kestrel_d_approval_thread.md" target="_blank" rel="noopener" data-step="1" data-type="sample" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 1</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step1_sample_kestrel_d_approval_thread.md</div>
+          <div class="purpose">Kestrel Raw Artifact (d): Complete chronologically timestamped Email &amp; Slack approval thread (Oct 28–Nov 25, 2026) proving the 19-day stall, verbal VP nods, Deal Desk HARD HOLD, and unengaged CFO.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step1_sample_kestrel_e_price_book_policy.md" target="_blank" rel="noopener" data-step="1" data-type="sample" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 1</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step1_sample_kestrel_e_price_book_policy.md</div>
+          <div class="purpose">Kestrel Raw Artifact (e): Standard Enterprise Price Book &amp; Commercial Discount Policy (POL-COMM-2026-v3) establishing list prices, direct COGS, Tier 0–4 approvals, 75% GM floor, and PB-4.3 verbal ban.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ======================================================================= -->
+  <!-- STEP 2 — 6 CLICKABLE FIELDS (3 TOOLS + 3 SAMPLES)                        -->
+  <!-- ======================================================================= -->
+  <section class="step-group" data-step-group="2">
+    <div class="step-head">
+      <div>
+        <h2>Step 2 — Focused History &amp; Problem Representation (30 Min)</h2>
+        <div class="step-sub">UW FCM 60–90 second verified Problem Representation, OLDCARTS Deal Chronology, and Q1 Block A Structured Interview (Who / When / What deal shape).</div>
+      </div>
+      <span class="step-count" data-step-badge="2">6 Files (3 Tools, 3 Samples)</span>
+    </div>
+    <div class="card-grid">
+      <!-- Step 2 Tools (3) -->
+      <a class="item-card is-tool" href="step2_tool_uw_fcm_problem_representation.html" target="_blank" rel="noopener" data-step="2" data-type="tool" data-ext="html">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 2</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.html</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step2_tool_uw_fcm_problem_representation.html</div>
+          <div class="purpose">Reusable interactive UW FCM Problem Representation Builder with a 30-minute timer, 7-dimension citation tracker, live 60–90 second pacing calculator, and hearsay-word detector.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-tool" href="step2_tool_oldcarts_chronology.py" target="_blank" rel="noopener" data-step="2" data-type="tool" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 2</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step2_tool_oldcarts_chronology.py</div>
+          <div class="purpose">Reusable Python script building step2_tool_oldcarts_chronology_template.xlsx: a blank, live-formula multi-tab Excel workbook for 8-dimension OLDCARTS chronology and elapsed-day timeline tracking.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-tool" href="step2_tool_q1_block_a_interview.md" target="_blank" rel="noopener" data-step="2" data-type="tool" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 2</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step2_tool_q1_block_a_interview.md</div>
+          <div class="purpose">Reusable Q1 Block A Structured Interview Protocol, clinical probing guide, and blank Who / When / What Deal Shape verification worksheet.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <!-- Step 2 Samples (3) -->
+      <a class="item-card is-sample" href="step2_sample_kestrel_uw_fcm_problem_representation.html" target="_blank" rel="noopener" data-step="2" data-type="sample" data-ext="html">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 2</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.html</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step2_sample_kestrel_uw_fcm_problem_representation.html</div>
+          <div class="purpose">Completed interactive UW FCM Problem Representation for Kestrel using strictly verified Step 1 facts (~197 words / ~79 sec spoken) with all 7 unverified gaps explicitly flagged.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step2_sample_kestrel_oldcarts_chronology.py" target="_blank" rel="noopener" data-step="2" data-type="sample" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 2</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step2_sample_kestrel_oldcarts_chronology.py</div>
+          <div class="purpose">Python builder producing step2_sample_kestrel_oldcarts_chronology.xlsx: Kestrel's completed 8-dimension OLDCARTS Matrix and 14-event timeline with live elapsed-day formulas (19-day stall, 16-day hold).</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step2_sample_kestrel_q1_block_a_interview.md" target="_blank" rel="noopener" data-step="2" data-type="sample" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 2</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step2_sample_kestrel_q1_block_a_interview.md</div>
+          <div class="purpose">Completed Q1 Block A Structured Interview record for Kestrel contrasting interviewee claims vs Step 1 primary-source proof across Who, When, and What Deal Shape plus 7 UNVERIFIED gaps.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ======================================================================= -->
+  <!-- STEP 3 — 6 CLICKABLE FIELDS (3 TOOLS + 3 SAMPLES)                        -->
+  <!-- ======================================================================= -->
+  <section class="step-group" data-step-group="3">
+    <div class="step-head">
+      <div>
+        <h2>Step 3 — Surgical Sieve: Prioritized Differential (30 Min)</h2>
+        <div class="step-sub">Mandatory scan of all 5 Q1 Block B QTC buckets (Commercial/Pricing, Governance/Authority, Config/Tools, Paper/Redline, Billability/Rev-Rec) + Leading Hypothesis, ROWS Threat, and 2 Alternatives.</div>
+      </div>
+      <span class="step-count" data-step-badge="3">6 Files (3 Tools, 3 Samples)</span>
+    </div>
+    <div class="card-grid">
+      <!-- Step 3 Tools (3) -->
+      <a class="item-card is-tool" href="step3_tool_surgical_sieve_differential.html" target="_blank" rel="noopener" data-step="3" data-type="tool" data-ext="html">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 3</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.html</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step3_tool_surgical_sieve_differential.html</div>
+          <div class="purpose">Reusable interactive Surgical Sieve and Prioritized Differential workbench with 30-minute timer, mandatory 5-bucket anti-anchoring gate, weighted risk scorer, and JSON/CSV/PDF output.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-tool" href="step3_tool_q1_block_b_sieve_matrix.py" target="_blank" rel="noopener" data-step="3" data-type="tool" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 3</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step3_tool_q1_block_b_sieve_matrix.py</div>
+          <div class="purpose">Reusable Python script building step3_tool_q1_block_b_sieve_matrix_template.xlsx: a blank, live-formula 2-tab Excel QTC 5-bucket scorer linked to the 4-slot Prioritized Differential readiness gate.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-tool" href="step3_tool_surgical_sieve_facilitation_guide.md" target="_blank" rel="noopener" data-step="3" data-type="tool" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 3</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step3_tool_surgical_sieve_facilitation_guide.md</div>
+          <div class="purpose">Reusable 30-minute Step 3 facilitation script, Q1 Block B diagnostic probe list across all 5 QTC buckets, anti-anchoring guardrails, and differential scoring rubric.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <!-- Step 3 Samples (3) -->
+      <a class="item-card is-sample" href="step3_sample_kestrel_surgical_sieve_differential.html" target="_blank" rel="noopener" data-step="3" data-type="sample" data-ext="html">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 3</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.html</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step3_sample_kestrel_surgical_sieve_differential.html</div>
+          <div class="purpose">Completed interactive Surgical Sieve and Prioritized Differential for Kestrel scoring all 5 QTC buckets (120/125 risk) and locking Leading Hypothesis, ROWS Threat, and 2 Alternatives.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step3_sample_kestrel_q1_block_b_sieve_matrix.py" target="_blank" rel="noopener" data-step="3" data-type="sample" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 3</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step3_sample_kestrel_q1_block_b_sieve_matrix.py</div>
+          <div class="purpose">Python builder producing step3_sample_kestrel_q1_block_b_sieve_matrix.xlsx: Kestrel's completed 2-tab live-formula Excel QTC 5-bucket matrix and cross-tab Step 3 readiness gate.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step3_sample_kestrel_prioritized_differential.md" target="_blank" rel="noopener" data-step="3" data-type="sample" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 3</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step3_sample_kestrel_prioritized_differential.md</div>
+          <div class="purpose">Canonical executive Markdown report of Kestrel's Surgical Sieve across all 5 QTC buckets, Leading Hypothesis, Can't-Miss/ROWS Threat, 2 Alternative Explanations, and Step 4 test plan.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ======================================================================= -->
+  <!-- STEP 4 — 8 CLICKABLE FIELDS (4 TOOLS + 4 SAMPLES)                        -->
+  <!-- ======================================================================= -->
+  <section class="step-group" data-step-group="4">
+    <div class="step-head">
+      <div>
+        <h2>Step 4 — Forensic Verification (30 Min)</h2>
+        <div class="step-sub">Line-by-line Three-Way Diff (CRM vs Quote vs Redline), 3-Window Deal Engine (Leak Waterfall, Behavioral Verdict, 51 Contract Flags), Approval-Hop Timestamp Audit, and Disconfirming-Evidence Hunt.</div>
+      </div>
+      <span class="step-count" data-step-badge="4">8 Files (4 Tools, 4 Samples)</span>
+    </div>
+    <div class="card-grid">
+      <!-- Step 4 Tools (4) -->
+      <a class="item-card is-tool" href="step4_tool_three_way_diff.py" target="_blank" rel="noopener" data-step="4" data-type="tool" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 4</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step4_tool_three_way_diff.py</div>
+          <div class="purpose">Reusable Python script building step4_tool_three_way_diff_template.xlsx: a blank, live-formula line-by-line Three-Way Diff workbook comparing CRM vs Quote Calculator vs Redlined Contract vs Policy.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-tool" href="step4_tool_3window_deal_engine.html" target="_blank" rel="noopener" data-step="4" data-type="tool" data-ext="html">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 4</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.html</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step4_tool_3window_deal_engine.html</div>
+          <div class="purpose">Reusable interactive 3-Window Deal Engine browser app containing Window 1 Leak Waterfall calculator, Window 2 8-signal Behavioral Verdict, and Window 3 complete 51-Contract-Flag scanner.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-tool" href="step4_tool_approval_hop_audit.py" target="_blank" rel="noopener" data-step="4" data-type="tool" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 4</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step4_tool_approval_hop_audit.py</div>
+          <div class="purpose">Reusable Python script building step4_tool_approval_hop_audit_template.xlsx: a blank, live-formula Excel Approval-Hop Timestamp Audit computing elapsed hours, days, and % ball-holder stall share.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-tool" href="step4_tool_disconfirming_evidence_hunt.md" target="_blank" rel="noopener" data-step="4" data-type="tool" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 4</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step4_tool_disconfirming_evidence_hunt.md</div>
+          <div class="purpose">Reusable Disconfirming-Evidence Hunt protocol and falsification worksheet testing both the prospect's/buyer's story and the AE's/internal story against Step 1 primary-source proof.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <!-- Step 4 Samples (4) -->
+      <a class="item-card is-sample" href="step4_sample_kestrel_three_way_diff.py" target="_blank" rel="noopener" data-step="4" data-type="sample" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 4</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step4_sample_kestrel_three_way_diff.py</div>
+          <div class="purpose">Python builder producing step4_sample_kestrel_three_way_diff.xlsx: Kestrel's completed 16-row line-by-line Three-Way Diff proving 15 of 16 lines mismatched (93.8%, PB-6.1 HARD HOLD).</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step4_sample_kestrel_3window_deal_engine.html" target="_blank" rel="noopener" data-step="4" data-type="sample" data-ext="html">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 4</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.html</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step4_sample_kestrel_3window_deal_engine.html</div>
+          <div class="purpose">Completed interactive 3-Window Deal Engine for Kestrel outputting the Leak Waterfall ($330K&rarr;$240K&rarr;$78K&rarr;$17K), 16/16 Behavioral Verdict, and all 51 evaluated contract flags (41 triggered).</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step4_sample_kestrel_approval_hop_audit.py" target="_blank" rel="noopener" data-step="4" data-type="sample" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 4</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step4_sample_kestrel_approval_hop_audit.py</div>
+          <div class="purpose">Python builder producing step4_sample_kestrel_approval_hop_audit.xlsx: Kestrel's 12-hop timestamp audit proving 0.0% Buyer Legal stall, 0.0% Finance routing, and 85.4% (388.3h) unworked AE hold.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step4_sample_kestrel_disconfirming_evidence_hunt.md" target="_blank" rel="noopener" data-step="4" data-type="sample" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 4</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step4_sample_kestrel_disconfirming_evidence_hunt.md</div>
+          <div class="purpose">Completed Disconfirming-Evidence Hunt for Kestrel falsifying 5 buyer/prospect claims and 5 AE/internal claims with exact Step 1–3 citations plus post-Step 4 differential updates.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ======================================================================= -->
+  <!-- STEP 5 — 6 CLICKABLE FIELDS (3 TOOLS + 3 SAMPLES)                        -->
+  <!-- ======================================================================= -->
+  <section class="step-group" data-step-group="5">
+    <div class="step-head">
+      <div>
+        <h2>Step 5 — Mandatory Diagnostic Time-Out (10 Min)</h2>
+        <div class="step-sub">Hard safety pause before building the Step 6 readout: Ely Time-Out, Graber Cognitive &amp; System Safety Checklist, and 4-letter TWED check (Threat, What else, Evidence, Dispositional).</div>
+      </div>
+      <span class="step-count" data-step-badge="5">6 Files (3 Tools, 3 Samples)</span>
+    </div>
+    <div class="card-grid">
+      <!-- Step 5 Tools (3) -->
+      <a class="item-card is-tool" href="step5_tool_twed_ely_graber_timeout.html" target="_blank" rel="noopener" data-step="5" data-type="tool" data-ext="html">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 5</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.html</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step5_tool_twed_ely_graber_timeout.html</div>
+          <div class="purpose">Reusable interactive 10-minute Mandatory Diagnostic Time-Out browser gate integrating Ely Time-Out, Graber Checklists, TWED evaluator, candidate claim auditor, and JSON/CSV/PDF output.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-tool" href="step5_tool_timeout_audit_tracker.py" target="_blank" rel="noopener" data-step="5" data-type="tool" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 5</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step5_tool_timeout_audit_tracker.py</div>
+          <div class="purpose">Reusable Python script building step5_tool_timeout_audit_tracker_template.xlsx: a blank, live-formula 2-tab Excel workbook scoring 19 Ely/Graber/TWED controls and gating candidate Step 6 claims.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-tool" href="step5_tool_timeout_facilitation_script.md" target="_blank" rel="noopener" data-step="5" data-type="tool" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 5</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step5_tool_timeout_facilitation_script.md</div>
+          <div class="purpose">Reusable 10-minute Mandatory Diagnostic Time-Out facilitation script, Ely/Graber/TWED rapid interrogation guide, and verbatim No-Rescue Boundary deflection scripts.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <!-- Step 5 Samples (3) -->
+      <a class="item-card is-sample" href="step5_sample_kestrel_twed_ely_graber_timeout.html" target="_blank" rel="noopener" data-step="5" data-type="sample" data-ext="html">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 5</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.html</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step5_sample_kestrel_twed_ely_graber_timeout.html</div>
+          <div class="purpose">Completed interactive Diagnostic Time-Out for Kestrel testing Step 3 &amp; Step 4 across all 19 Ely/Graber/TWED checks, flagging 6 real catches and 4 rewritten/stripped Step 6 statements.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step5_sample_kestrel_timeout_audit_tracker.py" target="_blank" rel="noopener" data-step="5" data-type="sample" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 5</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step5_sample_kestrel_timeout_audit_tracker.py</div>
+          <div class="purpose">Python builder producing step5_sample_kestrel_timeout_audit_tracker.xlsx: Kestrel's completed 2-tab live-formula Excel Time-Out scoring 13 PASS, 6 FAIL-REMEDIATED, and 12 audited readout claims.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step5_sample_kestrel_twed_diagnostic_timeout.md" target="_blank" rel="noopener" data-step="5" data-type="sample" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 5</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step5_sample_kestrel_twed_diagnostic_timeout.md</div>
+          <div class="purpose">Canonical executive Markdown document of Kestrel's TWED Diagnostic Time-Out detailing Ely, Graber, TWED stress-test results, all 6 flagged catches, 4 fixed statements, and Step 6 release clearance.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ======================================================================= -->
+  <!-- STEP 6 — 6 CLICKABLE FIELDS (3 TOOLS + 3 SAMPLES)                        -->
+  <!-- ======================================================================= -->
+  <section class="step-group" data-step-group="6">
+    <div class="step-head">
+      <div>
+        <h2>Step 6 — Structured Readout &amp; Bridge to Commercial Mode: SNAPPS Debrief (30 Min)</h2>
+        <div class="step-sub">4 crisp executive beats: (1) Problem Representation, (2) Exact Stuck Point &amp; Failed Controls, (3) Clean Boundary / MESO Options (No Rescue), and (4) Commercial Bridge to 5-Deal Diagnostic (Slot #1).</div>
+      </div>
+      <span class="step-count" data-step-badge="6">6 Files (3 Tools, 3 Samples)</span>
+    </div>
+    <div class="card-grid">
+      <!-- Step 6 Tools (3) -->
+      <a class="item-card is-tool" href="step6_tool_snapps_readout_builder.html" target="_blank" rel="noopener" data-step="6" data-type="tool" data-ext="html">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 6</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.html</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step6_tool_snapps_readout_builder.html</div>
+          <div class="purpose">Reusable interactive 4-Beat SNAPPS Executive Readout &amp; Commercial Bridge builder with 30-minute timer, Step 5 Time-Out survival lock, Markdown/JSON export, and print-to-PDF brief.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-tool" href="step6_tool_meso_options_calculator.py" target="_blank" rel="noopener" data-step="6" data-type="tool" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 6</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step6_tool_meso_options_calculator.py</div>
+          <div class="purpose">Reusable Python script building step6_tool_meso_options_calculator_template.xlsx: a blank, live-formula 2-tab Excel MESO Structural Options comparison model and 5-Deal Diagnostic Slot Tracker.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-tool" href="step6_tool_snapps_debrief_bridge_script.md" target="_blank" rel="noopener" data-step="6" data-type="tool" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 6</span><span class="badge b-tool">TOOL</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step6_tool_snapps_debrief_bridge_script.md</div>
+          <div class="purpose">Reusable 30-minute SNAPPS Executive Debrief facilitation script covering all 4 beats, verbatim Commercial Bridge language, Clean-Boundary hold lines, and 6 executive objection handlers.</div>
+        </div>
+        <div class="open-cue"><span>Open reusable tool</span><span>&rarr;</span></div>
+      </a>
+
+      <!-- Step 6 Samples (3) -->
+      <a class="item-card is-sample" href="step6_sample_kestrel_snapps_readout.html" target="_blank" rel="noopener" data-step="6" data-type="sample" data-ext="html">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 6</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.html</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step6_sample_kestrel_snapps_readout.html</div>
+          <div class="purpose">Completed executive-ready interactive 4-Beat SNAPPS Readout &amp; Commercial Bridge for Kestrel built strictly from Step 5-cleared findings with client-owned MESO options and verbatim Bridge.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step6_sample_kestrel_meso_options_calculator.py" target="_blank" rel="noopener" data-step="6" data-type="sample" data-ext="py">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 6</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.py</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step6_sample_kestrel_meso_options_calculator.py</div>
+          <div class="purpose">Python builder producing step6_sample_kestrel_meso_options_calculator.xlsx: Kestrel's completed live-formula MESO Options Calculator (Redline vs Options A–D) and 5-Deal Tracker with Slot #1 completed.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+
+      <a class="item-card is-sample" href="step6_sample_kestrel_snapps_executive_readout.md" target="_blank" rel="noopener" data-step="6" data-type="sample" data-ext="md">
+        <div class="item-meta">
+          <div class="badges"><span class="badge b-step">Step 6</span><span class="badge b-sample">SAMPLE</span><span class="badge b-ext">.md</span></div>
+        </div>
+        <div class="item-body">
+          <div class="fname">step6_sample_kestrel_snapps_executive_readout.md</div>
+          <div class="purpose">Canonical executive Markdown document of Kestrel's SNAPPS Executive Readout and Commercial Bridge across all 4 crisp beats, strictly honoring every Step 5 Time-Out guardrail.</div>
+        </div>
+        <div class="open-cue"><span>Open Kestrel sample</span><span>&rarr;</span></div>
+      </a>
+    </div>
+  </section>
+</div>
+
+<script>
+let activeStep = "ALL";
+let activeType = "ALL";
+
+function setStep(step) {
+  activeStep = step;
+  document.querySelectorAll("[data-step-btn]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.stepBtn === step);
+  });
+  applyFilters();
+}
+
+function setType(type) {
+  activeType = type;
+  document.querySelectorAll("[data-type-btn]").forEach(btn => {
+    btn.classList.remove("active", "active-tool", "active-sample");
+    if (btn.dataset.typeBtn === type) {
+      btn.classList.add(type === "tool" ? "active-tool" : type === "sample" ? "active-sample" : "active");
+    }
+  });
+  applyFilters();
+}
+
+function toggleView() {
+  const isRows = document.body.classList.toggle("view-rows");
+  document.getElementById("viewToggle").textContent = isRows ? "Switch to Card Grid" : "Switch to Row View";
+}
+
+function resetFilters() {
+  document.getElementById("searchBox").value = "";
+  document.getElementById("extFilter").value = "ALL";
+  setStep("ALL");
+  setType("ALL");
+}
+
+function applyFilters() {
+  const query = document.getElementById("searchBox").value.trim().toLowerCase();
+  const ext = document.getElementById("extFilter").value;
+  let totalShown = 0;
+  let toolsShown = 0;
+  let samplesShown = 0;
+
+  document.querySelectorAll(".step-group").forEach(group => {
+    const stepNum = group.dataset.stepGroup;
+    let groupShown = 0;
+    let groupTools = 0;
+    let groupSamples = 0;
+
+    group.querySelectorAll(".item-card").forEach(card => {
+      const cStep = card.dataset.step;
+      const cType = card.dataset.type;
+      const cExt = card.dataset.ext;
+      const text = card.textContent.toLowerCase();
+
+      const matchStep = activeStep === "ALL" || cStep === activeStep;
+      const matchType = activeType === "ALL" || cType === activeType;
+      const matchExt = ext === "ALL" || cExt === ext;
+      const matchQuery = !query || text.includes(query);
+
+      const visible = matchStep && matchType && matchExt && matchQuery;
+      card.classList.toggle("hidden", !visible);
+
+      if (visible) {
+        groupShown++;
+        totalShown++;
+        if (cType === "tool") { groupTools++; toolsShown++; }
+        else { groupSamples++; samplesShown++; }
+      }
+    });
+
+    group.classList.toggle("hidden", groupShown === 0);
+    const badge = group.querySelector(`[data-step-badge="${stepNum}"]`);
+    if (badge) {
+      badge.textContent = `${groupShown} File${groupShown === 1 ? "" : "s"} (${groupTools} Tool${groupTools === 1 ? "" : "s"}, ${groupSamples} Sample${groupSamples === 1 ? "" : "s"})`;
+    }
+  });
+
+  document.getElementById("visibleCount").textContent =
+    `Showing ${totalShown} of 41 clickable fields (${toolsShown} tool${toolsShown === 1 ? "" : "s"}, ${samplesShown} sample${samplesShown === 1 ? "" : "s"})`;
+  document.getElementById("emptyState").style.display = totalShown === 0 ? "block" : "none";
+}
+
+applyFilters();
+</script>
+</body>
+</html>
