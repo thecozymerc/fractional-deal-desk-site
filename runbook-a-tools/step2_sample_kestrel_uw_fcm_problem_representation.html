@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runbook A — Step 2 Sample: Kestrel UW FCM Problem Representation</title>
+<style>
+  :root {
+    --ink: #111827;
+    --muted: #4b5563;
+    --line: #d1d5db;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --navy: #0f172a;
+    --blue: #1d4ed8;
+    --green-bg: #dcfce7;
+    --green-ink: #166534;
+    --amber-bg: #fef3c7;
+    --amber-ink: #92400e;
+    --red-bg: #fee2e2;
+    --red-ink: #991b1b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.45;
+  }
+  .wrap { max-width: 1160px; margin: 20px auto; padding: 0 16px 40px; }
+  .topbar {
+    background: var(--navy);
+    color: #fff;
+    padding: 18px 22px;
+    border-radius: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+  }
+  .topbar h1 { margin: 0; font-size: 20px; }
+  .topbar p { margin: 4px 0 0; font-size: 13px; color: #cbd5e1; }
+  .pill { background: #16a34a; color: #fff; padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 12px; }
+  button {
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-top: 16px;
+  }
+  .card h2 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 8px;
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  label.field { display: flex; flex-direction: column; font-size: 12px; font-weight: 600; color: var(--muted); gap: 4px; }
+  input[type="text"], input[type="date"], select, textarea {
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--ink);
+    background: #fff;
+  }
+  textarea { min-height: 68px; resize: vertical; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; vertical-align: top; }
+  th { background: #f9fafb; font-size: 12px; color: var(--muted); }
+  .status-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    margin-top: 16px;
+  }
+  .st-green { background: var(--green-bg); color: var(--green-ink); border: 1px solid #86efac; }
+  .st-amber { background: var(--amber-bg); color: var(--amber-ink); border: 1px solid #fcd34d; }
+  .st-red { background: var(--red-bg); color: var(--red-ink); border: 1px solid #fca5a5; }
+  .metrics { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; }
+  .readout-box {
+    width: 100%;
+    min-height: 155px;
+    font-size: 14px;
+    line-height: 1.65;
+    padding: 12px;
+    border: 2px solid #86efac;
+    border-radius: 8px;
+    background: #f8fafc;
+  }
+  .warn-panel { margin-top: 10px; padding: 10px 12px; border-radius: 6px; font-size: 13px; }
+  .badge-v { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 11px; font-weight: 700; background: #dcfce7; color: #166534; }
+  .badge-u { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 11px; font-weight: 700; background: #fef3c7; color: #92400e; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  @media print {
+    body { background: #fff; }
+    .toolbar, .no-print { display: none !important; }
+    .card { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Runbook A — Step 2 Sample: Kestrel UW FCM Problem Representation</h1>
+      <p>Verified 60–90 Second Clinical Synthesis | Built Strictly from Step 1 Raw Artifacts (a–e)</p>
+    </div>
+    <span class="pill">COMPLETED SAMPLE — KESTREL</span>
+  </div>
+
+  <div id="pacingBanner" class="status-bar st-green">
+    <div id="pacingVerdict">GREEN — CLINICALLY VALID: 60–90 second verified Problem Representation ready to align with client.</div>
+    <div class="metrics">
+      <span id="mWords">Words: 0</span>
+      <span id="mSeconds">Est. Read Time: 0 sec</span>
+      <span id="mVerified">Verified Elements: 7 / 7</span>
+      <span id="mHearsay">Hearsay Flags: 0</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>1. Deal Header</h2>
+    <div class="grid">
+      <label class="field">Account Name<input type="text" id="accountName"></label>
+      <label class="field">CRM Opportunity ID<input type="text" id="oppId"></label>
+      <label class="field">Diagnostic Date<input type="date" id="diagDate"></label>
+      <label class="field">Clinician / Scribe<input type="text" id="clinician"></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. Seven UW FCM Verified-Fact Elements (Kestrel Industrial Holdings)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:14%;">UW FCM Element</th>
+          <th style="width:49%;">Verified Fact Statement (Step 1 Raw Artifacts Only)</th>
+          <th style="width:23%;">Exact Step 1 Citation</th>
+          <th style="width:14%;">Status</th>
+        </tr>
+      </thead>
+      <tbody id="elemBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>3. Final 60–90 Second UW FCM Problem Representation (Read Aloud Verbatim)</h2>
+    <textarea id="prText" class="readout-box" oninput="analyze()"></textarea>
+    <div id="hearsayBox" class="warn-panel st-green">Hearsay &amp; Opinion Scanner: Clean — zero speculative or AE-framing terms detected.</div>
+    <div class="toolbar no-print">
+      <button class="primary" onclick="startReadAloud()">Run 90-Sec Read-Aloud Pacer</button>
+      <span id="readPacer" style="font-family:monospace;font-weight:700;padding:7px 10px;background:#e2e8f0;border-radius:6px;">00:00 / 01:30</span>
+      <button onclick="exportTXT()">Export Plain-Text Readout</button>
+      <button onclick="window.print()">Print / Save PDF</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>4. Explicitly Flagged UNVERIFIED Gaps (Excluded from Confirmed Facts)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:8%;">Tag</th>
+          <th style="width:52%;">Unverified Point (Not Evidenced in Step 1 Raw Artifacts)</th>
+          <th style="width:40%;">Primary Source Required to Verify</th>
+        </tr>
+      </thead>
+      <tbody id="unvBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const KESTREL_PR = {
+  header: {
+    accountName: "Kestrel Industrial Holdings, Inc.",
+    oppId: "OPP-2026-4819",
+    diagDate: "2026-11-25",
+    clinician: "Runbook A Lead Clinician"
+  },
+  elements: [
+    {
+      label: "1. WHO",
+      fact: "Account: Kestrel Industrial Holdings, Inc. Seller AE: Jordan Reyes. Buyer Champion: VP Ops Derek Halvorsen (no signature authority over $50K). Verified Economic Buyer & Signatory: CFO Gregory Cho (zero direct meetings, zero budget sign-off). Buyer Counsel: GC Nadia Benali. Seller internal holders: Senior Counsel Tessa Morales (Legal HOLD), Deal Desk Priyesh Patel (HARD HOLD), Finance Controller Elena Rostova (zero exception packet received), VP Sales Marcus Vance (casual verbal Slack support only).",
+      cite: "a:CRM-02,03,27-30; c:L098-104; d:T034-104",
+      status: "VERIFIED"
+    },
+    {
+      label: "2. WHAT",
+      fact: "$240,000 enterprise 3-year ramp (50/70/80 seats at $1,080/seat/yr = $216,000 net subscription + $24,000 Year-1 ERP implementation), carrying a 28.0% discretionary subscription discount (-$84,000), a hidden $6,000 manual implementation list override ($30K->$24K), consolidated 70.8% Gross Margin (-$10,000 below 75.0% floor), Month-12 unilateral penalty-free opt-out, Net-60 post-acceptance payment terms, 20% Y2-3 seat true-down, and 3x ($720K) liability cap.",
+      cite: "b:Quote_Ramp_Calculator!D9:M14; c:L005-095; e:PB-1.1-5.4",
+      status: "VERIFIED"
+    },
+    {
+      label: "3. WHEN",
+      fact: "Offline Quote v4 sent Nov 3, 2026; verbal VP Slack nod Nov 4; Kestrel redlines returned Nov 6, 2026 at 10:14 ET (stall onset); Legal HOLD Nov 6 at 16:18 ET; Deal Desk HARD HOLD Nov 9 at 09:05 ET; buyer champion chased Nov 16 warning of Dec 2 Q4 CFO budget committee deadline (need alignment before Dec 1); diagnostic pull Nov 25, 2026.",
+      cite: "d:T018-104; a:CRM-07,09,31",
+      status: "VERIFIED"
+    },
+    {
+      label: "4. WHERE",
+      fact: "CRM shows Stage 5 (Contracting / Legal Review) in Q4 Commit with stale 20% discount / Net-30 / no-opt-out data. Internally blocked in Slack #deal-desk-approvals on Ticket DD-8842 (HARD HOLD) awaiting CRM sync and Finance Margin Exception. Externally blocked before Kestrel's CFO Dec 2 capital budget docket.",
+      cite: "a:CRM-05,08,15-24; d:T047-076,T101-104",
+      status: "VERIFIED"
+    },
+    {
+      label: "5. HOW LONG",
+      fact: "19 calendar days stalled post-redline (Nov 6 to Nov 25), including 16 calendar days with zero AE action on Deal Desk's Nov 9 HARD HOLD, 9 calendar days since buyer's Nov 16 chase email, and 26 total days in Stage 5 across 2 close-date pushes.",
+      cite: "a:CRM-06,07,10; d:T039,T062,T081,T099-103",
+      status: "VERIFIED"
+    },
+    {
+      label: "6. HOW SEVERE",
+      fact: "Critical commercial, rev-rec, and forecast severity: 70.8% Gross Margin breaches the 75.0% floor by $10,000 with zero Finance sign-off (verbal VP support invalid under PB-4.3); Month-12 opt-out cuts ASC 606 enforceable TCV by 67.5% ($240,000 down to $78,000; $162,000 at risk; Year-1 GM 52.6%; $17,000 Y1 contribution after $24,000 upfront commission); Net-60 post-acceptance pushes cash out ~105 days; missing Dec 1 pushes deal to Q2 2027.",
+      cite: "b:Year1_OptOut_Sensitivity!B3:B12; d:T069-072,T087; e:PB-4.1-5.3",
+      status: "VERIFIED"
+    },
+    {
+      label: "7. WHAT CHANGED",
+      fact: "On Nov 3, AE sent unapproved offline Quote v4 (28% discount, hidden $6K impl override, Net-60) without updating CRM or engaging Deal Desk. On Nov 6, Kestrel GC returned redlines adding a Month-12 penalty-free opt-out, Net-60 post-acceptance billing, 20% true-down, and 3x liability cap while disclosing CFO Gregory Cho has not approved budget — triggering immediate Legal and Deal Desk HARD HOLDS that AE never worked.",
+      cite: "a:CRM-15-26; b:E13; c:L019-095; d:T018-080",
+      status: "VERIFIED"
+    }
+  ],
+  prText: "Kestrel Industrial Holdings is a $240,000 enterprise 3-year ramp opportunity—50, 70, and 80 seats plus $24,000 implementation—stalled in Stage 5 for 19 calendar days since Kestrel General Counsel Nadia Benali returned redlines on November 6, 2026. The stall sits internally on Deal Desk ticket DD-8842, placed on HARD HOLD by Priyesh Patel on November 9, and externally with Kestrel's unengaged economic buyer, CFO Gregory Cho, who has not approved capital budget ahead of a December 2 Q4 budget committee deadline. What changed on November 3 and November 6 is that AE Jordan Reyes quoted an unapproved offline 28.0% subscription discount with a manual $6,000 implementation list override and Net-60 terms while leaving CRM at 20.0% and Net-30, and Kestrel redlined a penalty-free Month-12 opt-out, Net-60 post-acceptance invoicing, a 20% seat true-down, and a 3x liability cap. Severity is critical: consolidated gross margin is 70.8%, $10,000 below the 75.0% policy floor, with verbal VP Sales support only and zero Finance margin sign-off, while the Month-12 opt-out cuts ASC 606 enforceable value from $240,000 to $78,000. Six days remain before December 1, and neither CFO Gregory Cho's trade-off tolerance nor Seller Finance's exception appetite is verified.",
+  unverified: [
+    { gap: "UNVERIFIED: CFO Gregory Cho's ROI criteria, capital budget availability, and willingness to accept a structural trade-off (e.g., 12-month pilot at list or termination fee).", need: "Direct executive discovery call or written confirmation from CFO Gregory Cho." },
+    { gap: "UNVERIFIED: Whether Kestrel Industrial Holdings is evaluating a competing vendor or internal build alternative.", need: "Verified buyer technical evaluation record or champion confirmation." },
+    { gap: "UNVERIFIED: Seller Finance Controller Elena Rostova's or CFO's tolerance for approving 70.8% GM, Net-60 invoice-dated terms, or a modified exit clause.", need: "Formal Tier-4 Margin Exception submission and written Finance ruling." },
+    { gap: "UNVERIFIED: Feasibility of the 45-day SAP/ERP cutover in Section 3.1 and whether actual delivery cost stays within $26,000 COGS.", need: "Signed Statement of Work (SOW) and VP Professional Services scoping sign-off." },
+    { gap: "UNVERIFIED: Whether AE Jordan Reyes had any unlogged phone calls with Derek Halvorsen after Derek's Nov 16 chase email.", need: "Call logs / CRM activity audit or direct confirmation from Derek Halvorsen." },
+    { gap: "UNVERIFIED: Whether VP Sales Marcus Vance would still support Kestrel at $240,000 after seeing the true 70.8% GM, 28% discount, and Month-12 opt-out.", need: "Written VP Sales review of Quote v4 P&L and redline summary." },
+    { gap: "UNVERIFIED: Exact document package and submission cutoff time required for Kestrel's Dec 2 Q4 budget committee docket.", need: "Written procurement/finance submission checklist from Kestrel GC or CFO office." }
+  ]
+};
+
+const HEARSAY_TERMS = [
+  "probably", "maybe", "feels like", "seems like", "i think", "we think",
+  "almost done", "just slow", "should sign", "likely", "presumably",
+  "supposedly", "ae says", "rep says", "loves the product", "minor redlines",
+  "bureaucratic", "easy fix", "rubber stamp", "gut feel"
+];
+
+let pacerSec = 0;
+let pacerHandle = null;
+
+function esc(s) {
+  return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function fmt(sec) {
+  return String(Math.floor(sec / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");
+}
+
+function startReadAloud() {
+  if (pacerHandle) { clearInterval(pacerHandle); pacerHandle = null; return; }
+  pacerSec = 0;
+  document.getElementById("readPacer").textContent = "00:00 / 01:30";
+  pacerHandle = setInterval(() => {
+    pacerSec += 1;
+    const el = document.getElementById("readPacer");
+    el.textContent = `${fmt(pacerSec)} / 01:30`;
+    el.style.background = pacerSec > 90 ? "#fee2e2" : (pacerSec >= 60 ? "#dcfce7" : "#e2e8f0");
+    if (pacerSec >= 120) { clearInterval(pacerHandle); pacerHandle = null; }
+  }, 1000);
+}
+
+function analyze() {
+  const txt = document.getElementById("prText").value.trim();
+  const words = txt ? txt.split(/\s+/).length : 0;
+  const sec = Math.round((words / 150) * 60);
+  const low = txt.toLowerCase();
+  const flagged = HEARSAY_TERMS.filter(t => low.includes(t));
+
+  document.getElementById("mWords").textContent = `Words: ${words}`;
+  document.getElementById("mSeconds").textContent = `Est. Read Time: ${sec} sec`;
+  document.getElementById("mHearsay").textContent = `Hearsay Flags: ${flagged.length}`;
+
+  const hb = document.getElementById("hearsayBox");
+  if (flagged.length > 0) {
+    hb.className = "warn-panel st-red";
+    hb.textContent = `HEARSAY WARNING: Remove speculative terms: ${flagged.join(", ")}.`;
+  } else {
+    hb.className = "warn-panel st-green";
+    hb.textContent = "Hearsay & Opinion Scanner: Clean — zero speculative or AE-framing terms detected.";
+  }
+
+  const b = document.getElementById("pacingBanner");
+  const v = document.getElementById("pacingVerdict");
+  if (flagged.length > 0 || sec > 105) {
+    b.className = "status-bar st-red";
+    v.textContent = "RED — REVIEW REQUIRED: Hearsay detected or read time exceeds 105 seconds.";
+  } else if (sec >= 60 && sec <= 90) {
+    b.className = "status-bar st-green";
+    v.textContent = "GREEN — CLINICALLY VALID: 60–90 second verified Problem Representation ready to align with client.";
+  } else {
+    b.className = "status-bar st-amber";
+    v.textContent = "AMBER — ADJUST LENGTH: Keep between 150–225 words (60–90 seconds spoken).";
+  }
+}
+
+function exportTXT() {
+  const txt = document.getElementById("prText").value;
+  const lines = [
+    "UW FCM PROBLEM REPRESENTATION — KESTREL INDUSTRIAL HOLDINGS (OPP-2026-4819)",
+    "Diagnostic Date: 2026-11-25",
+    "",
+    "60-90 SECOND VERIFIED STATEMENT:",
+    txt,
+    "",
+    "EXPLICITLY FLAGGED UNVERIFIED GAPS:",
+    ...KESTREL_PR.unverified.map((u, i) => `U-${i + 1}: ${u.gap} | Need: ${u.need}`)
+  ];
+  const blob = new Blob([lines.join("\n")], { type: "text/plain" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "kestrel_step2_uw_fcm_problem_representation.txt";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function init() {
+  document.getElementById("accountName").value = KESTREL_PR.header.accountName;
+  document.getElementById("oppId").value = KESTREL_PR.header.oppId;
+  document.getElementById("diagDate").value = KESTREL_PR.header.diagDate;
+  document.getElementById("clinician").value = KESTREL_PR.header.clinician;
+
+  const eb = document.getElementById("elemBody");
+  KESTREL_PR.elements.forEach(e => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><strong>${esc(e.label)}</strong></td>
+      <td>${esc(e.fact)}</td>
+      <td><code>${esc(e.cite)}</code></td>
+      <td><span class="badge-v">${esc(e.status)}</span></td>
+    `;
+    eb.appendChild(tr);
+  });
+
+  document.getElementById("prText").value = KESTREL_PR.prText;
+
+  const ub = document.getElementById("unvBody");
+  KESTREL_PR.unverified.forEach((u, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><span class="badge-u">U-${i + 1}</span></td>
+      <td>${esc(u.gap)}</td>
+      <td>${esc(u.need)}</td>
+    `;
+    ub.appendChild(tr);
+  });
+  analyze();
+}
+
+init();
+</script>
+</body>
+</html>
