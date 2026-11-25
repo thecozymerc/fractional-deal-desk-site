@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runbook A — Step 1 Completed Gate: Kestrel Industrial Holdings</title>
+<style>
+  :root {
+    --ink: #111827;
+    --muted: #4b5563;
+    --line: #d1d5db;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --navy: #0f172a;
+    --blue: #1d4ed8;
+    --green-bg: #dcfce7;
+    --green-ink: #166534;
+    --amber-bg: #fef3c7;
+    --amber-ink: #92400e;
+    --red-bg: #fee2e2;
+    --red-ink: #991b1b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.45;
+  }
+  .wrap { max-width: 1180px; margin: 20px auto; padding: 0 16px 40px; }
+  .topbar {
+    background: var(--navy);
+    color: #fff;
+    padding: 18px 22px;
+    border-radius: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+  }
+  .topbar h1 { margin: 0; font-size: 20px; }
+  .topbar p { margin: 4px 0 0; font-size: 13px; color: #cbd5e1; }
+  .pill { background: #16a34a; color: #fff; padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 12px; }
+  button {
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-top: 16px;
+  }
+  .card h2 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 8px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+  }
+  label.field { display: flex; flex-direction: column; font-size: 12px; font-weight: 600; color: var(--muted); gap: 4px; }
+  input[type="text"], input[type="date"], select, textarea {
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--ink);
+    background: #fff;
+  }
+  textarea { min-height: 62px; resize: vertical; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; vertical-align: top; }
+  th { background: #f9fafb; font-size: 12px; color: var(--muted); }
+  .gate-banner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    margin-top: 16px;
+  }
+  .gate-red { background: var(--red-bg); color: var(--red-ink); border: 1px solid #fca5a5; }
+  .gate-amber { background: var(--amber-bg); color: var(--amber-ink); border: 1px solid #fcd34d; }
+  .gate-green { background: var(--green-bg); color: var(--green-ink); border: 1px solid #86efac; }
+  .metrics { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; font-weight: 600; }
+  .check-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 13px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 11px; font-weight: 700; background: #dcfce7; color: #166534; }
+  @media print {
+    body { background: #fff; }
+    .toolbar, .no-print { display: none !important; }
+    .card { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Runbook A — Step 1 Sample: Kestrel Industrial Holdings (Primary-Source Gate)</h1>
+      <p>Slot #1 in Validation Mode | Completed 10-Minute Primary-Source Check before Step 2 Focused History</p>
+    </div>
+    <span class="pill">COMPLETED SAMPLE — KESTREL</span>
+  </div>
+
+  <div id="gateBanner" class="gate-banner gate-green">
+    <div id="gateText">GREEN — GATE PASSED: All 5 raw primary-source artifacts verified. Proceed to Step 2 (Focused History).</div>
+    <div class="metrics">
+      <span id="mReceived">Received: 5 / 5</span>
+      <span id="mVerified">Primary-Source Verified: 5 / 5</span>
+      <span id="mQuarantine">AE Quarantine: Complete</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>1. Deal Intake Header</h2>
+    <div class="grid">
+      <label class="field">Account Name<input type="text" id="accountName" oninput="recalc()"></label>
+      <label class="field">CRM Opportunity ID<input type="text" id="oppId" oninput="recalc()"></label>
+      <label class="field">Diagnostic Date<input type="date" id="diagDate" oninput="recalc()"></label>
+      <label class="field">Headline Deal Value ($)<input type="text" id="dealValue" oninput="recalc()"></label>
+      <label class="field">Account Executive (AE)<input type="text" id="aeName" oninput="recalc()"></label>
+      <label class="field">Client Diagnostic Lead<input type="text" id="clientLead" oninput="recalc()"></label>
+      <label class="field">Clinician / Facilitator<input type="text" id="clinician" oninput="recalc()"></label>
+      <label class="field">Session Mode
+        <select id="sessionMode" onchange="recalc()">
+          <option value="Slot #1 — Validation Mode">Slot #1 — Validation Mode</option>
+          <option value="5-Deal Forensic Diagnostic">5-Deal Forensic Diagnostic</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. Verified 5-Artifact Primary-Source Register (Kestrel Industrial Holdings)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:17%;">Required Artifact</th>
+          <th style="width:11%;">Status</th>
+          <th style="width:20%;">Exact File Name / Doc ID</th>
+          <th style="width:12%;">Source System</th>
+          <th style="width:11%;">Last Modified</th>
+          <th style="width:8%;">Native?</th>
+          <th style="width:21%;">Initial Red Flag Spotted (Fact Only)</th>
+        </tr>
+      </thead>
+      <tbody id="artifactBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>3. AE-Story Quarantine Compliance (Kestrel)</h2>
+    <label class="check-row"><input type="checkbox" id="qPullFirst" onchange="recalc()"> All 5 raw files were opened BEFORE accepting Jordan Reyes's verbal framing.</label>
+    <label class="check-row"><input type="checkbox" id="qNoSummary" onchange="recalc()"> AE forecast slide and CRM v2 PDF attachment were rejected; native v4 quote &amp; raw thread pulled.</label>
+    <label class="check-row"><input type="checkbox" id="qLoggedClaims" onchange="recalc()"> All 4 verbal AE claims are quarantined below for formal forensic testing in Step 4.</label>
+
+    <h3 style="font-size:14px; margin:14px 0 8px;">Quarantined Verbal Claims Log</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:7%;">#</th>
+          <th style="width:45%;">Verbal Claim (AE Jordan Reyes)</th>
+          <th style="width:24%;">Artifact Required to Test Claim</th>
+          <th style="width:24%;">Intake Observation</th>
+        </tr>
+      </thead>
+      <tbody id="claimsBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>4. Step 1 Clinician Sign-Off &amp; Export</h2>
+    <label class="field">Gate Notes &amp; Handoff to Step 2
+      <textarea id="gateNotes"></textarea>
+    </label>
+    <div class="toolbar no-print">
+      <button class="primary" onclick="exportJSON()">Save JSON Snapshot</button>
+      <button onclick="exportCSV()">Export CSV Register</button>
+      <button onclick="window.print()">Print / Save PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KESTREL_STATE = {
+  header: {
+    accountName: "Kestrel Industrial Holdings, Inc.",
+    oppId: "OPP-2026-4819",
+    diagDate: "2026-11-25",
+    dealValue: "$240,000 (3-Year Enterprise Ramp)",
+    aeName: "Jordan Reyes (Enterprise AE)",
+    clientLead: "VP Revenue Operations (Client Sponsor)",
+    clinician: "Runbook A Lead Clinician",
+    sessionMode: "Slot #1 — Validation Mode"
+  },
+  artifacts: [
+    {
+      key: "a",
+      label: "(a) CRM Opportunity Record",
+      status: "Received",
+      file: "step1_sample_kestrel_a_crm_opportunity.csv",
+      source: "Salesforce Native CSV",
+      modified: "2026-11-20",
+      native: true,
+      flag: "CRM logs 20% discount, Net-30, no opt-out, and old v2 quote PDF; Economic Buyer listed as VP Ops Derek Halvorsen."
+    },
+    {
+      key: "b",
+      label: "(b) Quote / Pricing Spreadsheet",
+      status: "Received",
+      file: "step1_sample_kestrel_b_pricing_spreadsheet.xlsx",
+      source: "Offline Excel (QT-2026-4819-v4)",
+      modified: "2026-11-03",
+      native: true,
+      flag: "True 28% sub discount, Impl list cell overwritten $30K->$24K, Gross Margin = 70.8% (below 75% floor by $10K), Net-60."
+    },
+    {
+      key: "c",
+      label: "(c) Latest Redlined Contract / Order Form",
+      status: "Received",
+      file: "step1_sample_kestrel_c_redlined_contract.md",
+      source: "OF-2026-4819-v3-KESTREL-REDLINE",
+      modified: "2026-11-06",
+      native: true,
+      flag: "Returned Nov 6 (19 days ago). Inserts Month-12 penalty-free opt-out, Net-60 post-acceptance, 3x liability cap; signatory is CFO Gregory Cho."
+    },
+    {
+      key: "d",
+      label: "(d) Approval / Slack / Email Thread",
+      status: "Received",
+      file: "step1_sample_kestrel_d_approval_thread.md",
+      source: "Slack #deal-desk-approvals + Email",
+      modified: "2026-11-25",
+      native: true,
+      flag: "Deal Desk put HARD HOLD Nov 9 (16 days unaddressed by AE). Verbal VP nod only; zero Finance margin sign-off. Buyer CFO has NOT approved budget."
+    },
+    {
+      key: "e",
+      label: "(e) Standard Price Book / Discount Policy",
+      status: "Received",
+      file: "step1_sample_kestrel_e_price_book_policy.md",
+      source: "Commercial Policy v2026.3",
+      modified: "2026-01-01",
+      native: true,
+      flag: "PB-3.0 (>25% = Tier 4 CFO/Controller), PB-4.1 (75% GM floor), PB-4.3 (verbal approval invalid), PB-5.3 (opt-out prohibited on discounted ramps)."
+    }
+  ],
+  quarantine: { qPullFirst: true, qNoSummary: true, qLoggedClaims: true },
+  claims: [
+    {
+      text: "Kestrel's legal team is just slow turning minor redlines over the holiday month.",
+      target: "(c) Redlined Contract + (d) Approval Thread",
+      status: "Contradicted at Intake"
+    },
+    {
+      text: "VP Sales Marcus Vance already approved the $240K deal structure.",
+      target: "(d) Approval Thread + (e) Price Book Policy PB-4.3",
+      status: "Contradicted at Intake"
+    },
+    {
+      text: "Derek Halvorsen (VP Ops) is the Economic Buyer and ready to sign this Friday.",
+      target: "(a) CRM + (c) Signature Block + (d) GC Email Nov 6",
+      status: "Contradicted at Intake"
+    },
+    {
+      text: "Pricing is clean and under our standard approval threshold.",
+      target: "(a) CRM vs (b) Quote v4 vs (e) Policy PB-3.0/PB-4.1",
+      status: "Contradicted at Intake"
+    }
+  ],
+  gateNotes: "GREEN GATE PASSED in 9 minutes. All 5 primary-source files pulled intact with exact timestamps. Immediate visual discrepancies logged across CRM vs Quote v4 vs Redline vs Policy. Four AE verbal claims quarantined for formal disconfirming-evidence testing in Step 4. Proceeding to Step 2 (Focused History)."
+};
+
+function esc(str) {
+  return String(str || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function render(st) {
+  Object.entries(st.header).forEach(([k, v]) => {
+    const el = document.getElementById(k);
+    if (el) el.value = v;
+  });
+  const ab = document.getElementById("artifactBody");
+  ab.innerHTML = "";
+  st.artifacts.forEach((a, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><strong>${esc(a.label)}</strong><br><span class="badge">VERIFIED</span></td>
+      <td><select id="art_status_${i}" onchange="recalc()">
+        <option ${a.status==="Missing"?"selected":""}>Missing</option>
+        <option ${a.status==="Partial"?"selected":""}>Partial</option>
+        <option ${a.status==="Received"?"selected":""}>Received</option>
+      </select></td>
+      <td><input type="text" id="art_file_${i}" value="${esc(a.file)}" oninput="recalc()"></td>
+      <td><input type="text" id="art_source_${i}" value="${esc(a.source)}" oninput="recalc()"></td>
+      <td><input type="text" id="art_mod_${i}" value="${esc(a.modified)}" oninput="recalc()"></td>
+      <td style="text-align:center;"><input type="checkbox" id="art_native_${i}" ${a.native?"checked":""} onchange="recalc()"></td>
+      <td><textarea id="art_flag_${i}" oninput="recalc()">${esc(a.flag)}</textarea></td>
+    `;
+    ab.appendChild(tr);
+  });
+  document.getElementById("qPullFirst").checked = st.quarantine.qPullFirst;
+  document.getElementById("qNoSummary").checked = st.quarantine.qNoSummary;
+  document.getElementById("qLoggedClaims").checked = st.quarantine.qLoggedClaims;
+
+  const cb = document.getElementById("claimsBody");
+  cb.innerHTML = "";
+  st.claims.forEach((c, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><strong>C-${i+1}</strong></td>
+      <td>${esc(c.text)}</td>
+      <td>${esc(c.target)}</td>
+      <td><strong>${esc(c.status)}</strong></td>
+    `;
+    cb.appendChild(tr);
+  });
+  document.getElementById("gateNotes").value = st.gateNotes;
+  recalc();
+}
+
+function recalc() {
+  let rec = 0, ver = 0;
+  for (let i = 0; i < 5; i++) {
+    const st = document.getElementById(`art_status_${i}`).value;
+    const nat = document.getElementById(`art_native_${i}`).checked;
+    const fn = document.getElementById(`art_file_${i}`).value.trim();
+    if (st === "Received") rec++;
+    if (st === "Received" && nat && fn !== "") ver++;
+  }
+  const qDone = document.getElementById("qPullFirst").checked &&
+                document.getElementById("qNoSummary").checked &&
+                document.getElementById("qLoggedClaims").checked;
+  document.getElementById("mReceived").textContent = `Received: ${rec} / 5`;
+  document.getElementById("mVerified").textContent = `Primary-Source Verified: ${ver} / 5`;
+  document.getElementById("mQuarantine").textContent = `AE Quarantine: ${qDone ? "Complete" : "Incomplete"}`;
+  const b = document.getElementById("gateBanner");
+  const t = document.getElementById("gateText");
+  if (rec === 5 && ver === 5 && qDone) {
+    b.className = "gate-banner gate-green";
+    t.textContent = "GREEN — GATE PASSED: All 5 raw primary-source artifacts verified. Proceed to Step 2 (Focused History).";
+  } else {
+    b.className = "gate-banner gate-amber";
+    t.textContent = "YELLOW — CHECK REQUIRED: One or more verification flags unchecked.";
+  }
+}
+
+function downloadFile(name, text, mime) {
+  const blob = new Blob([text], { type: mime });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function exportJSON() {
+  downloadFile("kestrel_step1_primary_source_gate.json", JSON.stringify(KESTREL_STATE, null, 2), "application/json");
+}
+
+function exportCSV() {
+  const rows = [["Artifact","Status","File_Name","Source_System","Last_Modified","Native","Initial_Red_Flag"]];
+  KESTREL_STATE.artifacts.forEach(a => rows.push([a.label, a.status, a.file, a.source, a.modified, a.native ? "YES" : "NO", a.flag]));
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+  downloadFile("kestrel_step1_artifact_register.csv", csv, "text/csv");
+}
+
+render(KESTREL_STATE);
+</script>
+</body>
+</html>
